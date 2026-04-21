@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Velmora Chroné — My Profile</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: "Jost", sans-serif; background-color: #0e1f18; color: #f5f2eb; overflow-x: hidden; min-height: 100vh; }
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-track { background: #0e1f18; }
+    ::-webkit-scrollbar-thumb { background: #c9a96e; }
+    .nav-root { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(6,15,11,0.97); backdrop-filter: blur(14px); border-bottom: 1px solid rgba(201,169,110,0.1); }
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 1.1rem 3rem; }
+    @media(max-width:767px){ .nav-inner { padding: 1rem 1.25rem; } }
+    .nav-link { font-family: "Jost", sans-serif; font-size: 0.6rem; font-weight: 400; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(245,242,235,0.65); text-decoration: none; transition: color 0.2s; }
+    .nav-link:hover, .nav-link.active { color: #c9a96e; }
+    .hamburger { display: flex; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; background: none; border: none; }
+    .hamburger span { display: block; width: 22px; height: 1px; background: rgba(245,242,235,0.7); transition: transform 0.3s, opacity 0.3s; }
+    .hamburger.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+    .mobile-menu { display: none; flex-direction: column; background: rgba(6,15,11,0.98); padding: 1.5rem; gap: 1.2rem; border-top: 1px solid rgba(201,169,110,0.15); }
+    .mobile-menu.open { display: flex; }
+    .cart-badge { position: absolute; top: -5px; right: -6px; width: 14px; height: 14px; border-radius: 50%; background: #c9a96e; font-size: 0.45rem; font-weight: 500; color: #0e1f18; display: flex; align-items: center; justify-content: center; }
+    .section-label { font-family: "Jost", sans-serif; font-size: 0.55rem; font-weight: 500; letter-spacing: 0.3em; text-transform: uppercase; color: #c9a96e; }
+    .rule { height: 1px; background: linear-gradient(90deg, transparent, rgba(201,169,110,0.35), transparent); }
+    .sidebar-tab { display: flex; align-items: center; gap: 10px; padding: 0.7rem 1rem; font-family: "Jost", sans-serif; font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(245,242,235,0.45); cursor: pointer; border-left: 2px solid transparent; transition: all 0.2s; background: none; border-top: none; border-right: none; border-bottom: none; width: 100%; text-align: left; }
+    .sidebar-tab:hover { color: rgba(245,242,235,0.8); border-left-color: rgba(201,169,110,0.4); }
+    .sidebar-tab.active { color: #c9a96e; border-left-color: #c9a96e; background: rgba(201,169,110,0.04); }
+    .panel { display: none; }
+    .panel.active { display: block; }
+    .vc-input { width: 100%; background: rgba(245,242,235,0.04); border: 1px solid rgba(245,242,235,0.12); padding: 0.7rem 1rem; font-family: "Jost", sans-serif; font-size: 0.82rem; font-weight: 300; color: #f5f2eb; outline: none; transition: border-color 0.2s; }
+    .vc-input::placeholder { color: rgba(245,242,235,0.25); }
+    .vc-input:focus { border-color: rgba(201,169,110,0.5); }
+    .vc-input:disabled { opacity: 0.4; cursor: not-allowed; background: rgba(245,242,235,0.02); }
+    label.vc-label { display: block; font-family: "Jost", sans-serif; font-size: 0.52rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(245,242,235,0.4); margin-bottom: 6px; }
+    .btn-gold { display: inline-flex; align-items: center; gap: 6px; font-family: "Jost", sans-serif; font-size: 0.6rem; font-weight: 400; letter-spacing: 0.25em; text-transform: uppercase; color: #0e1f18; background: #c9a96e; padding: 0.75rem 1.6rem; border: 1px solid #c9a96e; cursor: pointer; transition: background 0.25s, color 0.25s; }
+    .btn-gold:hover { background: transparent; color: #c9a96e; }
+    .btn-gold:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-outline { display: inline-flex; align-items: center; gap: 6px; font-family: "Jost", sans-serif; font-size: 0.6rem; font-weight: 400; letter-spacing: 0.25em; text-transform: uppercase; color: #f5f2eb; background: transparent; padding: 0.75rem 1.6rem; border: 1px solid rgba(245,242,235,0.25); cursor: pointer; transition: border-color 0.25s, color 0.25s; }
+    .btn-outline:hover { border-color: #c9a96e; color: #c9a96e; }
+    .btn-outline:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-danger { display: inline-flex; align-items: center; gap: 6px; font-family: "Jost", sans-serif; font-size: 0.58rem; font-weight: 400; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(245,100,80,0.75); background: transparent; padding: 0.6rem 1rem; border: 1px solid rgba(245,100,80,0.25); cursor: pointer; transition: border-color 0.25s, color 0.25s; }
+    .btn-danger:hover { border-color: rgba(245,100,80,0.6); color: rgba(245,100,80,1); }
+    .btn-sm { font-size: 0.52rem !important; padding: 0.55rem 1rem !important; }
+    .toast { position: fixed; bottom: 2rem; right: 1.5rem; background: #0a1410; border: 1px solid rgba(201,169,110,0.3); padding: 0.85rem 1.25rem; font-family: "Jost", sans-serif; font-size: 0.72rem; color: #f5f2eb; z-index: 9999; transform: translateY(20px); opacity: 0; transition: all 0.35s cubic-bezier(0.25,0.46,0.45,0.94); display: flex; align-items: center; gap: 10px; min-width: 240px; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .toast-dot.success { background: #0d9488; }
+    .toast-dot.error { background: #ef4444; }
+    .toast-dot.info { background: #c9a96e; }
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(6,10,8,0.85); backdrop-filter: blur(6px); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 1rem; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+    .modal-backdrop.open { opacity: 1; pointer-events: all; }
+    .modal-box { background: #0a1a14; border: 1px solid rgba(201,169,110,0.18); padding: 2rem; width: 100%; max-width: 440px; transform: translateY(16px); transition: transform 0.3s; overflow-y: auto; max-height: 90vh; }
+    .modal-backdrop.open .modal-box { transform: translateY(0); }
+    .addr-card { border: 1px solid rgba(245,242,235,0.08); padding: 1.25rem; position: relative; transition: border-color 0.2s; background: rgba(245,242,235,0.02); }
+    .addr-card:hover { border-color: rgba(201,169,110,0.25); }
+    .addr-card.default-addr { border-color: rgba(201,169,110,0.35); }
+    .otp-row { display: flex; gap: 8px; }
+    .otp-cell { width: 44px; height: 52px; text-align: center; background: rgba(245,242,235,0.04); border: 1px solid rgba(245,242,235,0.15); font-family: "Cormorant Garamond", serif; font-size: 1.5rem; font-weight: 300; color: #c9a96e; outline: none; transition: border-color 0.2s; }
+    .otp-cell:focus { border-color: #c9a96e; }
+    .avatar-wrap { position: relative; width: 96px; height: 96px; cursor: pointer; flex-shrink: 0; }
+    .avatar-img { width: 96px; height: 96px; object-fit: cover; border: 1px solid rgba(201,169,110,0.25); display: block; }
+    .avatar-overlay { position: absolute; inset: 0; background: rgba(10,20,16,0.65); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; }
+    .avatar-wrap:hover .avatar-overlay { opacity: 1; }
+    .pw-bar-wrap { display: flex; gap: 3px; margin-top: 6px; }
+    .pw-bar { flex: 1; height: 2px; background: rgba(245,242,235,0.1); transition: background 0.3s; }
+    .pw-bar.weak { background: #ef4444; }
+    .pw-bar.medium { background: #f59e0b; }
+    .pw-bar.strong { background: #0d9488; }
+    .stat-pill { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 0.9rem 1.4rem; border: 1px solid rgba(201,169,110,0.12); background: rgba(201,169,110,0.03); }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-in { animation: fadeIn 0.4s ease both; }
+    .flash-error { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25); padding: 0.75rem 1rem; font-size: 0.75rem; color: rgba(239,68,68,0.9); margin-bottom: 1rem; }
+    .flash-success { background: rgba(13,148,136,0.08); border: 1px solid rgba(13,148,136,0.25); padding: 0.75rem 1rem; font-size: 0.75rem; color: rgba(13,148,136,0.9); margin-bottom: 1rem; }
+    @media(max-width:767px) {
+      .profile-layout { flex-direction: column !important; }
+      .profile-sidebar { width: 100% !important; border-right: none !important; border-bottom: 1px solid rgba(201,169,110,0.1) !important; padding-top: 0 !important; }
+      .sidebar-inner { display: flex; overflow-x: auto; gap: 0; }
+      .sidebar-tab { border-left: none !important; border-bottom: 2px solid transparent !important; white-space: nowrap; }
+      .sidebar-tab.active { border-bottom-color: #c9a96e !important; }
+      .profile-main { padding: 1.5rem 0 0 0 !important; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="nav-root">
+  <div class="nav-inner">
+    <div class="hidden md:flex items-center gap-8">
+      <a href="/home" class="nav-link">Collection</a>
+      <a href="/home" class="nav-link">Manufacture</a>
+      <a href="/home" class="nav-link">Heritage</a>
+    </div>
+    <a href="/home" class="md:absolute md:left-1/2 md:-translate-x-1/2">
+      <span style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:300;letter-spacing:0.18em;color:#f5f2eb;">Velmora Chroné</span>
+    </a>
+    <div class="flex items-center gap-4 md:gap-5 ml-auto md:ml-0">
+      <a href="/profile" class="nav-link active" aria-label="Profile">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </a>
+      <a href="/cart" class="nav-link relative" aria-label="Cart">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <span class="cart-badge">0</span>
+      </a>
+      <a href="/logout" class="nav-link"><span class="hidden md:inline">Logout</span></a>
+      <button class="hamburger md:hidden" id="hamburger"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="/home" class="nav-link">Collection</a>
+    <a href="/home" class="nav-link">Manufacture</a>
+    <a href="/profile" class="nav-link active">My Profile</a>
+    <a href="/cart" class="nav-link">Cart</a>
+    <a href="/logout" class="nav-link" style="color:rgba(201,169,110,0.7);">Logout</a>
+  </div>
+</nav>
+
+<div style="padding-top:80px;background:linear-gradient(180deg,#060f0b 0%,#0e1f18 100%);border-bottom:1px solid rgba(201,169,110,0.08);">
+  <div style="max-width:1200px;margin:0 auto;padding:2.5rem 1.5rem 2rem;">
+    <p class="section-label" style="margin-bottom:8px;">Account</p>
+    <h1 style="font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:300;font-size:clamp(2rem,5vw,3rem);color:#f5f2eb;line-height:1.1;">My Profile</h1>
+  </div>
+</div>
+
+<div style="max-width:1200px;margin:0 auto;padding:0 1.5rem 4rem;">
+  <div class="profile-layout" style="display:flex;gap:0;min-height:70vh;">
+
+    <aside class="profile-sidebar" style="width:220px;flex-shrink:0;border-right:1px solid rgba(201,169,110,0.1);padding-top:2rem;">
+      <div class="sidebar-inner" style="flex-direction:column;gap:2px;display:flex;">
+        <button class="sidebar-tab active" onclick="switchTab('details')" id="tab-details">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Profile Details
+        </button>
+        <button class="sidebar-tab" onclick="switchTab('edit')" id="tab-edit">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          Edit Profile
+        </button>
+        <button class="sidebar-tab" onclick="switchTab('email')" id="tab-email">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          Change Email
+        </button>
+        <% if (user.password) { %>
+        <button class="sidebar-tab" onclick="switchTab('password')" id="tab-password">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Change Password
+        </button>
+        <% } %>
+        <button class="sidebar-tab" onclick="switchTab('addresses')" id="tab-addresses">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Addresses
+        </button>
+      </div>
+      <div style="padding:1.5rem 1rem 0;">
+        <div class="rule" style="margin-bottom:1rem;"></div>
+        <a href="/logout" style="font-family:'Jost',sans-serif;font-size:0.52rem;letter-spacing:0.18em;text-transform:uppercase;color:rgba(201,169,110,0.45);text-decoration:none;display:flex;align-items:center;gap:8px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Logout
+        </a>
+      </div>
+    </aside>
+
+    <main class="profile-main" style="flex:1;padding:2rem 0 0 2rem;min-width:0;">
+
+      <!-- DETAILS PANEL -->
+      <div class="panel active fade-in" id="panel-details">
+        <p class="section-label" style="margin-bottom:1.5rem;">Profile Overview</p>
+        <div style="display:flex;align-items:flex-start;gap:1.5rem;flex-wrap:wrap;margin-bottom:2.5rem;">
+          <div>
+            <div class="avatar-wrap" onclick="document.getElementById('avatarInput').click()">
+              <img id="avatarPreview"
+                src="<%= user.profileImage && user.profileImage !== '/images/default-avatar.png' ? user.profileImage : 'https://res.cloudinary.com/dwb0hd0m6/image/upload/v1774530220/velmora_chrone_logo_bgyhmw.svg' %>"
+                onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 96 96%22%3E%3Crect fill=%22%231a2820%22 width=%2296%22 height=%2296%22/%3E%3Ccircle cx=%2248%22 cy=%2238%22 r=%2216%22 fill=%22rgba(201,169,110,0.2)%22/%3E%3Cpath d=%22M20 80a28 28 0 0 1 56 0%22 fill=%22rgba(201,169,110,0.2)%22/%3E%3C/svg%3E'"
+                alt="Profile" class="avatar-img"/>
+              <div class="avatar-overlay">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c9a96e" stroke-width="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              </div>
+            </div>
+            <input type="file" id="avatarInput" accept="image/*" style="display:none;" onchange="uploadAvatar(event)"/>
+            <p style="font-size:0.48rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(245,242,235,0.25);margin-top:6px;text-align:center;" id="avatarStatus">Click to change</p>
+          </div>
+          <div style="flex:1;min-width:160px;">
+            <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:300;color:#f5f2eb;margin-bottom:4px;"><%= user.name %></h2>
+            <p style="font-size:0.7rem;color:rgba(245,242,235,0.4);font-weight:300;margin-bottom:12px;" id="displayEmail"><%= user.email %></p>
+            <% if (user.googleId && !user.password) { %>
+            <span style="font-size:0.52rem;letter-spacing:0.15em;text-transform:uppercase;color:#0d9488;border:1px solid rgba(13,148,136,0.3);padding:3px 10px;margin-bottom:12px;display:inline-block;">Google Account</span>
+            <% } %>
+            <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:8px;">
+              <div class="stat-pill">
+                <span style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:300;color:#c9a96e;"><%= user.addresses ? user.addresses.length : 0 %></span>
+                <span style="font-size:0.48rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(245,242,235,0.3);">Addresses</span>
+              </div>
+              <div class="stat-pill">
+                <span style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:300;color:#c9a96e;"><%= user.emailVerified ? '✓' : '—' %></span>
+                <span style="font-size:0.48rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(245,242,235,0.3);">Verified</span>
+              </div>
+              <div class="stat-pill">
+                <span style="font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:300;color:#c9a96e;"><%= new Date(user.createdAt).getFullYear() %></span>
+                <span style="font-size:0.48rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(245,242,235,0.3);">Member Since</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="rule" style="margin-bottom:2rem;"></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1.5rem 2rem;">
+          <div><p class="section-label" style="font-size:0.48rem;margin-bottom:4px;">Full Name</p><p style="font-size:0.88rem;font-weight:300;"><%= user.name %></p></div>
+          <div><p class="section-label" style="font-size:0.48rem;margin-bottom:4px;">Email Address</p><p style="font-size:0.88rem;font-weight:300;"><%= user.email %></p></div>
+          <div><p class="section-label" style="font-size:0.48rem;margin-bottom:4px;">Account Type</p><p style="font-size:0.88rem;font-weight:300;"><%= user.googleId ? 'Google OAuth' : 'Email & Password' %></p></div>
+          <div><p class="section-label" style="font-size:0.48rem;margin-bottom:4px;">Member Since</p><p style="font-size:0.88rem;font-weight:300;"><%= new Date(user.createdAt).toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' }) %></p></div>
+          <div><p class="section-label" style="font-size:0.48rem;margin-bottom:4px;">Last Login</p><p style="font-size:0.88rem;font-weight:300;"><%= user.lastLogin ? new Date(user.lastLogin).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) : '—' %></p></div>
+          <div><p class="section-label" style="font-size:0.48rem;margin-bottom:4px;">Role</p><p style="font-size:0.88rem;font-weight:300;text-transform:capitalize;"><%= user.role %></p></div>
+        </div>
+        <div style="margin-top:2rem;"><button class="btn-gold btn-sm" onclick="switchTab('edit')">Edit Profile</button></div>
+      </div>
+
+      <!-- EDIT PROFILE PANEL -->
+      <div class="panel fade-in" id="panel-edit">
+        <p class="section-label" style="margin-bottom:1.5rem;">Edit Profile</p>
+        <% if (locals.editError) { %><div class="flash-error"><%= editError %></div><% } %>
+        <% if (locals.editSuccess) { %><div class="flash-success"><%= editSuccess %></div><% } %>
+        <form action="/profile/update" method="POST" style="max-width:480px;">
+          <div style="display:grid;gap:1.25rem;">
+            <div>
+              <label class="vc-label" for="edit-name">Full Name</label>
+              <input class="vc-input" id="edit-name" name="name" value="<%= user.name %>" placeholder="Your full name" required/>
+            </div>
+            <div>
+              <label class="vc-label">Email Address</label>
+              <input class="vc-input" value="<%= user.email %>" disabled/>
+              <p style="font-size:0.5rem;color:rgba(245,242,235,0.25);margin-top:4px;letter-spacing:0.1em;">To change email, use the Change Email tab.</p>
+            </div>
+          </div>
+          <div style="margin-top:1.75rem;display:flex;gap:0.75rem;flex-wrap:wrap;">
+            <button type="submit" class="btn-gold">Save Changes</button>
+            <button type="button" class="btn-outline" onclick="switchTab('details')">Cancel</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- CHANGE EMAIL PANEL -->
+      <div class="panel fade-in" id="panel-email">
+        <p class="section-label" style="margin-bottom:1.5rem;">Change Email Address</p>
+        <div id="email-step1" style="max-width:400px;">
+          <p style="font-size:0.78rem;font-weight:300;color:rgba(245,242,235,0.5);line-height:1.7;margin-bottom:1.5rem;">Enter your new email address. We'll send a 6-digit verification code to confirm the change.</p>
+          <div style="margin-bottom:1.25rem;">
+            <label class="vc-label">Current Email</label>
+            <input class="vc-input" value="<%= user.email %>" disabled/>
+          </div>
+          <div style="margin-bottom:1.5rem;">
+            <label class="vc-label" for="new-email">New Email Address</label>
+            <input class="vc-input" id="new-email" type="email" placeholder="new@email.com"/>
+            <p id="emailInputError" style="display:none;font-size:0.62rem;color:#ef4444;margin-top:6px;"></p>
+          </div>
+          <button class="btn-gold" id="sendOtpBtn" onclick="sendEmailOTP()">Send Verification Code</button>
+        </div>
+        <div id="email-step2" style="display:none;max-width:400px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:1.5rem;">
+            <div style="width:32px;height:32px;border:1px solid rgba(13,148,136,0.4);display:flex;align-items:center;justify-content:center;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0d9488" stroke-width="1.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+            <div>
+              <p style="font-size:0.72rem;color:rgba(245,242,235,0.8);">Verification code sent</p>
+              <p style="font-size:0.62rem;color:rgba(245,242,235,0.35);" id="otp-sent-to">Check your new inbox</p>
+            </div>
+          </div>
+          <p style="font-size:0.72rem;color:rgba(245,242,235,0.45);margin-bottom:1.25rem;">Enter the 6-digit code:</p>
+          <div class="otp-row" style="margin-bottom:0.75rem;" id="otpCellsRow">
+            <input class="otp-cell" maxlength="1" oninput="otpNext(this,0)" onkeydown="otpBack(event,this,0)"/>
+            <input class="otp-cell" maxlength="1" oninput="otpNext(this,1)" onkeydown="otpBack(event,this,1)"/>
+            <input class="otp-cell" maxlength="1" oninput="otpNext(this,2)" onkeydown="otpBack(event,this,2)"/>
+            <input class="otp-cell" maxlength="1" oninput="otpNext(this,3)" onkeydown="otpBack(event,this,3)"/>
+            <input class="otp-cell" maxlength="1" oninput="otpNext(this,4)" onkeydown="otpBack(event,this,4)"/>
+            <input class="otp-cell" maxlength="1" oninput="otpNext(this,5)" onkeydown="otpBack(event,this,5)"/>
+          </div>
+          <p id="otpError" style="display:none;font-size:0.62rem;color:#ef4444;margin-bottom:1rem;"></p>
+          <div style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:1rem;">
+            <button class="btn-gold" id="verifyOtpBtn" onclick="verifyEmailOTP()">Verify &amp; Update Email</button>
+            <button class="btn-outline btn-sm" id="resendOtpBtn" onclick="resendEmailOTP()" disabled>Resend <span id="resendTimer"></span></button>
+          </div>
+          <button onclick="resetEmailForm()" style="margin-top:1rem;background:none;border:none;font-size:0.58rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(245,242,235,0.25);cursor:pointer;">← Use different email</button>
+        </div>
+      </div>
+
+      <!-- CHANGE PASSWORD PANEL -->
+      <% if (user.password) { %>
+      <div class="panel fade-in" id="panel-password">
+        <p class="section-label" style="margin-bottom:1.5rem;">Change Password</p>
+        <form action="/change-password" method="POST" style="max-width:400px;" id="pwForm">
+          <div style="margin-bottom:1.25rem;">
+            <label class="vc-label" for="pw-current">Current Password</label>
+            <div style="position:relative;">
+              <input class="vc-input" id="pw-current" name="oldPassword" type="password" placeholder="Enter current password" style="padding-right:2.5rem;" required/>
+              <button type="button" onclick="togglePw('pw-current')" style="position:absolute;right:0.75rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:rgba(245,242,235,0.35);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+            </div>
+          </div>
+          <div style="margin-bottom:1.25rem;">
+            <label class="vc-label" for="pw-new">New Password</label>
+            <div style="position:relative;">
+              <input class="vc-input" id="pw-new" name="newPassword" type="password" placeholder="Min. 8 characters" style="padding-right:2.5rem;" oninput="updateStrength(this.value)" required/>
+              <button type="button" onclick="togglePw('pw-new')" style="position:absolute;right:0.75rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:rgba(245,242,235,0.35);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+            </div>
+            <div class="pw-bar-wrap"><div class="pw-bar" id="bar1"></div><div class="pw-bar" id="bar2"></div><div class="pw-bar" id="bar3"></div></div>
+            <p style="font-size:0.52rem;color:rgba(245,242,235,0.25);margin-top:4px;" id="pwStrengthLabel"></p>
+          </div>
+          <div style="margin-bottom:1.75rem;">
+            <label class="vc-label" for="pw-confirm">Confirm New Password</label>
+            <input class="vc-input" id="pw-confirm" name="confirmPassword" type="password" placeholder="Re-enter new password" required/>
+          </div>
+          <button type="button" class="btn-gold" onclick="submitPassword()">Update Password</button>
+        </form>
+      </div>
+      <% } %>
+
+      <!-- ADDRESSES PANEL -->
+      <div class="panel fade-in" id="panel-addresses">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.75rem;flex-wrap:wrap;gap:1rem;">
+          <p class="section-label">Saved Addresses</p>
+          <button class="btn-gold btn-sm" onclick="openAddressModal()">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add Address
+          </button>
+        </div>
+        <script>
+          const dbAddresses = <%- JSON.stringify(user.addresses || []) %>;
+          let addresses = dbAddresses.map(a => ({ ...a, id: a._id ? a._id.toString() : String(Math.random()) }));
+        </script>
+        <div id="addressList" style="display:flex;flex-direction:column;gap:1rem;max-width:640px;"></div>
+        <p id="noAddresses" style="font-size:0.78rem;color:rgba(245,242,235,0.3);display:none;">No saved addresses. Add one above.</p>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ADDRESS MODAL -->
+<div class="modal-backdrop" id="addrModal">
+  <div class="modal-box">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
+      <p class="section-label" id="addrModalTitle">Add New Address</p>
+      <button onclick="closeAddressModal()" style="background:none;border:none;cursor:pointer;color:rgba(245,242,235,0.35);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div style="display:grid;gap:1rem;">
+      <div><label class="vc-label" for="addr-street">Street / House No.</label><input class="vc-input" id="addr-street" placeholder="House No., Street, Area"/></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+        <div><label class="vc-label" for="addr-city">City</label><input class="vc-input" id="addr-city" placeholder="City"/></div>
+        <div><label class="vc-label" for="addr-pincode">PIN Code</label><input class="vc-input" id="addr-pincode" placeholder="6-digit PIN" maxlength="6"/></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
+        <input type="checkbox" id="addr-default" style="accent-color:#c9a96e;width:13px;height:13px;"/>
+        <label for="addr-default" style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:rgba(245,242,235,0.4);cursor:pointer;">Set as default address</label>
+      </div>
+    </div>
+    <div style="margin-top:1.5rem;display:flex;gap:0.75rem;">
+      <button class="btn-gold" onclick="saveAddress()" id="saveAddrBtn">Save Address</button>
+      <button class="btn-outline" onclick="closeAddressModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE MODAL -->
+<div class="modal-backdrop" id="deleteModal">
+  <div class="modal-box" style="max-width:360px;text-align:center;">
+    <div style="width:44px;height:44px;border:1px solid rgba(245,100,80,0.25);display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(245,100,80,0.8)" stroke-width="1.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+    </div>
+    <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:300;margin-bottom:8px;">Remove Address?</h3>
+    <p style="font-size:0.72rem;font-weight:300;color:rgba(245,242,235,0.4);margin-bottom:1.5rem;line-height:1.6;">This address will be permanently deleted from your account.</p>
+    <div style="display:flex;gap:0.75rem;justify-content:center;">
+      <button class="btn-danger" onclick="confirmDelete()" style="padding:0.7rem 1.4rem;">Delete</button>
+      <button class="btn-outline btn-sm" onclick="closeDeleteModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <div class="toast-dot info" id="toastDot"></div>
+  <span id="toastMsg"></span>
+</div>
+
+<script>
+  // TAB SWITCHING
+  function switchTab(tab) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
+    const panel = document.getElementById('panel-' + tab);
+    const tabEl = document.getElementById('tab-' + tab);
+    if (panel) { panel.classList.add('active'); panel.classList.remove('fade-in'); void panel.offsetWidth; panel.classList.add('fade-in'); }
+    if (tabEl) tabEl.classList.add('active');
+    if (tab === 'addresses') renderAddresses();
+  }
+
+  // TOAST
+  function showToast(msg, type = 'info') {
+    const t = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    document.getElementById('toastDot').className = 'toast-dot ' + type;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3200);
+  }
+
+  // AVATAR UPLOAD
+  async function uploadAvatar(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => document.getElementById('avatarPreview').src = ev.target.result;
+    reader.readAsDataURL(file);
+    const statusEl = document.getElementById('avatarStatus');
+    statusEl.textContent = 'Uploading...';
+    const formData = new FormData();
+    formData.append('profileImage', file);
+    try {
+      const res  = await fetch('/profile/upload-image', { method: 'POST', body: formData });
+      const data = await res.json();
+      if (data.success) {
+        document.getElementById('avatarPreview').src = data.imageUrl;
+        statusEl.textContent = 'Click to change';
+        showToast('Profile photo updated!', 'success');
+      } else {
+        statusEl.textContent = 'Upload failed';
+        showToast(data.message || 'Upload failed', 'error');
+      }
+    } catch {
+      statusEl.textContent = 'Click to change';
+      showToast('Network error. Try again.', 'error');
+    }
+  }
+
+  // EMAIL CHANGE
+  let resendInterval = null;
+
+  async function sendEmailOTP() {
+    const email = document.getElementById('new-email').value.trim();
+    const errEl = document.getElementById('emailInputError');
+    const btn   = document.getElementById('sendOtpBtn');
+    errEl.style.display = 'none';
+    if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+      errEl.textContent = 'Please enter a valid email address.';
+      errEl.style.display = 'block';
+      return;
+    }
+    btn.disabled = true; btn.textContent = 'Sending...';
+    try {
+      const res  = await fetch('/profile/request-email-change', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ newEmail: email }) });
+      const data = await res.json();
+      if (data.success) {
+        document.getElementById('otp-sent-to').textContent = 'Sent to ' + email;
+        document.getElementById('email-step1').style.display = 'none';
+        document.getElementById('email-step2').style.display = 'block';
+        document.querySelectorAll('.otp-cell')[0].focus();
+        startResendTimer();
+        showToast('OTP sent! Check your inbox.', 'success');
+      } else {
+        errEl.textContent = data.message || 'Failed to send OTP.';
+        errEl.style.display = 'block';
+      }
+    } catch {
+      errEl.textContent = 'Network error. Please try again.';
+      errEl.style.display = 'block';
+    }
+    btn.disabled = false; btn.textContent = 'Send Verification Code';
+  }
+
+  async function verifyEmailOTP() {
+    const cells = document.querySelectorAll('.otp-cell');
+    const otp   = Array.from(cells).map(c => c.value).join('');
+    const errEl = document.getElementById('otpError');
+    const btn   = document.getElementById('verifyOtpBtn');
+    errEl.style.display = 'none';
+    if (otp.length < 6) {
+      errEl.textContent = 'Please enter the complete 6-digit code.';
+      errEl.style.display = 'block';
+      return;
+    }
+    btn.disabled = true; btn.textContent = 'Verifying...';
+    try {
+      const res  = await fetch('/profile/verify-email-change', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ otp }) });
+      const data = await res.json();
+      if (data.success) {
+        showToast('Email updated successfully!', 'success');
+        clearInterval(resendInterval);
+        const newEmail  = document.getElementById('new-email').value.trim();
+        const displayEl = document.getElementById('displayEmail');
+        if (displayEl) displayEl.textContent = newEmail;
+        resetEmailForm();
+      } else {
+        errEl.textContent = data.message || 'Invalid OTP. Try again.';
+        errEl.style.display = 'block';
+        cells.forEach(c => { c.style.borderColor = 'rgba(239,68,68,0.6)'; });
+        setTimeout(() => cells.forEach(c => { c.style.borderColor = ''; }), 1400);
+      }
+    } catch {
+      errEl.textContent = 'Network error. Please try again.';
+      errEl.style.display = 'block';
+    }
+    btn.disabled = false; btn.textContent = 'Verify & Update Email';
+  }
+
+  async function resendEmailOTP() {
+    const btn   = document.getElementById('resendOtpBtn');
+    const errEl = document.getElementById('otpError');
+    errEl.style.display = 'none'; btn.disabled = true;
+    try {
+      const email = document.getElementById('new-email').value.trim();
+      const res   = await fetch('/profile/request-email-change', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ newEmail: email }) });
+      const data  = await res.json();
+      if (data.success) {
+        document.querySelectorAll('.otp-cell').forEach(c => c.value = '');
+        document.querySelectorAll('.otp-cell')[0].focus();
+        startResendTimer();
+        showToast('New OTP sent! Check your inbox.', 'success');
+      } else {
+        errEl.textContent = data.message || 'Failed to resend OTP.';
+        errEl.style.display = 'block';
+        btn.disabled = false;
+      }
+    } catch {
+      errEl.textContent = 'Network error. Please try again.';
+      errEl.style.display = 'block';
+      btn.disabled = false;
+    }
+  }
+
+  // OTP CELL — type digit by digit, auto-move, auto-submit on last digit
+  function otpNext(input, idx) {
+    input.value = input.value.replace(/[^0-9]/g, '');
+    const cells = document.querySelectorAll('.otp-cell');
+    if (input.value.length === 1 && idx < 5) cells[idx + 1].focus();
+    // Auto-submit when last digit typed manually
+    if (idx === 5 && input.value.length === 1) {
+      const otp = Array.from(cells).map(c => c.value).join('');
+      if (otp.length === 6) verifyEmailOTP();
+    }
+  }
+
+  function otpBack(e, input, idx) {
+    if (e.key === 'Backspace' && !input.value && idx > 0)
+      document.querySelectorAll('.otp-cell')[idx - 1].focus();
+  }
+
+  // OTP PASTE — distribute across all cells + auto-submit if 6 digits
+  document.querySelectorAll('.otp-cell').forEach(cell => {
+    cell.addEventListener('paste', e => {
+      e.preventDefault();
+      const pasted = e.clipboardData.getData('text').replace(/[^0-9]/g, '').slice(0, 6);
+      if (!pasted) return;
+      const cells = document.querySelectorAll('.otp-cell');
+      pasted.split('').forEach((char, i) => { if (cells[i]) cells[i].value = char; });
+      cells[Math.min(pasted.length - 1, 5)].focus();
+      if (pasted.length === 6) verifyEmailOTP();
+    });
+  });
+
+  function startResendTimer() {
+    const btn = document.getElementById('resendOtpBtn');
+    const timerEl = document.getElementById('resendTimer');
+    btn.disabled = true; let secs = 30;
+    timerEl.textContent = '(' + secs + 's)';
+    clearInterval(resendInterval);
+    resendInterval = setInterval(() => {
+      secs--;
+      timerEl.textContent = '(' + secs + 's)';
+      if (secs <= 0) { clearInterval(resendInterval); btn.disabled = false; timerEl.textContent = ''; }
+    }, 1000);
+  }
+
+  function resetEmailForm() {
+    document.getElementById('email-step1').style.display = 'block';
+    document.getElementById('email-step2').style.display = 'none';
+    document.getElementById('new-email').value = '';
+    document.getElementById('emailInputError').style.display = 'none';
+    document.getElementById('otpError').style.display = 'none';
+    document.querySelectorAll('.otp-cell').forEach(c => c.value = '');
+    clearInterval(resendInterval);
+  }
+
+  // PASSWORD
+  function togglePw(id) { const el = document.getElementById(id); el.type = el.type === 'password' ? 'text' : 'password'; }
+  function updateStrength(val) {
+    let score = 0;
+    if (val.length >= 8) score++;
+    if (/[A-Z]/.test(val) && /[0-9]/.test(val)) score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+    const b1 = document.getElementById('bar1'), b2 = document.getElementById('bar2'), b3 = document.getElementById('bar3'), lb = document.getElementById('pwStrengthLabel');
+    if (!b1) return;
+    b1.className = b2.className = b3.className = 'pw-bar';
+    if (score === 1) { b1.classList.add('weak'); lb.textContent = 'Weak'; lb.style.color = '#ef4444'; }
+    else if (score === 2) { b1.classList.add('medium'); b2.classList.add('medium'); lb.textContent = 'Good'; lb.style.color = '#f59e0b'; }
+    else if (score === 3) { b1.classList.add('strong'); b2.classList.add('strong'); b3.classList.add('strong'); lb.textContent = 'Strong'; lb.style.color = '#0d9488'; }
+    else { lb.textContent = ''; }
+  }
+  function submitPassword() {
+    const nw = document.getElementById('pw-new').value, conf = document.getElementById('pw-confirm').value;
+    if (nw.length < 8) { showToast('Password must be at least 8 characters', 'error'); return; }
+    if (nw !== conf)   { showToast('Passwords do not match', 'error'); return; }
+    document.getElementById('pwForm').submit();
+  }
+
+  // ADDRESSES
+  let editingAddrId = null, deleteAddrId = null;
+
+  function renderAddresses() {
+    const list = document.getElementById('addressList'), empty = document.getElementById('noAddresses');
+    list.innerHTML = '';
+    if (!addresses.length) { empty.style.display = 'block'; return; }
+    empty.style.display = 'none';
+    addresses.forEach(addr => {
+      const card = document.createElement('div');
+      card.className = 'addr-card' + (addr.isDefault ? ' default-addr' : '');
+      card.innerHTML = `
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
+          <div style="flex:1;min-width:140px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+              ${addr.isDefault ? '<span style="font-size:0.48rem;letter-spacing:0.15em;text-transform:uppercase;color:#0d9488;border:1px solid rgba(13,148,136,0.3);padding:2px 8px;">Default</span>' : ''}
+            </div>
+            <p style="font-size:0.85rem;font-weight:300;line-height:1.7;color:rgba(245,242,235,0.7);">
+              ${addr.street || '—'}<br/>${addr.city || ''}${addr.pincode ? ' — ' + addr.pincode : ''}
+            </p>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;">
+            <button class="btn-outline btn-sm" onclick="editAddress('${addr.id}')">Edit</button>
+            ${!addr.isDefault ? `<button class="btn-sm" style="font-family:'Jost',sans-serif;font-size:0.52rem;letter-spacing:0.18em;text-transform:uppercase;color:rgba(245,242,235,0.35);background:none;border:1px solid rgba(245,242,235,0.1);padding:0.55rem 1rem;cursor:pointer;" onclick="setDefaultAddr('${addr.id}')">Set Default</button>` : ''}
+            <button class="btn-danger btn-sm" onclick="promptDelete('${addr.id}')">Delete</button>
+          </div>
+        </div>`;
+      list.appendChild(card);
+    });
+  }
+
+  function openAddressModal(id = null) {
+    editingAddrId = id;
+    document.getElementById('addr-street').value = '';
+    document.getElementById('addr-city').value   = '';
+    document.getElementById('addr-pincode').value = '';
+    document.getElementById('addr-default').checked = false;
+    document.getElementById('addrModalTitle').textContent = id ? 'Edit Address' : 'Add New Address';
+    document.getElementById('saveAddrBtn').textContent    = id ? 'Update Address' : 'Save Address';
+    if (id) {
+      const a = addresses.find(x => x.id === id);
+      if (a) {
+        document.getElementById('addr-street').value  = a.street  || '';
+        document.getElementById('addr-city').value    = a.city    || '';
+        document.getElementById('addr-pincode').value = a.pincode || '';
+        document.getElementById('addr-default').checked = !!a.isDefault;
+      }
+    }
+    document.getElementById('addrModal').classList.add('open');
+  }
+  function closeAddressModal() { document.getElementById('addrModal').classList.remove('open'); editingAddrId = null; }
+
+  function saveAddress() {
+    const street = document.getElementById('addr-street').value.trim();
+    const city   = document.getElementById('addr-city').value.trim();
+    const pincode = document.getElementById('addr-pincode').value.trim();
+    const isDefault = document.getElementById('addr-default').checked;
+    if (!street || !city || !pincode) { showToast('Please fill all address fields', 'error'); return; }
+    if (!/^\d{6}$/.test(pincode))     { showToast('PIN code must be 6 digits', 'error'); return; }
+    const payload = { street, city, pincode, isDefault };
+    if (editingAddrId) {
+      fetch(`/profile/address/${editingAddrId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+        .then(r => r.json()).then(data => {
+          if (data.success) { addresses = data.addresses.map(a => ({ ...a, id: a._id.toString() })); closeAddressModal(); renderAddresses(); showToast('Address updated', 'success'); }
+          else showToast(data.message || 'Update failed', 'error');
+        }).catch(() => showToast('Network error', 'error'));
+    } else {
+      fetch('/profile/address', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+        .then(r => r.json()).then(data => {
+          if (data.success) { addresses = data.addresses.map(a => ({ ...a, id: a._id.toString() })); closeAddressModal(); renderAddresses(); showToast('Address added', 'success'); }
+          else showToast(data.message || 'Could not add address', 'error');
+        }).catch(() => showToast('Network error', 'error'));
+    }
+  }
+
+  function setDefaultAddr(id) {
+    fetch(`/profile/address/${id}/default`, { method: 'PATCH' })
+      .then(r => r.json()).then(data => {
+        if (data.success) { addresses = data.addresses.map(a => ({ ...a, id: a._id.toString() })); renderAddresses(); showToast('Default address updated', 'success'); }
+      }).catch(() => showToast('Network error', 'error'));
+  }
+
+  function editAddress(id) { openAddressModal(id); }
+  function promptDelete(id) { deleteAddrId = id; document.getElementById('deleteModal').classList.add('open'); }
+  function closeDeleteModal() { document.getElementById('deleteModal').classList.remove('open'); deleteAddrId = null; }
+  function confirmDelete() {
+    if (!deleteAddrId) return;
+    fetch(`/profile/address/${deleteAddrId}`, { method: 'DELETE' })
+      .then(r => r.json()).then(data => {
+        if (data.success) { addresses = data.addresses.map(a => ({ ...a, id: a._id.toString() })); closeDeleteModal(); renderAddresses(); showToast('Address removed', 'info'); }
+        else showToast(data.message || 'Delete failed', 'error');
+      }).catch(() => showToast('Network error', 'error'));
+  }
+
+  // NAV
+  document.getElementById('hamburger').addEventListener('click', function() { this.classList.toggle('open'); document.getElementById('mobileMenu').classList.toggle('open'); });
+  document.getElementById('addrModal').addEventListener('click',  e => { if (e.target === document.getElementById('addrModal'))  closeAddressModal(); });
+  document.getElementById('deleteModal').addEventListener('click', e => { if (e.target === document.getElementById('deleteModal')) closeDeleteModal(); });
+
+  // INIT
+  renderAddresses();
+  const hash = window.location.hash.replace('#', '');
+  if (['details','edit','email','password','addresses'].includes(hash)) switchTab(hash);
+</script>
+</body>
+</html>

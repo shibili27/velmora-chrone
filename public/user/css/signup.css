@@ -1,0 +1,379 @@
+/* public/css/signup.css */
+
+body {
+  font-family: "Jost", sans-serif;
+  background-color: #1a1a18;
+}
+
+.input-vault {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid #555;
+  border-radius: 0;
+  outline: none;
+  color: #1a1a18;
+  font-family: "Jost", sans-serif;
+  font-weight: 300;
+  font-size: 0.875rem;
+  width: 100%;
+  padding: 0.35rem 0;
+  transition: border-color 0.3s;
+}
+
+.input-vault::placeholder {
+  color: #aaa;
+}
+
+.input-vault:focus {
+  border-bottom-color: #0d9488;
+}
+
+.input-vault.input-error {
+  border-bottom-color: #b91c1c;
+}
+
+.field-label {
+  font-family: "Jost", sans-serif;
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #555;
+  margin-bottom: 0.5rem;
+}
+
+.btn-vault {
+  background-color: #1a1a18;
+  color: #f5f2eb;
+  font-family: "Jost", sans-serif;
+  font-size: 0.65rem;
+  font-weight: 400;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  padding: 1rem 2rem;
+  width: 100%;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.btn-vault:hover {
+  background-color: #0d9488;
+  color: #fff;
+}
+
+.btn-vault:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.toggle-icon {
+  cursor: pointer;
+  color: #888;
+  transition: color 0.2s;
+}
+
+.toggle-icon:hover {
+  color: #0d9488;
+}
+
+.hero-overlay {
+  background: linear-gradient(
+    160deg,
+    rgba(10, 10, 10, 0.55) 0%,
+    rgba(10, 10, 10, 0.35) 60%,
+    rgba(10, 10, 10, 0.65) 100%
+  );
+}
+
+.footer-link {
+  transition: color 0.2s;
+}
+
+.footer-link:hover {
+  color: #0d9488;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-up {
+  animation: fadeUp 0.7s ease both;
+}
+
+.delay-1 {
+  animation-delay: 0.10s;
+}
+
+.delay-2 {
+  animation-delay: 0.22s;
+}
+
+.delay-3 {
+  animation-delay: 0.34s;
+}
+
+.delay-4 {
+  animation-delay: 0.46s;
+}
+
+.delay-5 {
+  animation-delay: 0.58s;
+}
+
+.delay-6 {
+  animation-delay: 0.70s;
+}
+
+/* VAULT SEAL */
+#vault-seal {
+  position: fixed;
+  bottom: -200px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  transition: bottom 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: none;
+}
+
+#vault-seal.seal-visible {
+  bottom: 2.5rem;
+  pointer-events: auto;
+}
+
+.seal-body {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: #0f0f0e;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  padding: 16px 22px 16px 20px;
+  min-width: 300px;
+  max-width: 400px;
+  box-shadow: 0 0 0 1px rgba(13, 148, 136, 0.2),
+    0 24px 64px rgba(0, 0, 0, 0.7), 0 0 40px rgba(13, 148, 136, 0.06);
+}
+
+.seal-body::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(180deg, transparent, #0d9488, transparent);
+}
+
+.seal-wax {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #2a0a0a, #1a0505);
+  border: 1px solid rgba(185, 28, 28, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.seal-wax svg {
+  width: 16px;
+  height: 16px;
+  color: #f87171;
+}
+
+.seal-bezel {
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  border: 1px dashed rgba(185, 28, 28, 0.25);
+  animation: bezelSpin 10s linear infinite;
+}
+
+@keyframes bezelSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.seal-bezel::before,
+.seal-bezel::after {
+  content: "";
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: rgba(185, 28, 28, 0.5);
+  border-radius: 50%;
+  top: 50%;
+  left: -1.5px;
+  margin-top: -1.5px;
+}
+
+.seal-bezel::after {
+  left: auto;
+  right: -1.5px;
+}
+
+.seal-label {
+  font-family: "Jost", sans-serif;
+  font-size: 0.52rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #f87171;
+  margin-bottom: 3px;
+}
+
+.seal-message {
+  font-family: "Cormorant Garamond", serif;
+  font-style: italic;
+  font-size: 1rem;
+  font-weight: 300;
+  color: #e2ddd7;
+  line-height: 1.3;
+}
+
+.seal-drain {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 1px;
+  width: 100%;
+  background: rgba(13, 148, 136, 0.5);
+  transform-origin: left;
+  transform: scaleX(1);
+  transition: none;
+}
+
+.seal-drain.draining {
+  transition: transform 4.2s linear;
+  transform: scaleX(0);
+}
+
+.seal-x {
+  position: absolute;
+  top: 9px;
+  right: 9px;
+  cursor: pointer;
+  opacity: 0.25;
+  transition: opacity 0.2s;
+  line-height: 0;
+}
+
+.seal-x:hover {
+  opacity: 0.7;
+}
+
+.seal-x svg {
+  width: 9px;
+  height: 9px;
+  color: #fff;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-6px);
+  }
+  40% {
+    transform: translateX(6px);
+  }
+  60% {
+    transform: translateX(-3px);
+  }
+  80% {
+    transform: translateX(3px);
+  }
+}
+
+.shake {
+  animation: shake 0.38s ease;
+}
+
+.field-hint {
+  font-family: "Jost", sans-serif;
+  font-size: 0.57rem;
+  letter-spacing: 0.08em;
+  color: #b91c1c;
+  margin-top: 5px;
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: opacity 0.3s, max-height 0.3s;
+}
+
+.field-hint.hint-show {
+  opacity: 1;
+  max-height: 30px;
+}
+
+.checkbox-vault {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.checkbox-vault input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 13px;
+  height: 13px;
+  border: 1px solid #555;
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-top: 1px;
+  transition: border-color 0.2s, background 0.2s;
+  position: relative;
+}
+
+.checkbox-vault input[type="checkbox"]:checked {
+  background: #0d9488;
+  border-color: #0d9488;
+}
+
+.checkbox-vault input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 0px;
+  width: 5px;
+  height: 8px;
+  border: 1.5px solid #fff;
+  border-top: none;
+  border-left: none;
+  transform: rotate(45deg);
+}
+
+.checkbox-vault input[type="checkbox"].input-error {
+  border-color: #b91c1c;
+}
+
+.strength-bar {
+  height: 2px;
+  width: 100%;
+  background: #e0ddd6;
+  margin-top: 6px;
+  position: relative;
+  overflow: hidden;
+}
+
+.strength-fill {
+  height: 100%;
+  width: 0%;
+  transition: width 0.4s, background 0.4s;
+}

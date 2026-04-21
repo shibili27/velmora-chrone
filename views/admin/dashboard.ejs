@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate"/>
+  <meta http-equiv="Pragma" content="no-cache"/>
+  <meta http-equiv="Expires" content="0"/>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Customers — Velmora Chroné Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --teal:       #2d8c84;
+      --teal-dark:  #1f6e67;
+      --teal-light: #e8f4f3;
+      --sidebar-w:  220px;
+      --bg:         #f2f4f3;
+      --white:      #ffffff;
+      --border:     #e2e6e4;
+      --text:       #1a1f1e;
+      --text-mid:   #5a6461;
+      --text-light: #9aa8a5;
+      --green:      #16a34a;
+      --green-bg:   #dcfce7;
+      --blue:       #2563eb;
+      --blue-bg:    #dbeafe;
+      --red:        #dc2626;
+      --red-bg:     #fee2e2;
+    }
+
+    html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--bg); color: var(--text); }
+    .layout { display: flex; min-height: 100vh; }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--white);
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      position: fixed; top: 0; left: 0; bottom: 0;
+      z-index: 100;
+    }
+    .sidebar__brand { padding: 24px 20px 18px; border-bottom: 1px solid var(--border); }
+    .sidebar__brand-name { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 600; letter-spacing: 0.06em; color: var(--text); line-height: 1.2; }
+    .sidebar__brand-sub  { font-size: 9px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-light); margin-top: 3px; }
+    .sidebar__nav { flex: 1; padding: 14px 0; overflow-y: auto; }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 20px; font-size: 13px; font-weight: 500;
+      color: var(--text-mid); text-decoration: none;
+      transition: background 0.15s, color 0.15s; cursor: pointer;
+    }
+    .nav-item:hover  { background: var(--teal-light); color: var(--teal); }
+    .nav-item.active { background: var(--teal-light); color: var(--teal); border-right: 3px solid var(--teal); }
+    .nav-item svg    { width: 16px; height: 16px; flex-shrink: 0; }
+    .sidebar__footer { padding: 16px 20px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+    .avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--teal); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 13px; font-weight: 600; flex-shrink: 0; }
+    .sidebar__footer-info { overflow: hidden; flex: 1; }
+    .sidebar__footer-name { font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sidebar__footer-role { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); }
+    .btn-logout { display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 6px; border: 1px solid #fecaca; background: var(--red-bg); color: var(--red); cursor: pointer; flex-shrink: 0; transition: background 0.15s, border-color 0.15s; text-decoration: none; }
+    .btn-logout:hover { background: var(--red); color: #fff; border-color: var(--red); }
+    .btn-logout svg { width: 14px; height: 14px; }
+
+    /* ── Main ── */
+    .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+
+    /* ── Topbar ── */
+    .topbar { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 32px; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+    .topbar__title { font-size: 13px; font-weight: 500; color: var(--text-mid); letter-spacing: 0.04em; }
+    .topbar__bell { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-mid); background: none; transition: background 0.15s; }
+    .topbar__bell:hover { background: var(--teal-light); color: var(--teal); }
+    .topbar__bell svg { width: 16px; height: 16px; }
+
+    /* ── Content ── */
+    .content { padding: 32px; flex: 1; }
+    .page-header { margin-bottom: 24px; }
+    .page-header h1 { font-size: 22px; font-weight: 600; color: var(--text); }
+    .page-header p  { font-size: 13px; color: var(--text-mid); margin-top: 4px; }
+
+    /* ── Search bar ── */
+    .search-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .search-wrap {
+      position: relative;
+      flex: 1;
+      max-width: 380px;
+    }
+    .search-wrap svg.search-icon {
+      position: absolute;
+      left: 12px; top: 50%;
+      transform: translateY(-50%);
+      width: 15px; height: 15px;
+      color: var(--text-light);
+      pointer-events: none;
+    }
+    .search-input {
+      width: 100%;
+      height: 38px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0 36px 0 36px;
+      font-family: 'Jost', sans-serif;
+      font-size: 13px;
+      color: var(--text);
+      background: var(--white);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-input:focus { border-color: var(--teal); }
+    .search-clear {
+      position: absolute;
+      right: 10px; top: 50%;
+      transform: translateY(-50%);
+      background: none; border: none;
+      cursor: pointer; color: var(--text-light);
+      display: none; align-items: center;
+      padding: 0;
+    }
+    .search-clear svg { width: 14px; height: 14px; }
+    .search-clear.visible { display: flex; }
+    .btn-search {
+      height: 38px;
+      padding: 0 18px;
+      background: var(--teal);
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-family: 'Jost', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-search:hover { background: var(--teal-dark); }
+    .search-count {
+      font-size: 12px;
+      color: var(--text-light);
+      margin-left: 4px;
+    }
+
+    /* ── Section card ── */
+    .section-card { background: var(--white); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+    .section-card__header { padding: 18px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .section-card__title  { font-size: 13px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text); }
+    .section-card__meta   { font-size: 11px; color: var(--text-light); }
+
+    /* ── Table ── */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { background: #f8faf9; }
+    th { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); padding: 12px 24px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+    td { padding: 14px 24px; font-size: 13px; color: var(--text); border-bottom: 1px solid var(--border); vertical-align: middle; }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: #fafcfb; }
+
+    /* Badges */
+    .badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
+    .badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+    .badge--active  { color: var(--green); background: var(--green-bg); }
+    .badge--blocked { color: var(--red);   background: var(--red-bg);   }
+
+    /* Customer cell */
+    .customer-cell   { display: flex; align-items: center; gap: 10px; }
+    .customer-avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--teal-light); color: var(--teal); font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .customer-name   { font-weight: 500; }
+
+    /* Action buttons */
+    .actions { display: flex; align-items: center; gap: 6px; }
+    .btn-action { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; padding: 5px 10px; border-radius: 3px; border: 1px solid transparent; cursor: pointer; text-decoration: none; transition: opacity 0.15s; white-space: nowrap; background: none; font-family: 'Jost', sans-serif; }
+    .btn-action:hover { opacity: 0.75; }
+    .btn-action svg { width: 12px; height: 12px; }
+    .btn-action--block   { background: var(--red-bg);   color: var(--red);   border-color: #fecaca; }
+    .btn-action--unblock { background: var(--green-bg); color: var(--green); border-color: #bbf7d0; }
+
+    /* Empty state */
+    .empty-state { padding: 48px 24px; text-align: center; color: var(--text-light); font-size: 13px; }
+    .empty-state svg { width: 36px; height: 36px; margin-bottom: 10px; color: var(--border); display: block; margin-inline: auto; }
+
+    /* ── Pagination ── */
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+    }
+    .pagination__info { font-size: 12px; color: var(--text-light); }
+    .pagination__pages { display: flex; align-items: center; gap: 4px; }
+    .page-btn {
+      min-width: 32px; height: 32px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: var(--white);
+      color: var(--text-mid);
+      font-family: 'Jost', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      text-decoration: none;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+      padding: 0 8px;
+    }
+    .page-btn:hover:not(.active):not(.disabled) { background: var(--teal-light); color: var(--teal); border-color: var(--teal); }
+    .page-btn.active   { background: var(--teal); color: #fff; border-color: var(--teal); }
+    .page-btn.disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
+    .page-btn svg { width: 13px; height: 13px; }
+
+    /* ── Confirmation Modal ── */
+    .modal-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--white);
+      border-radius: 8px;
+      padding: 32px 28px 24px;
+      width: 100%;
+      max-width: 380px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+      animation: modalIn 0.18s ease;
+    }
+    @keyframes modalIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .modal__icon {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 16px;
+    }
+    .modal__icon--block   { background: var(--red-bg); color: var(--red); }
+    .modal__icon--unblock { background: var(--green-bg); color: var(--green); }
+    .modal__icon svg { width: 22px; height: 22px; }
+    .modal__title { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+    .modal__body  { font-size: 13px; color: var(--text-mid); line-height: 1.6; margin-bottom: 24px; }
+    .modal__body strong { color: var(--text); font-weight: 600; }
+    .modal__actions { display: flex; gap: 10px; justify-content: flex-end; }
+    .btn-cancel  { height: 36px; padding: 0 16px; background: none; border: 1px solid var(--border); border-radius: 4px; font-family: 'Jost', sans-serif; font-size: 12px; font-weight: 600; color: var(--text-mid); cursor: pointer; transition: background 0.15s; }
+    .btn-cancel:hover { background: var(--bg); }
+    .btn-confirm { height: 36px; padding: 0 18px; border: none; border-radius: 4px; font-family: 'Jost', sans-serif; font-size: 12px; font-weight: 600; color: #fff; cursor: pointer; transition: opacity 0.15s; }
+    .btn-confirm--block   { background: var(--red); }
+    .btn-confirm--unblock { background: var(--green); }
+    .btn-confirm:hover { opacity: 0.85; }
+
+    /* Flash */
+    .flash { padding: 10px 16px; border-radius: 4px; font-size: 12.5px; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+    .flash--error   { background: #fdecea; color: #b00020; border: 1px solid #f5c6cb; }
+    .flash--success { background: #e8f5e9; color: #1b5e20; border: 1px solid #c8e6c9; }
+
+    /* Footer */
+    .page-footer { text-align: center; padding: 20px 32px; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); border-top: 1px solid var(--border); }
+  </style>
+</head>
+<body>
+
+<!-- ── Confirmation Modal ── -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal">
+    <div class="modal__icon" id="modalIcon">
+      <svg id="modalIconSvg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"></svg>
+    </div>
+    <div class="modal__title" id="modalTitle"></div>
+    <div class="modal__body"  id="modalBody"></div>
+    <div class="modal__actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-confirm" id="modalConfirmBtn" onclick="submitModal()">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- Hidden form that gets submitted on confirm -->
+<form id="actionForm" method="POST" style="display:none">
+  <input type="hidden" name="search" id="formSearch"/>
+  <input type="hidden" name="page"   id="formPage"/>
+</form>
+
+<div class="layout">
+
+  <!-- ── Sidebar ── */-->
+  <aside class="sidebar">
+    <div class="sidebar__brand">
+      <div class="sidebar__brand-name">Velmora<br>Chroné</div>
+      <div class="sidebar__brand-sub">Admin Dashboard</div>
+    </div>
+
+    <nav class="sidebar__nav">
+      <a href="/admin/dashboard" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Dashboard
+      </a>
+      <a href="/admin/orders" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+        Orders
+      </a>
+      <a href="/admin/products" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"/></svg>
+        Products
+      </a>
+      <a href="/admin/rating" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+        Rating/Review
+      </a>
+      <a href="/admin/dashboard" class="nav-item active">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        Customers
+      </a>
+      <a href="/admin/coupons" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+        Coupons
+      </a>
+      <a href="/admin/categories" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+        Categories
+      </a>
+      <a href="/admin/refunds" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
+        Refund/Return
+      </a>
+      <a href="/admin/banners" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+        Banner
+      </a>
+      <a href="/admin/referral" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+        Referral
+      </a>
+    </nav>
+
+    <div class="sidebar__footer">
+      <div class="avatar"><%= adminName ? adminName.charAt(0).toUpperCase() : 'A' %></div>
+      <div class="sidebar__footer-info">
+        <div class="sidebar__footer-name"><%= adminName || 'Admin' %></div>
+        <div class="sidebar__footer-role">Administrator</div>
+      </div>
+      <a href="/admin/logout" class="btn-logout" title="Logout">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+      </a>
+    </div>
+  </aside>
+
+  <!-- ── Main ── -->
+  <div class="main">
+
+    <header class="topbar">
+      <span class="topbar__title">Operational Administrator Hub</span>
+      <button class="topbar__bell" aria-label="Notifications">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+      </button>
+    </header>
+
+    <div class="content">
+
+      <!-- Flash -->
+      <% if (locals.success && success.length) { %>
+        <div class="flash flash--success">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+          <%= success[0] %>
+        </div>
+      <% } %>
+      <% if (locals.error && error.length) { %>
+        <div class="flash flash--error">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <%= error[0] %>
+        </div>
+      <% } %>
+
+      <div class="page-header">
+        <h1>Customers</h1>
+        <p>Manage your customer accounts — search, block or unblock access as needed.</p>
+      </div>
+
+      <!-- Search bar -->
+      <form method="GET" action="/admin/dashboard" id="searchForm">
+        <div class="search-row">
+          <div class="search-wrap">
+            <svg class="search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35"/></svg>
+            <input
+              type="text"
+              name="search"
+              id="searchInput"
+              class="search-input"
+              placeholder="Search by name or email…"
+              value="<%= search %>"
+              autocomplete="off"
+            />
+            <button type="button" class="search-clear <%= search ? 'visible' : '' %>" id="clearBtn" onclick="clearSearch()" title="Clear search">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+          <button type="submit" class="btn-search">Search</button>
+          <% if (search) { %>
+            <span class="search-count"><%= total %> result<%= total !== 1 ? 's' : '' %> for "<%= search %>"</span>
+          <% } %>
+        </div>
+      </form>
+
+      <!-- Table card -->
+      <div class="section-card">
+        <div class="section-card__header">
+          <span class="section-card__title">All Customers</span>
+          <span class="section-card__meta">
+            <%= total %> total · Page <%= page %> of <%= pages %>
+          </span>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Customer</th>
+                <th>Email</th>
+                <th>Joined</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (typeof customers !== 'undefined' && customers.length > 0) { %>
+                <% customers.forEach(function(c, i) { %>
+                <tr>
+                  <td style="color:var(--text-light);font-size:11px"><%= ((page - 1) * 8) + i + 1 %></td>
+                  <td>
+                    <div class="customer-cell">
+                      <div class="customer-avatar"><%= c.name.charAt(0).toUpperCase() %></div>
+                      <div class="customer-name"><%= c.name %></div>
+                    </div>
+                  </td>
+                  <td><%= c.email %></td>
+                  <td><%= new Date(c.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) %></td>
+                  <td>
+                    <% if (c.isBlocked) { %>
+                      <span class="badge badge--blocked">Blocked</span>
+                    <% } else { %>
+                      <span class="badge badge--active">Active</span>
+                    <% } %>
+                  </td>
+                  <td>
+                    <div class="actions">
+                      <% if (c.isBlocked) { %>
+                        <button
+                          type="button"
+                          class="btn-action btn-action--unblock"
+                          onclick="confirmAction('/admin/customers/<%= c._id %>/unblock', 'unblock', '<%= c.name %>')"
+                        >
+                          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"/></svg>
+                          Unblock
+                        </button>
+                      <% } else { %>
+                        <button
+                          type="button"
+                          class="btn-action btn-action--block"
+                          onclick="confirmAction('/admin/customers/<%= c._id %>/block', 'block', '<%= c.name %>')"
+                        >
+                          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zM10 11V7a2 2 0 114 0v4"/></svg>
+                          Block
+                        </button>
+                      <% } %>
+                    </div>
+                  </td>
+                </tr>
+                <% }) %>
+              <% } else { %>
+                <tr>
+                  <td colspan="6">
+                    <div class="empty-state">
+                      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                      <% if (search) { %>
+                        No customers found for "<%= search %>".
+                      <% } else { %>
+                        No customers yet.
+                      <% } %>
+                    </div>
+                  </td>
+                </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <% if (pages > 1) { %>
+        <div class="pagination">
+          <span class="pagination__info">
+            Showing <%= ((page - 1) * 8) + 1 %>–<%= Math.min(page * 8, total) %> of <%= total %> customers
+          </span>
+          <div class="pagination__pages">
+            <!-- Prev -->
+            <% if (page > 1) { %>
+              <a href="/admin/dashboard?page=<%= page - 1 %><%= search ? '&search=' + encodeURIComponent(search) : '' %>" class="page-btn">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+              </a>
+            <% } else { %>
+              <span class="page-btn disabled">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+              </span>
+            <% } %>
+
+            <!-- Page numbers -->
+            <% for (let p = 1; p <= pages; p++) { %>
+              <% if (p === 1 || p === pages || (p >= page - 1 && p <= page + 1)) { %>
+                <a
+                  href="/admin/dashboard?page=<%= p %><%= search ? '&search=' + encodeURIComponent(search) : '' %>"
+                  class="page-btn <%= p === page ? 'active' : '' %>"
+                ><%= p %></a>
+              <% } else if (p === page - 2 || p === page + 2) { %>
+                <span class="page-btn disabled">…</span>
+              <% } %>
+            <% } %>
+
+            <!-- Next -->
+            <% if (page < pages) { %>
+              <a href="/admin/dashboard?page=<%= page + 1 %><%= search ? '&search=' + encodeURIComponent(search) : '' %>" class="page-btn">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+              </a>
+            <% } else { %>
+              <span class="page-btn disabled">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+              </span>
+            <% } %>
+          </div>
+        </div>
+        <% } %>
+
+      </div><!-- /.section-card -->
+    </div><!-- /.content -->
+
+    <footer class="page-footer">
+      © 2024 Velmora Chroné. All Rights Reserved. Admin Panel.
+    </footer>
+  </div><!-- /.main -->
+</div>
+
+<script>
+
+  const searchInput = document.getElementById('searchInput');
+  const clearBtn    = document.getElementById('clearBtn');
+
+  searchInput.addEventListener('input', () => {
+    clearBtn.classList.toggle('visible', searchInput.value.length > 0);
+  });
+
+  function clearSearch() {
+    searchInput.value = '';
+    clearBtn.classList.remove('visible');
+    window.location.href = '/admin/dashboard';
+  }
+
+  let pendingAction = null;
+
+  function confirmAction(url, type, name) {
+    pendingAction = url;
+
+    const isBlock = type === 'block';
+
+ 
+    const icon = document.getElementById('modalIcon');
+    icon.className = 'modal__icon ' + (isBlock ? 'modal__icon--block' : 'modal__icon--unblock');
+    document.getElementById('modalIconSvg').innerHTML = isBlock
+      ? '<path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zM10 11V7a2 2 0 114 0v4"/>'
+      : '<path stroke-linecap="round" stroke-linejoin="round" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"/>';
+
+    document.getElementById('modalTitle').textContent = isBlock ? 'Block User' : 'Unblock User';
+    document.getElementById('modalBody').innerHTML    = isBlock
+      ? `Are you sure you want to block <strong>${name}</strong>? They will no longer be able to log in.`
+      : `Are you sure you want to unblock <strong>${name}</strong>? They will regain access to their account.`;
+
+    const confirmBtn = document.getElementById('modalConfirmBtn');
+    confirmBtn.textContent = isBlock ? 'Yes, Block' : 'Yes, Unblock';
+    confirmBtn.className   = 'btn-confirm ' + (isBlock ? 'btn-confirm--block' : 'btn-confirm--unblock');
+
+    document.getElementById('confirmModal').classList.add('open');
+  }
+
+  function closeModal() {
+    document.getElementById('confirmModal').classList.remove('open');
+    pendingAction = null;
+  }
+
+  function submitModal() {
+    if (!pendingAction) return;
+    const form = document.getElementById('actionForm');
+    form.action = pendingAction;
+    document.getElementById('formSearch').value = searchInput.value;
+    document.getElementById('formPage').value   = '<%= page %>';
+    form.submit();
+  }
+
+ 
+  document.getElementById('confirmModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+ 
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeModal();
+  });
+</script>
+
+</body>
+</html>

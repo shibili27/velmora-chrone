@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="0"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title><%= title %></title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --teal: #2d8c84; --bg-outer: #2d8c84; --bg-inner: #f0f2f0;
+      --card-bg: #ffffff; --border: #d8dbd8; --text-dark: #1a1a1a;
+      --text-mid: #444; --text-light: #888; --btn-bg: #1c2b3a; --btn-hover: #253547;
+    }
+    html, body { height: 100%; }
+    body { background-color: var(--bg-outer); display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: 'Montserrat', sans-serif; padding: 24px; }
+    .frame { background: var(--bg-inner); border-radius: 6px; width: 100%; max-width: 760px; padding: 60px 40px 48px; display: flex; flex-direction: column; align-items: center; }
+    .brand { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 500; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-dark); margin-bottom: 36px; }
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 4px; width: 100%; max-width: 480px; padding: 36px 40px 40px; }
+    .card__title { font-size: 17px; font-weight: 600; color: var(--text-dark); margin-bottom: 8px; }
+    .card__subtitle { font-size: 12.5px; color: var(--text-mid); line-height: 1.6; margin-bottom: 28px; }
+    .card__subtitle strong { font-weight: 600; color: var(--text-dark); }
+    .toast-bar { display: flex; align-items: center; gap: 10px; padding: 11px 14px; border-radius: 3px; font-size: 12px; margin-bottom: 18px; background: #fff8f0; border: 1px solid #f5c07a; color: #7a3e00; transform: translateY(-6px); opacity: 0; transition: opacity 0.22s ease, transform 0.22s ease; pointer-events: none; }
+    .toast-bar.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+    .toast-icon { flex-shrink: 0; width: 16px; height: 16px; border-radius: 50%; background: #e07b00; display: flex; align-items: center; justify-content: center; }
+    .toast-icon svg { width: 10px; height: 10px; }
+    .toast-text { flex: 1; line-height: 1.4; }
+    .toast-close { cursor: pointer; background: none; border: none; color: #7a3e00; padding: 0; font-size: 14px; opacity: 0.6; }
+    .toast-close:hover { opacity: 1; }
+    .flash { padding: 10px 14px; border-radius: 3px; font-size: 12px; line-height: 1.5; margin-bottom: 18px; display: flex; align-items: flex-start; gap: 8px; }
+    .flash__icon { flex-shrink: 0; margin-top: 1px; }
+    .flash--error { background: #fdecea; color: #b00020; border: 1px solid #f5c6cb; }
+    .flash--success { background: #e8f5e9; color: #1b5e20; border: 1px solid #c8e6c9; }
+    .field { margin-bottom: 18px; }
+    .field__label { display: block; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dark); margin-bottom: 6px; }
+    .input-wrap { position: relative; }
+    .input-wrap input { width: 100%; height: 42px; border: 1px solid var(--border); border-radius: 3px; padding: 0 40px 0 14px; font-family: 'Montserrat', sans-serif; font-size: 13px; color: var(--text-dark); background: #fff; outline: none; transition: border-color 0.2s; }
+    .input-wrap input:focus { border-color: var(--teal); }
+    .input-wrap input.shake { animation: shake 0.4s ease; border-color: #b00020; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-5px)} 40%{transform:translateX(5px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
+    .toggle-pw { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; padding: 0; color: var(--text-light); display: flex; align-items: center; }
+    .toggle-pw svg { width: 18px; height: 18px; }
+
+    /* Email hint shown on invalid format */
+    .field__hint { font-size: 10.5px; color: #b00020; margin-top: 5px; display: none; }
+    .field__hint.visible { display: block; }
+
+    .btn-signin { margin-top: 22px; width: 100%; height: 44px; background: var(--btn-bg); color: #fff; border: none; border-radius: 3px; font-family: 'Montserrat', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; transition: background 0.2s, opacity 0.2s; }
+    .btn-signin:hover { background: var(--btn-hover); }
+    .btn-signin[data-loading="true"] { opacity: 0.7; cursor: not-allowed; pointer-events: none; }
+    .divider { display: flex; align-items: center; gap: 12px; margin: 24px 0 0; }
+    .divider__line { flex: 1; height: 1px; background: var(--border); }
+    .divider__text { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); }
+    .footer { margin-top: 28px; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.65); }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <div class="brand">Velmora Chroné</div>
+    <div class="card">
+      <h1 class="card__title">Admin Sign In</h1>
+      <p class="card__subtitle">Manage <strong>Velmora Chroné</strong> — orders, banners, referrals, and more.</p>
+
+      <!-- Client-side toast -->
+      <div class="toast-bar" id="toastBar">
+        <div class="toast-icon">
+          <svg viewBox="0 0 10 10" fill="none" stroke="#fff" stroke-width="1.8">
+            <line x1="5" y1="2" x2="5" y2="5.5"/>
+            <circle cx="5" cy="7.5" r="0.6" fill="#fff" stroke="none"/>
+          </svg>
+        </div>
+        <span class="toast-text" id="toastText"></span>
+        <button class="toast-close" onclick="hideToast()">&#x2715;</button>
+      </div>
+
+      <!-- Server-side flash messages -->
+      <% if (error && error.length) { %>
+        <div class="flash flash--error">
+          <svg class="flash__icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <%= Array.isArray(error) ? error[0] : error %>
+        </div>
+      <% } %>
+      <% if (success && success.length) { %>
+        <div class="flash flash--success">
+          <svg class="flash__icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+          </svg>
+          <%= Array.isArray(success) ? success[0] : success %>
+        </div>
+      <% } %>
+
+      <form action="/admin/login" method="POST" id="loginForm">
+        <div class="field">
+          <label class="field__label" for="email">Email</label>
+          <div class="input-wrap">
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder="admin@velmorachrone.com"
+              value="<%= formData.email || '' %>"
+              autocomplete="username"
+              oninput="clearEmailHint()"
+            />
+          </div>
+          <!-- Inline format hint -->
+          <p class="field__hint" id="emailHint">Please enter a valid email format (e.g. admin@example.com)</p>
+        </div>
+
+        <div class="field">
+          <label class="field__label" for="password">Password</label>
+          <div class="input-wrap">
+            <input type="password" id="password" name="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" autocomplete="current-password"/>
+            <button type="button" class="toggle-pw" aria-label="Toggle password visibility" onclick="togglePassword()">
+              <svg id="icon-eye" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M1.5 12S5.25 5.25 12 5.25 22.5 12 22.5 12 18.75 18.75 12 18.75 1.5 12 1.5 12z"/>
+                <circle cx="12" cy="12" r="3" stroke-linecap="round"/>
+              </svg>
+              <svg id="icon-eye-off" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" style="display:none;">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 3l18 18M10.477 10.477A3 3 0 0013.5 13.5M6.357 6.357A9.77 9.77 0 001.5 12s3.75 6.75 10.5 6.75a9.77 9.77 0 004.143-.893M9.88 4.63A9.77 9.77 0 0112 4.5c6.75 0 10.5 7.5 10.5 7.5a9.81 9.81 0 01-2.357 2.893"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-signin" id="submitBtn">Sign In</button>
+      </form>
+
+      <div class="divider">
+        <span class="divider__line"></span>
+        <span class="divider__text">Secure Admin Access</span>
+        <span class="divider__line"></span>
+      </div>
+    </div>
+    <p class="footer">&copy; 2024 Velmora Chron&eacute;. All rights reserved.</p>
+  </div>
+
+  <script>
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    function showToast(msg) {
+      document.getElementById('toastText').textContent = msg;
+      document.getElementById('toastBar').classList.add('show');
+    }
+    function hideToast() {
+      document.getElementById('toastBar').classList.remove('show');
+    }
+    function shakeField(id) {
+      const el = document.getElementById(id);
+      el.classList.remove('shake');
+      void el.offsetWidth;
+      el.classList.add('shake');
+      el.addEventListener('animationend', () => el.classList.remove('shake'), { once: true });
+    }
+    function showEmailHint() {
+      document.getElementById('emailHint').classList.add('visible');
+      document.getElementById('email').style.borderColor = '#b00020';
+    }
+    function clearEmailHint() {
+      document.getElementById('emailHint').classList.remove('visible');
+      document.getElementById('email').style.borderColor = '';
+    }
+    function togglePassword() {
+      const input  = document.getElementById('password');
+      const eyeOn  = document.getElementById('icon-eye');
+      const eyeOff = document.getElementById('icon-eye-off');
+      if (input.type === 'password') {
+        input.type = 'text'; eyeOn.style.display = 'none'; eyeOff.style.display = 'block';
+      } else {
+        input.type = 'password'; eyeOn.style.display = 'block'; eyeOff.style.display = 'none';
+      }
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', function (e) {
+      const email = document.getElementById('email').value.trim();
+      const pass  = document.getElementById('password').value.trim();
+      hideToast();
+      clearEmailHint();
+
+      if (!email && !pass) {
+        e.preventDefault(); shakeField('email'); shakeField('password');
+        showToast('Please enter your email and password to continue.'); return;
+      }
+      if (!email) {
+        e.preventDefault(); shakeField('email');
+        showToast('Email address is required.'); return;
+      }
+      
+      if (!emailRegex.test(email)) {
+        e.preventDefault(); shakeField('email');
+        showEmailHint();
+        showToast('Please enter a valid email format (e.g. admin@example.com)'); return;
+      }
+      if (!pass) {
+        e.preventDefault(); shakeField('password');
+        showToast('Password is required.'); return;
+      }
+
+      const btn = document.getElementById('submitBtn');
+      btn.textContent = 'Signing in\u2026';
+      btn.setAttribute('data-loading', 'true');
+    });
+
+    
+    document.getElementById('email').addEventListener('blur', function () {
+      const val = this.value.trim();
+      if (val && !emailRegex.test(val)) {
+        showEmailHint();
+        shakeField('email');
+      } else {
+        clearEmailHint();
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate"/>
+  <meta http-equiv="Pragma" content="no-cache"/>
+  <meta http-equiv="Expires" content="0"/>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Categories — Velmora Chroné</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --teal:#2d8c84;--teal-dark:#1f6e67;--teal-light:#e8f4f3;
+      --navy:#1c2b3a;--navy-hover:#253547;
+      --sidebar-w:160px;--bg:#f2f4f3;--white:#fff;--border:#e2e6e4;
+      --text:#1a1f1e;--text-mid:#5a6461;--text-light:#9aa8a5;
+      --green:#16a34a;--green-bg:#dcfce7;
+      --red:#dc2626;--red-bg:#fee2e2;
+      --orange:#d97706;--orange-bg:#fef3c7;
+      --blue:#2563eb;--blue-bg:#dbeafe;
+    }
+    html,body{height:100%;font-family:'Jost',sans-serif;background:var(--bg);color:var(--text)}
+    .layout{display:flex;min-height:100vh}
+
+    /* Sidebar */
+    .sidebar{width:var(--sidebar-w);background:var(--white);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100}
+    .sidebar__brand{padding:20px 16px 14px;border-bottom:1px solid var(--border)}
+    .sidebar__brand-name{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;letter-spacing:0.06em;color:var(--text);line-height:1.2}
+    .sidebar__brand-sub{font-size:8px;font-weight:500;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-light);margin-top:3px}
+    .sidebar__nav{flex:1;padding:10px 0;overflow-y:auto}
+    .nav-item{display:flex;align-items:center;gap:8px;padding:9px 16px;font-size:12px;font-weight:500;color:var(--text-mid);text-decoration:none;transition:background .15s,color .15s;white-space:nowrap}
+    .nav-item:hover{background:var(--teal-light);color:var(--teal)}
+    .nav-item.active{background:var(--navy);color:#fff}
+    .nav-item svg{width:14px;height:14px;flex-shrink:0}
+    .sidebar__footer{padding:12px 16px;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px}
+    .avatar{width:30px;height:30px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:600;flex-shrink:0}
+    .sidebar__footer-info{overflow:hidden;flex:1}
+    .sidebar__footer-name{font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .sidebar__footer-role{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-light)}
+    .btn-logout{display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:5px;border:1px solid #fecaca;background:var(--red-bg);color:var(--red);cursor:pointer;flex-shrink:0;transition:background .15s;text-decoration:none}
+    .btn-logout:hover{background:var(--red);color:#fff;border-color:var(--red)}
+    .btn-logout svg{width:12px;height:12px}
+
+    /* Main */
+    .main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh}
+
+    /* Topbar */
+    .topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 28px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+    .topbar__left h1{font-size:18px;font-weight:600;color:var(--text)}
+    .topbar__left p{font-size:11px;color:var(--text-light);margin-top:1px}
+    .topbar__right{display:flex;align-items:center;gap:10px}
+    .btn-primary{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 16px;background:var(--navy);color:#fff;border:none;border-radius:4px;font-family:'Jost',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:background .15s;text-decoration:none;white-space:nowrap}
+    .btn-primary:hover{background:var(--navy-hover)}
+    .btn-primary svg{width:14px;height:14px}
+    .topbar__bell{width:32px;height:32px;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-mid);background:none;transition:background .15s}
+    .topbar__bell:hover{background:var(--teal-light);color:var(--teal)}
+    .topbar__bell svg{width:14px;height:14px}
+
+    /* Content */
+    .content{padding:24px 28px;flex:1}
+
+    /* Search row */
+    .toolbar{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+    .search-wrap{position:relative;flex:1;max-width:340px}
+    .search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:13px;height:13px;color:var(--text-light);pointer-events:none}
+    .search-input{width:100%;height:36px;border:1px solid var(--border);border-radius:4px;padding:0 32px 0 32px;font-family:'Jost',sans-serif;font-size:12px;color:var(--text);background:var(--white);outline:none;transition:border-color .2s}
+    .search-input:focus{border-color:var(--teal)}
+    .search-clear{position:absolute;right:9px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text-light);display:none;align-items:center;padding:0}
+    .search-clear svg{width:12px;height:12px}
+    .search-clear.visible{display:flex}
+    .btn-search{height:36px;padding:0 14px;background:var(--teal);color:#fff;border:none;border-radius:4px;font-family:'Jost',sans-serif;font-size:11px;font-weight:600;cursor:pointer;transition:background .15s}
+    .btn-search:hover{background:var(--teal-dark)}
+    .search-result-info{font-size:11px;color:var(--text-light)}
+
+    /* Card */
+    .card{background:var(--white);border:1px solid var(--border);border-radius:6px;overflow:hidden}
+    .card__header{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+    .card__title{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text)}
+    .card__meta{font-size:11px;color:var(--text-light)}
+
+    /* Table */
+    .table-wrap{overflow-x:auto}
+    table{width:100%;border-collapse:collapse}
+    thead tr{background:#f8faf9}
+    th{font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text-light);padding:10px 20px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}
+    td{padding:12px 20px;font-size:12px;color:var(--text);border-bottom:1px solid var(--border);vertical-align:middle}
+    tbody tr:last-child td{border-bottom:none}
+    tbody tr:hover{background:#fafcfb}
+
+    /* Badge */
+    .badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;white-space:nowrap}
+    .badge::before{content:'';width:4px;height:4px;border-radius:50%;background:currentColor;flex-shrink:0}
+    .badge--active{color:var(--green);background:var(--green-bg)}
+    .badge--inactive{color:var(--text-light);background:#f0f2f0}
+
+    /* Action btns */
+    .actions{display:flex;align-items:center;gap:5px}
+    .btn-icon{width:28px;height:28px;border-radius:4px;border:1px solid var(--border);background:var(--white);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-mid);transition:all .15s;text-decoration:none}
+    .btn-icon:hover{background:var(--teal-light);color:var(--teal);border-color:var(--teal)}
+    .btn-icon--delete:hover{background:var(--red-bg);color:var(--red);border-color:#fecaca}
+    .btn-icon svg{width:13px;height:13px}
+
+    /* Pagination */
+    .pagination{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid var(--border)}
+    .pagination__info{font-size:11px;color:var(--text-light)}
+    .pagination__pages{display:flex;align-items:center;gap:3px}
+    .page-btn{min-width:28px;height:28px;border:1px solid var(--border);border-radius:3px;background:var(--white);color:var(--text-mid);font-family:'Jost',sans-serif;font-size:11px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;text-decoration:none;transition:all .15s;padding:0 6px}
+    .page-btn:hover:not(.active):not(.disabled){background:var(--teal-light);color:var(--teal);border-color:var(--teal)}
+    .page-btn.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+    .page-btn.disabled{opacity:.4;cursor:not-allowed;pointer-events:none}
+    .page-btn svg{width:11px;height:11px}
+
+    /* Empty */
+    .empty-state{padding:40px;text-align:center;color:var(--text-light);font-size:12px}
+    .empty-state svg{width:32px;height:32px;display:block;margin:0 auto 10px;color:var(--border)}
+
+    /* Flash */
+    .flash{padding:10px 14px;border-radius:4px;font-size:12px;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+    .flash--error{background:#fdecea;color:#b00020;border:1px solid #f5c6cb}
+    .flash--success{background:#e8f5e9;color:#1b5e20;border:1px solid #c8e6c9}
+
+    /* Modal */
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:999;align-items:center;justify-content:center}
+    .modal-overlay.open{display:flex}
+    .modal{background:var(--white);border-radius:8px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,.15);animation:modalIn .18s ease}
+    @keyframes modalIn{from{transform:scale(.95);opacity:0}to{transform:scale(1);opacity:1}}
+    .modal__header{padding:20px 24px 0;display:flex;align-items:flex-start;justify-content:space-between}
+    .modal__title{font-size:15px;font-weight:600;color:var(--text)}
+    .modal__close{background:none;border:none;cursor:pointer;color:var(--text-light);padding:0;display:flex}
+    .modal__close svg{width:16px;height:16px}
+    .modal__body{padding:16px 24px 24px}
+    .modal__footer{padding:0 24px 20px;display:flex;gap:8px;justify-content:flex-end}
+    .form-group{margin-bottom:16px}
+    .form-label{display:block;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text);margin-bottom:5px}
+    .form-input,.form-textarea,.form-select{width:100%;border:1px solid var(--border);border-radius:4px;font-family:'Jost',sans-serif;font-size:12px;color:var(--text);background:var(--white);outline:none;transition:border-color .2s}
+    .form-input,.form-select{height:38px;padding:0 12px}
+    .form-textarea{padding:10px 12px;resize:vertical;min-height:80px}
+    .form-input:focus,.form-textarea:focus,.form-select:focus{border-color:var(--teal)}
+    .btn-cancel{height:34px;padding:0 14px;background:none;border:1px solid var(--border);border-radius:4px;font-family:'Jost',sans-serif;font-size:11px;font-weight:600;color:var(--text-mid);cursor:pointer;transition:background .15s}
+    .btn-cancel:hover{background:var(--bg)}
+    .btn-confirm{height:34px;padding:0 16px;border:none;border-radius:4px;font-family:'Jost',sans-serif;font-size:11px;font-weight:600;color:#fff;cursor:pointer;transition:opacity .15s}
+    .btn-confirm--save{background:var(--navy)}
+    .btn-confirm--delete{background:var(--red)}
+    .btn-confirm:hover{opacity:.85}
+
+    /* Delete confirm modal */
+    .delete-icon{width:40px;height:40px;border-radius:50%;background:var(--red-bg);display:flex;align-items:center;justify-content:center;color:var(--red);margin-bottom:12px}
+    .delete-icon svg{width:20px;height:20px}
+
+    /* Footer */
+    .page-footer{text-align:center;padding:16px;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-light);border-top:1px solid var(--border)}
+  </style>
+</head>
+<body>
+
+<!-- Add/Edit Category Modal -->
+<div class="modal-overlay" id="categoryModal">
+  <div class="modal">
+    <div class="modal__header">
+      <span class="modal__title" id="modalTitle">Add Category</span>
+      <button class="modal__close" onclick="closeModal('categoryModal')">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <form id="categoryForm" method="POST">
+      <div class="modal__body">
+        <div class="form-group">
+          <label class="form-label" for="catName">Category Name *</label>
+          <input class="form-input" type="text" id="catName" name="name" placeholder="e.g. Luxury Watches" required/>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="catDesc">Description</label>
+          <textarea class="form-textarea" id="catDesc" name="description" placeholder="Brief description of this category…"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="catStatus">Status</label>
+          <select class="form-select" id="catStatus" name="isActive">
+            <option value="true">Active</option>
+            <option value="false">Inactive</option>
+          </select>
+        </div>
+        <input type="hidden" name="search" id="formSearch" value="<%= search %>"/>
+        <input type="hidden" name="page"   id="formPage"   value="<%= page %>"/>
+      </div>
+      <div class="modal__footer">
+        <button type="button" class="btn-cancel" onclick="closeModal('categoryModal')">Cancel</button>
+        <button type="submit" class="btn-confirm btn-confirm--save" id="modalSaveBtn">Save Category</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Delete Confirm Modal -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal">
+    <div class="modal__body" style="padding:24px">
+      <div class="delete-icon">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path stroke-linecap="round" stroke-linejoin="round" d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6m5 0V4a1 1 0 011-1h2a1 1 0 011 1v2"/></svg>
+      </div>
+      <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:8px">Delete Category?</div>
+      <div style="font-size:12px;color:var(--text-mid);line-height:1.6">
+        Are you sure you want to delete <strong id="deleteCatName"></strong>? This action soft-deletes the category and it can be restored.
+      </div>
+    </div>
+    <div class="modal__footer">
+      <button class="btn-cancel" onclick="closeModal('deleteModal')">Cancel</button>
+      <form id="deleteForm" method="POST" style="display:inline">
+        <input type="hidden" name="search" value="<%= search %>"/>
+        <input type="hidden" name="page"   value="<%= page %>"/>
+        <button type="submit" class="btn-confirm btn-confirm--delete">Yes, Delete</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar__brand">
+      <div class="sidebar__brand-name">Velmora<br>Chroné</div>
+      <div class="sidebar__brand-sub">Admin Dashboard</div>
+    </div>
+    <nav class="sidebar__nav">
+      <a href="/admin/dashboard" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Dashboard
+      </a>
+      <a href="/admin/orders" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+        Orders
+      </a>
+      <a href="/admin/products" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"/></svg>
+        Products
+      </a>
+      <a href="/admin/rating" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+        Rating/Review
+      </a>
+      <a href="/admin/dashboard" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        Customers
+      </a>
+      <a href="/admin/coupons" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+        Coupons
+      </a>
+      <a href="/admin/categories" class="nav-item active">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+        Categories
+      </a>
+      <a href="/admin/refunds" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
+        Refund/Return
+      </a>
+      <a href="/admin/banners" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+        Banner
+      </a>
+      <a href="/admin/referral" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+        Referral
+      </a>
+      <a href="/admin/sales" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+        Sales
+      </a>
+    </nav>
+    <div class="sidebar__footer">
+      <div class="avatar"><%= adminName ? adminName.charAt(0).toUpperCase() : 'A' %></div>
+      <div class="sidebar__footer-info">
+        <div class="sidebar__footer-name"><%= adminName || 'Admin' %></div>
+        <div class="sidebar__footer-role">Administrator</div>
+      </div>
+      <a href="/admin/logout" class="btn-logout" title="Logout">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+      </a>
+    </div>
+  </aside>
+
+  <div class="main">
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="topbar__left">
+        <h1>Category Management</h1>
+        <p>Organise product categories — add, edit or soft-delete</p>
+      </div>
+      <div class="topbar__right">
+        <button class="btn-primary" onclick="openAddModal()">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Category
+        </button>
+        <button class="topbar__bell">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="content">
+      <!-- Flash -->
+      <% if (locals.success && success.length) { %>
+        <div class="flash flash--success">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+          <%= success[0] %>
+        </div>
+      <% } %>
+      <% if (locals.error && error.length) { %>
+        <div class="flash flash--error">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <%= error[0] %>
+        </div>
+      <% } %>
+
+      <!-- Search -->
+      <form method="GET" action="/admin/categories" id="searchForm">
+        <div class="toolbar">
+          <div class="search-wrap">
+            <svg class="search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35"/></svg>
+            <input type="text" name="search" id="searchInput" class="search-input" placeholder="Search categories…" value="<%= search %>" autocomplete="off"/>
+            <button type="button" class="search-clear <%= search ? 'visible' : '' %>" id="clearBtn" onclick="clearSearch()">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+          <button type="submit" class="btn-search">Search</button>
+          <% if (search) { %>
+            <span class="search-result-info"><%= total %> result<%= total!==1?'s':'' %> for "<%= search %>"</span>
+          <% } %>
+        </div>
+      </form>
+
+      <!-- Table -->
+      <div class="card">
+        <div class="card__header">
+          <span class="card__title">All Categories</span>
+          <span class="card__meta"><%= total %> total · Page <%= page %> of <%= pages %></span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Category Name</th>
+                <th>Description</th>
+                <th>Products</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (typeof categories !== 'undefined' && categories.length > 0) { %>
+                <% categories.forEach(function(cat, i) { %>
+                <tr>
+                  <td style="color:var(--text-light);font-size:10px"><%= ((page-1)*10)+i+1 %></td>
+                  <td><strong style="font-weight:600"><%= cat.name %></strong></td>
+                  <td style="color:var(--text-mid);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><%= cat.description || '—' %></td>
+                  <td><span style="font-weight:600"><%= cat.productCount || 0 %></span></td>
+                  <td>
+                    <% if (cat.isActive !== false) { %>
+                      <span class="badge badge--active">Active</span>
+                    <% } else { %>
+                      <span class="badge badge--inactive">Inactive</span>
+                    <% } %>
+                  </td>
+                  <td style="color:var(--text-mid)"><%= new Date(cat.createdAt).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}) %></td>
+                  <td>
+                    <div class="actions">
+                      <button class="btn-icon" title="Edit" onclick="openEditModal('<%= cat._id %>','<%= cat.name.replace(/'/g,\"\\\\'\" ) %>','<%= (cat.description||'').replace(/'/g,\"\\\\'\" ) %>','<%= cat.isActive !== false %>')">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                      </button>
+                      <button class="btn-icon btn-icon--delete" title="Delete" onclick="openDeleteModal('<%= cat._id %>','<%= cat.name.replace(/'/g,\"\\\\'\" ) %>')">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path stroke-linecap="round" stroke-linejoin="round" d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6m5 0V4a1 1 0 011-1h2a1 1 0 011 1v2"/></svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                <% }) %>
+              <% } else { %>
+                <tr><td colspan="7">
+                  <div class="empty-state">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+                    <% if (search) { %>No categories found for "<%= search %>".<% } else { %>No categories yet. Add your first one!<% } %>
+                  </div>
+                </td></tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <% if (pages > 1) { %>
+        <div class="pagination">
+          <span class="pagination__info">Showing <%= ((page-1)*10)+1 %>–<%= Math.min(page*10,total) %> of <%= total %></span>
+          <div class="pagination__pages">
+            <% if (page > 1) { %>
+              <a href="/admin/categories?page=<%= page-1 %><%= search?'&search='+encodeURIComponent(search):'' %>" class="page-btn"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg></a>
+            <% } else { %><span class="page-btn disabled"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg></span><% } %>
+            <% for(let p=1;p<=pages;p++){ %>
+              <% if(p===1||p===pages||(p>=page-1&&p<=page+1)){ %>
+                <a href="/admin/categories?page=<%= p %><%= search?'&search='+encodeURIComponent(search):'' %>" class="page-btn <%= p===page?'active':'' %>"><%= p %></a>
+              <% } else if(p===page-2||p===page+2){ %><span class="page-btn disabled">…</span><% } %>
+            <% } %>
+            <% if (page < pages) { %>
+              <a href="/admin/categories?page=<%= page+1 %><%= search?'&search='+encodeURIComponent(search):'' %>" class="page-btn"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg></a>
+            <% } else { %><span class="page-btn disabled"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg></span><% } %>
+          </div>
+        </div>
+        <% } %>
+      </div>
+    </div>
+
+    <footer class="page-footer">© 2024 Velmora Chroné. All Rights Reserved. Admin Panel.</footer>
+  </div>
+</div>
+
+<script>
+  const searchInput = document.getElementById('searchInput');
+  const clearBtn    = document.getElementById('clearBtn');
+  searchInput.addEventListener('input', () => clearBtn.classList.toggle('visible', searchInput.value.length > 0));
+  function clearSearch(){ searchInput.value=''; window.location.href='/admin/categories'; }
+
+  function openModal(id){ document.getElementById(id).classList.add('open'); }
+  function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+  document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeModal('categoryModal'); closeModal('deleteModal'); } });
+  ['categoryModal','deleteModal'].forEach(id => {
+    document.getElementById(id).addEventListener('click', function(e){ if(e.target===this) closeModal(id); });
+  });
+
+  function openAddModal(){
+    document.getElementById('modalTitle').textContent = 'Add Category';
+    document.getElementById('categoryForm').action = '/admin/categories/add';
+    document.getElementById('catName').value = '';
+    document.getElementById('catDesc').value = '';
+    document.getElementById('catStatus').value = 'true';
+    openModal('categoryModal');
+  }
+
+  function openEditModal(id, name, desc, isActive){
+    document.getElementById('modalTitle').textContent = 'Edit Category';
+    document.getElementById('categoryForm').action = '/admin/categories/' + id + '/edit';
+    document.getElementById('catName').value  = name;
+    document.getElementById('catDesc').value  = desc;
+    document.getElementById('catStatus').value = isActive === 'true' ? 'true' : 'false';
+    openModal('categoryModal');
+  }
+
+  function openDeleteModal(id, name){
+    document.getElementById('deleteCatName').textContent = name;
+    document.getElementById('deleteForm').action = '/admin/categories/' + id + '/delete';
+    openModal('deleteModal');
+  }
+</script>
+</body>
+</html>

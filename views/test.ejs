@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Velmora Chroné</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap"
+    rel="stylesheet"
+  />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ["Cormorant Garamond", "serif"],
+            body: ["Jost", "sans-serif"],
+          },
+          colors: {
+            cream: "#f5f2eb",
+            vault: "#1a1a18",
+            accent: "#0d9488",
+          },
+          letterSpacing: { widest2: "0.25em" },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    body {
+      font-family: "Jost", sans-serif;
+      background-color: #1a1a18;
+    }
+
+    .input-vault {
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid #555;
+      border-radius: 0;
+      outline: none;
+      color: #1a1a18;
+      font-family: "Jost", sans-serif;
+      font-weight: 300;
+      font-size: 0.875rem;
+      width: 100%;
+      padding: 0.35rem 0;
+      transition: border-color 0.3s;
+    }
+    .input-vault::placeholder { color: #aaa; }
+    .input-vault:focus        { border-bottom-color: #0d9488; }
+    .input-vault.input-error  { border-bottom-color: #b91c1c; }
+
+    .field-label {
+      font-family: "Jost", sans-serif;
+      font-size: 0.6rem;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #555;
+      margin-bottom: 0.5rem;
+    }
+
+    .btn-vault {
+      background-color: #1a1a18;
+      color: #f5f2eb;
+      font-family: "Jost", sans-serif;
+      font-size: 0.65rem;
+      font-weight: 400;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      border: none;
+      cursor: pointer;
+      padding: 1rem 2rem;
+      width: 100%;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .btn-vault:hover { background-color: #0d9488; color: #fff; }
+
+    .toggle-icon { cursor: pointer; color: #888; transition: color 0.2s; }
+    .toggle-icon:hover { color: #0d9488; }
+
+    .hero-overlay {
+      background: linear-gradient(
+        160deg,
+        rgba(10,10,10,0.55) 0%,
+        rgba(10,10,10,0.35) 60%,
+        rgba(10,10,10,0.65) 100%
+      );
+    }
+
+    .footer-link { transition: color 0.2s; }
+    .footer-link:hover { color: #0d9488; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up  { animation: fadeUp 0.7s ease both; }
+    .delay-1  { animation-delay: 0.10s; }
+    .delay-2  { animation-delay: 0.22s; }
+    .delay-3  { animation-delay: 0.34s; }
+    .delay-4  { animation-delay: 0.46s; }
+    .delay-5  { animation-delay: 0.58s; }
+
+    /* ══════════════════════════════════════
+       VAULT SEAL — luxury wax-stamp toast
+       Rises from bottom with spring easing
+    ══════════════════════════════════════ */
+    #vault-seal {
+      position: fixed;
+      bottom: -200px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      transition: bottom 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+      pointer-events: none;
+    }
+    #vault-seal.seal-visible {
+      bottom: 2.5rem;
+      pointer-events: auto;
+    }
+
+    .seal-body {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: #0f0f0e;
+      border: 1px solid rgba(255,255,255,0.07);
+      padding: 16px 22px 16px 20px;
+      min-width: 300px;
+      max-width: 380px;
+      box-shadow:
+        0 0 0 1px rgba(13,148,136,0.2),
+        0 24px 64px rgba(0,0,0,0.7),
+        0 0 40px rgba(13,148,136,0.06);
+    }
+
+    /* Left teal accent bar */
+    .seal-body::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 2px;
+      background: linear-gradient(180deg, transparent, #0d9488, transparent);
+    }
+
+    /* Wax-seal circular icon */
+    .seal-wax {
+      flex-shrink: 0;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #2a0a0a, #1a0505);
+      border: 1px solid rgba(185,28,28,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .seal-wax svg { width: 16px; height: 16px; color: #f87171; }
+
+    /* Slowly spinning dashed ring — like a mechanical bezel */
+    .seal-bezel {
+      position: absolute;
+      inset: -5px;
+      border-radius: 50%;
+      border: 1px dashed rgba(185,28,28,0.25);
+      animation: bezelSpin 10s linear infinite;
+    }
+    @keyframes bezelSpin { to { transform: rotate(360deg); } }
+
+    /* Tick marks on bezel */
+    .seal-bezel::before,
+    .seal-bezel::after {
+      content: '';
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      background: rgba(185,28,28,0.5);
+      border-radius: 50%;
+      top: 50%;
+      left: -1.5px;
+      margin-top: -1.5px;
+    }
+    .seal-bezel::after { left: auto; right: -1.5px; }
+
+    .seal-label {
+      font-family: "Jost", sans-serif;
+      font-size: 0.52rem;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #f87171;
+      margin-bottom: 3px;
+    }
+    .seal-message {
+      font-family: "Cormorant Garamond", serif;
+      font-style: italic;
+      font-size: 1rem;
+      font-weight: 300;
+      color: #e2ddd7;
+      line-height: 1.3;
+    }
+
+    /* Auto-drain progress bar at bottom */
+    .seal-drain {
+      position: absolute;
+      bottom: 0; left: 0;
+      height: 1px;
+      width: 100%;
+      background: rgba(13,148,136,0.5);
+      transform-origin: left;
+      transform: scaleX(1);
+      transition: none;
+    }
+    .seal-drain.draining {
+      transition: transform 4.2s linear;
+      transform: scaleX(0);
+    }
+
+    /* Dismiss X */
+    .seal-x {
+      position: absolute;
+      top: 9px; right: 9px;
+      cursor: pointer;
+      opacity: 0.25;
+      transition: opacity 0.2s;
+      line-height: 0;
+    }
+    .seal-x:hover { opacity: 0.7; }
+    .seal-x svg { width: 9px; height: 9px; color: #fff; }
+
+    /* ── Field shake animation ── */
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      20%      { transform: translateX(-6px); }
+      40%      { transform: translateX(6px); }
+      60%      { transform: translateX(-3px); }
+      80%      { transform: translateX(3px); }
+    }
+    .shake { animation: shake 0.38s ease; }
+
+    /* ── Inline field hint ── */
+    .field-hint {
+      font-family: "Jost", sans-serif;
+      font-size: 0.57rem;
+      letter-spacing: 0.08em;
+      color: #b91c1c;
+      margin-top: 5px;
+      opacity: 0;
+      max-height: 0;
+      overflow: hidden;
+      transition: opacity 0.3s, max-height 0.3s;
+    }
+    .field-hint.hint-show {
+      opacity: 1;
+      max-height: 20px;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex flex-col">
+
+  <!-- ══════════════════════════════════════
+       VAULT SEAL NOTIFICATION
+  ══════════════════════════════════════ -->
+  <div id="vault-seal" role="alert" aria-live="assertive">
+    <div class="seal-body">
+
+      <div class="seal-wax">
+        <div class="seal-bezel"></div>
+        <svg id="seal-icon" xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <!-- default: lock -->
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+      </div>
+
+      <div>
+        <div class="seal-label" id="seal-label">Access Denied</div>
+        <div class="seal-message" id="seal-msg">Identity field is required.</div>
+      </div>
+
+      <div class="seal-x" onclick="hideSeal()" title="Dismiss">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+          fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </div>
+
+      <div class="seal-drain" id="seal-drain"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       MAIN LAYOUT
+  ══════════════════════════════════════ -->
+  <main class="flex flex-1 items-center justify-center p-4 md:p-8">
+    <div class="w-full max-w-5xl flex shadow-2xl" style="min-height:520px;">
+
+      <!-- LEFT: Form panel -->
+      <section class="w-full md:w-5/12 bg-cream flex flex-col justify-between p-10 md:p-12 fade-up">
+
+        <div class="mb-8">
+          <img
+            src="/images/logo-velmora.svg"
+            alt="Velmora Chroné"
+            class="h-6 opacity-70"
+            onerror="this.style.display='none'"
+          />
+        </div>
+
+        <div class="flex-1 flex flex-col justify-center">
+
+          <h1 class="font-display text-4xl font-light text-vault leading-tight mb-1 fade-up delay-1">
+            Welcome Back
+          </h1>
+          <p class="field-label mb-8 fade-up delay-2">
+            Please authenticate to access your private vault.
+          </p>
+
+          <% if (typeof error !== 'undefined' && error) { %>
+          <div class="mb-5 text-xs text-red-600 tracking-widest uppercase fade-up">
+            <%= error %>
+          </div>
+          <% } %>
+
+          <form id="loginForm" action="/auth/login" method="POST" class="space-y-7 fade-up delay-3" novalidate>
+
+            <% if (typeof csrfToken !== 'undefined') { %>
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+            <% } %>
+
+            <!-- Identity / Email -->
+            <div>
+              <label for="email" class="field-label block">Identity / Email</label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                class="input-vault"
+                placeholder="curator@velmora.com"
+                value="<%= typeof formData !== 'undefined' ? formData.email : '' %>"
+                autocomplete="username"
+              />
+              <div class="field-hint" id="hint-email">Identity address cannot be empty.</div>
+            </div>
+
+            <!-- Passcode -->
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <label for="passcode" class="field-label block" style="margin-bottom:0;">Passcode</label>
+                <a href="/auth/forgot-password" class="field-label footer-link"
+                   style="margin-bottom:0; text-decoration:none;">Forgot password?</a>
+              </div>
+              <div class="relative flex items-center">
+                <input
+                  id="passcode"
+                  name="password"
+                  type="password"
+                  class="input-vault pr-6"
+                  placeholder="············"
+                  autocomplete="current-password"
+                />
+                <button type="button" class="toggle-icon absolute right-0 bottom-1"
+                  onclick="togglePasscode()" aria-label="Toggle password visibility">
+                  <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg"
+                    width="16" height="16" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor" stroke-width="1.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/>
+                  </svg>
+                </button>
+              </div>
+              <div class="field-hint" id="hint-password">Passcode is required to unlock.</div>
+            </div>
+
+            <div class="pt-2 fade-up delay-4">
+              <button type="submit" class="btn-vault">Sign In to Collection</button>
+            </div>
+
+          </form>
+
+          <p class="mt-8 text-xs text-gray-400 fade-up delay-5"
+             style="font-family:'Jost',sans-serif; font-weight:300;">
+            Don't have an account?
+            <a href="/signup" class="footer-link text-vault underline underline-offset-2">
+              Apply for membership
+            </a>
+          </p>
+
+        </div>
+        <div></div>
+      </section>
+
+      <!-- RIGHT: Hero panel -->
+      <section class="hidden md:block md:w-7/12 relative overflow-hidden">
+        <img
+          src="/images/hero-watch.jpg"
+          alt="Luxury timepiece — Velmora Chroné"
+          class="absolute inset-0 w-full h-full object-cover object-center"
+          onerror="this.style.background='#1a1a18';this.removeAttribute('src')"
+        />
+        <div class="hero-overlay absolute inset-0"></div>
+        <div class="relative z-10 flex flex-col justify-center h-full px-12 pb-16">
+          <h2 class="font-display text-5xl font-light text-white leading-tight mb-4"
+              style="text-shadow:0 2px 24px rgba(0,0,0,0.5);">
+            Mastering the<br />Art of Time
+          </h2>
+          <p class="text-white/60 text-sm font-light max-w-xs leading-relaxed"
+             style="font-family:'Jost',sans-serif;">
+            Crafting heritage on your wrist. Each piece is a testament to centuries
+            of horological excellence and precision.
+          </p>
+          <div class="mt-8 flex items-center gap-3">
+            <div class="h-px w-8 bg-white/30"></div>
+            <span class="text-white/40 text-xs tracking-widest2 uppercase"
+                  style="font-family:'Jost',sans-serif; font-size:0.6rem;">Est. 1882</span>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="w-full px-8 py-4 flex items-center justify-between">
+    <span class="text-white/30 text-xs tracking-widest uppercase"
+          style="font-family:'Jost',sans-serif; font-size:0.6rem; font-weight:300;">
+      &copy; <%= new Date().getFullYear() %> Velmora Chroné Manufacture
+    </span>
+    <nav class="flex gap-6">
+      <a href="/privacy"       class="footer-link text-white/30 text-xs tracking-widest uppercase" style="font-size:0.6rem;">Privacy Policy</a>
+      <a href="/terms"         class="footer-link text-white/30 text-xs tracking-widest uppercase" style="font-size:0.6rem;">Terms of Service</a>
+      <a href="/accessibility" class="footer-link text-white/30 text-xs tracking-widest uppercase" style="font-size:0.6rem;">Accessibility</a>
+    </nav>
+    <div class="flex gap-4">
+      <a href="#" aria-label="Instagram" class="toggle-icon text-white/30">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+          viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+          <circle cx="12" cy="12" r="4"/>
+          <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/>
+        </svg>
+      </a>
+      <a href="#" aria-label="X" class="toggle-icon text-white/30">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+          viewBox="0 0 24 24" fill="currentColor">
+          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L2.25 2.25h7.086l4.26 5.63 4.648-5.63Zm-1.161 17.52h1.833L7.084 4.126H5.117Z"/>
+        </svg>
+      </a>
+    </div>
+  </footer>
+
+  <!-- ══════════════════════════════════════
+       SCRIPTS
+  ══════════════════════════════════════ -->
+  <script>
+    /* ── Password visibility toggle ── */
+    function togglePasscode() {
+      const inp  = document.getElementById('passcode');
+      const icon = document.getElementById('eye-icon');
+      if (inp.type === 'password') {
+        inp.type = 'text';
+        icon.innerHTML = `
+          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+          <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+          <line x1="1" y1="1" x2="23" y2="23"/>`;
+      } else {
+        inp.type = 'password';
+        icon.innerHTML = `
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/>`;
+      }
+    }
+
+    /* ── Vault Seal notification engine ── */
+    const ICONS = {
+      lock: `<rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+             <path d="M7 11V7a5 5 0 0 1 10 0v4"/>`,
+      key:  `<path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>`,
+      warn: `<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+             <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>`,
+    };
+
+    let sealTimer = null;
+
+    function showSeal(label, message, iconKey = 'lock') {
+      const seal  = document.getElementById('vault-seal');
+      const drain = document.getElementById('seal-drain');
+
+      document.getElementById('seal-label').textContent  = label;
+      document.getElementById('seal-msg').textContent    = message;
+      document.getElementById('seal-icon').innerHTML     = ICONS[iconKey] || ICONS.lock;
+
+      /* Reset drain bar */
+      drain.classList.remove('draining');
+      drain.style.transition = 'none';
+      drain.style.transform  = 'scaleX(1)';
+
+      seal.classList.add('seal-visible');
+
+      /* Start drain after paint */
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        drain.classList.add('draining');
+      }));
+
+      if (sealTimer) clearTimeout(sealTimer);
+      sealTimer = setTimeout(hideSeal, 4200);
+    }
+
+    function hideSeal() {
+      document.getElementById('vault-seal').classList.remove('seal-visible');
+      if (sealTimer) { clearTimeout(sealTimer); sealTimer = null; }
+    }
+
+    /* Escape key to dismiss */
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') hideSeal(); });
+
+    /* ── Field helpers ── */
+    function markError(el) {
+      el.classList.add('input-error');
+      el.addEventListener('input', () => el.classList.remove('input-error'), { once: true });
+    }
+
+    function shakeEl(el) {
+      el.classList.remove('shake');
+      void el.offsetWidth;
+      el.classList.add('shake');
+      el.addEventListener('animationend', () => el.classList.remove('shake'), { once: true });
+    }
+
+    function showHint(id, msg) {
+      const h = document.getElementById(id);
+      if (msg) h.textContent = msg;
+      h.classList.add('hint-show');
+    }
+
+    function hideHint(id) {
+      document.getElementById(id).classList.remove('hint-show');
+    }
+
+    /* ── Form validation ── */
+    document.getElementById('loginForm').addEventListener('submit', function (e) {
+      const emailEl = document.getElementById('email');
+      const passEl  = document.getElementById('passcode');
+      const email   = emailEl.value.trim();
+      const pass    = passEl.value.trim();
+      const emailRx = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      hideHint('hint-email');
+      hideHint('hint-password');
+
+      if (!email) {
+        e.preventDefault();
+        markError(emailEl);
+        shakeEl(emailEl);
+        showHint('hint-email', 'Identity address cannot be empty.');
+        showSeal('Vault Sealed', 'An identity address is required to proceed.', 'lock');
+        emailEl.focus();
+        return;
+      }
+
+      if (!emailRx.test(email)) {
+        e.preventDefault();
+        markError(emailEl);
+        shakeEl(emailEl);
+        showHint('hint-email', 'The address format is unrecognised.');
+        showSeal('Invalid Format', 'Please provide a valid identity address.', 'key');
+        emailEl.focus();
+        return;
+      }
+
+      if (!pass) {
+        e.preventDefault();
+        markError(passEl);
+        shakeEl(passEl);
+        showHint('hint-password', 'Passcode is required to unlock.');
+        showSeal('Passcode Required', 'Your passcode is needed to open the vault.', 'warn');
+        passEl.focus();
+        return;
+      }
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Verify Code</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Cinzel:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/user/otp.css">
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+<style>
+  #verifyBtn {
+    background-color: #1a1a18;
+    color: #f5f2eb;
+    font-family: "Jost", sans-serif;
+    font-size: 0.65rem;
+    font-weight: 400;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    border: none;
+    cursor: pointer;
+    padding: 1rem 2rem;
+    width: 100%;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  #verifyBtn:hover { background-color: #0d9488; color: #fff; }
+  #verifyBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+</style>
+</head>
+
+<body>
+
+<div class="card">
+  <h2>Enter OTP</h2>
+
+  <div class="otp-boxes">
+    <input type="text" maxlength="1" inputmode="numeric">
+    <input type="text" maxlength="1" inputmode="numeric">
+    <input type="text" maxlength="1" inputmode="numeric">
+    <input type="text" maxlength="1" inputmode="numeric">
+    <input type="text" maxlength="1" inputmode="numeric">
+    <input type="text" maxlength="1" inputmode="numeric">
+  </div>
+
+  <p class="resend">
+    Didn't receive the code?
+    <a href="#" id="resendBtn" class="disabled">Resend Code</a><br>
+    <span id="timer">00:59</span>
+  </p>
+
+  <button id="verifyBtn">VERIFY</button>
+
+  <p id="otpError" class="error-msg"></p>
+</div>
+
+<script type="module" src="/user/js/otp.js"></script>
+
+</body>
+</html>

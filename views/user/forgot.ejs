@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Velmora Chroné — Forgot Password</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ["Cormorant Garamond", "serif"],
+            body: ["Jost", "sans-serif"],
+          },
+          colors: { cream: "#f5f2eb", vault: "#1a1a18", accent: "#0d9488" },
+          letterSpacing: { widest2: "0.25em" },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    body { font-family: "Jost", sans-serif; background-color: #1a1a18; }
+
+    .input-vault {
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid #555;
+      border-radius: 0;
+      outline: none;
+      color: #1a1a18;
+      font-family: "Jost", sans-serif;
+      font-weight: 300;
+      font-size: 0.875rem;
+      width: 100%;
+      padding: 0.35rem 0;
+      transition: border-color 0.3s;
+    }
+    .input-vault::placeholder { color: #aaa; }
+    .input-vault:focus { border-bottom-color: #0d9488; }
+    .input-vault.input-error { border-bottom-color: #b91c1c; }
+
+    .field-label {
+      font-family: "Jost", sans-serif;
+      font-size: 0.6rem;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #555;
+      margin-bottom: 0.5rem;
+    }
+
+    .btn-vault {
+      background-color: #1a1a18;
+      color: #f5f2eb;
+      font-family: "Jost", sans-serif;
+      font-size: 0.65rem;
+      font-weight: 400;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      border: none;
+      cursor: pointer;
+      padding: 1rem 2rem;
+      width: 100%;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .btn-vault:hover { background-color: #0d9488; color: #fff; }
+    .btn-vault:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .footer-link { transition: color 0.2s; }
+    .footer-link:hover { color: #0d9488; }
+
+    .hero-overlay {
+      background: linear-gradient(160deg, rgba(10,10,10,0.55) 0%, rgba(10,10,10,0.35) 60%, rgba(10,10,10,0.65) 100%);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up  { animation: fadeUp 0.7s ease both; }
+    .delay-1  { animation-delay: 0.10s; }
+    .delay-2  { animation-delay: 0.22s; }
+    .delay-3  { animation-delay: 0.34s; }
+    .delay-4  { animation-delay: 0.46s; }
+
+    .field-hint {
+      font-family: "Jost", sans-serif;
+      font-size: 0.57rem;
+      letter-spacing: 0.08em;
+      color: #b91c1c;
+      margin-top: 5px;
+      opacity: 0;
+      max-height: 0;
+      overflow: hidden;
+      transition: opacity 0.3s, max-height 0.3s;
+    }
+    .field-hint.hint-show { opacity: 1; max-height: 20px; }
+  </style>
+</head>
+
+<body class="min-h-screen flex flex-col">
+
+  <main class="flex flex-1 items-center justify-center p-4 md:p-8">
+    <div class="w-full max-w-5xl flex shadow-2xl" style="min-height:520px;">
+
+      <!-- LEFT PANEL -->
+      <section class="w-full md:w-5/12 bg-cream flex flex-col justify-between p-10 md:p-12 fade-up">
+
+        <div class="mb-8">
+          <img src="/images/logo-velmora.svg" alt="Velmora Chroné"
+            class="h-6 opacity-70" onerror="this.style.display='none'" />
+        </div>
+
+        <div class="flex-1 flex flex-col justify-center">
+
+          <h1 class="font-display text-4xl font-light text-vault leading-tight mb-1 fade-up delay-1">
+            Restore Access
+          </h1>
+          <p class="field-label mb-8 fade-up delay-2">
+            Enter your email to receive a verification code.
+          </p>
+
+          <form id="forgotForm" class="space-y-7 fade-up delay-3" novalidate>
+            <div>
+              <label for="forgotEmail" class="field-label block">Email Address</label>
+              <input
+                id="forgotEmail"
+                name="email"
+                type="email"
+                class="input-vault"
+                placeholder="curator@velmora.com"
+                autocomplete="email"
+              />
+              <div class="field-hint" id="hint-email"></div>
+            </div>
+
+            <div class="pt-2 fade-up delay-4">
+              <button type="submit" id="forgotBtn" class="btn-vault">Send OTP</button>
+            </div>
+          </form>
+
+          <p class="mt-8 text-xs text-gray-400 fade-up"
+             style="font-family:'Jost',sans-serif; font-weight:300;">
+            Remembered your password?
+            <a href="/login" class="footer-link text-vault underline underline-offset-2">
+              Sign in
+            </a>
+          </p>
+
+        </div>
+        <div></div>
+      </section>
+
+      <!-- RIGHT PANEL -->
+      <section class="hidden md:block md:w-7/12 relative overflow-hidden">
+        <img src="https://res.cloudinary.com/dwb0hd0m6/image/upload/v1774530629/wp12480364_djglbm.jpg"
+          alt="Luxury timepiece — Velmora Chroné"
+          class="absolute inset-0 w-full h-full object-cover object-center"
+          onerror="this.style.background='#1a1a18';this.removeAttribute('src')" />
+        <div class="hero-overlay absolute inset-0"></div>
+        <div class="relative z-10 flex flex-col justify-center h-full px-12 pb-16">
+          <h2 class="font-display text-5xl font-light text-white leading-tight mb-4"
+              style="text-shadow:0 2px 24px rgba(0,0,0,0.5);">
+            Reclaim Your<br />Collection
+          </h2>
+          <p class="text-white/60 text-sm font-light max-w-xs leading-relaxed"
+             style="font-family:'Jost',sans-serif;">
+            We'll send a secure code to your registered address
+            to restore access to your private vault.
+          </p>
+          <div class="mt-8 flex items-center gap-3">
+            <div class="h-px w-8 bg-white/30"></div>
+            <span class="text-white/40 text-xs tracking-widest2 uppercase"
+                  style="font-family:'Jost',sans-serif; font-size:0.6rem;">Est. 1882</span>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="w-full px-8 py-4 flex items-center justify-between">
+    <span class="text-white/30 text-xs tracking-widest uppercase"
+          style="font-family:'Jost',sans-serif; font-size:0.6rem; font-weight:300;">
+      &copy; <%= new Date().getFullYear() %> Velmora Chroné Manufacture
+    </span>
+    <nav class="flex gap-6">
+      <a href="/privacy" class="footer-link text-white/30 text-xs tracking-widest uppercase" style="font-size:0.6rem;">Privacy Policy</a>
+      <a href="/terms"   class="footer-link text-white/30 text-xs tracking-widest uppercase" style="font-size:0.6rem;">Terms of Service</a>
+    </nav>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    function showHint(id, msg) {
+      const h = document.getElementById(id);
+      h.textContent = msg;
+      h.classList.add('hint-show');
+    }
+    function hideHint(id) {
+      document.getElementById(id).classList.remove('hint-show');
+    }
+
+    document.getElementById('forgotForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const email = document.getElementById('forgotEmail').value.trim();
+      const btn   = document.getElementById('forgotBtn');
+
+      hideHint('hint-email');
+
+      if (!email) {
+        showHint('hint-email', 'Please enter your email address.');
+        return;
+      }
+
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showHint('hint-email', 'Please enter a valid email address.');
+        return;
+      }
+
+      btn.textContent = 'Sending...';
+      btn.disabled = true;
+
+      try {
+        const res = await axios.post('/forget-password', { email });
+
+        if (res.data.success) {
+          localStorage.setItem('resetFlow', 'true');
+          localStorage.setItem('verifyEmail', email);
+          window.location.href = '/otp';
+        } else {
+          showHint('hint-email', res.data.message || 'Email not found.');
+          btn.textContent = 'Send OTP';
+          btn.disabled = false;
+        }
+
+      } catch (err) {
+        showHint('hint-email', err.response?.data?.message || 'Server error. Please try again.');
+        btn.textContent = 'Send OTP';
+        btn.disabled = false;
+      }
+    });
+  </script>
+
+</body>
+</html>

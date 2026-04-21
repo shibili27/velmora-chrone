@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="0"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Velmora Chroné — Manufacture</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Jost:wght@200;300;400;500&display=swap"
+    rel="stylesheet"
+  />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ["Cormorant Garamond", "serif"],
+            body:    ["Jost", "sans-serif"],
+          },
+          colors: {
+            cream:  "#f5f2eb",
+            vault:  "#1a1a18",
+            pine:   "#0e1f18",
+            accent: "#0d9488",
+            gold:   "#c9a96e",
+          },
+          screens: {
+            xs: "400px",
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Jost", sans-serif;
+      background-color: #0e1f18;
+      color: #f5f2eb;
+      overflow-x: hidden;
+    }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-track { background: #0e1f18; }
+    ::-webkit-scrollbar-thumb { background: #c9a96e; }
+
+    /* ═══════════════════════════
+       NAV
+    ═══════════════════════════ */
+    .nav-root {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      transition: background 0.3s, backdrop-filter 0.3s;
+    }
+    .nav-root.scrolled {
+      background: rgba(6,15,11,0.97) !important;
+      backdrop-filter: blur(14px);
+    }
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+    }
+    @media (min-width: 768px) {
+      .nav-inner { padding: 1.1rem 3rem; }
+    }
+
+    .nav-link {
+      font-family: "Jost", sans-serif;
+      font-size: 0.6rem;
+      font-weight: 400;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(245,242,235,0.65);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nav-link:hover { color: #c9a96e; }
+
+    /* Hamburger */
+    .hamburger {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 4px;
+      background: none;
+      border: none;
+    }
+    .hamburger span {
+      display: block;
+      width: 22px;
+      height: 1px;
+      background: rgba(245,242,235,0.7);
+      transition: transform 0.3s, opacity 0.3s;
+    }
+    .hamburger.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+    /* Mobile drawer */
+    .mobile-menu {
+      display: none;
+      flex-direction: column;
+      background: rgba(6,15,11,0.98);
+      padding: 1.5rem;
+      gap: 1.2rem;
+      border-top: 1px solid rgba(201,169,110,0.15);
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu .nav-link {
+      font-size: 0.75rem;
+      padding: 0.3rem 0;
+      border-bottom: 1px solid rgba(245,242,235,0.05);
+    }
+
+    /* ═══════════════════════════
+       HERO
+    ═══════════════════════════ */
+    .hero-section {
+      position: relative;
+      width: 100%;
+      height: 100svh;
+      min-height: 500px;
+      overflow: hidden;
+      background: #0a1410;
+    }
+    .hero-img {
+      position: absolute;
+      inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      object-position: center;
+      opacity: 0.88;
+    }
+    .hero-gradient {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        180deg,
+        rgba(14,31,24,0.4) 0%,
+        rgba(14,31,24,0.05) 40%,
+        rgba(14,31,24,0.75) 100%
+      );
+    }
+    .hero-content {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 0 1.5rem;
+    }
+    .hero-title {
+      font-family: "Cormorant Garamond", serif;
+      font-style: italic;
+      font-weight: 300;
+      line-height: 1.05;
+      color: #f5f2eb;
+      text-shadow: 0 4px 40px rgba(0,0,0,0.45);
+      /* fluid: 48px → 96px */
+      font-size: clamp(3rem, 9vw, 6rem);
+    }
+    .hero-scroll {
+      position: absolute;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* ═══════════════════════════
+       SECTION LABEL
+    ═══════════════════════════ */
+    .section-label {
+      font-family: "Jost", sans-serif;
+      font-size: 0.55rem;
+      font-weight: 500;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: #c9a96e;
+    }
+
+    /* ═══════════════════════════
+       PRODUCT CARD
+    ═══════════════════════════ */
+    .product-card {
+      background: #f5f2eb;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.35s cubic-bezier(0.25,0.46,0.45,0.94),
+                  box-shadow 0.35s;
+    }
+    .product-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.18);
+    }
+    .product-card:hover .card-img { transform: scale(1.05); }
+
+    .card-img-wrap {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      overflow: hidden;
+      background: #e8e4dc;
+    }
+    .card-img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s cubic-bezier(0.25,0.46,0.45,0.94);
+    }
+    .card-body { padding: 0.85rem 0.9rem 1rem; }
+    .card-name {
+      font-family: "Cormorant Garamond", serif;
+      font-size: 1rem;
+      font-weight: 400;
+      color: #1a1a18;
+      line-height: 1.2;
+    }
+    .card-sub {
+      font-family: "Jost", sans-serif;
+      font-size: 0.52rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #999;
+      margin-bottom: 4px;
+    }
+    .card-price {
+      font-family: "Jost", sans-serif;
+      font-size: 0.78rem;
+      color: #1a1a18;
+      margin-top: 4px;
+    }
+    .watch-placeholder {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, #1a2820, #0d1a14);
+    }
+
+    /* ═══════════════════════════
+       CATEGORY CARD
+    ═══════════════════════════ */
+    .cat-card {
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      background: #0a1410;
+    }
+    .cat-card img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94);
+      opacity: 0.75;
+      display: block;
+    }
+    .cat-card:hover img { transform: scale(1.07); opacity: 0.88; }
+    .cat-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(180deg, transparent 40%, rgba(10,20,16,0.88) 100%);
+    }
+    .cat-label {
+      position: absolute;
+      bottom: 1rem; left: 1rem;
+    }
+
+    /* ═══════════════════════════
+       BUTTONS
+    ═══════════════════════════ */
+    .btn-gold {
+      display: inline-block;
+      font-family: "Jost", sans-serif;
+      font-size: 0.6rem;
+      font-weight: 400;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: #0e1f18;
+      background: #c9a96e;
+      padding: 0.75rem 1.6rem;
+      text-decoration: none;
+      border: 1px solid #c9a96e;
+      transition: background 0.25s, color 0.25s;
+      white-space: nowrap;
+    }
+    .btn-gold:hover { background: transparent; color: #c9a96e; }
+
+    .btn-outline {
+      display: inline-block;
+      font-family: "Jost", sans-serif;
+      font-size: 0.6rem;
+      font-weight: 400;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: #f5f2eb;
+      border: 1px solid rgba(245,242,235,0.35);
+      padding: 0.75rem 1.6rem;
+      text-decoration: none;
+      transition: border-color 0.25s, color 0.25s;
+      white-space: nowrap;
+    }
+    .btn-outline:hover { border-color: #c9a96e; color: #c9a96e; }
+
+    /* ═══════════════════════════
+       TICKER
+    ═══════════════════════════ */
+    .ticker-wrap { overflow: hidden; background: #c9a96e; padding: 0.55rem 0; }
+    .ticker-track {
+      display: flex;
+      gap: 3.5rem;
+      white-space: nowrap;
+      animation: tickerMove 30s linear infinite;
+      width: max-content;
+    }
+    .ticker-item {
+      font-family: "Jost", sans-serif;
+      font-size: 0.55rem;
+      font-weight: 500;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: #0e1f18;
+      flex-shrink: 0;
+    }
+    @keyframes tickerMove {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    /* ═══════════════════════════
+       DIVIDER
+    ═══════════════════════════ */
+    .rule {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(201,169,110,0.35), transparent);
+    }
+
+    /* ═══════════════════════════
+       SCROLL REVEAL
+    ═══════════════════════════ */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up { animation: fadeUp 0.8s ease both; }
+    .d1 { animation-delay: 0.1s; }
+    .d2 { animation-delay: 0.25s; }
+    .d3 { animation-delay: 0.4s; }
+    .d4 { animation-delay: 0.55s; }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(26px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ═══════════════════════════
+       FOOTER
+    ═══════════════════════════ */
+    .footer-link {
+      font-family: "Jost", sans-serif;
+      font-size: 0.58rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(245,242,235,0.4);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer-link:hover { color: #c9a96e; }
+
+    /* ═══════════════════════════
+       CART BADGE
+    ═══════════════════════════ */
+    .cart-badge {
+      position: absolute;
+      top: -5px; right: -6px;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: #c9a96e;
+      font-size: 0.45rem;
+      font-weight: 500;
+      color: #0e1f18;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* ═══════════════════════════
+       RESPONSIVE PRODUCT GRID
+    ═══════════════════════════ */
+    .products-grid {
+      display: grid;
+      gap: 0.75rem;
+      grid-template-columns: repeat(2, 1fr);
+    }
+    @media (min-width: 768px) {
+      .products-grid { grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+    }
+
+    /* ═══════════════════════════
+       RESPONSIVE CATEGORY GRID
+    ═══════════════════════════ */
+    .cat-grid {
+      display: grid;
+      gap: 0.6rem;
+      grid-template-columns: repeat(2, 1fr);
+    }
+    @media (min-width: 768px) {
+      .cat-grid { grid-template-columns: repeat(4, 1fr); gap: 0.75rem; }
+    }
+    .cat-card { aspect-ratio: 2 / 3; }
+    @media (min-width: 768px) { .cat-card { aspect-ratio: 3 / 4; } }
+
+    /* ═══════════════════════════
+       EDITORIAL SPLIT
+    ═══════════════════════════ */
+    .editorial-wrap {
+      display: flex;
+      flex-direction: column;
+    }
+    @media (min-width: 768px) {
+      .editorial-wrap { flex-direction: row; min-height: 520px; }
+    }
+    .editorial-text {
+      width: 100%;
+      padding: 3rem 1.5rem;
+    }
+    @media (min-width: 768px) {
+      .editorial-text { width: 42%; padding: 4rem 4rem 4rem 3rem; }
+    }
+    .editorial-img-wrap {
+      width: 100%;
+      min-height: 280px;
+      position: relative;
+      overflow: hidden;
+    }
+    @media (min-width: 768px) {
+      .editorial-img-wrap { width: 58%; min-height: auto; }
+    }
+
+    /* ═══════════════════════════
+       FOOTER GRID
+    ═══════════════════════════ */
+    .footer-top {
+      display: flex;
+      flex-direction: column;
+      gap: 2.5rem;
+      padding-bottom: 2.5rem;
+      border-bottom: 1px solid rgba(245,242,235,0.06);
+    }
+    @media (min-width: 768px) {
+      .footer-top { flex-direction: row; justify-content: space-between; align-items: flex-start; }
+    }
+    .footer-links-grid {
+      display: grid;
+      grid-template-columns: repeat(2, auto);
+      gap: 0.75rem 3rem;
+    }
+    @media (min-width: 768px) {
+      .footer-links-grid { grid-template-columns: repeat(3, auto); }
+    }
+    .footer-bottom {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      padding-top: 1.5rem;
+      text-align: center;
+    }
+    @media (min-width: 768px) {
+      .footer-bottom { flex-direction: row; justify-content: space-between; text-align: left; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ══════════════════════════════════════
+       NAV
+  ══════════════════════════════════════ -->
+  <nav class="nav-root" style="background: linear-gradient(180deg, rgba(10,20,16,0.9) 0%, rgba(10,20,16,0) 100%);">
+
+    <div class="nav-inner">
+
+      <!-- Desktop left links -->
+      <div class="hidden md:flex items-center gap-8">
+        <a href="/home" class="nav-link">Collection</a>
+        <a href="/home" class="nav-link">Manufacture</a>
+        <a href="/home" class="nav-link">Heritage</a>
+      </div>
+
+      <!-- Logo — centered on desktop, left on mobile -->
+      <a href="/home" class="md:absolute md:left-1/2 md:-translate-x-1/2">
+        <span style="font-family:'Cormorant Garamond',serif; font-size:1.1rem;
+                     font-weight:300; letter-spacing:0.18em; color:#f5f2eb;">
+          Velmora Chroné
+        </span>
+      </a>
+
+      <!-- Right: icons always visible -->
+      <div class="flex items-center gap-4 md:gap-5 ml-auto md:ml-0">
+
+        <!-- Search (hidden on smallest screens) -->
+        <button class="nav-link hidden xs:block" aria-label="Search">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+        </button>
+
+        <!-- Profile -->
+        <a href="/profile" class="nav-link" aria-label="Profile">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+        </a>
+
+        <!-- Cart -->
+        <a href="/cart" class="nav-link relative" aria-label="Cart">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <path d="M16 10a4 4 0 0 1-8 0"/>
+          </svg>
+          <span class="cart-badge">0</span>
+        </a>
+
+        <!-- Logout — text hidden on mobile -->
+        <a href="/logout" class="nav-link">
+          <span class="hidden md:inline">Logout</span>
+          <svg class="md:hidden" width="15" height="15" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+        </a>
+
+        <!-- Hamburger — mobile only -->
+        <button class="hamburger md:hidden" id="hamburger" aria-label="Menu">
+          <span></span><span></span><span></span>
+        </button>
+
+      </div>
+    </div>
+
+    <!-- Mobile drawer -->
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="/home"    class="nav-link">Collection</a>
+      <a href="/home"    class="nav-link">Manufacture</a>
+      <a href="/home"    class="nav-link">Heritage</a>
+      <a href="/home"    class="nav-link">About Us</a>
+      <a href="/profile" class="nav-link">My Profile</a>
+      <a href="/cart"    class="nav-link">Cart</a>
+      <a href="/logout"  class="nav-link" style="color:rgba(201,169,110,0.7);">Logout</a>
+    </div>
+
+  </nav>
+
+  <!-- ══════════════════════════════════════
+       HERO
+  ══════════════════════════════════════ -->
+  <section class="hero-section">
+<img src=https://res.cloudinary.com/dwb0hd0m6/image/upload/v1774866520/Rolex_Cosmograph_Daytona___Triumph_of_Performance___Rolex_bbqplm.jpg
+  class="hero-img"
+     onerror="this.style.display='none'" />
+              
+    <div class="hero-gradient"></div>
+
+    <div class="hero-content">
+      <p class="section-label fade-up d1 mb-4"
+         style="color:rgba(201,169,110,0.8);">Est. 1882 — Velmora Chroné</p>
+
+      <h1 class="hero-title fade-up d2">
+        A Legacy of<br />
+        <span style="color:#c9a96e;">Precision</span>
+      </h1>
+
+      <div class="mt-6 md:mt-8 flex flex-col xs:flex-row items-center gap-3 fade-up d3">
+        <a href="/home" class="btn-gold w-full xs:w-auto text-center">Explore Collection</a>
+        <a href="/home" class="btn-outline w-full xs:w-auto text-center">Our Story</a>
+      </div>
+    </div>
+
+    <!-- Scroll hint -->
+    <div class="hero-scroll fade-up d4">
+      <span class="section-label" style="color:rgba(245,242,235,0.35); font-size:0.5rem;">Scroll</span>
+      <div style="width:1px; height:32px; background:linear-gradient(180deg,rgba(201,169,110,0.5),transparent);"></div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       TICKER
+  ══════════════════════════════════════ -->
+  <div class="ticker-wrap">
+    <div class="ticker-track">
+      <% for(let i = 0; i < 2; i++) { %>
+        <span class="ticker-item">Swiss Movement</span>
+        <span class="ticker-item">·</span>
+        <span class="ticker-item">Handcrafted Dials</span>
+        <span class="ticker-item">·</span>
+        <span class="ticker-item">Sapphire Crystal</span>
+        <span class="ticker-item">·</span>
+        <span class="ticker-item">Limited Editions</span>
+        <span class="ticker-item">·</span>
+        <span class="ticker-item">Free Worldwide Shipping</span>
+        <span class="ticker-item">·</span>
+        <span class="ticker-item">5 Year Warranty</span>
+        <span class="ticker-item">·</span>
+        <span class="ticker-item">Bespoke Engraving</span>
+        <span class="ticker-item">·</span>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       SELECTED MASTERPIECES
+  ══════════════════════════════════════ -->
+  <section style="background:#f5f2eb; padding: 4rem 1.25rem 4rem;">
+    <div style="max-width:1200px; margin:0 auto;">
+
+      <!-- Header -->
+      <div class="reveal" style="display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:2rem; flex-wrap:wrap; gap:1rem;">
+        <div>
+          <p class="section-label" style="color:#0d9488; margin-bottom:6px;">Curated Selection</p>
+          <h2 style="font-family:'Cormorant Garamond',serif; font-size:clamp(1.8rem,4vw,2.8rem);
+                     font-weight:300; color:#1a1a18; line-height:1.1;">
+            Selected Masterpieces
+          </h2>
+        </div>
+        <a href="/home"
+           style="font-family:'Jost',sans-serif; font-size:0.6rem; letter-spacing:0.2em;
+                  text-transform:uppercase; color:#1a1a18; text-decoration:none;
+                  display:flex; align-items:center; gap:8px; opacity:0.6; white-space:nowrap;">
+          View All
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <line x1="5" y1="12" x2="19" y2="12"/>
+            <polyline points="12 5 19 12 12 19"/>
+          </svg>
+        </a>
+      </div>
+
+      <!-- Grid -->
+      <div class="products-grid reveal">
+        <%
+          const products = [
+            { name: "Noir Classique",  sub: "Automatic · 40mm",  price: "₹ 2,40,000", img: "https://res.cloudinary.com/dwb0hd0m6/image/upload/v1774607282/download_17_rzpb1h.jpg" },
+            { name: "Blanc Heritage",  sub: "Manual Wind · 38mm", price: "₹ 1,85,000", img: "https://res.cloudinary.com/dwb0hd0m6/image/upload/v1774527532/The_Speedmaster_Apollo_11_50th_Anniversary_Limited_Edition_in_stainless_steel_and_18K_Moonshine_gold__Notice_the_number_11_on_the_dial_of_the_watch_and_the_laser-engraved_image_of_Buzz_Aldrin_climbing_down_o_2_eibhvm.jpg" },
+            { name: "Rosé Élite",      sub: "Automatic · 42mm",  price: "₹ 3,20,000", img: "https://res.cloudinary.com/dwb0hd0m6/image/upload/v1774607373/Vincero_The_Harper_Bracelet_Watch_29mm_in_Gold_green_at_Nordstrom_zdrnoy.jpg" },
+            { name: "Obsidian GMT",    sub: "GMT · 41mm",         price: "₹ 4,10,000", img: "https://res.cloudinary.com/dwb0hd0m6/image/upload/v1774607517/Titan_premium_watch_photography_umihbi.jpg" },
+          ];
+        %>
+        <% products.forEach(function(p) { %>
+        <div class="product-card">
+          <div class="card-img-wrap">
+            <img src="<%= p.img %>" alt="<%= p.name %>" class="card-img"
+              onerror="this.parentElement.innerHTML='<div class=\'watch-placeholder\'><svg width=\'56\' height=\'56\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'rgba(201,169,110,0.25)\' stroke-width=\'0.5\'><circle cx=\'12\' cy=\'12\' r=\'10\'/><line x1=\'12\' y1=\'6\' x2=\'12\' y2=\'12\'/><line x1=\'12\' y1=\'12\' x2=\'15\' y2=\'14\'/></svg></div>'"
+            />
+          </div>
+          <div class="card-body">
+            <div class="card-sub"><%= p.sub %></div>
+            <div class="card-name"><%= p.name %></div>
+            <div class="card-price"><%= p.price %></div>
+          </div>
+        </div>
+        <% }); %>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       SHOP BY CATEGORY
+  ══════════════════════════════════════ -->
+  <section style="background:#0e1f18; padding: 4rem 1.25rem;">
+    <div style="max-width:1200px; margin:0 auto;">
+
+      <div class="reveal" style="margin-bottom:2rem;">
+        <p class="section-label" style="margin-bottom:6px;">Browse</p>
+        <h2 style="font-family:'Cormorant Garamond',serif; font-size:clamp(1.8rem,4vw,2.8rem);
+                   font-weight:300; color:#f5f2eb; line-height:1.1;">
+          Shop by Category
+        </h2>
+      </div>
+
+      <div class="cat-grid reveal">
+        <%
+          const categories = [
+            { name: "Fromal Watches", img: "https://res.cloudinary.com/dwb0hd0m6/image/upload/v1774611384/download_18_cqo3mr.jpg"   },
+            { name: "For Him",    img: "https://res.cloudinary.com/dwb0hd0m6/image/upload/v1774607627/%E6%99%82%E8%A8%88_bidkje.jpg"   },
+            { name: "For Her",    img: "https://res.cloudinary.com/dwb0hd0m6/image/upload/v1774528987/_follow_my_Whatsapp_channel____foryou_androidwallpaper_wallpaperiphone_iphonewallpaper_pc_wallpaper_Pinterest_Aesthetic_view_ExplorePage_trending_Explore_3d_nature___zmn7d4.jpg"   },
+            { name: "Partywear Watches", img: "https://res.cloudinary.com/dwb0hd0m6/image/upload/v1774935664/ROLEX_COSMOGRAPH_csacv2.jpg"},
+          ];
+        %>
+        <% categories.forEach(function(c) { %>
+        <div class="cat-card">
+          <img src="<%= c.img %>" alt="<%= c.name %>"
+            onerror="this.style.display='none'; this.parentElement.style.background='#1a2820';" />
+          <div class="cat-overlay"></div>
+          <div class="cat-label">
+            <p class="section-label" style="margin-bottom:3px; font-size:0.48rem;">Category</p>
+            <p style="font-family:'Cormorant Garamond',serif; font-size:clamp(1.1rem,2.5vw,1.5rem);
+                      font-weight:300; color:#f5f2eb; font-style:italic;">
+              <%= c.name %>
+            </p>
+          </div>
+        </div>
+        <% }); %>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       EDITORIAL — Generations of Craftsmanship
+  ══════════════════════════════════════ -->
+  <section style="background:#0a1410; overflow:hidden;">
+    <div class="editorial-wrap">
+
+      <!-- Text -->
+      <div class="editorial-text reveal">
+        <p class="section-label" style="margin-bottom:1.2rem;">Our Philosophy</p>
+        <h2 style="font-family:'Cormorant Garamond',serif;
+                   font-size:clamp(2rem,4vw,3rem);
+                   font-weight:300; color:#f5f2eb; line-height:1.15;
+                   margin-bottom:1.25rem;">
+          Generations of<br />
+          <span style="font-style:italic; color:#c9a96e;">Craftsmanship</span>
+        </h2>
+        <div class="rule" style="width:48px; margin-bottom:1.25rem;"></div>
+        <p style="color:rgba(245,242,235,0.5); font-size:0.85rem; line-height:1.8;
+                  font-family:'Jost',sans-serif; font-weight:300; max-width:360px;
+                  margin-bottom:2rem;">
+          Each Velmora timepiece is assembled by hand in our Geneva atelier.
+          Over 300 individual components, tested to the most exacting tolerances
+          in horology — a tradition passed from master to apprentice since 1882.
+        </p>
+        <a href="/home" class="btn-gold">Discover Heritage</a>
+      </div>
+
+      <!-- Image -->
+      <div class="editorial-img-wrap">
+        <img src="https://res.cloudinary.com/dwb0hd0m6/image/upload/v1774530220/velmora_chrone_logo_bgyhmw.svg" alt="Watchmaker at work"
+             style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover;"
+             onerror="this.style.display='none'" />
+        <div style="position:absolute; inset:0;
+                    background:linear-gradient(90deg, rgba(10,20,16,0.55) 0%, transparent 55%);"></div>
+        <div style="position:absolute; bottom:1.5rem; right:1.5rem; text-align:right;">
+          <div style="width:40px; height:1px; background:rgba(201,169,110,0.35);
+                      margin-left:auto; margin-bottom:6px;"></div>
+          <span class="section-label" style="color:rgba(201,169,110,0.45);">Est. 1882</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       QUOTE BAR
+  ══════════════════════════════════════ -->
+  <div style="background:#c9a96e; padding:1.5rem 1.5rem; text-align:center;">
+    <p style="font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:300;
+              color:#0e1f18; font-size:clamp(1.1rem,3vw,1.6rem); line-height:1.4;
+              max-width:700px; margin:0 auto;">
+      "Time is the only luxury that cannot be manufactured — only honoured."
+    </p>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       FOOTER
+  ══════════════════════════════════════ -->
+  <footer style="background:#060f0b; padding:3rem 1.25rem 1.5rem;">
+    <div style="max-width:1200px; margin:0 auto;">
+
+      <div class="footer-top">
+
+        <!-- Brand -->
+        <div style="max-width:260px;">
+          <p style="font-family:'Cormorant Garamond',serif; font-size:1.3rem;
+                    font-weight:300; color:#f5f2eb; letter-spacing:0.15em; margin-bottom:1rem;">
+            Velmora Chroné
+          </p>
+          <p style="color:rgba(245,242,235,0.35); font-size:0.75rem; line-height:1.8;
+                    font-family:'Jost',sans-serif; font-weight:300;">
+            Geneva-made timepieces for those who understand that true luxury
+            is measured not in price, but in permanence.
+          </p>
+        </div>
+
+        <!-- Links -->
+        <div class="footer-links-grid">
+          <a href="/home"    class="footer-link">Collection</a>
+          <a href="/home"    class="footer-link">About</a>
+          <a href="/home"    class="footer-link">Stockists</a>
+          <a href="/home"    class="footer-link">Manufacture</a>
+          <a href="/home"    class="footer-link">Press</a>
+          <a href="/home"    class="footer-link">Careers</a>
+          <a href="/privacy" class="footer-link">Privacy</a>
+          <a href="/terms"   class="footer-link">Terms</a>
+          <a href="/home"    class="footer-link">Contact</a>
+        </div>
+
+        <!-- Newsletter -->
+        <div style="min-width:220px; max-width:280px; width:100%;">
+          <p class="section-label" style="color:rgba(245,242,235,0.35); margin-bottom:0.75rem;">
+            Private Newsletter
+          </p>
+          <div style="display:flex; border-bottom:1px solid rgba(245,242,235,0.18); padding-bottom:0.3rem;">
+            <input type="email" placeholder="your@email.com"
+              style="background:transparent; border:none; outline:none;
+                     font-family:'Jost',sans-serif; font-size:0.75rem; font-weight:300;
+                     color:#f5f2eb; flex:1; min-width:0;" />
+            <button style="background:none; border:none; cursor:pointer;
+                           color:#c9a96e; padding:0 0.25rem; flex-shrink:0;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                <line x1="5" y1="12" x2="19" y2="12"/>
+                <polyline points="12 5 19 12 12 19"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Bottom -->
+      <div class="footer-bottom">
+        <span style="font-family:'Jost',sans-serif; font-size:0.52rem;
+                     letter-spacing:0.15em; text-transform:uppercase;
+                     color:rgba(245,242,235,0.2);">
+          &copy; <%= new Date().getFullYear() %> Velmora Chroné Manufacture. All rights reserved.
+        </span>
+
+        <div style="display:flex; gap:1.25rem; align-items:center;">
+          <a href="#" aria-label="Instagram" class="footer-link" style="color:rgba(245,242,235,0.3);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+              <circle cx="12" cy="12" r="4"/>
+              <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/>
+            </svg>
+          </a>
+          <a href="#" aria-label="X" class="footer-link" style="color:rgba(245,242,235,0.3);">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L2.25 2.25h7.086l4.26 5.63 4.648-5.63Zm-1.161 17.52h1.833L7.084 4.126H5.117Z"/>
+            </svg>
+          </a>
+          <a href="#" aria-label="Pinterest" class="footer-link" style="color:rgba(245,242,235,0.3);">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 0C5.373 0 0 5.373 0 12c0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738a.36.36 0 0 1 .083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.632-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- ══════════════════════════════════════
+       SCRIPTS
+  ══════════════════════════════════════ -->
+  <script>
+   
+    const hamburger   = document.getElementById('hamburger');
+    const mobileMenu  = document.getElementById('mobileMenu');
+    hamburger.addEventListener('click', () => {
+      hamburger.classList.toggle('open');
+      mobileMenu.classList.toggle('open');
+    });
+   
+    mobileMenu.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', () => {
+        hamburger.classList.remove('open');
+        mobileMenu.classList.remove('open');
+      });
+    });
+
+  
+    const nav = document.querySelector('.nav-root');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 60);
+    }, { passive: true });
+
+ 
+    const revealEls = document.querySelectorAll('.reveal');
+    const observer  = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => entry.target.classList.add('visible'), i * 90);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    revealEls.forEach(el => observer.observe(el));
+  </script>
+<script>
+  
+  history.pushState(null, null, window.location.href);
+  window.addEventListener('popstate', function() {
+    history.pushState(null, null, window.location.href);
+  });
+</script>
+</body>
+
+</html>

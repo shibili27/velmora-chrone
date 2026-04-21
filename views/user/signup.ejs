@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Velmora Chroné — Apply for Membership</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ["Cormorant Garamond", "serif"],
+            body: ["Jost", "sans-serif"],
+          },
+          colors: { cream: "#f5f2eb", vault: "#1a1a18", accent: "#0d9488" },
+          letterSpacing: { widest2: "0.25em" },
+        },
+      },
+    };
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="/user/css/signup.css" />
+  
+  <!-- Axios CDN for AJAX requests -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+
+<body class="min-h-screen flex flex-col">
+
+  <!-- VAULT SEAL -->
+  <div id="vault-seal" role="alert" aria-live="assertive">
+    <div class="seal-body">
+      <div class="seal-wax">
+        <div class="seal-bezel"></div>
+        <svg id="seal-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+          fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+      </div>
+      <div>
+        <div class="seal-label" id="seal-label">Registration Blocked</div>
+        <div class="seal-message" id="seal-msg">Please complete all required fields.</div>
+      </div>
+      <div class="seal-x" onclick="hideSeal()" title="Dismiss">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+          fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </div>
+      <div class="seal-drain" id="seal-drain"></div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed top-4 right-4 z-50"></div>
+
+  <!-- MAIN CARD -->
+  <main class="flex flex-1 items-center justify-center p-4 md:p-8">
+    <div class="w-full max-w-5xl flex shadow-2xl" style="min-height:560px;">
+
+      <!-- LEFT PANEL -->
+      <section class="w-full md:w-5/12 bg-cream flex flex-col justify-between p-10 md:p-12 fade-up">
+
+        <div class="mb-6">
+          <img src="/images/logo-velmora.svg" alt="Velmora Chroné"
+            class="h-6 opacity-70" onerror="this.style.display='none'" />
+        </div>
+
+        <div class="flex-1 flex flex-col justify-center">
+
+          <h1 class="font-display text-4xl font-light text-vault leading-tight mb-1 fade-up delay-1">
+            Join the Heritage
+          </h1>
+          <p class="field-label mb-7 fade-up delay-2">
+            Secure an exclusive invitation to the manufacture estate.
+          </p>
+
+          <!-- Server error placeholder (hidden) -->
+          <% if (locals.authError) { %>
+          <div id="server-auth-error" data-message="<%= authError %>" style="display:none;"></div>
+          <% } %>
+
+          <!-- Form with AJAX submission -->
+          <form id="signupForm" class="space-y-5 fade-up delay-3" novalidate>
+
+            <% if (typeof csrfToken !== 'undefined') { %>
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+            <% } %>
+
+            <!-- Row 1: Full Name + Email -->
+            <div class="grid grid-cols-2 gap-5">
+              <div>
+                <label for="name" class="field-label block">Full Name</label>
+                <input id="name" name="name" type="text" class="input-vault"
+                  placeholder="Arthur M. Morgan"
+                  value="<%= locals.formData ? formData.name : '' %>"
+                  autocomplete="name" />
+                <div class="field-hint" id="hint-name">Full name is required.</div>
+              </div>
+              <div>
+                <label for="email" class="field-label block">Preferred Email</label>
+                <input id="email" name="email" type="email" class="input-vault"
+                  placeholder="collector@velmora.com"
+                  value="<%= locals.formData ? formData.email : '' %>"
+                  autocomplete="email" />
+                <div class="field-hint" id="hint-email">A valid email is required.</div>
+              </div>
+            </div>
+
+            <!-- Row 2: Password + Confirm -->
+            <div class="grid grid-cols-2 gap-5">
+              <div>
+                <label for="password" class="field-label block">Choose Password</label>
+                <div class="relative flex items-center">
+                  <input id="password" name="password" type="password"
+                    class="input-vault pr-6" placeholder="············"
+                    autocomplete="new-password" oninput="updateStrength(this.value)" />
+                  <button type="button" class="toggle-icon absolute right-0 bottom-1"
+                    onclick="toggleField('password','eye-pw')" aria-label="Toggle password">
+                    <svg id="eye-pw" xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                      viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="3"/>
+                      <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/>
+                    </svg>
+                  </button>
+                </div>
+                <div class="strength-bar"><div class="strength-fill" id="strength-fill"></div></div>
+                <div class="field-hint" id="hint-password">Password is required.</div>
+              </div>
+              <div>
+                <label for="confirmPassword" class="field-label block">Confirm Password</label>
+                <div class="relative flex items-center">
+                  <input id="confirmPassword" name="confirmPassword" type="password"
+                    class="input-vault pr-6" placeholder="············"
+                    autocomplete="new-password" />
+                  <button type="button" class="toggle-icon absolute right-0 bottom-1"
+                    onclick="toggleField('confirmPassword','eye-cpw')" aria-label="Toggle confirm password">
+                    <svg id="eye-cpw" xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                      viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="3"/>
+                      <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/>
+                    </svg>
+                  </button>
+                </div>
+                <div class="field-hint" id="hint-confirm">Passwords do not match.</div>
+              </div>
+            </div>
+          
+
+            <!-- Terms -->
+            <div class="fade-up delay-4">
+              <label class="checkbox-vault">
+                <input type="checkbox" id="terms" name="terms" />
+                <span class="field-label" style="margin:0;text-transform:none;font-size:0.65rem;line-height:1.5;color:#666;">
+                  I agree to the
+                  <a href="/terms" class="footer-link text-vault underline underline-offset-2">Terms</a>
+                  &amp;
+                  <a href="/privacy" class="footer-link text-vault underline underline-offset-2">Privacy Policy</a>
+                </span>
+              </label>
+              <div class="field-hint" id="hint-terms">You must accept the terms to proceed.</div>
+            </div>
+
+            <!-- Submit -->
+            <div class="pt-1 fade-up delay-5">
+              <button type="submit" class="btn-vault" id="submitBtn">Create Account</button>
+            </div>
+             <a href="/auth/google" class="btn-google fade-up delay-6">
+            <!-- Official Google G icon -->
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+            </svg>
+            Continue with Google
+          </a>
+
+
+          </form>
+
+          <p class="mt-7 text-xs text-gray-400 fade-up delay-6"
+             style="font-family:'Jost',sans-serif;font-weight:300;">
+            Already a member?
+            <a href="/login" class="footer-link text-vault underline underline-offset-2">
+              Sign in to access
+            </a>
+          </p>
+
+        </div>
+        <div></div>
+      </section>
+
+      <!-- RIGHT PANEL -->
+      <section class="hidden md:block md:w-7/12 relative overflow-hidden">
+        <img src="https://res.cloudinary.com/dwb0hd0m6/image/upload/v1774530629/wp12480364_djglbm.jpg"
+          alt="Luxury timepiece — Velmora Chroné"
+          class="absolute inset-0 w-full h-full object-cover object-center"
+          onerror="this.style.background='#1a1a18';this.removeAttribute('src')" />
+        <div class="hero-overlay absolute inset-0"></div>
+        <div class="relative z-10 flex flex-col justify-center h-full px-12 pb-16">
+          <h2 class="font-display text-5xl font-light text-white leading-tight mb-4"
+              style="text-shadow:0 2px 24px rgba(0,0,0,0.5);">
+            The Soul of<br />Precision
+          </h2>
+          <p class="text-white/60 text-sm font-light max-w-xs leading-relaxed"
+             style="font-family:'Jost',sans-serif;">
+            Born in the craft tradition, each timepiece tells a story of heritage,
+            design excellence, and refined individuality.
+          </p>
+          <div class="mt-8 flex items-center gap-3">
+            <div class="h-px w-8 bg-white/30"></div>
+            <span class="text-white/40 text-xs tracking-widest2 uppercase"
+                  style="font-family:'Jost',sans-serif;font-size:0.6rem;">Est. 1997</span>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="w-full px-8 py-4 flex items-center justify-between">
+    <span class="text-white/30 text-xs tracking-widest uppercase"
+          style="font-family:'Jost',sans-serif;font-size:0.6rem;font-weight:300;">
+      &copy; <%= new Date().getFullYear() %> Velmora Chroné Manufacture
+    </span>
+    <nav class="flex gap-6">
+      <a href="/privacy"       class="footer-link text-white/30 text-xs tracking-widest uppercase" style="font-size:0.6rem;">Privacy Policy</a>
+      <a href="/terms"         class="footer-link text-white/30 text-xs tracking-widest uppercase" style="font-size:0.6rem;">Terms of Service</a>
+      <a href="/accessibility" class="footer-link text-white/30 text-xs tracking-widest uppercase" style="font-size:0.6rem;">Accessibility</a>
+    </nav>
+    <div class="flex gap-4">
+      <a href="#" aria-label="Instagram" class="toggle-icon text-white/30">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+          fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+          <circle cx="12" cy="12" r="4"/>
+          <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/>
+        </svg>
+      </a>
+      <a href="#" aria-label="X" class="toggle-icon text-white/30">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L2.25 2.25h7.086l4.26 5.63 4.648-5.63Zm-1.161 17.52h1.833L7.084 4.126H5.117Z"/>
+        </svg>
+      </a>
+    </div>
+  </footer>
+
+  <script>
+    /* ── Toast Notification System ── */
+    function showToast(type, message) {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `toast-notification ${type}`;
+      toast.innerHTML = `
+        <div class="flex items-center gap-2">
+          <span>${type === 'success' ? '✓' : type === 'error' ? '✗' : '⚠'}</span>
+          <span>${message}</span>
+        </div>
+      `;
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 4000);
+    }
+
+    /* ── Password toggle ── */
+    const EYE_OPEN = `<circle cx="12" cy="12" r="3"/><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/>`;
+    const EYE_SHUT = `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+                      <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+                      <line x1="1" y1="1" x2="23" y2="23"/>`;
+
+    function toggleField(inputId, iconId) {
+      const inp = document.getElementById(inputId);
+      const icon = document.getElementById(iconId);
+      if (inp.type === 'password') { inp.type = 'text'; icon.innerHTML = EYE_SHUT; }
+      else { inp.type = 'password'; icon.innerHTML = EYE_OPEN; }
+    }
+
+    /* ── Strength bar ── */
+    function updateStrength(val) {
+      const fill = document.getElementById('strength-fill');
+      let score = 0;
+      if (val.length >= 8)          score++;
+      if (/[A-Z]/.test(val))        score++;
+      if (/[0-9]/.test(val))        score++;
+      if (/[^A-Za-z0-9]/.test(val)) score++;
+      const map = ['0%','25%','50%','75%','100%'];
+      const col = ['#b91c1c','#b91c1c','#d97706','#65a30d','#0d9488'];
+      fill.style.width = map[score];
+      fill.style.background = col[score];
+    }
+
+    /* ── Vault Seal ── */
+    const ICONS = {
+      lock:   `<rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>`,
+      key:    `<path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>`,
+      warn:   `<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>`,
+      shield: `<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>`,
+      user:   `<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>`,
+    };
+
+    let sealTimer = null;
+
+    function showSeal(label, message, iconKey = 'lock') {
+      const seal  = document.getElementById('vault-seal');
+      const drain = document.getElementById('seal-drain');
+      if (!seal) return;
+      document.getElementById('seal-label').textContent = label;
+      document.getElementById('seal-msg').textContent   = message;
+      document.getElementById('seal-icon').innerHTML    = ICONS[iconKey] || ICONS.lock;
+      drain.classList.remove('draining');
+      drain.style.transition = 'none';
+      drain.style.transform  = 'scaleX(1)';
+      seal.classList.add('seal-visible');
+      requestAnimationFrame(() => requestAnimationFrame(() => drain.classList.add('draining')));
+      if (sealTimer) clearTimeout(sealTimer);
+      sealTimer = setTimeout(hideSeal, 4200);
+    }
+
+    function hideSeal() {
+      const seal = document.getElementById('vault-seal');
+      if (seal) seal.classList.remove('seal-visible');
+      if (sealTimer) { clearTimeout(sealTimer); sealTimer = null; }
+    }
+
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') hideSeal(); });
+
+    /* ── Field helpers ── */
+    function markError(el) {
+      if (!el) return;
+      el.classList.add('input-error');
+      el.addEventListener('input', () => el.classList.remove('input-error'), { once: true });
+    }
+    function shakeEl(el) {
+      if (!el) return;
+      el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake');
+      el.addEventListener('animationend', () => el.classList.remove('shake'), { once: true });
+    }
+    function showHint(id, msg) {
+      const h = document.getElementById(id);
+      if (h) {
+        h.innerHTML = msg;
+        h.classList.add('hint-show');
+      }
+    }
+    function hideHint(id) { 
+      const h = document.getElementById(id);
+      if (h) h.classList.remove('hint-show'); 
+    }
+
+    /* ── Form validation with AJAX submission ── */
+    document.getElementById('signupForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const nameEl  = document.getElementById('name');
+      const emailEl = document.getElementById('email');
+      const passEl  = document.getElementById('password');
+      const confEl  = document.getElementById('confirmPassword');
+      const termsEl = document.getElementById('terms');
+      const submitBtn = document.getElementById('submitBtn');
+      const csrfToken = document.querySelector('input[name="_csrf"]')?.value;
+
+      const nameVal  = nameEl.value.trim();
+      const emailVal = emailEl.value.trim();
+      const passVal  = passEl.value;
+      const confVal  = confEl.value;
+
+      const emailRx = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const nameRx  = /^[a-zA-Z\s]+$/;
+
+
+
+
+      // Clear all hints
+      ['hint-name','hint-email','hint-password','hint-confirm','hint-terms'].forEach(hideHint);
+
+      // Validation checks
+      if (!nameVal) {
+        markError(nameEl); shakeEl(nameEl);
+        showHint('hint-name', 'Full name is required.');
+        showSeal('Registration Blocked', 'Please enter your full name to continue.', 'user');
+        nameEl.focus();
+        return;
+      }
+      if (!nameRx.test(nameVal)) {
+        markError(nameEl); shakeEl(nameEl);
+        showHint('hint-name', 'Name must contain only letters and spaces.');
+        showSeal('Invalid Name', 'Numbers and symbols are not allowed in your name.', 'warn');
+        nameEl.focus();
+        return;
+      }
+      if (nameVal.length < 3) {
+        markError(nameEl); shakeEl(nameEl);
+        showHint('hint-name', 'Name must be at least 3 characters long.');
+        showSeal('Name Too Short', 'Please enter your full name (min. 3 characters).', 'warn');
+        nameEl.focus();
+        return;
+      }
+      if (nameVal.length > 50) {
+        markError(nameEl); shakeEl(nameEl);
+        showHint('hint-name', 'Name cannot exceed 50 characters.');
+        showSeal('Name Too Long', 'Please shorten your name to 50 characters or less.', 'warn');
+        nameEl.focus();
+        return;
+      }
+      if (!emailVal) {
+        markError(emailEl); shakeEl(emailEl);
+        showHint('hint-email', 'Email address cannot be empty.');
+        showSeal('Registration Blocked', 'A preferred email address is required.', 'lock');
+        emailEl.focus();
+        return;
+      }
+      if (!emailRx.test(emailVal)) {
+        markError(emailEl); shakeEl(emailEl);
+        showHint('hint-email', 'Enter a valid email address.');
+        showSeal('Invalid Format', 'Please provide a valid email address.', 'key');
+        emailEl.focus();
+        return;
+      }
+      if (!passVal) {
+        markError(passEl); shakeEl(passEl);
+        showHint('hint-password', 'A password is required.');
+        showSeal('Passcode Missing', 'Please choose a password for your account.', 'lock');
+        passEl.focus();
+        return;
+      }
+      if (passVal.length < 8) {
+        markError(passEl); shakeEl(passEl);
+        showHint('hint-password', 'Password must be at least 8 characters.');
+        showSeal('Passcode Too Short', 'Your password must be at least 8 characters long.', 'warn');
+        passEl.focus();
+        return;
+      }
+      if (!/[A-Z]/.test(passVal)) {
+        markError(passEl); shakeEl(passEl);
+        showHint('hint-password', 'Include at least one uppercase letter (A–Z).');
+        showSeal('Weak Passcode', 'Password must contain at least one uppercase letter.', 'warn');
+        passEl.focus();
+        return;
+      }
+      if (!/[0-9]/.test(passVal)) {
+        markError(passEl); shakeEl(passEl);
+        showHint('hint-password', 'Include at least one number (0–9).');
+        showSeal('Weak Passcode', 'Password must contain at least one number.', 'warn');
+        passEl.focus();
+        return;
+      }
+      if (!/[^A-Za-z0-9]/.test(passVal)) {
+        markError(passEl); shakeEl(passEl);
+        showHint('hint-password', 'Include at least one special character (e.g. @, #, !).');
+        showSeal('Weak Passcode', 'Password must contain at least one special character.', 'warn');
+        passEl.focus();
+        return;
+      }
+      if (!confVal) {
+        markError(confEl); shakeEl(confEl);
+        showHint('hint-confirm', 'Please confirm your password.');
+        showSeal('Confirmation Required', 'Please confirm your chosen passcode.', 'lock');
+        confEl.focus();
+        return;
+      }
+      if (passVal !== confVal) {
+        markError(passEl); markError(confEl);
+        shakeEl(passEl); setTimeout(() => shakeEl(confEl), 100);
+        showHint('hint-confirm', 'Passwords do not match.');
+        showSeal('Passcode Mismatch', 'The passwords you entered do not match.', 'warn');
+        confEl.focus();
+        return;
+      }
+      if (!termsEl.checked) {
+        termsEl.classList.add('input-error');
+        termsEl.addEventListener('change', () => termsEl.classList.remove('input-error'), { once: true });
+        showHint('hint-terms', 'You must accept the terms to proceed.');
+        showSeal('Terms Required', 'Please accept the Terms & Privacy Policy.', 'shield');
+        return;
+      }
+
+      // Disable submit button
+      submitBtn.disabled = true;
+      const originalText = submitBtn.textContent;
+      submitBtn.textContent = "Creating Account...";
+
+      try {
+        // Send AJAX request
+        // ✅ Add confirmPassword to the request body
+const response = await axios.post('/sendSignupOtp', {
+  name: nameVal,
+  email: emailVal,
+  password: passVal,
+  confirmPassword: confVal,   // 👈 add this line
+  _csrf: csrfToken
+});
+
+        // Success - OTP sent
+        if (response.data && response.data.success === true) {
+           localStorage.setItem('verifyEmail', emailVal);
+  localStorage.removeItem('resetFlow');        // 👈 add this line
+  localStorage.setItem('signupFlow', 'true');
+
+          showToast('success', response.data.message || 'OTP sent successfully!');
+          showSeal('Verification Required', 'OTP sent! Redirecting to verification...', 'key');
+          localStorage.setItem('verifyEmail', emailVal);
+          
+          setTimeout(() => {
+            window.location.href = '/otp';
+          }, 1500);
+        } else {
+          // Error response
+          const errorMsg = response.data?.message || 'Registration failed.';
+          showToast('error', errorMsg);
+          showSeal('Registration Failed', errorMsg, 'warn');
+          
+          if (response.data?.field === 'email' || errorMsg.toLowerCase().includes('email')) {
+            markError(emailEl);
+            shakeEl(emailEl);
+            showHint('hint-email', errorMsg);
+            emailEl.focus();
+          }
+          
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalText;
+        }
+      } catch (error) {
+        console.error('Signup error:', error);
+        
+        let errorMsg = 'Unable to create account. Please try again.';
+        
+        if (error.response) {
+          errorMsg = error.response.data?.message || error.response.data?.msg || errorMsg;
+          
+          if (error.response.status === 409 || errorMsg.toLowerCase().includes('already registered')) {
+            errorMsg = 'This email is already registered. Please use a different email or login.';
+            markError(emailEl);
+            shakeEl(emailEl);
+            showHint('hint-email', `${errorMsg} <a href="/login" style="color:#0d9488;text-decoration:underline;">Login here</a>`);
+            emailEl.focus();
+          } else if (errorMsg.toLowerCase().includes('email')) {
+            markError(emailEl);
+            shakeEl(emailEl);
+            showHint('hint-email', errorMsg);
+            emailEl.focus();
+          }
+        }
+        
+        showToast('error', errorMsg);
+        showSeal('Registration Error', errorMsg, 'warn');
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+      }
+    });
+
+    /* ── Server error handler ── */
+    window.addEventListener('DOMContentLoaded', () => {
+      const errEl = document.getElementById('server-auth-error');
+      if (!errEl) return;
+
+      const msg = errEl.dataset.message;
+      if (!msg) return;
+
+      const emailEl = document.getElementById('email');
+      const nameEl = document.getElementById('name');
+
+      if (msg.toLowerCase().includes('name')) {
+        markError(nameEl);
+        shakeEl(nameEl);
+        showHint('hint-name', msg);
+      } else {
+        markError(emailEl);
+        shakeEl(emailEl);
+        showHint('hint-email', msg);
+      }
+
+      showToast('error', msg);
+      setTimeout(() => showSeal('Registration Blocked', msg, 'warn'), 400);
+    });
+
+    window.addEventListener('pageshow', function(event) {
+      if (event.persisted) { window.location.reload(); }
+    });
+  </script>
+
+  <style>
+    /* Toast styles */
+    .toast-notification {
+      background: white;
+      border-radius: 8px;
+      padding: 12px 20px;
+      margin-bottom: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      animation: slideIn 0.3s ease;
+      font-family: 'Jost', sans-serif;
+      font-size: 14px;
+      border-left: 4px solid;
+    }
+
+      .btn-google {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      width: 100%; padding: 0.7rem 1rem;
+      background: #fff; border: 1px solid #ddd; border-radius: 2px;
+      font-family: "Jost", sans-serif; font-size: 0.65rem; font-weight: 400;
+      letter-spacing: 0.15em; text-transform: uppercase; color: #3c3c3c;
+      cursor: pointer; text-decoration: none;
+      transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+    }
+    .btn-google:hover {
+      background: #f7f7f7; border-color: #bbb;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+    }
+    .btn-google svg { flex-shrink: 0; width: 16px; height: 16px; }
+
+    .toast-notification.success { border-left-color: #0d9488; background: #f0fdf9; }
+    .toast-notification.error { border-left-color: #dc2626; background: #fef2f2; }
+    .toast-notification.warning { border-left-color: #f59e0b; background: #fffbeb; }
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+  </style>
+
+</body>
+</html>
