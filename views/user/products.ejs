@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Collection — Velmora Chroné</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet"/>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { display: ['Cormorant Garamond','serif'], body: ['Jost','sans-serif'] },
+          colors: { cream:'#f5f2eb', vault:'#1a1a18', pine:'#0e1f18', accent:'#0d9488', gold:'#c9a96e' },
+        }
+      }
+    };
+  </script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Jost', sans-serif; background: #0e1f18; color: #f5f2eb; overflow-x: hidden; }
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-track { background: #0e1f18; }
+    ::-webkit-scrollbar-thumb { background: #c9a96e; }
+
+    /* Nav */
+    .nav-root { position: fixed; top: 0; left: 0; right: 0; z-index: 100; transition: background 0.3s; }
+    .nav-root.scrolled { background: rgba(6,15,11,0.97) !important; backdrop-filter: blur(14px); }
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.5rem; }
+    @media(min-width:768px) { .nav-inner { padding: 1.1rem 3rem; } }
+    .nav-link { font-family: 'Jost',sans-serif; font-size: 0.6rem; font-weight: 400; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(245,242,235,0.65); text-decoration: none; transition: color 0.2s; }
+    .nav-link:hover { color: #c9a96e; }
+    .cart-badge { position: absolute; top: -5px; right: -6px; width: 14px; height: 14px; border-radius: 50%; background: #c9a96e; font-size: 0.45rem; font-weight: 500; color: #0e1f18; display: flex; align-items: center; justify-content: center; }
+    .hamburger { display: flex; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; background: none; border: none; }
+    .hamburger span { display: block; width: 22px; height: 1px; background: rgba(245,242,235,0.7); transition: transform 0.3s, opacity 0.3s; }
+    .hamburger.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+    .mobile-menu { display: none; flex-direction: column; background: rgba(6,15,11,0.98); padding: 1.5rem; gap: 1.2rem; border-top: 1px solid rgba(201,169,110,0.15); }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu .nav-link { font-size: 0.75rem; padding: 0.3rem 0; border-bottom: 1px solid rgba(245,242,235,0.05); }
+
+    /* Section label */
+    .section-label { font-family: 'Jost',sans-serif; font-size: 0.55rem; font-weight: 500; letter-spacing: 0.3em; text-transform: uppercase; color: #c9a96e; }
+
+    /* Product card */
+    .product-card { background: #f5f2eb; overflow: hidden; cursor: pointer; transition: transform 0.35s cubic-bezier(0.25,0.46,0.45,0.94), box-shadow 0.35s; }
+    .product-card:hover { transform: translateY(-5px); box-shadow: 0 16px 40px rgba(0,0,0,0.25); }
+    .product-card:hover .card-img { transform: scale(1.05); }
+    .card-img-wrap { width: 100%; aspect-ratio: 1/1; overflow: hidden; background: #e8e4dc; }
+    .card-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s cubic-bezier(0.25,0.46,0.45,0.94); }
+    .card-body { padding: 0.85rem 0.9rem 1rem; }
+    .card-name { font-family: 'Cormorant Garamond',serif; font-size: 1rem; font-weight: 400; color: #1a1a18; line-height: 1.2; }
+    .card-cat { font-family: 'Jost',sans-serif; font-size: 0.52rem; letter-spacing: 0.15em; text-transform: uppercase; color: #999; margin-bottom: 4px; }
+    .card-price { font-family: 'Jost',sans-serif; font-size: 0.78rem; color: #1a1a18; margin-top: 4px; }
+    .out-of-stock-badge { background: rgba(220,38,38,0.12); border: 1px solid rgba(220,38,38,0.3); color: #f87171; font-size: 0.5rem; letter-spacing: 0.15em; text-transform: uppercase; padding: 2px 8px; display: inline-block; margin-top: 4px; }
+
+    /* Filter sidebar */
+    .filter-sidebar { background: rgba(10,20,16,0.8); border: 1px solid rgba(201,169,110,0.12); }
+    .filter-label { font-family: 'Jost',sans-serif; font-size: 0.52rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(245,242,235,0.4); margin-bottom: 0.5rem; display: block; }
+    .filter-input { width: 100%; background: rgba(245,242,235,0.05); border: 1px solid rgba(245,242,235,0.1); color: #f5f2eb; font-family: 'Jost',sans-serif; font-size: 0.75rem; padding: 0.5rem 0.75rem; outline: none; transition: border-color 0.2s; }
+    .filter-input:focus { border-color: rgba(201,169,110,0.5); }
+    .filter-input option { background: #0a1410; }
+    .filter-cat-btn { width: 100%; text-align: left; background: none; border: 1px solid transparent; color: rgba(245,242,235,0.5); font-family: 'Jost',sans-serif; font-size: 0.65rem; letter-spacing: 0.1em; padding: 0.4rem 0.6rem; cursor: pointer; transition: all 0.2s; text-transform: uppercase; }
+    .filter-cat-btn:hover { color: #c9a96e; border-color: rgba(201,169,110,0.2); }
+    .filter-cat-btn.active { color: #c9a96e; border-color: rgba(201,169,110,0.4); background: rgba(201,169,110,0.05); }
+
+    /* Search bar */
+    .search-wrap { position: relative; }
+    .search-input { width: 100%; background: rgba(245,242,235,0.05); border: 1px solid rgba(245,242,235,0.1); border-radius: 0; color: #f5f2eb; font-family: 'Jost',sans-serif; font-size: 0.75rem; padding: 0.6rem 2.5rem 0.6rem 0.9rem; outline: none; transition: border-color 0.2s; }
+    .search-input:focus { border-color: rgba(201,169,110,0.5); }
+    .search-input::placeholder { color: rgba(245,242,235,0.3); }
+    .search-btn { position: absolute; right: 0.6rem; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: rgba(245,242,235,0.4); padding: 0; }
+    .search-clear { position: absolute; right: 2rem; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: rgba(245,242,235,0.4); padding: 0; font-size: 0.8rem; display: none; }
+    .search-clear.visible { display: block; }
+
+    /* Sort select */
+    .sort-select { background: rgba(245,242,235,0.05); border: 1px solid rgba(245,242,235,0.1); color: #f5f2eb; font-family: 'Jost',sans-serif; font-size: 0.65rem; letter-spacing: 0.1em; padding: 0.5rem 0.75rem; outline: none; cursor: pointer; text-transform: uppercase; }
+    .sort-select option { background: #0a1410; }
+    .sort-select:focus { border-color: rgba(201,169,110,0.5); }
+
+    /* Pagination */
+    .page-btn { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 1px solid rgba(245,242,235,0.15); color: rgba(245,242,235,0.5); font-family: 'Jost',sans-serif; font-size: 0.7rem; text-decoration: none; transition: all 0.2s; }
+    .page-btn:hover { border-color: rgba(201,169,110,0.5); color: #c9a96e; }
+    .page-btn.active { border-color: #c9a96e; color: #c9a96e; background: rgba(201,169,110,0.08); }
+    .page-btn.disabled { opacity: 0.3; pointer-events: none; }
+
+    /* Rule */
+    .rule { height: 1px; background: linear-gradient(90deg, transparent, rgba(201,169,110,0.25), transparent); }
+
+    /* Footer */
+    .footer-link { font-family: 'Jost',sans-serif; font-size: 0.58rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(245,242,235,0.4); text-decoration: none; transition: color 0.2s; }
+    .footer-link:hover { color: #c9a96e; }
+
+    /* Products grid */
+    .products-grid { display: grid; gap: 0.75rem; grid-template-columns: repeat(2,1fr); }
+    @media(min-width:640px) { .products-grid { grid-template-columns: repeat(3,1fr); } }
+    @media(min-width:1024px) { .products-grid { grid-template-columns: repeat(3,1fr); gap: 1rem; } }
+
+    /* Watch placeholder */
+    .watch-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg,#1a2820,#0d1a14); }
+
+    /* Active filter tag */
+    .filter-tag { display: inline-flex; align-items: center; gap: 6px; background: rgba(201,169,110,0.1); border: 1px solid rgba(201,169,110,0.3); color: #c9a96e; font-family: 'Jost',sans-serif; font-size: 0.52rem; letter-spacing: 0.12em; text-transform: uppercase; padding: 3px 8px; }
+    .filter-tag button { background: none; border: none; cursor: pointer; color: #c9a96e; font-size: 0.7rem; padding: 0; line-height: 1; }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="nav-root" style="background: linear-gradient(180deg,rgba(10,20,16,0.9) 0%,rgba(10,20,16,0) 100%);">
+    <div class="nav-inner">
+      <div class="hidden md:flex items-center gap-8">
+        <a href="/products" class="nav-link" style="color:#c9a96e;">Collection</a>
+        <a href="/home"     class="nav-link">Manufacture</a>
+        <a href="/home"     class="nav-link">Heritage</a>
+      </div>
+      <a href="/home" class="md:absolute md:left-1/2 md:-translate-x-1/2">
+        <span style="font-family:'Cormorant Garamond',serif; font-size:1.1rem; font-weight:300; letter-spacing:0.18em; color:#f5f2eb;">Velmora Chroné</span>
+      </a>
+      <div class="flex items-center gap-4 md:gap-5 ml-auto md:ml-0">
+        <a href="/profile" class="nav-link" aria-label="Profile">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </a>
+        <a href="/cart" class="nav-link relative" aria-label="Cart">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          <span class="cart-badge">0</span>
+        </a>
+        <a href="/logout" class="nav-link"><span class="hidden md:inline">Logout</span>
+          <svg class="md:hidden" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </a>
+        <button class="hamburger md:hidden" id="hamburger"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="/products" class="nav-link">Collection</a>
+      <a href="/home"     class="nav-link">Manufacture</a>
+      <a href="/home"     class="nav-link">Heritage</a>
+      <a href="/profile"  class="nav-link">My Profile</a>
+      <a href="/cart"     class="nav-link">Cart</a>
+      <a href="/logout"   class="nav-link" style="color:rgba(201,169,110,0.7);">Logout</a>
+    </div>
+  </nav>
+
+  <!-- PAGE HEADER -->
+  <div style="padding: 7rem 1.5rem 2.5rem; background: linear-gradient(180deg,#0a1410 0%,#0e1f18 100%);">
+    <div style="max-width:1200px; margin:0 auto;">
+      <p class="section-label" style="margin-bottom:6px;">The Collection</p>
+      <h1 style="font-family:'Cormorant Garamond',serif; font-size:clamp(2rem,5vw,3.5rem); font-weight:300; color:#f5f2eb; line-height:1.1;">
+        All Timepieces
+      </h1>
+      <div class="rule" style="margin-top:1.5rem;"></div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div style="max-width:1200px; margin:0 auto; padding:2rem 1.5rem 4rem;">
+    <div style="display:flex; gap:2rem; align-items:flex-start;">
+
+      <!-- ── FILTER SIDEBAR ── -->
+      <aside style="width:220px; flex-shrink:0; position:sticky; top:5rem;" class="hidden md:block">
+        <form id="filterForm" method="GET" action="/products">
+
+          <!-- Search -->
+          <div style="margin-bottom:1.5rem;">
+            <span class="filter-label">Search</span>
+            <div class="search-wrap">
+              <input class="search-input" type="text" name="search" id="searchInput"
+                     placeholder="Search timepieces…" value="<%= search %>"/>
+              <button type="submit" class="search-btn" aria-label="Search">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              </button>
+              <button type="button" class="search-clear <%= search ? 'visible' : '' %>" id="clearSearch" onclick="clearSearch()">×</button>
+            </div>
+          </div>
+
+          <!-- Category -->
+          <div style="margin-bottom:1.5rem;">
+            <span class="filter-label">Category</span>
+            <div style="display:flex; flex-direction:column; gap:4px;">
+              <button type="button" class="filter-cat-btn <%= !category ? 'active' : '' %>"
+                onclick="setCategory('')">All</button>
+              <% categories.forEach(c => { %>
+                <button type="button"
+                  class="filter-cat-btn <%= category === c._id.toString() ? 'active' : '' %>"
+                  onclick="setCategory('<%= c._id %>')">
+                  <%= c.name %>
+                </button>
+              <% }) %>
+            </div>
+            <input type="hidden" name="category" id="categoryInput" value="<%= category %>"/>
+          </div>
+
+          <!-- Price Range -->
+          <div style="margin-bottom:1.5rem;">
+            <span class="filter-label">Price Range (₹)</span>
+            <div style="display:flex; gap:6px;">
+              <input class="filter-input" type="number" name="minPrice" placeholder="Min"
+                     value="<%= minPrice %>" min="0" style="width:50%;"/>
+              <input class="filter-input" type="number" name="maxPrice" placeholder="Max"
+                     value="<%= maxPrice %>" min="0" style="width:50%;"/>
+            </div>
+          </div>
+
+          <!-- Sort (sidebar) -->
+          <div style="margin-bottom:1.5rem;">
+            <span class="filter-label">Sort By</span>
+            <select class="filter-input" name="sort" onchange="this.form.submit()">
+              <option value="newest"    <%= sort==='newest'    ? 'selected':'' %>>Newest First</option>
+              <option value="priceLow"  <%= sort==='priceLow'  ? 'selected':'' %>>Price: Low to High</option>
+              <option value="priceHigh" <%= sort==='priceHigh' ? 'selected':'' %>>Price: High to Low</option>
+              <option value="nameAZ"    <%= sort==='nameAZ'    ? 'selected':'' %>>Name: A to Z</option>
+              <option value="nameZA"    <%= sort==='nameZA'    ? 'selected':'' %>>Name: Z to A</option>
+            </select>
+          </div>
+
+          <button type="submit"
+            style="width:100%; background:#c9a96e; color:#0e1f18; font-family:'Jost',sans-serif;
+                   font-size:0.6rem; letter-spacing:0.2em; text-transform:uppercase;
+                   padding:0.65rem; border:none; cursor:pointer; transition:opacity 0.2s;">
+            Apply Filters
+          </button>
+
+          <% if (search || category || minPrice || maxPrice || sort !== 'newest') { %>
+          <a href="/products"
+             style="display:block; text-align:center; margin-top:0.6rem; font-family:'Jost',sans-serif;
+                    font-size:0.55rem; letter-spacing:0.15em; text-transform:uppercase;
+                    color:rgba(245,242,235,0.35); text-decoration:none; transition:color 0.2s;"
+             onmouseover="this.style.color='#c9a96e'" onmouseout="this.style.color='rgba(245,242,235,0.35)'">
+            Clear All Filters
+          </a>
+          <% } %>
+
+        </form>
+      </aside>
+
+      <!-- ── PRODUCT AREA ── -->
+      <div style="flex:1; min-width:0;">
+
+        <!-- Top bar: results count + sort (mobile) -->
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1.25rem; flex-wrap:wrap; gap:0.75rem;">
+          <div>
+            <p style="font-family:'Jost',sans-serif; font-size:0.65rem; color:rgba(245,242,235,0.4); letter-spacing:0.1em;">
+              <%= total %> timepiece<%= total !== 1 ? 's' : '' %> found
+              <% if (search) { %> for "<%= search %>"<% } %>
+            </p>
+            <!-- Active filter tags -->
+            <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:6px;">
+              <% if (search) { %>
+                <span class="filter-tag">
+                  Search: <%= search %>
+                  <button onclick="removeFilter('search')">×</button>
+                </span>
+              <% } %>
+              <% if (category) { %>
+                <% const activeCat = categories.find(c => c._id.toString() === category); %>
+                <% if (activeCat) { %>
+                  <span class="filter-tag">
+                    <%= activeCat.name %>
+                    <button onclick="removeFilter('category')">×</button>
+                  </span>
+                <% } %>
+              <% } %>
+              <% if (minPrice) { %>
+                <span class="filter-tag">
+                  Min ₹<%= minPrice %>
+                  <button onclick="removeFilter('minPrice')">×</button>
+                </span>
+              <% } %>
+              <% if (maxPrice) { %>
+                <span class="filter-tag">
+                  Max ₹<%= maxPrice %>
+                  <button onclick="removeFilter('maxPrice')">×</button>
+                </span>
+              <% } %>
+            </div>
+          </div>
+
+          <!-- Mobile sort + filter toggle -->
+          <div style="display:flex; gap:8px; align-items:center;">
+            <select class="sort-select md:hidden" onchange="applyMobileSort(this.value)">
+              <option value="newest"    <%= sort==='newest'    ? 'selected':'' %>>Newest</option>
+              <option value="priceLow"  <%= sort==='priceLow'  ? 'selected':'' %>>Price ↑</option>
+              <option value="priceHigh" <%= sort==='priceHigh' ? 'selected':'' %>>Price ↓</option>
+              <option value="nameAZ"    <%= sort==='nameAZ'    ? 'selected':'' %>>A → Z</option>
+              <option value="nameZA"    <%= sort==='nameZA'    ? 'selected':'' %>>Z → A</option>
+            </select>
+            <button onclick="toggleMobileFilter()"
+              style="display:flex; align-items:center; gap:6px; background:rgba(201,169,110,0.1);
+                     border:1px solid rgba(201,169,110,0.3); color:#c9a96e; font-family:'Jost',sans-serif;
+                     font-size:0.6rem; letter-spacing:0.15em; text-transform:uppercase;
+                     padding:0.45rem 0.75rem; cursor:pointer;" class="md:hidden">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+              Filter
+            </button>
+          </div>
+        </div>
+
+        <!-- Mobile filter panel -->
+        <div id="mobileFilterPanel" style="display:none; margin-bottom:1.25rem;">
+          <form method="GET" action="/products" style="background:rgba(10,20,16,0.9); border:1px solid rgba(201,169,110,0.12); padding:1.25rem; display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+            <div>
+              <span class="filter-label">Category</span>
+              <select class="filter-input" name="category">
+                <option value="">All Categories</option>
+                <% categories.forEach(c => { %>
+                  <option value="<%= c._id %>" <%= category === c._id.toString() ? 'selected':'' %>><%= c.name %></option>
+                <% }) %>
+              </select>
+            </div>
+            <div>
+              <span class="filter-label">Sort By</span>
+              <select class="filter-input" name="sort">
+                <option value="newest"    <%= sort==='newest'    ? 'selected':'' %>>Newest</option>
+                <option value="priceLow"  <%= sort==='priceLow'  ? 'selected':'' %>>Price Low-High</option>
+                <option value="priceHigh" <%= sort==='priceHigh' ? 'selected':'' %>>Price High-Low</option>
+                <option value="nameAZ"    <%= sort==='nameAZ'    ? 'selected':'' %>>A to Z</option>
+                <option value="nameZA"    <%= sort==='nameZA'    ? 'selected':'' %>>Z to A</option>
+              </select>
+            </div>
+            <div>
+              <span class="filter-label">Min Price (₹)</span>
+              <input class="filter-input" type="number" name="minPrice" placeholder="0" value="<%= minPrice %>"/>
+            </div>
+            <div>
+              <span class="filter-label">Max Price (₹)</span>
+              <input class="filter-input" type="number" name="maxPrice" placeholder="Any" value="<%= maxPrice %>"/>
+            </div>
+            <input type="hidden" name="search" value="<%= search %>"/>
+            <div style="grid-column:span 2; display:flex; gap:8px;">
+              <button type="submit"
+                style="flex:1; background:#c9a96e; color:#0e1f18; font-family:'Jost',sans-serif;
+                       font-size:0.6rem; letter-spacing:0.2em; text-transform:uppercase;
+                       padding:0.6rem; border:none; cursor:pointer;">
+                Apply
+              </button>
+              <a href="/products"
+                style="flex:1; display:flex; align-items:center; justify-content:center;
+                       border:1px solid rgba(245,242,235,0.15); color:rgba(245,242,235,0.5);
+                       font-family:'Jost',sans-serif; font-size:0.6rem; letter-spacing:0.15em;
+                       text-transform:uppercase; text-decoration:none;">
+                Clear
+              </a>
+            </div>
+          </form>
+        </div>
+
+        <!-- Products grid -->
+        <% if (products.length > 0) { %>
+        <div class="products-grid">
+          <% products.forEach(p => { %>
+          <a href="/products/<%= p._id %>" style="text-decoration:none;">
+            <div class="product-card">
+              <div class="card-img-wrap">
+                <% if (p.images && p.images.length > 0) { %>
+                  <img class="card-img" src="<%= p.images[0] %>" alt="<%= p.name %>"
+                    onerror="this.parentElement.innerHTML='<div class=\'watch-placeholder\'><svg width=\'48\' height=\'48\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'rgba(201,169,110,0.2)\' stroke-width=\'0.5\'><circle cx=\'12\' cy=\'12\' r=\'10\'/><line x1=\'12\' y1=\'6\' x2=\'12\' y2=\'12\'/><line x1=\'12\' y1=\'12\' x2=\'15\' y2=\'14\'/></svg></div>'"/>
+                <% } else { %>
+                  <div class="watch-placeholder">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(201,169,110,0.2)" stroke-width="0.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="6" x2="12" y2="12"/><line x1="12" y1="12" x2="15" y2="14"/></svg>
+                  </div>
+                <% } %>
+              </div>
+              <div class="card-body">
+                <div class="card-cat"><%= p.category ? p.category.name : '' %></div>
+                <div class="card-name"><%= p.name %></div>
+                <div class="card-price">₹ <%= p.price.toLocaleString('en-IN') %></div>
+                <% if (p.stock === 0) { %>
+                  <span class="out-of-stock-badge">Out of Stock</span>
+                <% } %>
+              </div>
+            </div>
+          </a>
+          <% }) %>
+        </div>
+
+        <!-- Pagination -->
+        <% if (totalPages > 1) { %>
+        <div style="display:flex; align-items:center; justify-content:center; gap:6px; margin-top:3rem;">
+          <a href="/products?<%= new URLSearchParams({search, sort, category, minPrice: minPrice||'', maxPrice: maxPrice||'', page: page-1}).toString() %>"
+             class="page-btn <%= page===1 ? 'disabled':'' %>">&#8592;</a>
+          <% for(let i=1; i<=totalPages; i++) { %>
+            <a href="/products?<%= new URLSearchParams({search, sort, category, minPrice: minPrice||'', maxPrice: maxPrice||'', page: i}).toString() %>"
+               class="page-btn <%= i===page ? 'active':'' %>"><%= i %></a>
+          <% } %>
+          <a href="/products?<%= new URLSearchParams({search, sort, category, minPrice: minPrice||'', maxPrice: maxPrice||'', page: page+1}).toString() %>"
+             class="page-btn <%= page===totalPages ? 'disabled':'' %>">&#8594;</a>
+        </div>
+        <% } %>
+
+        <% } else { %>
+        <!-- Empty state -->
+        <div style="text-align:center; padding:5rem 1rem;">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(201,169,110,0.2)" stroke-width="0.8" style="margin:0 auto 1.5rem;display:block;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="6" x2="12" y2="12"/><line x1="12" y1="12" x2="15" y2="14"/></svg>
+          <p style="font-family:'Cormorant Garamond',serif; font-size:1.5rem; font-weight:300; color:rgba(245,242,235,0.4); margin-bottom:0.5rem;">No timepieces found</p>
+          <p style="font-family:'Jost',sans-serif; font-size:0.7rem; color:rgba(245,242,235,0.25); margin-bottom:1.5rem;">Try adjusting your search or filters</p>
+          <a href="/products"
+             style="font-family:'Jost',sans-serif; font-size:0.6rem; letter-spacing:0.2em;
+                    text-transform:uppercase; color:#c9a96e; text-decoration:none;
+                    border:1px solid rgba(201,169,110,0.3); padding:0.6rem 1.5rem;">
+            Clear All Filters
+          </a>
+        </div>
+        <% } %>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer style="background:#060f0b; padding:3rem 1.25rem 1.5rem;">
+    <div style="max-width:1200px; margin:0 auto;">
+      <div style="display:flex; flex-direction:column; gap:2.5rem; padding-bottom:2.5rem; border-bottom:1px solid rgba(245,242,235,0.06);">
+        <div style="max-width:260px;">
+          <p style="font-family:'Cormorant Garamond',serif; font-size:1.3rem; font-weight:300; color:#f5f2eb; letter-spacing:0.15em; margin-bottom:1rem;">Velmora Chroné</p>
+          <p style="color:rgba(245,242,235,0.35); font-size:0.75rem; line-height:1.8; font-family:'Jost',sans-serif; font-weight:300;">Geneva-made timepieces for those who understand that true luxury is measured not in price, but in permanence.</p>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; justify-content:center; padding-top:1.5rem;">
+        <span style="font-family:'Jost',sans-serif; font-size:0.52rem; letter-spacing:0.15em; text-transform:uppercase; color:rgba(245,242,235,0.2);">
+          &copy; <%= new Date().getFullYear() %> Velmora Chroné Manufacture. All rights reserved.
+        </span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Nav scroll
+    const nav = document.querySelector('.nav-root');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 60);
+    }, { passive: true });
+
+    // Hamburger
+    const hamburger  = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobileMenu');
+    hamburger.addEventListener('click', () => {
+      hamburger.classList.toggle('open');
+      mobileMenu.classList.toggle('open');
+    });
+
+    // Search clear
+    function clearSearch() {
+      const input = document.getElementById('searchInput');
+      input.value = '';
+      document.getElementById('clearSearch').classList.remove('visible');
+      document.getElementById('filterForm').submit();
+    }
+    document.getElementById('searchInput').addEventListener('input', function() {
+      document.getElementById('clearSearch').classList.toggle('visible', this.value.length > 0);
+    });
+
+    // Category filter
+    function setCategory(id) {
+      document.getElementById('categoryInput').value = id;
+      document.getElementById('filterForm').submit();
+    }
+
+    // Mobile filter toggle
+    function toggleMobileFilter() {
+      const panel = document.getElementById('mobileFilterPanel');
+      panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+    }
+
+    // Mobile sort
+    function applyMobileSort(value) {
+      const url = new URL(window.location.href);
+      url.searchParams.set('sort', value);
+      url.searchParams.set('page', '1');
+      window.location.href = url.toString();
+    }
+
+    // Remove individual filter tag
+    function removeFilter(key) {
+      const url = new URL(window.location.href);
+      url.searchParams.delete(key);
+      url.searchParams.set('page', '1');
+      window.location.href = url.toString();
+    }
+
+    // Back button prevention
+    history.pushState(null, null, window.location.href);
+    window.addEventListener('popstate', () => {
+      history.pushState(null, null, window.location.href);
+    });
+  </script>
+</body>
+</html>

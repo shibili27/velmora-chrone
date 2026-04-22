@@ -1,220 +1,152 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate"/>
-  <meta http-equiv="Pragma" content="no-cache"/>
-  <meta http-equiv="Expires" content="0"/>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Categories — Velmora Chroné</title>
+  <title><%= title %></title>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css"/>
   <style>
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{
-      --teal:#2d8c84;--teal-dark:#1f6e67;--teal-light:#e8f4f3;
-      --navy:#1c2b3a;--navy-hover:#253547;
-      --sidebar-w:160px;--bg:#f2f4f3;--white:#fff;--border:#e2e6e4;
-      --text:#1a1f1e;--text-mid:#5a6461;--text-light:#9aa8a5;
-      --green:#16a34a;--green-bg:#dcfce7;
-      --red:#dc2626;--red-bg:#fee2e2;
-      --orange:#d97706;--orange-bg:#fef3c7;
-      --blue:#2563eb;--blue-bg:#dbeafe;
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --teal: #2d8c84; --teal-dark: #1f6e67; --teal-light: #e8f4f3;
+      --sidebar-w: 220px; --bg: #f2f4f3; --white: #ffffff;
+      --border: #e2e6e4; --text: #1a1f1e; --text-mid: #5a6461; --text-light: #9aa8a5;
+      --green: #16a34a; --green-bg: #dcfce7; --red: #dc2626; --red-bg: #fee2e2;
+      --blue: #2563eb; --blue-bg: #dbeafe; --orange: #d97706; --orange-bg: #fef3c7;
     }
-    html,body{height:100%;font-family:'Jost',sans-serif;background:var(--bg);color:var(--text)}
-    .layout{display:flex;min-height:100vh}
+    html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--bg); color: var(--text); }
+    .layout { display: flex; min-height: 100vh; }
 
-    /* Sidebar */
-    .sidebar{width:var(--sidebar-w);background:var(--white);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100}
-    .sidebar__brand{padding:20px 16px 14px;border-bottom:1px solid var(--border)}
-    .sidebar__brand-name{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;letter-spacing:0.06em;color:var(--text);line-height:1.2}
-    .sidebar__brand-sub{font-size:8px;font-weight:500;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-light);margin-top:3px}
-    .sidebar__nav{flex:1;padding:10px 0;overflow-y:auto}
-    .nav-item{display:flex;align-items:center;gap:8px;padding:9px 16px;font-size:12px;font-weight:500;color:var(--text-mid);text-decoration:none;transition:background .15s,color .15s;white-space:nowrap}
-    .nav-item:hover{background:var(--teal-light);color:var(--teal)}
-    .nav-item.active{background:var(--navy);color:#fff}
-    .nav-item svg{width:14px;height:14px;flex-shrink:0}
-    .sidebar__footer{padding:12px 16px;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px}
-    .avatar{width:30px;height:30px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:600;flex-shrink:0}
-    .sidebar__footer-info{overflow:hidden;flex:1}
-    .sidebar__footer-name{font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .sidebar__footer-role{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-light)}
-    .btn-logout{display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:5px;border:1px solid #fecaca;background:var(--red-bg);color:var(--red);cursor:pointer;flex-shrink:0;transition:background .15s;text-decoration:none}
-    .btn-logout:hover{background:var(--red);color:#fff;border-color:var(--red)}
-    .btn-logout svg{width:12px;height:12px}
+    .sidebar { width: var(--sidebar-w); background: var(--white); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; }
+    .sidebar__brand { padding: 24px 20px 18px; border-bottom: 1px solid var(--border); }
+    .sidebar__brand-name { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 600; letter-spacing: 0.06em; color: var(--text); line-height: 1.2; }
+    .sidebar__brand-sub { font-size: 9px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-light); margin-top: 3px; }
+    .sidebar__nav { flex: 1; padding: 14px 0; overflow-y: auto; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 20px; font-size: 13px; font-weight: 500; color: var(--text-mid); text-decoration: none; transition: background 0.15s, color 0.15s; }
+    .nav-item:hover { background: var(--teal-light); color: var(--teal); }
+    .nav-item.active { background: var(--teal-light); color: var(--teal); border-right: 3px solid var(--teal); }
+    .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .sidebar__footer { padding: 16px 20px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+    .avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--teal); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 13px; font-weight: 600; flex-shrink: 0; }
+    .sidebar__footer-name { font-size: 13px; font-weight: 600; color: var(--text); }
+    .sidebar__footer-info { overflow: hidden; flex: 1; }
+    .sidebar__footer-role { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); }
+    .btn-logout { display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 6px; border: 1px solid #fecaca; background: var(--red-bg); color: var(--red); cursor: pointer; flex-shrink: 0; transition: background 0.15s; text-decoration: none; }
+    .btn-logout:hover { background: var(--red); color: #fff; border-color: var(--red); }
+    .btn-logout svg { width: 14px; height: 14px; }
 
-    /* Main */
-    .main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh}
+    .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+    .topbar { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 32px; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+    .topbar__title { font-size: 13px; font-weight: 500; color: var(--text-mid); }
+    .content { padding: 32px; flex: 1; }
+    .page-header { margin-bottom: 24px; }
+    .page-header h1 { font-size: 22px; font-weight: 600; }
+    .page-header p { font-size: 13px; color: var(--text-mid); margin-top: 4px; }
 
-    /* Topbar */
-    .topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 28px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
-    .topbar__left h1{font-size:18px;font-weight:600;color:var(--text)}
-    .topbar__left p{font-size:11px;color:var(--text-light);margin-top:1px}
-    .topbar__right{display:flex;align-items:center;gap:10px}
-    .btn-primary{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 16px;background:var(--navy);color:#fff;border:none;border-radius:4px;font-family:'Jost',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:background .15s;text-decoration:none;white-space:nowrap}
-    .btn-primary:hover{background:var(--navy-hover)}
-    .btn-primary svg{width:14px;height:14px}
-    .topbar__bell{width:32px;height:32px;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-mid);background:none;transition:background .15s}
-    .topbar__bell:hover{background:var(--teal-light);color:var(--teal)}
-    .topbar__bell svg{width:14px;height:14px}
+    .flash { padding: 10px 16px; border-radius: 4px; font-size: 12.5px; margin-bottom: 20px; }
+    .flash--error   { background: #fdecea; color: #b00020; border: 1px solid #f5c6cb; }
+    .flash--success { background: #e8f5e9; color: #1b5e20; border: 1px solid #c8e6c9; }
 
-    /* Content */
-    .content{padding:24px 28px;flex:1}
+    .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+    .search-form { display: flex; align-items: center; gap: 8px; }
+    .search-input { height: 38px; border: 1px solid var(--border); border-radius: 4px; padding: 0 14px; font-family: 'Jost', sans-serif; font-size: 13px; outline: none; width: 260px; transition: border-color 0.2s; }
+    .search-input:focus { border-color: var(--teal); }
+    .btn { display: inline-flex; align-items: center; gap: 6px; height: 38px; padding: 0 16px; border-radius: 4px; font-family: 'Jost', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; cursor: pointer; border: none; transition: opacity 0.15s; text-decoration: none; white-space: nowrap; }
+    .btn svg { width: 14px; height: 14px; }
+    .btn--teal    { background: var(--teal); color: #fff; }
+    .btn--teal:hover { background: var(--teal-dark); }
+    .btn--outline { background: none; border: 1px solid var(--border); color: var(--text-mid); }
+    .btn--outline:hover { background: var(--bg); }
+    .btn--danger  { background: var(--red); color: #fff; border: none; }
+    .btn--danger:hover { background: #b91c1c; }
 
-    /* Search row */
-    .toolbar{display:flex;align-items:center;gap:10px;margin-bottom:18px}
-    .search-wrap{position:relative;flex:1;max-width:340px}
-    .search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:13px;height:13px;color:var(--text-light);pointer-events:none}
-    .search-input{width:100%;height:36px;border:1px solid var(--border);border-radius:4px;padding:0 32px 0 32px;font-family:'Jost',sans-serif;font-size:12px;color:var(--text);background:var(--white);outline:none;transition:border-color .2s}
-    .search-input:focus{border-color:var(--teal)}
-    .search-clear{position:absolute;right:9px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text-light);display:none;align-items:center;padding:0}
-    .search-clear svg{width:12px;height:12px}
-    .search-clear.visible{display:flex}
-    .btn-search{height:36px;padding:0 14px;background:var(--teal);color:#fff;border:none;border-radius:4px;font-family:'Jost',sans-serif;font-size:11px;font-weight:600;cursor:pointer;transition:background .15s}
-    .btn-search:hover{background:var(--teal-dark)}
-    .search-result-info{font-size:11px;color:var(--text-light)}
+    .card { background: var(--white); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+    .card__header { padding: 16px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .card__title { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-mid); }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { background: #f8faf9; }
+    th { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); padding: 12px 20px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+    td { padding: 12px 20px; font-size: 13px; color: var(--text); border-bottom: 1px solid var(--border); vertical-align: middle; }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: #fafcfb; }
 
-    /* Card */
-    .card{background:var(--white);border:1px solid var(--border);border-radius:6px;overflow:hidden}
-    .card__header{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-    .card__title{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text)}
-    .card__meta{font-size:11px;color:var(--text-light)}
+    .thumb-row { display: flex; gap: 4px; }
+    .thumb { width: 38px; height: 38px; border-radius: 4px; object-fit: cover; border: 1px solid var(--border); }
 
-    /* Table */
-    .table-wrap{overflow-x:auto}
-    table{width:100%;border-collapse:collapse}
-    thead tr{background:#f8faf9}
-    th{font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text-light);padding:10px 20px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}
-    td{padding:12px 20px;font-size:12px;color:var(--text);border-bottom:1px solid var(--border);vertical-align:middle}
-    tbody tr:last-child td{border-bottom:none}
-    tbody tr:hover{background:#fafcfb}
+    .badge { display: inline-flex; align-items: center; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+    .badge--cat { background: var(--teal-light); color: var(--teal-dark); }
 
-    /* Badge */
-    .badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;white-space:nowrap}
-    .badge::before{content:'';width:4px;height:4px;border-radius:50%;background:currentColor;flex-shrink:0}
-    .badge--active{color:var(--green);background:var(--green-bg)}
-    .badge--inactive{color:var(--text-light);background:#f0f2f0}
+    .actions { display: flex; gap: 6px; }
+    .btn-action { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; padding: 5px 10px; border-radius: 3px; border: 1px solid transparent; cursor: pointer; background: none; font-family: 'Jost', sans-serif; transition: opacity 0.15s; }
+    .btn-action:hover { opacity: 0.75; }
+    .btn-action svg { width: 12px; height: 12px; }
+    .btn-action--edit   { background: var(--blue-bg);  color: var(--blue);  border-color: #bfdbfe; }
+    .btn-action--delete { background: var(--red-bg);   color: var(--red);   border-color: #fecaca; }
 
-    /* Action btns */
-    .actions{display:flex;align-items:center;gap:5px}
-    .btn-icon{width:28px;height:28px;border-radius:4px;border:1px solid var(--border);background:var(--white);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-mid);transition:all .15s;text-decoration:none}
-    .btn-icon:hover{background:var(--teal-light);color:var(--teal);border-color:var(--teal)}
-    .btn-icon--delete:hover{background:var(--red-bg);color:var(--red);border-color:#fecaca}
-    .btn-icon svg{width:13px;height:13px}
+    .pagination { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 20px; border-top: 1px solid var(--border); }
+    .page-btn { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 4px; border: 1px solid var(--border); font-size: 13px; font-weight: 500; color: var(--text-mid); text-decoration: none; transition: background 0.15s; }
+    .page-btn:hover { background: var(--teal-light); color: var(--teal); border-color: var(--teal); }
+    .page-btn.active { background: var(--teal); color: #fff; border-color: var(--teal); }
+    .page-btn.disabled { opacity: 0.4; pointer-events: none; }
 
-    /* Pagination */
-    .pagination{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid var(--border)}
-    .pagination__info{font-size:11px;color:var(--text-light)}
-    .pagination__pages{display:flex;align-items:center;gap:3px}
-    .page-btn{min-width:28px;height:28px;border:1px solid var(--border);border-radius:3px;background:var(--white);color:var(--text-mid);font-family:'Jost',sans-serif;font-size:11px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;text-decoration:none;transition:all .15s;padding:0 6px}
-    .page-btn:hover:not(.active):not(.disabled){background:var(--teal-light);color:var(--teal);border-color:var(--teal)}
-    .page-btn.active{background:var(--navy);color:#fff;border-color:var(--navy)}
-    .page-btn.disabled{opacity:.4;cursor:not-allowed;pointer-events:none}
-    .page-btn svg{width:11px;height:11px}
+    .empty-state { padding: 48px 24px; text-align: center; color: var(--text-light); font-size: 13px; }
+    .footer { text-align: center; padding: 20px; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); border-top: 1px solid var(--border); }
 
-    /* Empty */
-    .empty-state{padding:40px;text-align:center;color:var(--text-light);font-size:12px}
-    .empty-state svg{width:32px;height:32px;display:block;margin:0 auto 10px;color:var(--border)}
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: flex-start; justify-content: center; overflow-y: auto; padding: 40px 16px; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: var(--white); border-radius: 8px; width: 100%; max-width: 620px; padding: 32px; margin: auto; }
+    .modal__title { font-size: 16px; font-weight: 600; margin-bottom: 24px; color: var(--text); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-group { margin-bottom: 16px; }
+    .form-label { display: block; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text); margin-bottom: 6px; }
+    .form-input { width: 100%; height: 40px; border: 1px solid var(--border); border-radius: 4px; padding: 0 14px; font-family: 'Jost', sans-serif; font-size: 13px; color: var(--text); outline: none; transition: border-color 0.2s; background: #fff; }
+    .form-input:focus { border-color: var(--teal); }
+    select.form-input { cursor: pointer; }
+    textarea.form-input { height: 80px; padding: 10px 14px; resize: vertical; }
+    .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
 
-    /* Flash */
-    .flash{padding:10px 14px;border-radius:4px;font-size:12px;margin-bottom:16px;display:flex;align-items:center;gap:8px}
-    .flash--error{background:#fdecea;color:#b00020;border:1px solid #f5c6cb}
-    .flash--success{background:#e8f5e9;color:#1b5e20;border:1px solid #c8e6c9}
+    .upload-section { margin-bottom: 16px; }
+    .upload-label { display: block; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text); margin-bottom: 8px; }
+    .upload-hint { font-size: 11px; color: var(--text-light); margin-bottom: 10px; }
+    .upload-zone { border: 2px dashed var(--border); border-radius: 6px; padding: 24px; text-align: center; cursor: pointer; transition: border-color 0.2s; background: #fafcfb; }
+    .upload-zone:hover { border-color: var(--teal); }
+    .upload-zone p { font-size: 13px; color: var(--text-mid); margin-top: 8px; }
+    .upload-zone svg { width: 28px; height: 28px; color: var(--text-light); }
+    #fileInput, #editFileInput { display: none; }
 
-    /* Modal */
-    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:999;align-items:center;justify-content:center}
-    .modal-overlay.open{display:flex}
-    .modal{background:var(--white);border-radius:8px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,.15);animation:modalIn .18s ease}
-    @keyframes modalIn{from{transform:scale(.95);opacity:0}to{transform:scale(1);opacity:1}}
-    .modal__header{padding:20px 24px 0;display:flex;align-items:flex-start;justify-content:space-between}
-    .modal__title{font-size:15px;font-weight:600;color:var(--text)}
-    .modal__close{background:none;border:none;cursor:pointer;color:var(--text-light);padding:0;display:flex}
-    .modal__close svg{width:16px;height:16px}
-    .modal__body{padding:16px 24px 24px}
-    .modal__footer{padding:0 24px 20px;display:flex;gap:8px;justify-content:flex-end}
-    .form-group{margin-bottom:16px}
-    .form-label{display:block;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text);margin-bottom:5px}
-    .form-input,.form-textarea,.form-select{width:100%;border:1px solid var(--border);border-radius:4px;font-family:'Jost',sans-serif;font-size:12px;color:var(--text);background:var(--white);outline:none;transition:border-color .2s}
-    .form-input,.form-select{height:38px;padding:0 12px}
-    .form-textarea{padding:10px 12px;resize:vertical;min-height:80px}
-    .form-input:focus,.form-textarea:focus,.form-select:focus{border-color:var(--teal)}
-    .btn-cancel{height:34px;padding:0 14px;background:none;border:1px solid var(--border);border-radius:4px;font-family:'Jost',sans-serif;font-size:11px;font-weight:600;color:var(--text-mid);cursor:pointer;transition:background .15s}
-    .btn-cancel:hover{background:var(--bg)}
-    .btn-confirm{height:34px;padding:0 16px;border:none;border-radius:4px;font-family:'Jost',sans-serif;font-size:11px;font-weight:600;color:#fff;cursor:pointer;transition:opacity .15s}
-    .btn-confirm--save{background:var(--navy)}
-    .btn-confirm--delete{background:var(--red)}
-    .btn-confirm:hover{opacity:.85}
+    .preview-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 12px; }
+    .preview-item { position: relative; aspect-ratio: 1; }
+    .preview-item img { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; border: 1px solid var(--border); }
+    .preview-item .remove-img { position: absolute; top: -6px; right: -6px; width: 18px; height: 18px; border-radius: 50%; background: var(--red); color: #fff; border: none; cursor: pointer; font-size: 11px; display: flex; align-items: center; justify-content: center; }
+    .img-count { font-size: 11px; color: var(--text-mid); margin-top: 6px; }
+    .img-count.warn { color: var(--red); }
 
-    /* Delete confirm modal */
-    .delete-icon{width:40px;height:40px;border-radius:50%;background:var(--red-bg);display:flex;align-items:center;justify-content:center;color:var(--red);margin-bottom:12px}
-    .delete-icon svg{width:20px;height:20px}
+    .cropper-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 300; align-items: center; justify-content: center; }
+    .cropper-modal-overlay.open { display: flex; }
+    .cropper-box { background: var(--white); border-radius: 8px; padding: 24px; max-width: 560px; width: 100%; }
+    .cropper-box h3 { font-size: 15px; font-weight: 600; margin-bottom: 16px; }
+    .cropper-container-wrap { max-height: 360px; overflow: hidden; }
+    #cropperImage { display: block; max-width: 100%; }
+    .cropper-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px; }
 
-    /* Footer */
-    .page-footer{text-align:center;padding:16px;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-light);border-top:1px solid var(--border)}
+    .confirm-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 400; align-items: center; justify-content: center; }
+    .confirm-overlay.open { display: flex; }
+    .confirm-box { background: var(--white); border-radius: 12px; padding: 32px 28px; max-width: 380px; width: 100%; box-shadow: 0 8px 40px rgba(0,0,0,0.18); text-align: center; animation: popIn 0.2s ease; }
+    @keyframes popIn { from { transform: scale(0.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .confirm-icon { width: 56px; height: 56px; border-radius: 50%; background: var(--red-bg); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; }
+    .confirm-icon svg { width: 26px; height: 26px; color: var(--red); }
+    .confirm-box h3 { font-size: 17px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+    .confirm-box p { font-size: 13px; color: var(--text-mid); line-height: 1.5; margin-bottom: 24px; }
+    .confirm-box p strong { color: var(--text); font-weight: 600; }
+    .confirm-actions { display: flex; gap: 10px; justify-content: center; }
+    .confirm-actions .btn { min-width: 110px; justify-content: center; }
   </style>
 </head>
 <body>
-
-<!-- Add/Edit Category Modal -->
-<div class="modal-overlay" id="categoryModal">
-  <div class="modal">
-    <div class="modal__header">
-      <span class="modal__title" id="modalTitle">Add Category</span>
-      <button class="modal__close" onclick="closeModal('categoryModal')">
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </div>
-    <form id="categoryForm" method="POST">
-      <div class="modal__body">
-        <div class="form-group">
-          <label class="form-label" for="catName">Category Name *</label>
-          <input class="form-input" type="text" id="catName" name="name" placeholder="e.g. Luxury Watches" required/>
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="catDesc">Description</label>
-          <textarea class="form-textarea" id="catDesc" name="description" placeholder="Brief description of this category…"></textarea>
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="catStatus">Status</label>
-          <select class="form-select" id="catStatus" name="isActive">
-            <option value="true">Active</option>
-            <option value="false">Inactive</option>
-          </select>
-        </div>
-        <input type="hidden" name="search" id="formSearch" value="<%= search %>"/>
-        <input type="hidden" name="page"   id="formPage"   value="<%= page %>"/>
-      </div>
-      <div class="modal__footer">
-        <button type="button" class="btn-cancel" onclick="closeModal('categoryModal')">Cancel</button>
-        <button type="submit" class="btn-confirm btn-confirm--save" id="modalSaveBtn">Save Category</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<!-- Delete Confirm Modal -->
-<div class="modal-overlay" id="deleteModal">
-  <div class="modal">
-    <div class="modal__body" style="padding:24px">
-      <div class="delete-icon">
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path stroke-linecap="round" stroke-linejoin="round" d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6m5 0V4a1 1 0 011-1h2a1 1 0 011 1v2"/></svg>
-      </div>
-      <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:8px">Delete Category?</div>
-      <div style="font-size:12px;color:var(--text-mid);line-height:1.6">
-        Are you sure you want to delete <strong id="deleteCatName"></strong>? This action soft-deletes the category and it can be restored.
-      </div>
-    </div>
-    <div class="modal__footer">
-      <button class="btn-cancel" onclick="closeModal('deleteModal')">Cancel</button>
-      <form id="deleteForm" method="POST" style="display:inline">
-        <input type="hidden" name="search" value="<%= search %>"/>
-        <input type="hidden" name="page"   value="<%= page %>"/>
-        <button type="submit" class="btn-confirm btn-confirm--delete">Yes, Delete</button>
-      </form>
-    </div>
-  </div>
-</div>
-
 <div class="layout">
+
   <!-- Sidebar -->
   <aside class="sidebar">
     <div class="sidebar__brand">
@@ -230,15 +162,15 @@
         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
         Orders
       </a>
-      <a href="/admin/products" class="nav-item">
+      <a href="/admin/products" class="nav-item active">
         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"/></svg>
         Products
       </a>
-      <a href="/admin/rating" class="nav-item">
+      <a href="/admin/reviews" class="nav-item">
         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
         Rating/Review
       </a>
-      <a href="/admin/dashboard" class="nav-item">
+      <a href="/admin/customers" class="nav-item">
         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
         Customers
       </a>
@@ -246,11 +178,11 @@
         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
         Coupons
       </a>
-      <a href="/admin/categories" class="nav-item active">
+      <a href="/admin/categories" class="nav-item">
         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
         Categories
       </a>
-      <a href="/admin/refunds" class="nav-item">
+      <a href="/admin/refund" class="nav-item">
         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
         Refund/Return
       </a>
@@ -261,10 +193,6 @@
       <a href="/admin/referral" class="nav-item">
         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
         Referral
-      </a>
-      <a href="/admin/sales" class="nav-item">
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
-        Sales
       </a>
     </nav>
     <div class="sidebar__footer">
@@ -279,176 +207,452 @@
     </div>
   </aside>
 
+  <!-- Main -->
   <div class="main">
-    <!-- Topbar -->
     <header class="topbar">
-      <div class="topbar__left">
-        <h1>Category Management</h1>
-        <p>Organise product categories — add, edit or soft-delete</p>
-      </div>
-      <div class="topbar__right">
-        <button class="btn-primary" onclick="openAddModal()">
-          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Add Category
-        </button>
-        <button class="topbar__bell">
-          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-        </button>
-      </div>
+      <span class="topbar__title">Operational Administrator Hub</span>
     </header>
 
     <div class="content">
-      <!-- Flash -->
-      <% if (locals.success && success.length) { %>
-        <div class="flash flash--success">
-          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-          <%= success[0] %>
-        </div>
-      <% } %>
-      <% if (locals.error && error.length) { %>
-        <div class="flash flash--error">
-          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-          <%= error[0] %>
-        </div>
-      <% } %>
 
-      <!-- Search -->
-      <form method="GET" action="/admin/categories" id="searchForm">
-        <div class="toolbar">
-          <div class="search-wrap">
-            <svg class="search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35"/></svg>
-            <input type="text" name="search" id="searchInput" class="search-input" placeholder="Search categories…" value="<%= search %>" autocomplete="off"/>
-            <button type="button" class="search-clear <%= search ? 'visible' : '' %>" id="clearBtn" onclick="clearSearch()">
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            </button>
-          </div>
-          <button type="submit" class="btn-search">Search</button>
+      <% if (locals.success && success.length) { %><div class="flash flash--success"><%= success[0] %></div><% } %>
+      <% if (locals.error   && error.length)   { %><div class="flash flash--error"><%=   error[0] %></div><% } %>
+
+      <div class="page-header">
+        <h1>Products</h1>
+        <p>Manage your product catalogue — add, edit, or soft-delete products.</p>
+      </div>
+
+      <div class="toolbar">
+        <form class="search-form" method="GET" action="/admin/products">
+          <input class="search-input" type="text" name="search" placeholder="Search products…" value="<%= search %>"/>
+          <button type="submit" class="btn btn--teal">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="M21 21l-4.35-4.35"/></svg>
+            Search
+          </button>
           <% if (search) { %>
-            <span class="search-result-info"><%= total %> result<%= total!==1?'s':'' %> for "<%= search %>"</span>
+            <a href="/admin/products" class="btn btn--outline">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              Clear
+            </a>
           <% } %>
-        </div>
-      </form>
+        </form>
+        <button class="btn btn--teal" onclick="openAddModal()">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Product
+        </button>
+      </div>
 
-      <!-- Table -->
       <div class="card">
         <div class="card__header">
-          <span class="card__title">All Categories</span>
-          <span class="card__meta"><%= total %> total · Page <%= page %> of <%= pages %></span>
+          <span class="card__title">All Products</span>
+          <span style="font-size:12px;color:var(--text-light)"><%= total %> total</span>
         </div>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
                 <th>#</th>
-                <th>Category Name</th>
-                <th>Description</th>
-                <th>Products</th>
-                <th>Status</th>
-                <th>Created</th>
-                <th>Actions</th>
+                <th>Images</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
-              <% if (typeof categories !== 'undefined' && categories.length > 0) { %>
-                <% categories.forEach(function(cat, i) { %>
+              <% if (products.length > 0) { %>
+                <% products.forEach((p, i) => { %>
                 <tr>
-                  <td style="color:var(--text-light);font-size:10px"><%= ((page-1)*10)+i+1 %></td>
-                  <td><strong style="font-weight:600"><%= cat.name %></strong></td>
-                  <td style="color:var(--text-mid);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><%= cat.description || '—' %></td>
-                  <td><span style="font-weight:600"><%= cat.productCount || 0 %></span></td>
+                  <td style="color:var(--text-light)"><%= (page-1)*8+i+1 %></td>
                   <td>
-                    <% if (cat.isActive !== false) { %>
-                      <span class="badge badge--active">Active</span>
-                    <% } else { %>
-                      <span class="badge badge--inactive">Inactive</span>
-                    <% } %>
+                    <div class="thumb-row">
+                      <% p.images.slice(0,3).forEach(img => { %>
+                        <img class="thumb" src="<%= img %>" alt="product"/>
+                      <% }) %>
+                    </div>
                   </td>
-                  <td style="color:var(--text-mid)"><%= new Date(cat.createdAt).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}) %></td>
+                  <td style="font-weight:500"><%= p.name %></td>
+                  <td><span class="badge badge--cat"><%= p.category ? p.category.name : '—' %></span></td>
+                  <td>&#8377;<%= p.price.toLocaleString() %></td>
+                  <td><%= p.stock %></td>
                   <td>
                     <div class="actions">
-                      <button class="btn-icon" title="Edit" onclick="openEditModal('<%= cat._id %>','<%= cat.name.replace(/'/g,\"\\\\'\" ) %>','<%= (cat.description||'').replace(/'/g,\"\\\\'\" ) %>','<%= cat.isActive !== false %>')">
+                      <button
+                        class="btn-action btn-action--edit"
+                        data-id="<%= p._id %>"
+                        data-name="<%- JSON.stringify(p.name).replace(/"/g, '&quot;') %>"
+                        data-desc="<%- JSON.stringify(p.description || '').replace(/"/g, '&quot;') %>"
+                        data-price="<%= p.price %>"
+                        data-stock="<%= p.stock %>"
+                        data-cat="<%= p.category ? p.category._id : '' %>"
+                        data-images="<%- JSON.stringify(p.images).replace(/"/g, '&quot;') %>"
+                        onclick="openEditFromBtn(this)">
                         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                        Edit
                       </button>
-                      <button class="btn-icon btn-icon--delete" title="Delete" onclick="openDeleteModal('<%= cat._id %>','<%= cat.name.replace(/'/g,\"\\\\'\" ) %>')">
-                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path stroke-linecap="round" stroke-linejoin="round" d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6m5 0V4a1 1 0 011-1h2a1 1 0 011 1v2"/></svg>
+                      <button
+                        class="btn-action btn-action--delete"
+                        data-action="/admin/products/<%= p._id %>/delete"
+                        data-name="<%= p.name %>"
+                        onclick="openDeleteConfirm(this)">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path stroke-linecap="round" stroke-linejoin="round" d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6m5 0V4h4v2"/></svg>
+                        Delete
                       </button>
                     </div>
                   </td>
                 </tr>
                 <% }) %>
               <% } else { %>
-                <tr><td colspan="7">
-                  <div class="empty-state">
-                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
-                    <% if (search) { %>No categories found for "<%= search %>".<% } else { %>No categories yet. Add your first one!<% } %>
-                  </div>
-                </td></tr>
+                <tr><td colspan="7"><div class="empty-state">No products found.</div></td></tr>
               <% } %>
             </tbody>
           </table>
         </div>
 
-        <!-- Pagination -->
-        <% if (pages > 1) { %>
+        <% if (totalPages > 1) { %>
         <div class="pagination">
-          <span class="pagination__info">Showing <%= ((page-1)*10)+1 %>–<%= Math.min(page*10,total) %> of <%= total %></span>
-          <div class="pagination__pages">
-            <% if (page > 1) { %>
-              <a href="/admin/categories?page=<%= page-1 %><%= search?'&search='+encodeURIComponent(search):'' %>" class="page-btn"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg></a>
-            <% } else { %><span class="page-btn disabled"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg></span><% } %>
-            <% for(let p=1;p<=pages;p++){ %>
-              <% if(p===1||p===pages||(p>=page-1&&p<=page+1)){ %>
-                <a href="/admin/categories?page=<%= p %><%= search?'&search='+encodeURIComponent(search):'' %>" class="page-btn <%= p===page?'active':'' %>"><%= p %></a>
-              <% } else if(p===page-2||p===page+2){ %><span class="page-btn disabled">…</span><% } %>
-            <% } %>
-            <% if (page < pages) { %>
-              <a href="/admin/categories?page=<%= page+1 %><%= search?'&search='+encodeURIComponent(search):'' %>" class="page-btn"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg></a>
-            <% } else { %><span class="page-btn disabled"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg></span><% } %>
-          </div>
+          <a href="/admin/products?page=<%= page-1 %>&search=<%= search %>" class="page-btn <%= page===1?'disabled':'' %>">&#8592;</a>
+          <% for(let p=1; p<=totalPages; p++) { %>
+            <a href="/admin/products?page=<%= p %>&search=<%= search %>" class="page-btn <%= p===page?'active':'' %>"><%= p %></a>
+          <% } %>
+          <a href="/admin/products?page=<%= page+1 %>&search=<%= search %>" class="page-btn <%= page===totalPages?'disabled':'' %>">&#8594;</a>
         </div>
         <% } %>
       </div>
-    </div>
 
-    <footer class="page-footer">© 2024 Velmora Chroné. All Rights Reserved. Admin Panel.</footer>
+    </div>
+    <footer class="footer">© 2024 Velmora Chroné. Admin Panel.</footer>
   </div>
 </div>
 
-<script>
-  const searchInput = document.getElementById('searchInput');
-  const clearBtn    = document.getElementById('clearBtn');
-  searchInput.addEventListener('input', () => clearBtn.classList.toggle('visible', searchInput.value.length > 0));
-  function clearSearch(){ searchInput.value=''; window.location.href='/admin/categories'; }
+<!-- ══ DELETE CONFIRM MODAL ══ -->
+<div class="confirm-overlay" id="confirmModal">
+  <div class="confirm-box">
+    <div class="confirm-icon">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <polyline points="3 6 5 6 21 6"/>
+        <path stroke-linecap="round" stroke-linejoin="round" d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6m5 0V4h4v2"/>
+      </svg>
+    </div>
+    <h3>Delete Product?</h3>
+    <p>You are about to delete <strong id="confirmProductName"></strong>. This action cannot be undone.</p>
+    <div class="confirm-actions">
+      <button class="btn btn--outline" onclick="closeDeleteConfirm()">Cancel</button>
+      <form id="confirmDeleteForm" method="POST" style="margin:0">
+        <button type="submit" class="btn btn--danger">Yes, Delete</button>
+      </form>
+    </div>
+  </div>
+</div>
 
-  function openModal(id){ document.getElementById(id).classList.add('open'); }
-  function closeModal(id){ document.getElementById(id).classList.remove('open'); }
-  document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeModal('categoryModal'); closeModal('deleteModal'); } });
-  ['categoryModal','deleteModal'].forEach(id => {
-    document.getElementById(id).addEventListener('click', function(e){ if(e.target===this) closeModal(id); });
+<!-- ══ ADD PRODUCT MODAL ══ -->
+<div class="modal-overlay" id="addModal">
+  <div class="modal">
+    <h2 class="modal__title">Add Product</h2>
+    <form id="addForm" action="/admin/products/add" method="POST" onsubmit="submitProductForm(event,'addForm','addImagesInput','addExistingImages')">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Product Name *</label>
+          <input class="form-input" type="text" name="name" required placeholder="e.g. Chronograph Watch"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Category *</label>
+          <select class="form-input" name="category" required>
+            <option value="">— Select —</option>
+            <% categories.forEach(c => { %>
+              <option value="<%= c._id %>"><%= c.name %></option>
+            <% }) %>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Price (₹) *</label>
+          <input class="form-input" type="number" name="price" required min="0" placeholder="0"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Stock</label>
+          <input class="form-input" type="number" name="stock" min="0" placeholder="0"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea class="form-input" name="description" placeholder="Product description…"></textarea>
+      </div>
+      <div class="upload-section">
+        <label class="upload-label">Product Images * <span style="font-weight:400;text-transform:none;letter-spacing:0">(min. 3)</span></label>
+        <p class="upload-hint">Click or drag to upload. Each image will be cropped before saving.</p>
+        <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+          <p>Click to select images</p>
+        </div>
+        <input type="file" id="fileInput" accept="image/*" multiple onchange="handleFiles(event,'addPreviewGrid','addImgCount')"/>
+        <div class="preview-grid" id="addPreviewGrid"></div>
+        <p class="img-count" id="addImgCount"></p>
+        <input type="hidden" name="images" id="addImagesInput"/>
+        <input type="hidden" name="existingImages" id="addExistingImages" value="[]"/>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn--outline" onclick="closeModal('addModal')">Cancel</button>
+        <button type="submit" class="btn btn--teal">Add Product</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ══ EDIT PRODUCT MODAL ══ -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <h2 class="modal__title">Edit Product</h2>
+    <form id="editForm" method="POST" onsubmit="submitProductForm(event,'editForm','editImagesInput','editExistingImages')">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Product Name *</label>
+          <input class="form-input" type="text" name="name" id="editName" required/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Category *</label>
+          <select class="form-input" name="category" id="editCategory" required>
+            <option value="">— Select —</option>
+            <% categories.forEach(c => { %>
+              <option value="<%= c._id %>"><%= c.name %></option>
+            <% }) %>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Price (₹) *</label>
+          <input class="form-input" type="number" name="price" id="editPrice" required min="0"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Stock</label>
+          <input class="form-input" type="number" name="stock" id="editStock" min="0"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea class="form-input" name="description" id="editDesc"></textarea>
+      </div>
+      <div class="upload-section">
+        <label class="upload-label">Product Images * <span style="font-weight:400;text-transform:none;letter-spacing:0">(min. 3)</span></label>
+        <p class="upload-hint">Existing images shown below. Upload new ones to add more.</p>
+        <div class="upload-zone" onclick="document.getElementById('editFileInput').click()">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+          <p>Click to add more images</p>
+        </div>
+        <input type="file" id="editFileInput" accept="image/*" multiple onchange="handleFiles(event,'editPreviewGrid','editImgCount')"/>
+        <div class="preview-grid" id="editPreviewGrid"></div>
+        <p class="img-count" id="editImgCount"></p>
+        <input type="hidden" name="images" id="editImagesInput"/>
+        <input type="hidden" name="existingImages" id="editExistingImages"/>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn--outline" onclick="closeModal('editModal')">Cancel</button>
+        <button type="submit" class="btn btn--teal">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ══ CROPPER MODAL ══ -->
+<div class="cropper-modal-overlay" id="cropperModal">
+  <div class="cropper-box">
+    <h3>Crop Image</h3>
+    <div class="cropper-container-wrap">
+      <img id="cropperImage" src="" alt="crop"/>
+    </div>
+    <div class="cropper-actions">
+      <button type="button" class="btn btn--outline" onclick="cancelCrop()">Skip</button>
+      <button type="button" class="btn btn--teal" onclick="applyCrop()">Crop & Use</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SINGLE script load — duplicate removed ══ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+<script>
+  let croppedImages  = [];
+  let currentGridId  = '';
+  let currentCountId = '';
+  let cropQueue      = [];
+  let currentCropper = null;
+  let currentFileObj = null;
+
+  function openEditFromBtn(btn) {
+    try {
+      const id     = btn.dataset.id;
+      const name   = JSON.parse(btn.dataset.name.replace(/&quot;/g, '"'));
+      const desc   = JSON.parse(btn.dataset.desc.replace(/&quot;/g, '"'));
+      const price  = btn.dataset.price;
+      const stock  = btn.dataset.stock;
+      const catId  = btn.dataset.cat;
+      const images = JSON.parse(btn.dataset.images.replace(/&quot;/g, '"'));
+      openEditModal(id, name, desc, price, stock, catId, images);
+    } catch(err) {
+      console.error('Edit parse error:', err);
+      alert('Could not open editor. Check the browser console for details.');
+    }
+  }
+
+  function openAddModal() {
+    croppedImages  = [];
+    currentGridId  = 'addPreviewGrid';
+    currentCountId = 'addImgCount';
+    document.getElementById('addPreviewGrid').innerHTML = '';
+    document.getElementById('addImgCount').textContent  = '';
+    document.getElementById('addImagesInput').value     = '';
+    document.getElementById('addExistingImages').value  = '[]';
+    document.getElementById('addForm').reset();
+    document.getElementById('addModal').classList.add('open');
+  }
+
+  function openEditModal(id, name, desc, price, stock, catId, images) {
+    currentGridId  = 'editPreviewGrid';
+    currentCountId = 'editImgCount';
+    croppedImages  = [];
+
+    document.getElementById('editForm').action    = '/admin/products/' + id + '/edit';
+    document.getElementById('editName').value     = name;
+    document.getElementById('editDesc').value     = desc;
+    document.getElementById('editPrice').value    = price;
+    document.getElementById('editStock').value    = stock;
+
+    setTimeout(() => {
+      document.getElementById('editCategory').value = catId;
+    }, 0);
+
+    const grid = document.getElementById('editPreviewGrid');
+    grid.innerHTML = '';
+    images.forEach(url => addPreviewItem(url, true));
+    document.getElementById('editExistingImages').value = JSON.stringify(images);
+    updateCount();
+    document.getElementById('editModal').classList.add('open');
+  }
+
+  function closeModal(id) {
+    document.getElementById(id).classList.remove('open');
+    cropQueue = [];
+  }
+
+  document.querySelectorAll('.modal-overlay').forEach(el => {
+    el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); });
   });
 
-  function openAddModal(){
-    document.getElementById('modalTitle').textContent = 'Add Category';
-    document.getElementById('categoryForm').action = '/admin/categories/add';
-    document.getElementById('catName').value = '';
-    document.getElementById('catDesc').value = '';
-    document.getElementById('catStatus').value = 'true';
-    openModal('categoryModal');
+  function openDeleteConfirm(btn) {
+    document.getElementById('confirmProductName').textContent = btn.dataset.name;
+    document.getElementById('confirmDeleteForm').action = btn.dataset.action;
+    document.getElementById('confirmModal').classList.add('open');
+  }
+  function closeDeleteConfirm() {
+    document.getElementById('confirmModal').classList.remove('open');
+  }
+  document.getElementById('confirmModal').addEventListener('click', function(e) {
+    if (e.target === this) closeDeleteConfirm();
+  });
+
+  function handleFiles(event, gridId, countId) {
+    currentGridId  = gridId;
+    currentCountId = countId;
+    const files = Array.from(event.target.files);
+    cropQueue   = files.slice();
+    event.target.value = '';
+    processNextInQueue();
   }
 
-  function openEditModal(id, name, desc, isActive){
-    document.getElementById('modalTitle').textContent = 'Edit Category';
-    document.getElementById('categoryForm').action = '/admin/categories/' + id + '/edit';
-    document.getElementById('catName').value  = name;
-    document.getElementById('catDesc').value  = desc;
-    document.getElementById('catStatus').value = isActive === 'true' ? 'true' : 'false';
-    openModal('categoryModal');
+  function processNextInQueue() {
+    if (cropQueue.length === 0) return;
+    const file   = cropQueue.shift();
+    const reader = new FileReader();
+    reader.onload = e => openCropper(e.target.result, file);
+    reader.readAsDataURL(file);
   }
 
-  function openDeleteModal(id, name){
-    document.getElementById('deleteCatName').textContent = name;
-    document.getElementById('deleteForm').action = '/admin/categories/' + id + '/delete';
-    openModal('deleteModal');
+  function openCropper(src, file) {
+    currentFileObj = file;
+    const img = document.getElementById('cropperImage');
+    img.src = src;
+    document.getElementById('cropperModal').classList.add('open');
+    if (currentCropper) { currentCropper.destroy(); currentCropper = null; }
+    currentCropper = new Cropper(img, { aspectRatio: 1, viewMode: 1, autoCropArea: 0.9 });
+  }
+
+  function applyCrop() {
+    if (!currentCropper) return;
+    const canvas = currentCropper.getCroppedCanvas({ width: 800, height: 800 });
+    const b64    = canvas.toDataURL('image/jpeg', 0.85);
+    croppedImages.push(b64);
+    addPreviewItem(b64, false);
+    updateCount();
+    closeCropper();
+    processNextInQueue();
+  }
+
+  function cancelCrop() {
+    const reader = new FileReader();
+    reader.onload = e => {
+      croppedImages.push(e.target.result);
+      addPreviewItem(e.target.result, false);
+      updateCount();
+    };
+    reader.readAsDataURL(currentFileObj);
+    closeCropper();
+    processNextInQueue();
+  }
+
+  function closeCropper() {
+    document.getElementById('cropperModal').classList.remove('open');
+    if (currentCropper) { currentCropper.destroy(); currentCropper = null; }
+  }
+
+  function addPreviewItem(src, isExisting) {
+    const grid = document.getElementById(currentGridId);
+    const wrap = document.createElement('div');
+    wrap.className        = 'preview-item';
+    wrap.dataset.src      = src;
+    wrap.dataset.existing = isExisting ? '1' : '0';
+    wrap.innerHTML = `
+      <img src="${src}" alt="preview"/>
+      <button type="button" class="remove-img" onclick="removeImage(this)">&#x2715;</button>
+    `;
+    grid.appendChild(wrap);
+  }
+
+  function removeImage(btn) {
+    const item = btn.closest('.preview-item');
+    item.remove();
+    const grid = document.getElementById(currentGridId);
+    croppedImages = Array.from(grid.querySelectorAll('[data-existing="0"]')).map(el => el.dataset.src);
+    updateCount();
+  }
+
+  function updateCount() {
+    const grid  = document.getElementById(currentGridId);
+    const count = grid.children.length;
+    const el    = document.getElementById(currentCountId);
+    el.textContent = count + ' image' + (count !== 1 ? 's' : '') + ' selected' + (count < 3 ? ' (need at least 3)' : '');
+    el.className   = 'img-count' + (count < 3 ? ' warn' : '');
+  }
+
+  function submitProductForm(e, formId, imagesInputId, existingInputId) {
+    e.preventDefault();
+    const gridId   = formId === 'editForm' ? 'editPreviewGrid' : 'addPreviewGrid';
+    const grid     = document.getElementById(gridId);
+    const allItems = Array.from(grid.querySelectorAll('.preview-item'));
+
+    if (allItems.length < 3) {
+      alert('Please upload at least 3 product images.');
+      return;
+    }
+
+    const existing = allItems.filter(i => i.dataset.existing === '1').map(i => i.dataset.src);
+    const newImgs  = allItems.filter(i => i.dataset.existing === '0').map(i => i.dataset.src);
+
+    document.getElementById(existingInputId).value = JSON.stringify(existing);
+    document.getElementById(imagesInputId).value   = JSON.stringify(newImgs);
+    document.getElementById(formId).submit();
   }
 </script>
 </body>

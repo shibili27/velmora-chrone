@@ -5,6 +5,8 @@ import passport from '../config/passport.js';
 import { isAuth, isGuest, noCache, hasOtpSession, hasOtpVerified } from '../middlewares/authMiddleware.js';
 import authController from '../controller/usercontroller/authController.js';
 import profileController, { upload } from '../controller/usercontroller/profileController.js';
+import { getProducts } from '../controller/usercontroller/productController.js';
+
 
 
 router.get('/login', isGuest, noCache, (req, res) => {
@@ -70,6 +72,8 @@ router.post('/reset-password', authController.resetPassword);
 router.get('/',    isAuth, (req, res) => res.render('user/home'));
 router.get('/home', isAuth, (req, res) => res.render('user/home'));
 
+
+router.get('/products', isAuth, getProducts);
 // ─────────────────────────────────────────
 // Profile routes
 // ─────────────────────────────────────────
