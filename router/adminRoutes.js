@@ -77,27 +77,7 @@ router.get('/logout', isAuthenticated, (req, res) => {
 // ── Dashboard ─────────────────────────────────────────────────────────────────
 router.get('/dashboard', isAuthenticated, getDashboard);
 
-// ── TEMPORARY FIX — visit once then remove ────────────────────────────────────
-// Visit: http://localhost:3000/admin/fix-products
-router.get('/fix-products', isAuthenticated, async (req, res) => {
-  try {
-    const p = await Product.updateMany(
-      { isListed: { $exists: false } },
-      { $set: { isListed: true } }
-    );
-    const c = await Category.updateMany(
-      { isListed: { $exists: false } },
-      { $set: { isListed: true } }
-    );
-    res.json({
-      message:          'Done! Remove this route now.',
-      productsFixed:    p.modifiedCount,
-      categoriesFixed:  c.modifiedCount,
-    });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+
 
 // ── Customers ─────────────────────────────────────────────────────────────────
 router.get('/customers', isAuthenticated, async (req, res) => {
