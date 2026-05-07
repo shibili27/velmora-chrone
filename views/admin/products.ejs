@@ -600,7 +600,6 @@
   </div>
 </div>
 
-<!-- ══ CROPPER ══ -->
 <div class="cropper-modal-overlay" id="cropperModal">
   <div class="cropper-box">
     <h3>Crop Image</h3>
@@ -616,9 +615,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 <script>
-/* ═══════════════════════════════════════════════════════════════
-   PRESET COLOURS
-═══════════════════════════════════════════════════════════════ */
+
 const PRESETS = [
   { hex: '#000000', name: 'Black'        },
   { hex: '#ffffff', name: 'White'        },
@@ -664,13 +661,9 @@ function initPresets(prefix) {
   });
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   VARIANT STATE
-═══════════════════════════════════════════════════════════════ */
 const variantState = { add: [], edit: [] };
 let activeTab      = { add: 0, edit: 0 };
 
-/* ── Normalise hex to 6-digit lowercase ── */
 function normaliseHex(raw) {
   let h = raw.trim();
   if (!h.startsWith('#')) h = '#' + h;
@@ -680,7 +673,6 @@ function normaliseHex(raw) {
   return h.toLowerCase();
 }
 
-/* ── Add a new variant ── */
 function addVariant(prefix) {
   let rawHex = document.getElementById(prefix + 'VHex').value.trim()
             || document.getElementById(prefix + 'VNative').value;
@@ -695,7 +687,6 @@ function addVariant(prefix) {
 
   if (!name) { alert('Enter a colour label.'); return; }
 
-  // FIX: compare normalised hex values so #000 and #000000 are treated the same
   if (variantState[prefix].some(v => normaliseHex(v.hex) === hex)) {
     alert('A variant with that colour already exists.');
     return;
@@ -712,7 +703,6 @@ function addVariant(prefix) {
   renderVariantUI(prefix);
 }
 
-/* ── Remove a variant ── */
 function removeVariant(prefix, idx) {
   variantState[prefix].splice(idx, 1);
   if (activeTab[prefix] >= variantState[prefix].length) {
@@ -726,7 +716,6 @@ function switchTab(prefix, idx) {
   renderVariantUI(prefix);
 }
 
-/* ── Render tabs + panels ── */
 function renderVariantUI(prefix) {
   const tabs   = document.getElementById(prefix + 'VariantTabs');
   const panels = document.getElementById(prefix + 'VariantPanels');
@@ -806,9 +795,7 @@ function triggerVariantUpload(prefix, idx) {
   document.getElementById(prefix + 'VFileInput' + idx).click();
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   CROPPER
-═══════════════════════════════════════════════════════════════ */
+
 let cropQueue      = [];
 let cropCtx        = null;
 let currentCropper = null;
@@ -848,7 +835,6 @@ function applyCrop() {
 }
 
 function cancelCrop() {
-  // Skip cropping — use original file as-is
   const reader = new FileReader();
   reader.onload = e => pushVariantImage(e.target.result, false);
   reader.readAsDataURL(currentFileObj);
@@ -869,14 +855,10 @@ function pushVariantImage(src, isExisting) {
   renderVariantUI(prefix);
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   FORM SUBMIT
-═══════════════════════════════════════════════════════════════ */
 function submitForm(e, prefix) {
   e.preventDefault();
   const state = variantState[prefix];
 
-  // FIX: clear, user-visible validation messages instead of bare alerts
   if (state.length === 0) {
     alert('Please add at least one colour variant before saving.');
     return;
@@ -889,7 +871,6 @@ function submitForm(e, prefix) {
     }
   }
 
-  // Serialize: separate existing Cloudinary URLs from new base64 images
   const payload = state.map(v => ({
     name:           v.name,
     hex:            v.hex,
@@ -900,7 +881,6 @@ function submitForm(e, prefix) {
 
   document.getElementById(prefix + 'ColorVariantsInput').value = JSON.stringify(payload);
 
-  // Show loading state on submit button
   const btn = document.getElementById(prefix + 'SubmitBtn');
   if (btn) {
     btn.classList.add('btn--loading');
@@ -910,9 +890,6 @@ function submitForm(e, prefix) {
   document.getElementById(prefix + 'Form').submit();
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   MODAL HELPERS
-═══════════════════════════════════════════════════════════════ */
 function openAddModal() {
   variantState.add = [];
   activeTab.add    = 0;
@@ -946,7 +923,6 @@ function openEditModal(id, name, desc, price, catId, brand, variants) {
   document.getElementById('editBrand').value = brand;
   setTimeout(() => { document.getElementById('editCategory').value = catId; }, 0);
 
-  // Load existing variants — all pre-loaded images are marked as "existing" (already on Cloudinary)
   variantState.edit = variants.map(v => ({
     name:     v.name,
     hex:      normaliseHex(v.hex),
@@ -980,7 +956,6 @@ document.getElementById('confirmModal').addEventListener('click', function(e) {
   if (e.target === this) closeDeleteConfirm();
 });
 
-/* ── Utility ── */
 function escHtml(str) {
   return String(str)
     .replace(/&/g,'&amp;')
@@ -989,7 +964,6 @@ function escHtml(str) {
     .replace(/"/g,'&quot;');
 }
 
-/* ── Init ── */
 initPresets('add');
 initPresets('edit');
 renderVariantUI('add');

@@ -293,7 +293,7 @@
     </div>
   </section>
 
-  <!-- ══ SHOP BY CATEGORY ══ -->
+  
   <section class="cat-section">
     <div style="max-width:1200px; margin:0 auto;">
       <div class="reveal" style="margin-bottom:2.5rem;">
@@ -325,7 +325,7 @@
     </div>
   </section>
 
-  <!-- ══ CRAFTSMANSHIP SPLIT ══ -->
+  
   <section class="craft-section">
     <div class="craft-wrap">
       <div class="craft-text reveal">
@@ -351,12 +351,12 @@
     </div>
   </section>
 
-  <!-- ══ QUOTE ══ -->
+  
   <div class="quote-bar">
     <p class="quote-text">"Time is the only luxury that cannot be manufactured — only honoured."</p>
   </div>
 
-  <!-- ══ FOOTER ══ -->
+  
   <footer class="footer">
     <div style="max-width:1200px; margin:0 auto;">
       <div class="footer-top">
@@ -414,7 +414,7 @@
   <div class="toast" id="toast"></div>
 
   <script>
-    /* NAV */
+    
     const navbar = document.getElementById('navbar');
     window.addEventListener('scroll', () => {
       navbar.classList.toggle('scrolled', window.scrollY > 50);
@@ -430,7 +430,7 @@
       mobileMenu.classList.remove('open');
     }));
 
-    /* SCROLL REVEAL */
+    
     const revealEls = document.querySelectorAll('.reveal');
     const observer  = new IntersectionObserver((entries) => {
       entries.forEach((entry, i) => {
@@ -442,7 +442,7 @@
     }, { threshold: 0.08 });
     revealEls.forEach(el => observer.observe(el));
 
-    /* TOAST */
+    
     let toastTimer;
     function showToast(msg, type = '') {
       const t = document.getElementById('toast');
@@ -452,10 +452,7 @@
       toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
     }
 
-    /* ── HOME PAGE WISHLIST ──
-       Home page shows static featured products (no real _id),
-       so we just toggle UI + redirect to the product page to properly add.
-       If your home page gets real product IDs in future, swap this for a real API call. */
+    
     function toggleHomeWishlist(e, btn) {
       e.preventDefault();
       e.stopPropagation();
@@ -466,7 +463,7 @@
       showToast(active ? 'Saved to wishlist' : 'Removed from wishlist', active ? 'gold' : '');
     }
 
-    /* BACK BUTTON */
+   
     history.pushState(null, null, window.location.href);
     window.addEventListener('popstate', () => history.pushState(null, null, window.location.href));
   </script>

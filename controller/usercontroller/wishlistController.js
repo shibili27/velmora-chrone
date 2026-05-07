@@ -1,26 +1,21 @@
 import Wishlist from '../../models/wishlist.js';
-import Product  from '../../models/product.js';   // adjust path if needed
-import Cart     from '../../models/cart.js';       // adjust path if needed
+ import Cart     from '../../models/cart.js';   
 import mongoose from 'mongoose';
 
-// ─────────────────────────────────────────────────────────────────
-//  Helper — get user ID from session (matches your auth pattern)
-// ─────────────────────────────────────────────────────────────────
+
 const uid = (req) => req.session?.user || req.session?.userId || req.user?._id;
 
 
-// ─────────────────────────────────────────────────────────────────
-//  GET /wishlist  — render wishlist page
-// ─────────────────────────────────────────────────────────────────
+
 export const getWishlist = async (req, res) => {
   try {
     const userId = uid(req);
 
-    // Fetch wishlist with populated products
+    
     const wishlist = await Wishlist.findOne({ user: userId })
       .populate('items.product');
 
-    // Fetch cart so the view knows which products are already in cart
+    
     let cartProductIds = [];
     try {
       const cart = await Cart.findOne({ user: userId });
@@ -28,7 +23,7 @@ export const getWishlist = async (req, res) => {
         cartProductIds = cart.items.map(i => i.product.toString());
       }
     } catch (_) {
-      // Cart model might be named differently — cartProductIds stays []
+      
       cartProductIds = [];
     }
 
@@ -36,7 +31,7 @@ export const getWishlist = async (req, res) => {
 
     res.render('user/wishlist', {
       wishlistItems,
-      cartProductIds,   // ← this is what the template needs
+      cartProductIds,   
       title: 'My Wishlist — Velmora Chroné',
     });
   } catch (err) {
@@ -46,9 +41,6 @@ export const getWishlist = async (req, res) => {
 };
 
 
-// ─────────────────────────────────────────────────────────────────
-//  POST /wishlist/add  — add single product
-// ─────────────────────────────────────────────────────────────────
 export const addToWishlist = async (req, res) => {
   try {
     const { productId } = req.body;
@@ -74,9 +66,7 @@ export const addToWishlist = async (req, res) => {
 };
 
 
-// ─────────────────────────────────────────────────────────────────
-//  DELETE /wishlist/remove/:itemId  — remove by wishlist item _id
-// ─────────────────────────────────────────────────────────────────
+
 export const removeFromWishlist = async (req, res) => {
   try {
     const wishlist = await Wishlist.findOne({ user: uid(req) });
@@ -95,9 +85,7 @@ export const removeFromWishlist = async (req, res) => {
 };
 
 
-// ─────────────────────────────────────────────────────────────────
-//  DELETE /wishlist/remove-product/:productId  — remove by product ID
-// ─────────────────────────────────────────────────────────────────
+
 export const removeFromWishlistByProduct = async (req, res) => {
   try {
     const { productId } = req.params;
@@ -120,9 +108,7 @@ export const removeFromWishlistByProduct = async (req, res) => {
 };
 
 
-// ─────────────────────────────────────────────────────────────────
-//  GET /wishlist/check/:productId  — check if product is in wishlist
-// ─────────────────────────────────────────────────────────────────
+
 export const checkInWishlist = async (req, res) => {
   try {
     const { productId } = req.params;
@@ -142,16 +128,14 @@ export const checkInWishlist = async (req, res) => {
 };
 
 
-// ─────────────────────────────────────────────────────────────────
-//  POST /wishlist/move-to-cart  — move item to cart
-// ─────────────────────────────────────────────────────────────────
+
 export const moveToCart = async (req, res) => {
   try {
     const { productId } = req.body;
     if (!mongoose.Types.ObjectId.isValid(productId))
       return res.status(400).json({ message: 'Invalid product ID' });
 
-    // Remove from wishlist
+    
     const wishlist = await Wishlist.findOne({ user: uid(req) });
     if (wishlist) {
       wishlist.items = wishlist.items.filter(
@@ -168,9 +152,7 @@ export const moveToCart = async (req, res) => {
 };
 
 
-// ─────────────────────────────────────────────────────────────────
-//  GET /api/wishlist/count  — get total wishlist item count
-// ─────────────────────────────────────────────────────────────────
+
 export const getWishlistCount = async (req, res) => {
   try {
     const wishlist = await Wishlist.findOne({ user: uid(req) }).select('items');
@@ -182,11 +164,7 @@ export const getWishlistCount = async (req, res) => {
 };
 
 
-// ─────────────────────────────────────────────────────────────────
-//  GET /wishlist/status/:productId
-//  Called on product page load — returns wishlist state + count
-//  This is what the product detail page calls on load
-// ─────────────────────────────────────────────────────────────────
+
 export const getWishlistStatus = async (req, res) => {
   try {
     const { productId } = req.params;
@@ -206,11 +184,7 @@ export const getWishlistStatus = async (req, res) => {
 };
 
 
-// ─────────────────────────────────────────────────────────────────
-//  POST /wishlist/toggle
-//  Adds if not present, removes if already there
-//  This is what the heart button on the product detail page calls
-// ─────────────────────────────────────────────────────────────────
+
 export const toggleWishlist = async (req, res) => {
   try {
     const { productId } = req.body;
@@ -218,7 +192,7 @@ export const toggleWishlist = async (req, res) => {
     if (!productId || !mongoose.Types.ObjectId.isValid(productId))
       return res.status(400).json({ message: 'Invalid product ID' });
 
-    // Find or create the wishlist document for this user
+    
     let wishlist = await Wishlist.findOne({ user: uid(req) });
     if (!wishlist) {
       wishlist = new Wishlist({ user: uid(req), items: [] });
@@ -230,11 +204,11 @@ export const toggleWishlist = async (req, res) => {
 
     let wishlisted;
     if (idx === -1) {
-      // Not in wishlist — add it
+      
       wishlist.items.push({ product: productId });
       wishlisted = true;
     } else {
-      // Already in wishlist — remove it
+      
       wishlist.items.splice(idx, 1);
       wishlisted = false;
     }

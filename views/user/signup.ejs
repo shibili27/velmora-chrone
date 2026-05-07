@@ -273,7 +273,6 @@
       setTimeout(() => toast.remove(), 4000);
     }
 
-    /* ── Password toggle ── */
     const EYE_OPEN = `<circle cx="12" cy="12" r="3"/><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/>`;
     const EYE_SHUT = `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
                       <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
@@ -286,7 +285,6 @@
       else { inp.type = 'password'; icon.innerHTML = EYE_OPEN; }
     }
 
-    /* ── Strength bar ── */
     function updateStrength(val) {
       const fill = document.getElementById('strength-fill');
       let score = 0;
@@ -300,7 +298,6 @@
       fill.style.background = col[score];
     }
 
-    /* ── Vault Seal ── */
     const ICONS = {
       lock:   `<rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>`,
       key:    `<path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>`,
@@ -335,7 +332,6 @@
 
     document.addEventListener('keydown', e => { if (e.key === 'Escape') hideSeal(); });
 
-    /* ── Field helpers ── */
     function markError(el) {
       if (!el) return;
       el.classList.add('input-error');
@@ -358,7 +354,6 @@
       if (h) h.classList.remove('hint-show'); 
     }
 
-    /* ── Form validation with AJAX submission ── */
     document.getElementById('signupForm').addEventListener('submit', async function(e) {
       e.preventDefault();
 
@@ -381,10 +376,10 @@
 
 
 
-      // Clear all hints
+      
       ['hint-name','hint-email','hint-password','hint-confirm','hint-terms'].forEach(hideHint);
 
-      // Validation checks
+     
       if (!nameVal) {
         markError(nameEl); shakeEl(nameEl);
         showHint('hint-name', 'Full name is required.');
@@ -485,26 +480,25 @@
         return;
       }
 
-      // Disable submit button
+      
       submitBtn.disabled = true;
       const originalText = submitBtn.textContent;
       submitBtn.textContent = "Creating Account...";
 
       try {
-        // Send AJAX request
-        // ✅ Add confirmPassword to the request body
+        
 const response = await axios.post('/sendSignupOtp', {
   name: nameVal,
   email: emailVal,
   password: passVal,
-  confirmPassword: confVal,   // 👈 add this line
+  confirmPassword: confVal,   
   _csrf: csrfToken
 });
 
-        // Success - OTP sent
+        
         if (response.data && response.data.success === true) {
            localStorage.setItem('verifyEmail', emailVal);
-  localStorage.removeItem('resetFlow');        // 👈 add this line
+  localStorage.removeItem('resetFlow');        
   localStorage.setItem('signupFlow', 'true');
 
           showToast('success', response.data.message || 'OTP sent successfully!');
@@ -515,7 +509,6 @@ const response = await axios.post('/sendSignupOtp', {
             window.location.href = '/otp';
           }, 1500);
         } else {
-          // Error response
           const errorMsg = response.data?.message || 'Registration failed.';
           showToast('error', errorMsg);
           showSeal('Registration Failed', errorMsg, 'warn');
@@ -559,7 +552,6 @@ const response = await axios.post('/sendSignupOtp', {
       }
     });
 
-    /* ── Server error handler ── */
     window.addEventListener('DOMContentLoaded', () => {
       const errEl = document.getElementById('server-auth-error');
       if (!errEl) return;
@@ -590,7 +582,6 @@ const response = await axios.post('/sendSignupOtp', {
   </script>
 
   <style>
-    /* Toast styles */
     .toast-notification {
       background: white;
       border-radius: 8px;

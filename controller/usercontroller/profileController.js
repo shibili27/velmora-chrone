@@ -4,13 +4,11 @@ import cloudinary from '../../config/cloudinary.js';
 import multer from 'multer';
 import nodemailer from 'nodemailer';
 
-// ─────────────────────────────────────────
-// Multer — store in memory, then push to Cloudinary
-// ─────────────────────────────────────────
+
 const storage = multer.memoryStorage();
 export const upload = multer({
   storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB max
+  limits: { fileSize: 5 * 1024 * 1024 }, //5 mb
   fileFilter: (req, file, cb) => {
     if (!file.mimetype.startsWith('image/')) {
       return cb(new Error('Only image files are allowed'), false);
@@ -19,14 +17,9 @@ export const upload = multer({
   }
 });
 
-// ─────────────────────────────────────────
-// Helper: get user ID from session
-// ─────────────────────────────────────────
 const getUserId = (req) => req.session.user;
 
-// ─────────────────────────────────────────
-// Helper: send OTP email
-// ─────────────────────────────────────────
+
 const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString();
 
 const sendOTP = async (email, otp) => {
@@ -48,9 +41,7 @@ const sendOTP = async (email, otp) => {
   console.log('Email change OTP sent:', otp);
 };
 
-// ─────────────────────────────────────────
-// GET /profile
-// ─────────────────────────────────────────
+
 const getProfile = async (req, res) => {
   try {
     const user = await User.findById(getUserId(req));
@@ -62,9 +53,7 @@ const getProfile = async (req, res) => {
   }
 };
 
-// ─────────────────────────────────────────
-// POST /profile/update  — update name
-// ─────────────────────────────────────────
+
 const updateProfile = async (req, res) => {
   try {
     const { name } = req.body;
@@ -78,11 +67,7 @@ const updateProfile = async (req, res) => {
   }
 };
 
-// ─────────────────────────────────────────
-// POST /profile/upload-image
-// Uses multer (upload.single('profileImage')) defined in routes
-// Uploads buffer to Cloudinary and saves the secure URL permanently
-// ─────────────────────────────────────────
+
 const uploadProfileImage = async (req, res) => {
   try {
     if (!req.file) {
@@ -92,10 +77,8 @@ const uploadProfileImage = async (req, res) => {
     const user = await User.findById(getUserId(req));
     if (!user) return res.status(401).json({ success: false, message: 'User not found' });
 
-    // Delete old Cloudinary image if it exists (not the default avatar)
     if (user.profileImage && user.profileImage.includes('cloudinary.com')) {
       try {
-        // Extract public_id from URL  e.g. .../velmora/profiles/abc123.jpg → velmora/profiles/abc123
         const parts = user.profileImage.split('/');
         const fileWithExt = parts[parts.length - 1];
         const fileName = fileWithExt.split('.')[0];
@@ -107,7 +90,6 @@ const uploadProfileImage = async (req, res) => {
       }
     }
 
-    // Upload buffer to Cloudinary
     const uploadResult = await new Promise((resolve, reject) => {
       const stream = cloudinary.uploader.upload_stream(
         {
@@ -125,7 +107,6 @@ const uploadProfileImage = async (req, res) => {
       stream.end(req.file.buffer);
     });
 
-    // Save permanent Cloudinary URL to DB
     user.profileImage = uploadResult.secure_url;
     await user.save();
 
@@ -141,9 +122,7 @@ const uploadProfileImage = async (req, res) => {
   }
 };
 
-// ─────────────────────────────────────────
-// POST /change-password
-// ─────────────────────────────────────────
+
 const changePassword = async (req, res) => {
   try {
     const user = await User.findById(getUserId(req));
@@ -165,10 +144,6 @@ const changePassword = async (req, res) => {
   }
 };
 
-// ─────────────────────────────────────────
-// POST /profile/request-email-change
-// Step 1: validate new email, send OTP to NEW email
-// ─────────────────────────────────────────
 const requestEmailChange = async (req, res) => {
   try {
     const { newEmail } = req.body;
@@ -191,7 +166,6 @@ const requestEmailChange = async (req, res) => {
       return res.json({ success: false, message: 'New email must be different from current email.' });
     }
 
-    // Check if new email already taken
     const existing = await User.findOne({ email: newEmail.toLowerCase() });
     if (existing) {
       return res.json({ success: false, message: 'This email is already registered to another account.' });
@@ -217,10 +191,7 @@ const requestEmailChange = async (req, res) => {
   }
 };
 
-// ─────────────────────────────────────────
-// POST /profile/verify-email-change
-// Step 2: verify OTP and update email in DB
-// ─────────────────────────────────────────
+
 const verifyEmailChange = async (req, res) => {
   try {
     const otp = req.body.otp ? req.body.otp.toString().trim() : '';

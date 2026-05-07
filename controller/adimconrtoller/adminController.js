@@ -4,9 +4,7 @@ import Product  from '../../models/product.js';
 import Brand    from '../../models/brand.js';
 import cloudinary from '../../config/cloudinary.js';
 
-/* ═══════════════════════════════════════════════════
-   DASHBOARD
-═══════════════════════════════════════════════════ */
+
 export const getDashboard = async (req, res) => {
   try {
     const today = new Date();
@@ -50,9 +48,7 @@ export const getDashboard = async (req, res) => {
   }
 };
 
-/* ═══════════════════════════════════════════════════
-   CATEGORIES
-═══════════════════════════════════════════════════ */
+
 export const getCategories = async (req, res) => {
   try {
     const search = req.query.search?.trim() || '';
@@ -144,9 +140,7 @@ export const deleteCategory = async (req, res) => {
   }
 };
 
-/* ═══════════════════════════════════════════════════
-   PRODUCTS
-═══════════════════════════════════════════════════ */
+
 export const getProducts = async (req, res) => {
   try {
     const search = req.query.search?.trim() || '';
@@ -189,7 +183,6 @@ export const getProducts = async (req, res) => {
   }
 };
 
-/* ── Helper: upload a single base64 string to Cloudinary ─────────────────── */
 async function uploadBase64(base64String, folder = 'velmora/products') {
   const result = await cloudinary.uploader.upload(base64String, {
     folder,
@@ -198,19 +191,6 @@ async function uploadBase64(base64String, folder = 'velmora/products') {
   return result.secure_url;
 }
 
-/* ── Helper: parse & upload colorVariants ────────────────────────────────────
-   Handles BOTH payload formats:
-
-   NEW format (products.ejs fix):
-     { name, hex, stock, images: ["data:image/...", "https://..."] }
-
-   OLD format (original frontend):
-     { name, hex, stock, existingImages: ["https://..."], newImages: ["data:..."] }
-
-   For each image string:
-     - starts with "data:image/" → upload to Cloudinary, use returned URL
-     - starts with "http"        → already a Cloudinary URL, keep as-is
-─────────────────────────────────────────────────────────────────────────── */
 async function parseAndUploadVariants(raw) {
   if (!raw) return [];
 
@@ -232,43 +212,34 @@ async function parseAndUploadVariants(raw) {
       continue;
     }
 
-    // ── Collect raw image strings from whichever format was sent ──────────
     let rawImages = [];
 
     if (Array.isArray(v.images) && v.images.length > 0) {
-      // NEW format: single mixed array
       rawImages = v.images;
     } else {
-      // OLD format: two separate arrays
       rawImages = [
         ...(Array.isArray(v.existingImages) ? v.existingImages : []),
         ...(Array.isArray(v.newImages)      ? v.newImages      : []),
       ];
     }
 
-    // ── Process each image ────────────────────────────────────────────────
     const finalImages = [];
 
     for (const img of rawImages) {
       if (!img || typeof img !== 'string') continue;
 
       if (img.startsWith('data:image/')) {
-        // New image — upload to Cloudinary
         try {
           const url = await uploadBase64(img);
           finalImages.push(url);
         } catch (uploadErr) {
           console.error(`Cloudinary upload failed for variant "${v.name}":`, uploadErr.message);
-          // Skip this image but continue processing others
         }
       } else if (img.startsWith('http://') || img.startsWith('https://')) {
-        // Existing URL — keep as-is
         finalImages.push(img);
       }
-      // Ignore anything else
     }
 
-    // ── Require at least 3 images per variant ────────────────────────────
     if (finalImages.length < 3) {
       console.warn(`Variant "${v.name}" only has ${finalImages.length} valid image(s) — need at least 3. Skipping.`);
       continue;
@@ -285,20 +256,17 @@ async function parseAndUploadVariants(raw) {
   return result;
 }
 
-/* ── addProduct ─────────────────────────────────────────────────────────── */
 export const addProduct = async (req, res) => {
   try {
     const { name, description, price, colorVariants: rawVariants } = req.body;
     const category = req.body.category || null;
     const brand    = req.body.brand    || null;
 
-    // ── Basic validation ──────────────────────────────────────────────────
     if (!name || !price || !category) {
       req.flash('error', 'Name, price, and category are required.');
       return res.redirect('/admin/products');
     }
 
-    // ── Parse + upload variants ───────────────────────────────────────────
     const colorVariants = await parseAndUploadVariants(rawVariants);
 
     if (colorVariants.length === 0) {
@@ -316,7 +284,7 @@ export const addProduct = async (req, res) => {
       stock:        totalStock,
       category,
       brand:        brand || null,
-      images:       colorVariants[0].images,   // first variant's images as top-level
+      images:       colorVariants[0].images,   
       colorVariants,
       colors,
     });
@@ -331,22 +299,18 @@ export const addProduct = async (req, res) => {
   }
 };
 
-/* ── editProduct ────────────────────────────────────────────────────────── */
 export const editProduct = async (req, res) => {
   try {
     const { name, description, price, colorVariants: rawVariants } = req.body;
     const category = req.body.category || null;
     const brand    = req.body.brand    || null;
 
-    // ── Basic validation ──────────────────────────────────────────────────
     if (!name || !price || !category) {
       req.flash('error', 'Name, price, and category are required.');
       return res.redirect('/admin/products');
     }
 
-    // ── Parse + upload variants ───────────────────────────────────────────
-    // Existing https:// URLs are passed through unchanged.
-    // New base64 images are uploaded to Cloudinary.
+
     const colorVariants = await parseAndUploadVariants(rawVariants);
 
     if (colorVariants.length === 0) {
@@ -383,7 +347,6 @@ export const editProduct = async (req, res) => {
   }
 };
 
-/* ── deleteProduct ──────────────────────────────────────────────────────── */
 export const deleteProduct = async (req, res) => {
   try {
     await Product.findByIdAndUpdate(req.params.id, { isDeleted: true });
@@ -396,9 +359,7 @@ export const deleteProduct = async (req, res) => {
   }
 };
 
-/* ═══════════════════════════════════════════════════
-   BRANDS
-═══════════════════════════════════════════════════ */
+
 export const getBrands = async (req, res) => {
   try {
     const search = req.query.search?.trim() || '';

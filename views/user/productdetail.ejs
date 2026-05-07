@@ -321,7 +321,7 @@
       </div>
     </div>
 
-    <!-- RIGHT: INFO -->
+    
     <div class="info-col">
       <% if (product.category) { %>
         <div class="prod-category"><%= product.category.name %></div>
@@ -695,12 +695,10 @@
     }
   }
 
-  /* ════════════════════════════════════════════════════════════
-     WISHLIST  — persists to server via POST /wishlist/toggle
-  ════════════════════════════════════════════════════════════ */
+
   let wishlisted = false;
 
-  /* Apply heart UI state everywhere (product button + nav icon) */
+  
   function applyWishlistUI(state) {
     // Product page heart button
     const btn      = document.getElementById('wishlistBtn');
@@ -710,7 +708,7 @@
       heartSvg.setAttribute('fill',   state ? '#f87171' : 'none');
       heartSvg.setAttribute('stroke', state ? '#f87171' : 'currentColor');
     }
-    // Nav bar heart icon
+    
     const navIcon    = document.getElementById('navWishlistIcon');
     const navHeart   = document.getElementById('navHeartSvg');
     if (navIcon)  navIcon.classList.toggle('wishlisted', state);
@@ -720,7 +718,7 @@
     }
   }
 
-  /* Update the nav wishlist badge (item count) */
+  
   function updateWishlistNavBadge(count) {
     const badge = document.getElementById('wishlistNavCount');
     if (!badge) return;
@@ -732,7 +730,7 @@
     }
   }
 
-  /* On page load — check if this product is already in the user's wishlist */
+  
   async function checkWishlistStatus() {
     try {
       const res  = await fetch(`/wishlist/status/${PRODUCT_ID}`);
@@ -741,10 +739,9 @@
       wishlisted = !!data.wishlisted;
       applyWishlistUI(wishlisted);
       if (data.count !== undefined) updateWishlistNavBadge(data.count);
-    } catch (e) { /* silent — user may not be logged in */ }
+    } catch (e) { /* silent user may not be logged in */ }
   }
 
-  /* Toggle wishlist — saves to DB */
   async function toggleWishlist() {
     const btn = document.getElementById('wishlistBtn');
     if (btn) btn.disabled = true;
@@ -756,7 +753,7 @@
       });
       const data = await res.json();
       if (!res.ok) {
-        // If not logged in, redirect to login
+
         if (res.status === 401) { window.location.href = '/login'; return; }
         showToast(data.message || 'Could not update wishlist', true);
         return;
@@ -772,10 +769,10 @@
     }
   }
 
-  /* Run on page load */
+  
   checkWishlistStatus();
 
-  /* ── Tabs ── */
+  // Tabs 
   function openTab(id) {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
@@ -784,7 +781,6 @@
     document.querySelector('.tabs-root').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  /* ── Toast ── */
   let toastTimer;
   function showToast(msg, isErr = false) {
     const toast = document.getElementById('toast');

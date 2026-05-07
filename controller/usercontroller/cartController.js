@@ -1,4 +1,3 @@
-// controller/usercontroller/cartController.js
 import Cart    from '../../models/cart.js';
 import Product from '../../models/product.js';
 
@@ -30,7 +29,6 @@ export const getCart = async (req, res) => {
     if (!cart) {
       cart = { items: [], totalItems: 0, subtotal: 0 };
     } else {
-      // ✅ FIX 1: use isDeleted & isListed instead of isBlocked & status
       const validItems = cart.items.filter(item => {
         const p = item.product;
         return (
@@ -130,7 +128,7 @@ export const updateCartItem = async (req, res) => {
     const item    = cart.items[itemIndex];
     const product = item.product;
 
-    // ✅ FIX 2: use isDeleted & isListed instead of isBlocked & status
+    
     if (!product || product.isDeleted || !product.isListed) {
       cart.items.splice(itemIndex, 1);
       await cart.save();

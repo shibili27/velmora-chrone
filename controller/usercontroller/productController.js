@@ -1,4 +1,4 @@
-// controller/usercontroller/productController.js
+
 import Product  from '../../models/product.js';
 import Category from '../../models/category.js';
 
@@ -39,15 +39,15 @@ export const getProducts = async (req, res) => {
           path:  'category',
           match: { isDeleted: false, isListed: { $ne: false } },
         })
-        .populate('brand')   // brand is now ObjectId ref — get brand.name
+        .populate('brand')   
         .sort(sortOption),
       Category.find({ isDeleted: false, isListed: { $ne: false } }).sort({ name: 1 }),
     ]);
 
-    // filter out products whose category was soft-deleted
+    
     let visibleProducts = allProducts.filter(p => p.category !== null);
 
-    // collect unique brand names from visible products for the filter sidebar
+    
     const brandNames = [
       ...new Set(
         visibleProducts
@@ -56,7 +56,7 @@ export const getProducts = async (req, res) => {
       ),
     ].sort();
 
-    // apply brand filter by name
+    
     if (brand) {
       visibleProducts = visibleProducts.filter(
         p => p.brand?.name?.toLowerCase() === brand.toLowerCase()

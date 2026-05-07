@@ -460,7 +460,6 @@
   </div>
 </footer>
 
-<!-- ══ ADDRESS MODAL ══ -->
 <div class="modal-backdrop" id="addrModal">
   <div class="modal-box">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
@@ -487,7 +486,6 @@
   </div>
 </div>
 
-<!-- ══ DELETE MODAL ══ -->
 <div class="modal-backdrop" id="deleteModal">
   <div class="modal-box" style="max-width:360px;text-align:center;">
     <div style="width:46px;height:46px;border:1px solid rgba(248,113,113,0.2);display:flex;align-items:center;justify-content:center;margin:0 auto 1.1rem;">
@@ -502,14 +500,13 @@
   </div>
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast">
   <span class="toast-dot"></span>
   <span id="toastMsg"></span>
 </div>
 
 <script>
-  /* ── Nav scroll (exact home.ejs) ── */
+  
   const navbar = document.getElementById('navbar');
   window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', scrollY > 50), { passive: true });
   document.getElementById('hamburger').addEventListener('click', function() {
@@ -517,7 +514,7 @@
     document.getElementById('mobileMenu').classList.toggle('open');
   });
 
-  /* ── Tab switching ── */
+  
   function switchTab(tab) {
     document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
@@ -528,7 +525,7 @@
     if (tab === 'addresses') renderAddresses();
   }
 
-  /* ── Toast ── */
+  
   let toastTimer;
   function showToast(msg, type = 'info') {
     const t = document.getElementById('toast');
@@ -538,7 +535,7 @@
     toastTimer = setTimeout(() => t.classList.remove('show'), 3200);
   }
 
-  /* ── Avatar upload ── */
+
   async function uploadAvatar(e) {
     const file = e.target.files[0];
     if (!file) return;
@@ -566,7 +563,7 @@
     }
   }
 
-  /* ── Email change ── */
+  
   let resendInterval = null;
 
   async function sendEmailOTP() {
@@ -684,7 +681,7 @@
     clearInterval(resendInterval);
   }
 
-  /* ── Password ── */
+  
   function togglePw(id) { const el = document.getElementById(id); el.type = el.type === 'password' ? 'text' : 'password'; }
   function updateStrength(val) {
     let score = 0;
@@ -706,7 +703,6 @@
     document.getElementById('pwForm').submit();
   }
 
-  /* ── Addresses ── */
   let editingAddrId = null, deleteAddrId = null;
 
   function renderAddresses() {
@@ -793,16 +789,13 @@
       }).catch(() => showToast('Network error', 'error'));
   }
 
-  /* ── Modal backdrop clicks ── */
   document.getElementById('addrModal').addEventListener('click',   e => { if (e.target === document.getElementById('addrModal'))   closeAddressModal(); });
   document.getElementById('deleteModal').addEventListener('click',  e => { if (e.target === document.getElementById('deleteModal'))  closeDeleteModal(); });
 
-  /* ── Init ── */
   renderAddresses();
   const hash = window.location.hash.replace('#', '');
   if (['details','edit','email','password','addresses'].includes(hash)) switchTab(hash);
 
-  /* ── Back button prevention ── */
   history.pushState(null, null, window.location.href);
   window.addEventListener('popstate', () => history.pushState(null, null, window.location.href));
 </script>
