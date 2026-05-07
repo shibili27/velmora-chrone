@@ -29,7 +29,7 @@
     ::-webkit-scrollbar-track{background:#111110}
     ::-webkit-scrollbar-thumb{background:#c9a96e}
 
-    /* NAV */
+    /* ── NAV ── */
     .nav-root{position:fixed;top:0;left:0;right:0;z-index:200;transition:background .4s}
     .nav-root.scrolled{background:rgba(10,10,9,.96);backdrop-filter:blur(16px)}
     .nav-inner{display:flex;align-items:center;justify-content:space-between;padding:1.1rem 2rem}
@@ -49,9 +49,31 @@
     .mobile-menu.open{display:flex}
     .mobile-menu .nav-link{font-size:.7rem;padding:.4rem 0;border-bottom:1px solid rgba(245,242,235,.04);color:rgba(245,242,235,.6)}
 
-    /* HERO */
+    /* ── HERO ── */
     .hero{position:relative;width:100%;height:100svh;min-height:560px;overflow:hidden;background:#0a0a09}
-    .hero-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 30%;opacity:.9}
+
+    /* Video fills the hero exactly like the old img */
+    .hero-video{
+      position:absolute;inset:0;
+      width:100%;height:100%;
+      object-fit:cover;
+      object-position:center 30%;
+      opacity:.88;
+      /* prevent controls bar on iOS */
+      -webkit-playsinline:1;
+    }
+
+    /* Fallback poster shown while video loads or on low-power mode */
+    .hero-poster{
+      position:absolute;inset:0;
+      width:100%;height:100%;
+      object-fit:cover;
+      object-position:center 30%;
+      opacity:.88;
+      /* hidden once video has started */
+    }
+    .hero-poster.hidden{opacity:0;pointer-events:none}
+
     .hero-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,10,9,.35) 0%,rgba(10,10,9,.1) 35%,rgba(10,10,9,.65) 100%)}
     .hero-content{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 1.5rem}
     .hero-tag{font-family:'Jost',sans-serif;font-size:.52rem;letter-spacing:.35em;text-transform:uppercase;color:rgba(201,169,110,.85);margin-bottom:1rem}
@@ -63,6 +85,21 @@
     .btn-dark:hover{background:rgba(245,242,235,.2);border-color:rgba(245,242,235,.5)}
     .btn-gold{font-family:'Jost',sans-serif;font-size:.55rem;letter-spacing:.22em;text-transform:uppercase;color:#111110;background:#c9a96e;border:1px solid #c9a96e;padding:.7rem 1.5rem;text-decoration:none;transition:background .25s,color .25s}
     .btn-gold:hover{background:transparent;color:#c9a96e}
+
+    /* Video mute/unmute toggle */
+    .hero-sound-btn{
+      position:absolute;bottom:2rem;right:2rem;z-index:10;
+      width:34px;height:34px;
+      background:rgba(10,10,9,.65);
+      border:1px solid rgba(245,242,235,.15);
+      backdrop-filter:blur(8px);
+      color:rgba(245,242,235,.6);
+      cursor:pointer;
+      display:flex;align-items:center;justify-content:center;
+      transition:color .2s,border-color .2s,background .2s;
+    }
+    .hero-sound-btn:hover{color:#c9a96e;border-color:rgba(201,169,110,.4);background:rgba(10,10,9,.85)}
+
     .hero-scroll-hint{position:absolute;bottom:1.75rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px}
     .hero-scroll-hint span{font-family:'Jost',sans-serif;font-size:.45rem;letter-spacing:.3em;text-transform:uppercase;color:rgba(245,242,235,.3)}
     .scroll-line{width:1px;height:28px;background:linear-gradient(180deg,rgba(201,169,110,.6),transparent);animation:scrollPulse 2s ease infinite}
@@ -70,7 +107,7 @@
 
     .sec-label{font-family:'Jost',sans-serif;font-size:.5rem;font-weight:500;letter-spacing:.35em;text-transform:uppercase}
 
-    /* MASTERPIECES */
+    /* ── MASTERPIECES ── */
     .masterpieces{background:#111110;padding:5rem 2rem}
     @media(min-width:768px){.masterpieces{padding:5rem 3rem}}
     .masterpieces-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:2.5rem;flex-wrap:wrap;gap:1rem}
@@ -79,38 +116,33 @@
     .view-all{font-family:'Jost',sans-serif;font-size:.52rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(245,242,235,.35);text-decoration:none;transition:color .2s;display:flex;align-items:center;gap:6px}
     .view-all:hover{color:#c9a96e}
 
-    /* CAROUSEL */
+    /* ── CAROUSEL ── */
     .carousel-outer{position:relative;overflow:hidden}
     .carousel-track{display:flex;transition:transform .6s cubic-bezier(.25,.46,.45,.94)}
 
-    /* PRODUCT CARD */
+    /* ── PRODUCT CARD ── */
     .prod-card{background:#1a1a18;overflow:hidden;cursor:pointer;transition:background .3s,box-shadow .3s,transform .3s;position:relative;flex-shrink:0;border:1px solid rgba(245,242,235,.04)}
     .prod-card:hover{background:#1f1f1d;transform:translateY(-3px);box-shadow:0 16px 48px rgba(0,0,0,.6)}
     .prod-card:hover .prod-img{transform:scale(1.06)}
-
-    /* IMAGE WRAP — dark tint overlay hides white product backgrounds */
     .prod-img-wrap{aspect-ratio:1/1;overflow:hidden;background:#1a1a18;position:relative}
     .prod-img-wrap::after{content:'';position:absolute;inset:0;background:rgba(10,10,9,.22);pointer-events:none;z-index:1;transition:background .3s}
     .prod-card:hover .prod-img-wrap::after{background:rgba(10,10,9,.1)}
     .prod-img{width:100%;height:100%;object-fit:cover;object-position:center;transition:transform .55s cubic-bezier(.25,.46,.45,.94);filter:brightness(.9) contrast(1.08) saturate(.88)}
-
     .prod-body{padding:1rem 1.1rem 1.25rem;border-top:1px solid rgba(245,242,235,.05)}
     .prod-cat{font-family:'Jost',sans-serif;font-size:.42rem;letter-spacing:.22em;text-transform:uppercase;color:rgba(201,169,110,.65);margin-bottom:5px}
     .prod-name{font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:300;color:#f5f2eb;line-height:1.2;margin-bottom:5px}
     .prod-price{font-family:'Jost',sans-serif;font-size:.62rem;color:rgba(245,242,235,.55);letter-spacing:.05em}
     .watch-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#1a1a18}
-
     .card-wish-btn{position:absolute;top:8px;right:8px;z-index:3;width:28px;height:28px;background:rgba(10,10,9,.8);border:1px solid rgba(245,242,235,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;color:rgba(245,242,235,.4);transition:color .2s,background .2s,border-color .2s}
     .card-wish-btn:hover{color:#c9a96e;border-color:rgba(201,169,110,.35);background:rgba(10,10,9,.95)}
     .card-wish-btn.active{color:#f87171;border-color:rgba(248,113,113,.3)}
 
-    /* CAROUSEL DOTS */
+    /* ── CAROUSEL DOTS ── */
     .carousel-dots{display:flex;justify-content:center;gap:6px;margin-top:1.5rem}
     .carousel-dot{height:6px;border-radius:3px;border:none;background:rgba(245,242,235,.15);cursor:pointer;transition:all .3s;padding:0}
-
     .no-products{width:100%;padding:4rem;text-align:center}
 
-    /* CATEGORY */
+    /* ── CATEGORY ── */
     .cat-section{background:#0d0d0c;padding:5rem 2rem;text-align:center}
     @media(min-width:768px){.cat-section{padding:5rem 3rem}}
     .cat-section-title{font-family:'Cormorant Garamond',serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:300;color:#f5f2eb;letter-spacing:.05em;margin-bottom:2.5rem}
@@ -126,7 +158,7 @@
     .cat-label-tag{font-family:'Jost',sans-serif;font-size:.42rem;letter-spacing:.3em;text-transform:uppercase;color:rgba(201,169,110,.7);margin-bottom:4px}
     .cat-label-name{font-family:'Cormorant Garamond',serif;font-size:clamp(.95rem,2vw,1.3rem);font-weight:300;color:#f5f2eb;font-style:italic}
 
-    /* CRAFTSMANSHIP */
+    /* ── CRAFTSMANSHIP ── */
     .craft-section{background:#111110}
     .craft-wrap{display:flex;flex-direction:column}
     @media(min-width:768px){.craft-wrap{flex-direction:row;min-height:560px}}
@@ -145,11 +177,11 @@
     .craft-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.7}
     .craft-img-overlay{position:absolute;inset:0;background:linear-gradient(90deg,rgba(17,17,16,.6) 0%,transparent 50%)}
 
-    /* QUOTE */
+    /* ── QUOTE ── */
     .quote-bar{background:#c9a96e;padding:2rem 1.5rem;text-align:center}
     .quote-text{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:300;font-size:clamp(1rem,3vw,1.5rem);color:#111110;line-height:1.5;max-width:680px;margin:0 auto}
 
-    /* FOOTER */
+    /* ── FOOTER ── */
     .footer{background:#0a0a09;padding:3.5rem 2rem 1.5rem}
     @media(min-width:768px){.footer{padding:3.5rem 3rem 1.5rem}}
     .footer-top{display:flex;flex-direction:column;gap:2.5rem;padding-bottom:2.5rem;border-bottom:1px solid rgba(245,242,235,.05)}
@@ -166,14 +198,14 @@
     @media(min-width:768px){.footer-bottom{flex-direction:row;justify-content:space-between;text-align:left}}
     .footer-copy{font-family:'Jost',sans-serif;font-size:.48rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(245,242,235,.15)}
 
-    /* REVEAL */
+    /* ── REVEAL ── */
     @keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
     .fade-up{animation:fadeUp .9s ease both}
     .d1{animation-delay:.1s}.d2{animation-delay:.25s}.d3{animation-delay:.4s}.d4{animation-delay:.55s}
     .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease}
     .reveal.visible{opacity:1;transform:translateY(0)}
 
-    /* TOAST */
+    /* ── TOAST ── */
     .toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(8px);background:#1a1a18;border:1px solid rgba(245,242,235,.08);font-family:'Jost',sans-serif;font-size:.58rem;letter-spacing:.08em;color:rgba(245,242,235,.7);padding:.65rem 1.5rem;box-shadow:0 8px 32px rgba(0,0,0,.5);z-index:999;opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;white-space:nowrap}
     .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
     .toast.gold{border-color:rgba(201,169,110,.3);color:#c9a96e}
@@ -220,12 +252,33 @@
   </div>
 </nav>
 
-<!-- HERO -->
+
+
 <section class="hero">
-  <img class="hero-img"
-    src="https://res.cloudinary.com/dwb0hd0m6/image/upload/v1774866520/Rolex_Cosmograph_Daytona___Triumph_of_Performance___Rolex_bbqplm.jpg"
-    alt="Velmora Chroné Hero" onerror="this.style.display='none'"/>
+
+  <!-- Poster fallback (shown before video plays) -->
+  <img class="hero-poster" id="heroPoster"
+       src="https://res.cloudinary.com/dwb0hd0m6/image/upload/v1774866520/Rolex_Cosmograph_Daytona___Triumph_of_Performance___Rolex_bbqplm.jpg"
+       alt="Velmora Chroné"
+       onerror="this.style.display='none'"/>
+
+
+  <video
+    class="hero-video"
+    id="heroVideo"
+    autoplay
+    muted
+    loop
+    playsinline
+    preload="auto"
+  >
+    <!-- video src -->
+    <source src="https://res.cloudinary.com/dwb0hd0m6/video/upload/v1778136576/From_KlickPin_CF_46_Stunning_Crochet_Project_Ideas_-_Pin-47850814779459123_lvyuos.mp4" type="video/mp4"/>
+    
+  </video>
+
   <div class="hero-overlay"></div>
+
   <div class="hero-content">
     <p class="hero-tag fade-up d1">Swiss Made Heritage · Est. 1882</p>
     <h1 class="hero-title fade-up d2">A Legacy of<br/><em>Precision</em></h1>
@@ -235,13 +288,36 @@
       <a href="/products" class="btn-dark">Explore the Collection</a>
     </div>
   </div>
+
+  <!-- Mute / Unmute button — bottom-right -->
+  <button class="hero-sound-btn" id="heroSoundBtn" title="Toggle sound"
+          onclick="toggleHeroSound()">
+    <!-- Speaker muted icon (default — video starts muted) -->
+    <svg id="iconMuted" width="13" height="13" viewBox="0 0 24 24" fill="none"
+         stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+      <line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>
+    </svg>
+    <!-- Speaker unmuted icon (hidden initially) -->
+    <svg id="iconSound" width="13" height="13" viewBox="0 0 24 24" fill="none"
+         stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+         style="display:none">
+      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+      <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+      <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+    </svg>
+  </button>
+
+  <!-- Scroll hint — bottom-centre -->
   <div class="hero-scroll-hint fade-up d4">
     <span>Scroll</span>
     <div class="scroll-line"></div>
   </div>
 </section>
 
-<!-- MASTERPIECES -->
+<!-- ══════════════════════════════════════════
+     MASTERPIECES
+══════════════════════════════════════════ -->
 <section class="masterpieces">
   <div style="max-width:1200px;margin:0 auto">
     <div class="masterpieces-header reveal">
@@ -293,7 +369,9 @@
   </div>
 </section>
 
-<!-- SHOP BY CATEGORY -->
+<!-- ══════════════════════════════════════════
+     SHOP BY CATEGORY
+══════════════════════════════════════════ -->
 <section class="cat-section">
   <div style="max-width:1200px;margin:0 auto">
     <div class="reveal" style="margin-bottom:2.5rem">
@@ -325,7 +403,9 @@
   </div>
 </section>
 
-<!-- CRAFTSMANSHIP -->
+<!-- ══════════════════════════════════════════
+     CRAFTSMANSHIP
+══════════════════════════════════════════ -->
 <section class="craft-section">
   <div class="craft-wrap">
     <div class="craft-text reveal">
@@ -413,136 +493,161 @@
 <div class="toast" id="toast"></div>
 
 <script>
-  /* ── Nav ── */
-  const navbar = document.getElementById('navbar');
-  window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', scrollY > 50), { passive:true });
-  const hamburger  = document.getElementById('hamburger');
-  const mobileMenu = document.getElementById('mobileMenu');
-  hamburger.addEventListener('click', () => {
-    hamburger.classList.toggle('open');
-    mobileMenu.classList.toggle('open');
+const navbar = document.getElementById('navbar');
+window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', scrollY > 50), { passive:true });
+const hamburger  = document.getElementById('hamburger');
+const mobileMenu = document.getElementById('mobileMenu');
+hamburger.addEventListener('click', () => {
+  hamburger.classList.toggle('open');
+  mobileMenu.classList.toggle('open');
+});
+mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+  hamburger.classList.remove('open');
+  mobileMenu.classList.remove('open');
+}));
+
+const revealEls = document.querySelectorAll('.reveal');
+const observer  = new IntersectionObserver(entries => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      setTimeout(() => entry.target.classList.add('visible'), i * 80);
+      observer.unobserve(entry.target);
+    }
   });
-  mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
-    hamburger.classList.remove('open');
-    mobileMenu.classList.remove('open');
-  }));
+}, { threshold: 0.08 });
+revealEls.forEach(el => observer.observe(el));
 
-  /* ── Scroll reveal ── */
-  const revealEls = document.querySelectorAll('.reveal');
-  const observer  = new IntersectionObserver(entries => {
-    entries.forEach((entry, i) => {
-      if (entry.isIntersecting) {
-        setTimeout(() => entry.target.classList.add('visible'), i * 80);
-        observer.unobserve(entry.target);
-      }
+let toastTimer;
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className   = 'toast show' + (type ? ' ' + type : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+
+(function () {
+  const video  = document.getElementById('heroVideo');
+  const poster = document.getElementById('heroPoster');
+  if (!video) return;
+
+  video.addEventListener('playing', function () {
+    if (poster) poster.classList.add('hidden');
+  });
+
+  video.addEventListener('error', function () {
+    video.style.display = 'none';
+    if (poster) poster.classList.remove('hidden');
+  });
+
+  document.addEventListener('DOMContentLoaded', function () {
+    video.play().catch(function () {
     });
-  }, { threshold: 0.08 });
-  revealEls.forEach(el => observer.observe(el));
+  });
+})();
 
-  /* ── Toast ── */
-  let toastTimer;
-  function showToast(msg, type = '') {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.className   = 'toast show' + (type ? ' ' + type : '');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+function toggleHeroSound() {
+  const video    = document.getElementById('heroVideo');
+  const iconMute = document.getElementById('iconMuted');
+  const iconSnd  = document.getElementById('iconSound');
+  if (!video) return;
+  video.muted = !video.muted;
+  iconMute.style.display = video.muted ? ''       : 'none';
+  iconSnd.style.display  = video.muted ? 'none'   : '';
+}
+
+function toggleWishlist(e, btn) {
+  e.preventDefault();
+  e.stopPropagation();
+  const active = btn.classList.toggle('active');
+  const svg    = btn.querySelector('svg');
+  svg.setAttribute('fill',   active ? '#f87171' : 'none');
+  svg.setAttribute('stroke', active ? '#f87171' : 'currentColor');
+  showToast(active ? 'Saved to wishlist' : 'Removed from wishlist', active ? 'gold' : '');
+}
+
+(function () {
+  const track    = document.getElementById('carouselTrack');
+  const dotsWrap = document.getElementById('carouselDots');
+  const outer    = document.getElementById('carouselOuter');
+  if (!track) return;
+
+  const cards = track.querySelectorAll('.prod-card');
+  const total = cards.length;
+  if (total === 0) return;
+
+  const visible = () => window.innerWidth < 640 ? 2 : 4;
+
+  function setCardWidths() {
+    const w = window.innerWidth < 640 ? '50%' : '25%';
+    cards.forEach(c => c.style.width = w);
+  }
+  setCardWidths();
+  window.addEventListener('resize', setCardWidths);
+
+  let current = 0;
+  let autoTimer;
+
+  function buildDots() {
+    dotsWrap.innerHTML = '';
+    const vis     = visible();
+    const numDots = Math.ceil(total / vis);
+    for (let i = 0; i < numDots; i++) {
+      const dot            = document.createElement('button');
+      dot.className        = 'carousel-dot';
+      dot.style.width      = i === 0 ? '18px' : '6px';
+      dot.style.background = i === 0 ? '#c9a96e' : 'rgba(245,242,235,0.15)';
+      dot.addEventListener('click', () => goTo(i * vis));
+      dotsWrap.appendChild(dot);
+    }
   }
 
-  /* ── Wishlist toggle (UI only) ── */
-  function toggleWishlist(e, btn) {
-    e.preventDefault();
-    e.stopPropagation();
-    const active = btn.classList.toggle('active');
-    const svg    = btn.querySelector('svg');
-    svg.setAttribute('fill',   active ? '#f87171' : 'none');
-    svg.setAttribute('stroke', active ? '#f87171' : 'currentColor');
-    showToast(active ? 'Saved to wishlist' : 'Removed from wishlist', active ? 'gold' : '');
+  function updateDots() {
+    const vis       = visible();
+    const activeDot = Math.floor(current / vis);
+    dotsWrap.querySelectorAll('.carousel-dot').forEach((d, i) => {
+      d.style.background = i === activeDot ? '#c9a96e' : 'rgba(245,242,235,0.15)';
+      d.style.width      = i === activeDot ? '18px' : '6px';
+    });
   }
 
-  /* ── Product Carousel ── */
-  (function () {
-    const track    = document.getElementById('carouselTrack');
-    const dotsWrap = document.getElementById('carouselDots');
-    const outer    = document.getElementById('carouselOuter');
-    if (!track) return;
+  function goTo(index) {
+    const vis      = visible();
+    const maxSlide = Math.max(0, total - vis);
+    current = Math.min(Math.max(0, index), maxSlide);
+    track.style.transform = `translateX(-${(current / total) * 100}%)`;
+    updateDots();
+  }
 
-    const cards = track.querySelectorAll('.prod-card');
-    const total = cards.length;
-    if (total === 0) return;
+  function next() {
+    const vis      = visible();
+    const maxSlide = Math.max(0, total - vis);
+    const nextIdx  = current + vis > maxSlide ? 0 : current + vis;
+    goTo(nextIdx);
+  }
 
-    const visible = () => window.innerWidth < 640 ? 2 : 4;
+  function startAuto() { autoTimer = setInterval(next, 3000); }
+  function stopAuto()  { clearInterval(autoTimer); }
 
-    function setCardWidths() {
-      const w = window.innerWidth < 640 ? '50%' : '25%';
-      cards.forEach(c => c.style.width = w);
-    }
-    setCardWidths();
-    window.addEventListener('resize', setCardWidths);
+  outer.addEventListener('mouseenter', stopAuto);
+  outer.addEventListener('mouseleave', startAuto);
 
-    let current = 0;
-    let autoTimer;
+  let touchStartX = 0;
+  track.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive:true });
+  track.addEventListener('touchend', e => {
+    const diff = touchStartX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 40) diff > 0 ? next() : goTo(Math.max(0, current - visible()));
+  });
 
-    function buildDots() {
-      dotsWrap.innerHTML = '';
-      const vis     = visible();
-      const numDots = Math.ceil(total / vis);
-      for (let i = 0; i < numDots; i++) {
-        const dot            = document.createElement('button');
-        dot.className        = 'carousel-dot';
-        dot.style.width      = i === 0 ? '18px' : '6px';
-        dot.style.background = i === 0 ? '#c9a96e' : 'rgba(245,242,235,0.15)';
-        dot.addEventListener('click', () => goTo(i * vis));
-        dotsWrap.appendChild(dot);
-      }
-    }
+  buildDots();
+  window.addEventListener('resize', () => { buildDots(); goTo(0); });
+  startAuto();
+})();
 
-    function updateDots() {
-      const vis       = visible();
-      const activeDot = Math.floor(current / vis);
-      dotsWrap.querySelectorAll('.carousel-dot').forEach((d, i) => {
-        d.style.background = i === activeDot ? '#c9a96e' : 'rgba(245,242,235,0.15)';
-        d.style.width      = i === activeDot ? '18px' : '6px';
-      });
-    }
 
-    function goTo(index) {
-      const vis      = visible();
-      const maxSlide = Math.max(0, total - vis);
-      current = Math.min(Math.max(0, index), maxSlide);
-      track.style.transform = `translateX(-${(current / total) * 100}%)`;
-      updateDots();
-    }
-
-    function next() {
-      const vis      = visible();
-      const maxSlide = Math.max(0, total - vis);
-      const nextIdx  = current + vis > maxSlide ? 0 : current + vis;
-      goTo(nextIdx);
-    }
-
-    function startAuto() { autoTimer = setInterval(next, 3000); }
-    function stopAuto()  { clearInterval(autoTimer); }
-
-    outer.addEventListener('mouseenter', stopAuto);
-    outer.addEventListener('mouseleave', startAuto);
-
-    // Touch swipe
-    let touchStartX = 0;
-    track.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive:true });
-    track.addEventListener('touchend', e => {
-      const diff = touchStartX - e.changedTouches[0].clientX;
-      if (Math.abs(diff) > 40) diff > 0 ? next() : goTo(Math.max(0, current - visible()));
-    });
-
-    buildDots();
-    window.addEventListener('resize', () => { buildDots(); goTo(0); });
-    startAuto();
-  })();
-
-  /* ── Back-button guard ── */
-  history.pushState(null, null, window.location.href);
-  window.addEventListener('popstate', () => history.pushState(null, null, window.location.href));
+history.pushState(null, null, window.location.href);
+window.addEventListener('popstate', () => history.pushState(null, null, window.location.href));
 </script>
 </body>
 </html>
