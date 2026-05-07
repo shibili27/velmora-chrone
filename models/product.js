@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
 
-// ── Each color variant carries its own images + stock ──────────────────────
 const colorVariantSchema = new mongoose.Schema(
   {
     name:   { type: String, trim: true, required: true },
@@ -60,14 +59,10 @@ const productSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// ✅ FIXED: removed `next` parameter — modern Mongoose does not need it
-// for synchronous pre-save hooks. Calling an undefined `next()` was
-// throwing "TypeError: next is not a function" and crashing every save.
 productSchema.pre('save', function () {
   if (this.colorVariants && this.colorVariants.length > 0) {
     this.stock = this.colorVariants.reduce((sum, v) => sum + (v.stock || 0), 0);
   }
 });
 
-// ── Guard against OverwriteModelError on hot reload ────────────────────────
 export default mongoose.models.Product || mongoose.model('Product', productSchema);

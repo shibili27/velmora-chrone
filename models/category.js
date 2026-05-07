@@ -1,4 +1,4 @@
-// models/category.js
+
 import mongoose from 'mongoose';
 
 const categorySchema = new mongoose.Schema(
@@ -26,7 +26,7 @@ const categorySchema = new mongoose.Schema(
     },
     isListed: {
       type:    Boolean,
-      default: true,   // true = visible to users
+      default: true,   
     },
   },
   { timestamps: true }

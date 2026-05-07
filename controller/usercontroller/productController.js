@@ -1,9 +1,7 @@
 import Product  from '../../models/product.js';
 import Category from '../../models/category.js';
 
-// ─────────────────────────────────────────
-// Home page — featured products carousel
-// ─────────────────────────────────────────
+
 export const getHomePage = async (req, res) => {
   try {
     const products = await Product.find({
@@ -18,6 +16,7 @@ export const getHomePage = async (req, res) => {
       .populate('brand')
       .sort({ createdAt: -1 })
       .limit(12)
+      .skip(1)
       .lean();
 
     const featuredProducts = products.filter(p => p.category !== null);
@@ -29,9 +28,7 @@ export const getHomePage = async (req, res) => {
   }
 };
 
-// ─────────────────────────────────────────
-// Products listing page
-// ─────────────────────────────────────────
+
 export const getProducts = async (req, res) => {
   try {
     const search   = req.query.search?.trim()       || '';
@@ -91,6 +88,7 @@ export const getProducts = async (req, res) => {
     }
 
     const total      = visibleProducts.length;
+    
     const totalPages = Math.ceil(total / limit);
     const paginatedProducts = visibleProducts.slice(skip, skip + limit);
 

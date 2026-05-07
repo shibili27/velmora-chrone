@@ -32,7 +32,6 @@ const wishlistSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Prevent duplicate products in wishlist
 wishlistSchema.index({ user: 1, 'items.product': 1 });
 
 export default mongoose.model('Wishlist', wishlistSchema);
