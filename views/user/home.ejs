@@ -15,457 +15,534 @@
     tailwind.config = {
       theme: {
         extend: {
-          fontFamily: {
-            display: ['Cormorant Garamond', 'serif'],
-            body:    ['Jost', 'sans-serif'],
-          },
-          colors: {
-            cream: '#f5f2eb',
-            vault: '#1a1a18',
-            pine:  '#0e1f18',
-            gold:  '#c9a96e',
-          },
+          fontFamily: { display: ['Cormorant Garamond','serif'], body: ['Jost','sans-serif'] },
+          colors: { cream:'#f5f2eb', vault:'#1a1a18', pine:'#0e1f18', gold:'#c9a96e' },
         },
       },
     };
   </script>
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body { font-family: 'Jost', sans-serif; background: #111110; color: #f5f2eb; overflow-x: hidden; }
-    ::-webkit-scrollbar { width: 2px; }
-    ::-webkit-scrollbar-track { background: #111110; }
-    ::-webkit-scrollbar-thumb { background: #c9a96e; }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:'Jost',sans-serif;background:#111110;color:#f5f2eb;overflow-x:hidden}
+    ::-webkit-scrollbar{width:2px}
+    ::-webkit-scrollbar-track{background:#111110}
+    ::-webkit-scrollbar-thumb{background:#c9a96e}
 
-    /* ── NAV ── */
-    .nav-root { position: fixed; top: 0; left: 0; right: 0; z-index: 200; transition: background 0.4s; }
-    .nav-root.scrolled { background: rgba(10,10,9,0.96); backdrop-filter: blur(16px); }
-    .nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 1.1rem 2rem; }
-    @media(min-width:768px) { .nav-inner { padding: 1.1rem 3rem; } }
-    .nav-logo { font-family: 'Cormorant Garamond', serif; font-size: 0.85rem; font-weight: 300; letter-spacing: 0.25em; text-transform: uppercase; color: #f5f2eb; text-decoration: none; }
-    .nav-link { font-family: 'Jost', sans-serif; font-size: 0.55rem; font-weight: 400; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(245,242,235,0.6); text-decoration: none; transition: color 0.2s; }
-    .nav-link:hover { color: #f5f2eb; }
-    .nav-icon { color: rgba(245,242,235,0.7); background: none; border: none; cursor: pointer; transition: color 0.2s; text-decoration: none; }
-    .nav-icon:hover { color: #c9a96e; }
-    .cart-badge { position: absolute; top: -4px; right: -5px; width: 13px; height: 13px; border-radius: 50%; background: #c9a96e; font-size: 0.4rem; font-weight: 600; color: #111110; display: flex; align-items: center; justify-content: center; }
-    .hamburger { display: flex; flex-direction: column; gap: 5px; background: none; border: none; cursor: pointer; padding: 3px; }
-    .hamburger span { display: block; width: 20px; height: 1px; background: rgba(245,242,235,0.7); transition: transform 0.3s, opacity 0.3s; }
-    .hamburger.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
-    .hamburger.open span:nth-child(2) { opacity: 0; }
-    .hamburger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
-    .mobile-menu { display: none; flex-direction: column; background: rgba(10,10,9,0.99); padding: 1.5rem 2rem; gap: 1rem; border-top: 1px solid rgba(201,169,110,0.1); }
-    .mobile-menu.open { display: flex; }
-    .mobile-menu .nav-link { font-size: 0.7rem; padding: 0.4rem 0; border-bottom: 1px solid rgba(245,242,235,0.04); color: rgba(245,242,235,0.6); }
+    /* NAV */
+    .nav-root{position:fixed;top:0;left:0;right:0;z-index:200;transition:background .4s}
+    .nav-root.scrolled{background:rgba(10,10,9,.96);backdrop-filter:blur(16px)}
+    .nav-inner{display:flex;align-items:center;justify-content:space-between;padding:1.1rem 2rem}
+    @media(min-width:768px){.nav-inner{padding:1.1rem 3rem}}
+    .nav-logo{font-family:'Cormorant Garamond',serif;font-size:.85rem;font-weight:300;letter-spacing:.25em;text-transform:uppercase;color:#f5f2eb;text-decoration:none}
+    .nav-link{font-family:'Jost',sans-serif;font-size:.55rem;font-weight:400;letter-spacing:.2em;text-transform:uppercase;color:rgba(245,242,235,.6);text-decoration:none;transition:color .2s}
+    .nav-link:hover{color:#f5f2eb}
+    .nav-icon{color:rgba(245,242,235,.7);background:none;border:none;cursor:pointer;transition:color .2s;text-decoration:none}
+    .nav-icon:hover{color:#c9a96e}
+    .cart-badge{position:absolute;top:-4px;right:-5px;width:13px;height:13px;border-radius:50%;background:#c9a96e;font-size:.4rem;font-weight:600;color:#111110;display:flex;align-items:center;justify-content:center}
+    .hamburger{display:flex;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:3px}
+    .hamburger span{display:block;width:20px;height:1px;background:rgba(245,242,235,.7);transition:transform .3s,opacity .3s}
+    .hamburger.open span:nth-child(1){transform:translateY(6px) rotate(45deg)}
+    .hamburger.open span:nth-child(2){opacity:0}
+    .hamburger.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+    .mobile-menu{display:none;flex-direction:column;background:rgba(10,10,9,.99);padding:1.5rem 2rem;gap:1rem;border-top:1px solid rgba(201,169,110,.1)}
+    .mobile-menu.open{display:flex}
+    .mobile-menu .nav-link{font-size:.7rem;padding:.4rem 0;border-bottom:1px solid rgba(245,242,235,.04);color:rgba(245,242,235,.6)}
 
-    /* ── HERO ── */
-    .hero { position: relative; width: 100%; height: 100svh; min-height: 560px; overflow: hidden; background: #0a0a09; }
-    .hero-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 30%; opacity: 0.9; }
-    .hero-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(10,10,9,0.35) 0%, rgba(10,10,9,0.1) 35%, rgba(10,10,9,0.65) 100%); }
-    .hero-content { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0 1.5rem; }
-    .hero-tag { font-family: 'Jost', sans-serif; font-size: 0.52rem; letter-spacing: 0.35em; text-transform: uppercase; color: rgba(201,169,110,0.85); margin-bottom: 1rem; }
-    .hero-title { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(2.8rem, 8vw, 5.5rem); line-height: 1.0; color: #f5f2eb; text-shadow: 0 2px 40px rgba(0,0,0,0.4); }
-    .hero-title em { font-style: italic; color: #f5f2eb; }
-    .hero-sub { font-family: 'Jost', sans-serif; font-size: 0.65rem; font-weight: 300; letter-spacing: 0.15em; color: rgba(245,242,235,0.55); margin-top: 1rem; max-width: 360px; line-height: 1.8; }
-    .hero-btns { display: flex; gap: 0.75rem; margin-top: 2rem; flex-wrap: wrap; justify-content: center; }
-    .btn-dark { font-family: 'Jost', sans-serif; font-size: 0.55rem; letter-spacing: 0.22em; text-transform: uppercase; color: #f5f2eb; background: rgba(245,242,235,0.12); border: 1px solid rgba(245,242,235,0.25); padding: 0.7rem 1.5rem; text-decoration: none; transition: background 0.25s, border-color 0.25s; backdrop-filter: blur(8px); }
-    .btn-dark:hover { background: rgba(245,242,235,0.2); border-color: rgba(245,242,235,0.5); }
-    .btn-gold { font-family: 'Jost', sans-serif; font-size: 0.55rem; letter-spacing: 0.22em; text-transform: uppercase; color: #111110; background: #c9a96e; border: 1px solid #c9a96e; padding: 0.7rem 1.5rem; text-decoration: none; transition: background 0.25s, color 0.25s; }
-    .btn-gold:hover { background: transparent; color: #c9a96e; }
-    .hero-scroll-hint { position: absolute; bottom: 1.75rem; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 6px; }
-    .hero-scroll-hint span { font-family: 'Jost', sans-serif; font-size: 0.45rem; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(245,242,235,0.3); }
-    .scroll-line { width: 1px; height: 28px; background: linear-gradient(180deg, rgba(201,169,110,0.6), transparent); animation: scrollPulse 2s ease infinite; }
-    @keyframes scrollPulse { 0%,100%{opacity:0.4} 50%{opacity:1} }
+    /* HERO */
+    .hero{position:relative;width:100%;height:100svh;min-height:560px;overflow:hidden;background:#0a0a09}
+    .hero-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 30%;opacity:.9}
+    .hero-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,10,9,.35) 0%,rgba(10,10,9,.1) 35%,rgba(10,10,9,.65) 100%)}
+    .hero-content{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 1.5rem}
+    .hero-tag{font-family:'Jost',sans-serif;font-size:.52rem;letter-spacing:.35em;text-transform:uppercase;color:rgba(201,169,110,.85);margin-bottom:1rem}
+    .hero-title{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:clamp(2.8rem,8vw,5.5rem);line-height:1;color:#f5f2eb;text-shadow:0 2px 40px rgba(0,0,0,.4)}
+    .hero-title em{font-style:italic;color:#f5f2eb}
+    .hero-sub{font-family:'Jost',sans-serif;font-size:.65rem;font-weight:300;letter-spacing:.15em;color:rgba(245,242,235,.55);margin-top:1rem;max-width:360px;line-height:1.8}
+    .hero-btns{display:flex;gap:.75rem;margin-top:2rem;flex-wrap:wrap;justify-content:center}
+    .btn-dark{font-family:'Jost',sans-serif;font-size:.55rem;letter-spacing:.22em;text-transform:uppercase;color:#f5f2eb;background:rgba(245,242,235,.12);border:1px solid rgba(245,242,235,.25);padding:.7rem 1.5rem;text-decoration:none;transition:background .25s,border-color .25s;backdrop-filter:blur(8px)}
+    .btn-dark:hover{background:rgba(245,242,235,.2);border-color:rgba(245,242,235,.5)}
+    .btn-gold{font-family:'Jost',sans-serif;font-size:.55rem;letter-spacing:.22em;text-transform:uppercase;color:#111110;background:#c9a96e;border:1px solid #c9a96e;padding:.7rem 1.5rem;text-decoration:none;transition:background .25s,color .25s}
+    .btn-gold:hover{background:transparent;color:#c9a96e}
+    .hero-scroll-hint{position:absolute;bottom:1.75rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px}
+    .hero-scroll-hint span{font-family:'Jost',sans-serif;font-size:.45rem;letter-spacing:.3em;text-transform:uppercase;color:rgba(245,242,235,.3)}
+    .scroll-line{width:1px;height:28px;background:linear-gradient(180deg,rgba(201,169,110,.6),transparent);animation:scrollPulse 2s ease infinite}
+    @keyframes scrollPulse{0%,100%{opacity:.4}50%{opacity:1}}
 
-    /* ── SECTION LABEL ── */
-    .sec-label { font-family: 'Jost', sans-serif; font-size: 0.5rem; font-weight: 500; letter-spacing: 0.35em; text-transform: uppercase; }
+    .sec-label{font-family:'Jost',sans-serif;font-size:.5rem;font-weight:500;letter-spacing:.35em;text-transform:uppercase}
 
-    /* ── MASTERPIECES ── */
-    .masterpieces { background: #111110; padding: 5rem 2rem; }
-    @media(min-width:768px) { .masterpieces { padding: 5rem 3rem; } }
-    .masterpieces-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 2.5rem; flex-wrap: wrap; gap: 1rem; }
-    .masterpieces-title { font-family: 'Jost', sans-serif; font-size: 0.55rem; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(245,242,235,0.4); margin-bottom: 0.5rem; }
-    .masterpieces-h2 { font-family: 'Cormorant Garamond', serif; font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 300; color: #f5f2eb; letter-spacing: 0.02em; }
-    .view-all { font-family: 'Jost', sans-serif; font-size: 0.52rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(245,242,235,0.35); text-decoration: none; transition: color 0.2s; display: flex; align-items: center; gap: 6px; }
-    .view-all:hover { color: #c9a96e; }
-    .prod-grid { display: grid; gap: 1px; background: rgba(245,242,235,0.05); grid-template-columns: repeat(2,1fr); }
-    @media(min-width:640px) { .prod-grid { grid-template-columns: repeat(4,1fr); } }
+    /* MASTERPIECES */
+    .masterpieces{background:#111110;padding:5rem 2rem}
+    @media(min-width:768px){.masterpieces{padding:5rem 3rem}}
+    .masterpieces-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:2.5rem;flex-wrap:wrap;gap:1rem}
+    .masterpieces-title{font-family:'Jost',sans-serif;font-size:.55rem;letter-spacing:.3em;text-transform:uppercase;color:rgba(245,242,235,.4);margin-bottom:.5rem}
+    .masterpieces-h2{font-family:'Cormorant Garamond',serif;font-size:clamp(1.6rem,3vw,2.2rem);font-weight:300;color:#f5f2eb;letter-spacing:.02em}
+    .view-all{font-family:'Jost',sans-serif;font-size:.52rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(245,242,235,.35);text-decoration:none;transition:color .2s;display:flex;align-items:center;gap:6px}
+    .view-all:hover{color:#c9a96e}
 
-    /* Product card with wishlist heart */
-    .prod-card { background: #111110; overflow: hidden; cursor: pointer; transition: background 0.3s; position: relative; }
-    .prod-card:hover { background: #161614; }
-    .prod-card:hover .prod-img { transform: scale(1.04); }
-    .prod-img-wrap { aspect-ratio: 3/4; overflow: hidden; background: #1a1a18; }
-    .prod-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s cubic-bezier(0.25,0.46,0.45,0.94); }
-    .prod-body { padding: 0.9rem 1rem 1.1rem; border-top: 1px solid rgba(245,242,235,0.06); }
-    .prod-cat { font-family: 'Jost', sans-serif; font-size: 0.45rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(245,242,235,0.3); margin-bottom: 4px; }
-    .prod-name { font-family: 'Cormorant Garamond', serif; font-size: 0.95rem; font-weight: 300; color: #f5f2eb; line-height: 1.2; margin-bottom: 5px; }
-    .prod-sub { font-family: 'Jost', sans-serif; font-size: 0.48rem; letter-spacing: 0.1em; color: rgba(245,242,235,0.3); margin-bottom: 6px; }
-    .prod-price { font-family: 'Jost', sans-serif; font-size: 0.65rem; color: rgba(245,242,235,0.7); letter-spacing: 0.05em; }
-    .watch-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #1a1a18; }
+    /* CAROUSEL */
+    .carousel-outer{position:relative;overflow:hidden}
+    .carousel-track{display:flex;transition:transform .6s cubic-bezier(.25,.46,.45,.94)}
 
-    /* Wishlist heart on card */
-    .card-wish-btn { position: absolute; top: 8px; right: 8px; z-index: 2; width: 28px; height: 28px; background: rgba(17,17,16,0.7); border: 1px solid rgba(245,242,235,0.08); display: flex; align-items: center; justify-content: center; cursor: pointer; color: rgba(245,242,235,0.4); transition: color 0.2s, background 0.2s, border-color 0.2s; }
-    .card-wish-btn:hover { color: #c9a96e; border-color: rgba(201,169,110,0.3); background: rgba(17,17,16,0.9); }
-    .card-wish-btn.active { color: #f87171; border-color: rgba(248,113,113,0.3); }
+    /* PRODUCT CARD */
+    .prod-card{background:#1a1a18;overflow:hidden;cursor:pointer;transition:background .3s,box-shadow .3s,transform .3s;position:relative;flex-shrink:0;border:1px solid rgba(245,242,235,.04)}
+    .prod-card:hover{background:#1f1f1d;transform:translateY(-3px);box-shadow:0 16px 48px rgba(0,0,0,.6)}
+    .prod-card:hover .prod-img{transform:scale(1.06)}
 
-    /* ── SHOP BY CATEGORY ── */
-    .cat-section { background: #0d0d0c; padding: 5rem 2rem; text-align: center; }
-    @media(min-width:768px) { .cat-section { padding: 5rem 3rem; } }
-    .cat-section-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(1.8rem,4vw,2.8rem); font-weight: 300; color: #f5f2eb; letter-spacing: 0.05em; margin-bottom: 2.5rem; }
-    .cat-section-title span { display: block; }
-    .cat-grid { display: grid; gap: 6px; grid-template-columns: repeat(2,1fr); }
-    @media(min-width:640px) { .cat-grid { grid-template-columns: repeat(4,1fr); } }
-    .cat-card { position: relative; overflow: hidden; cursor: pointer; aspect-ratio: 2/3; background: #1a1a18; }
-    @media(min-width:768px) { .cat-card { aspect-ratio: 3/4; } }
-    .cat-card img { width: 100%; height: 100%; object-fit: cover; opacity: 0.7; transition: transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.4s; display: block; }
-    .cat-card:hover img { transform: scale(1.06); opacity: 0.85; }
-    .cat-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, transparent 30%, rgba(10,10,9,0.85) 100%); }
-    .cat-label { position: absolute; bottom: 0; left: 0; right: 0; padding: 1rem; }
-    .cat-label-tag { font-family: 'Jost', sans-serif; font-size: 0.42rem; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(201,169,110,0.7); margin-bottom: 4px; }
-    .cat-label-name { font-family: 'Cormorant Garamond', serif; font-size: clamp(0.95rem,2vw,1.3rem); font-weight: 300; color: #f5f2eb; font-style: italic; }
+    /* IMAGE WRAP — dark tint overlay hides white product backgrounds */
+    .prod-img-wrap{aspect-ratio:1/1;overflow:hidden;background:#1a1a18;position:relative}
+    .prod-img-wrap::after{content:'';position:absolute;inset:0;background:rgba(10,10,9,.22);pointer-events:none;z-index:1;transition:background .3s}
+    .prod-card:hover .prod-img-wrap::after{background:rgba(10,10,9,.1)}
+    .prod-img{width:100%;height:100%;object-fit:cover;object-position:center;transition:transform .55s cubic-bezier(.25,.46,.45,.94);filter:brightness(.9) contrast(1.08) saturate(.88)}
 
-    /* ── CRAFTSMANSHIP ── */
-    .craft-section { background: #111110; }
-    .craft-wrap { display: flex; flex-direction: column; }
-    @media(min-width:768px) { .craft-wrap { flex-direction: row; min-height: 560px; } }
-    .craft-text { width: 100%; padding: 4rem 2rem; }
-    @media(min-width:768px) { .craft-text { width: 45%; padding: 5rem 4rem; } }
-    .craft-tag { font-family: 'Jost', sans-serif; font-size: 0.48rem; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(245,242,235,0.3); margin-bottom: 1rem; display: block; }
-    .craft-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(2rem,4vw,3rem); font-weight: 300; color: #f5f2eb; line-height: 1.15; margin-bottom: 1.5rem; }
-    .craft-title em { font-style: italic; color: #f5f2eb; }
-    .craft-divider { width: 36px; height: 1px; background: rgba(201,169,110,0.4); margin-bottom: 1.5rem; }
-    .craft-body { font-family: 'Jost', sans-serif; font-size: 0.78rem; font-weight: 300; color: rgba(245,242,235,0.4); line-height: 1.9; max-width: 340px; margin-bottom: 2rem; }
-    .craft-stats { display: flex; gap: 2rem; margin-bottom: 2.5rem; }
-    .stat-num { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 300; color: #f5f2eb; line-height: 1; }
-    .stat-label { font-family: 'Jost', sans-serif; font-size: 0.45rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(245,242,235,0.3); margin-top: 4px; }
-    .craft-img-wrap { width: 100%; min-height: 300px; position: relative; overflow: hidden; background: #1a1a18; }
-    @media(min-width:768px) { .craft-img-wrap { width: 55%; min-height: auto; } }
-    .craft-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.7; }
-    .craft-img-overlay { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(17,17,16,0.6) 0%, transparent 50%); }
+    .prod-body{padding:1rem 1.1rem 1.25rem;border-top:1px solid rgba(245,242,235,.05)}
+    .prod-cat{font-family:'Jost',sans-serif;font-size:.42rem;letter-spacing:.22em;text-transform:uppercase;color:rgba(201,169,110,.65);margin-bottom:5px}
+    .prod-name{font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:300;color:#f5f2eb;line-height:1.2;margin-bottom:5px}
+    .prod-price{font-family:'Jost',sans-serif;font-size:.62rem;color:rgba(245,242,235,.55);letter-spacing:.05em}
+    .watch-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#1a1a18}
 
-    /* ── QUOTE ── */
-    .quote-bar { background: #c9a96e; padding: 2rem 1.5rem; text-align: center; }
-    .quote-text { font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 300; font-size: clamp(1rem,3vw,1.5rem); color: #111110; line-height: 1.5; max-width: 680px; margin: 0 auto; }
+    .card-wish-btn{position:absolute;top:8px;right:8px;z-index:3;width:28px;height:28px;background:rgba(10,10,9,.8);border:1px solid rgba(245,242,235,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;color:rgba(245,242,235,.4);transition:color .2s,background .2s,border-color .2s}
+    .card-wish-btn:hover{color:#c9a96e;border-color:rgba(201,169,110,.35);background:rgba(10,10,9,.95)}
+    .card-wish-btn.active{color:#f87171;border-color:rgba(248,113,113,.3)}
 
-    /* ── FOOTER ── */
-    .footer { background: #0a0a09; padding: 3.5rem 2rem 1.5rem; }
-    @media(min-width:768px) { .footer { padding: 3.5rem 3rem 1.5rem; } }
-    .footer-top { display: flex; flex-direction: column; gap: 2.5rem; padding-bottom: 2.5rem; border-bottom: 1px solid rgba(245,242,235,0.05); }
-    @media(min-width:768px) { .footer-top { flex-direction: row; justify-content: space-between; align-items: flex-start; } }
-    .footer-brand { max-width: 220px; }
-    .footer-brand-name { font-family: 'Cormorant Garamond', serif; font-size: 1rem; font-weight: 300; letter-spacing: 0.2em; color: #f5f2eb; margin-bottom: 0.75rem; }
-    .footer-brand-desc { font-family: 'Jost', sans-serif; font-size: 0.65rem; font-weight: 300; color: rgba(245,242,235,0.25); line-height: 1.8; }
-    .footer-nav { display: flex; gap: 3rem; flex-wrap: wrap; }
-    .footer-col { display: flex; flex-direction: column; gap: 0.6rem; }
-    .footer-col-title { font-family: 'Jost', sans-serif; font-size: 0.45rem; letter-spacing: 0.25em; text-transform: uppercase; color: rgba(245,242,235,0.2); margin-bottom: 0.25rem; }
-    .footer-link { font-family: 'Jost', sans-serif; font-size: 0.58rem; letter-spacing: 0.1em; color: rgba(245,242,235,0.35); text-decoration: none; transition: color 0.2s; }
-    .footer-link:hover { color: #c9a96e; }
-    .footer-social { display: flex; gap: 1rem; align-items: center; }
-    .footer-bottom { display: flex; flex-direction: column; gap: 1rem; padding-top: 1.5rem; align-items: center; text-align: center; }
-    @media(min-width:768px) { .footer-bottom { flex-direction: row; justify-content: space-between; text-align: left; } }
-    .footer-copy { font-family: 'Jost', sans-serif; font-size: 0.48rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(245,242,235,0.15); }
+    /* CAROUSEL DOTS */
+    .carousel-dots{display:flex;justify-content:center;gap:6px;margin-top:1.5rem}
+    .carousel-dot{height:6px;border-radius:3px;border:none;background:rgba(245,242,235,.15);cursor:pointer;transition:all .3s;padding:0}
 
-    /* ── REVEAL ── */
-    @keyframes fadeUp { from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:translateY(0)} }
-    .fade-up { animation: fadeUp 0.9s ease both; }
-    .d1{animation-delay:0.1s} .d2{animation-delay:0.25s} .d3{animation-delay:0.4s} .d4{animation-delay:0.55s}
-    .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.7s ease, transform 0.7s ease; }
-    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .no-products{width:100%;padding:4rem;text-align:center}
 
-    /* ── TOAST ── */
-    .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(8px); background: #1a1a18; border: 1px solid rgba(245,242,235,0.08); font-family: 'Jost', sans-serif; font-size: 0.58rem; letter-spacing: 0.08em; color: rgba(245,242,235,0.7); padding: 0.65rem 1.5rem; box-shadow: 0 8px 32px rgba(0,0,0,0.5); z-index: 999; opacity: 0; pointer-events: none; transition: opacity 0.3s, transform 0.3s; white-space: nowrap; }
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-    .toast.gold { border-color: rgba(201,169,110,0.3); color: #c9a96e; }
-    .toast.err  { border-color: rgba(248,113,113,0.3); color: #f87171; }
+    /* CATEGORY */
+    .cat-section{background:#0d0d0c;padding:5rem 2rem;text-align:center}
+    @media(min-width:768px){.cat-section{padding:5rem 3rem}}
+    .cat-section-title{font-family:'Cormorant Garamond',serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:300;color:#f5f2eb;letter-spacing:.05em;margin-bottom:2.5rem}
+    .cat-section-title span{display:block}
+    .cat-grid{display:grid;gap:6px;grid-template-columns:repeat(2,1fr)}
+    @media(min-width:640px){.cat-grid{grid-template-columns:repeat(4,1fr)}}
+    .cat-card{position:relative;overflow:hidden;cursor:pointer;aspect-ratio:2/3;background:#1a1a18}
+    @media(min-width:768px){.cat-card{aspect-ratio:3/4}}
+    .cat-card img{width:100%;height:100%;object-fit:cover;opacity:.7;transition:transform .6s cubic-bezier(.25,.46,.45,.94),opacity .4s;display:block}
+    .cat-card:hover img{transform:scale(1.06);opacity:.85}
+    .cat-overlay{position:absolute;inset:0;background:linear-gradient(180deg,transparent 30%,rgba(10,10,9,.85) 100%)}
+    .cat-label{position:absolute;bottom:0;left:0;right:0;padding:1rem}
+    .cat-label-tag{font-family:'Jost',sans-serif;font-size:.42rem;letter-spacing:.3em;text-transform:uppercase;color:rgba(201,169,110,.7);margin-bottom:4px}
+    .cat-label-name{font-family:'Cormorant Garamond',serif;font-size:clamp(.95rem,2vw,1.3rem);font-weight:300;color:#f5f2eb;font-style:italic}
 
-    /* ── RULE ── */
-    .rule { height: 1px; background: linear-gradient(90deg, transparent, rgba(201,169,110,0.2), transparent); }
+    /* CRAFTSMANSHIP */
+    .craft-section{background:#111110}
+    .craft-wrap{display:flex;flex-direction:column}
+    @media(min-width:768px){.craft-wrap{flex-direction:row;min-height:560px}}
+    .craft-text{width:100%;padding:4rem 2rem}
+    @media(min-width:768px){.craft-text{width:45%;padding:5rem 4rem}}
+    .craft-tag{font-family:'Jost',sans-serif;font-size:.48rem;letter-spacing:.3em;text-transform:uppercase;color:rgba(245,242,235,.3);margin-bottom:1rem;display:block}
+    .craft-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,4vw,3rem);font-weight:300;color:#f5f2eb;line-height:1.15;margin-bottom:1.5rem}
+    .craft-title em{font-style:italic}
+    .craft-divider{width:36px;height:1px;background:rgba(201,169,110,.4);margin-bottom:1.5rem}
+    .craft-body{font-family:'Jost',sans-serif;font-size:.78rem;font-weight:300;color:rgba(245,242,235,.4);line-height:1.9;max-width:340px;margin-bottom:2rem}
+    .craft-stats{display:flex;gap:2rem;margin-bottom:2.5rem}
+    .stat-num{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:300;color:#f5f2eb;line-height:1}
+    .stat-label{font-family:'Jost',sans-serif;font-size:.45rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(245,242,235,.3);margin-top:4px}
+    .craft-img-wrap{width:100%;min-height:300px;position:relative;overflow:hidden;background:#1a1a18}
+    @media(min-width:768px){.craft-img-wrap{width:55%;min-height:auto}}
+    .craft-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.7}
+    .craft-img-overlay{position:absolute;inset:0;background:linear-gradient(90deg,rgba(17,17,16,.6) 0%,transparent 50%)}
+
+    /* QUOTE */
+    .quote-bar{background:#c9a96e;padding:2rem 1.5rem;text-align:center}
+    .quote-text{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:300;font-size:clamp(1rem,3vw,1.5rem);color:#111110;line-height:1.5;max-width:680px;margin:0 auto}
+
+    /* FOOTER */
+    .footer{background:#0a0a09;padding:3.5rem 2rem 1.5rem}
+    @media(min-width:768px){.footer{padding:3.5rem 3rem 1.5rem}}
+    .footer-top{display:flex;flex-direction:column;gap:2.5rem;padding-bottom:2.5rem;border-bottom:1px solid rgba(245,242,235,.05)}
+    @media(min-width:768px){.footer-top{flex-direction:row;justify-content:space-between;align-items:flex-start}}
+    .footer-brand{max-width:220px}
+    .footer-brand-name{font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:300;letter-spacing:.2em;color:#f5f2eb;margin-bottom:.75rem}
+    .footer-brand-desc{font-family:'Jost',sans-serif;font-size:.65rem;font-weight:300;color:rgba(245,242,235,.25);line-height:1.8}
+    .footer-nav{display:flex;gap:3rem;flex-wrap:wrap}
+    .footer-col{display:flex;flex-direction:column;gap:.6rem}
+    .footer-col-title{font-family:'Jost',sans-serif;font-size:.45rem;letter-spacing:.25em;text-transform:uppercase;color:rgba(245,242,235,.2);margin-bottom:.25rem}
+    .footer-link{font-family:'Jost',sans-serif;font-size:.58rem;letter-spacing:.1em;color:rgba(245,242,235,.35);text-decoration:none;transition:color .2s}
+    .footer-link:hover{color:#c9a96e}
+    .footer-bottom{display:flex;flex-direction:column;gap:1rem;padding-top:1.5rem;align-items:center;text-align:center}
+    @media(min-width:768px){.footer-bottom{flex-direction:row;justify-content:space-between;text-align:left}}
+    .footer-copy{font-family:'Jost',sans-serif;font-size:.48rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(245,242,235,.15)}
+
+    /* REVEAL */
+    @keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+    .fade-up{animation:fadeUp .9s ease both}
+    .d1{animation-delay:.1s}.d2{animation-delay:.25s}.d3{animation-delay:.4s}.d4{animation-delay:.55s}
+    .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease}
+    .reveal.visible{opacity:1;transform:translateY(0)}
+
+    /* TOAST */
+    .toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(8px);background:#1a1a18;border:1px solid rgba(245,242,235,.08);font-family:'Jost',sans-serif;font-size:.58rem;letter-spacing:.08em;color:rgba(245,242,235,.7);padding:.65rem 1.5rem;box-shadow:0 8px 32px rgba(0,0,0,.5);z-index:999;opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;white-space:nowrap}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    .toast.gold{border-color:rgba(201,169,110,.3);color:#c9a96e}
+    .toast.err{border-color:rgba(248,113,113,.3);color:#f87171}
+    .rule{height:1px;background:linear-gradient(90deg,transparent,rgba(201,169,110,.2),transparent)}
   </style>
 </head>
 <body>
 
-  <!-- ══ NAV ══ -->
-  <nav class="nav-root" id="navbar">
-    <div class="nav-inner">
-      <div class="hidden md:flex items-center gap-8">
-        <a href="/products" class="nav-link">Collection</a>
-        <a href="/home"     class="nav-link">Watches</a>
-        <a href="/home"     class="nav-link">About</a>
-        <a href="/home"     class="nav-link">Contact</a>
-      </div>
-      <a href="/home" class="nav-logo md:absolute md:left-1/2 md:-translate-x-1/2">Velmora Chroné</a>
-      <div class="flex items-center gap-4 md:gap-5 ml-auto md:ml-0">
-        <button class="nav-icon hidden md:block" aria-label="Search">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        </button>
-        <a href="/profile" class="nav-icon" aria-label="Profile">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        </a>
-        <!-- ── WISHLIST ICON ── -->
-        <a href="/wishlist" class="nav-icon" aria-label="Wishlist" style="position:relative">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-        </a>
-        <a href="/cart" class="nav-icon relative" aria-label="Cart">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-          <span class="cart-badge" id="cartBadge">0</span>
-        </a>
-        <a href="/logout" class="nav-link hidden md:inline">Logout</a>
-        <button class="hamburger md:hidden" id="hamburger"><span></span><span></span><span></span></button>
-      </div>
+<!-- NAV -->
+<nav class="nav-root" id="navbar">
+  <div class="nav-inner">
+    <div class="hidden md:flex items-center gap-8">
+      <a href="/products" class="nav-link">Collection</a>
+      <a href="/home"     class="nav-link">Watches</a>
+      <a href="/home"     class="nav-link">About</a>
+      <a href="/home"     class="nav-link">Contact</a>
     </div>
-    <div class="mobile-menu" id="mobileMenu">
-      <a href="/products"  class="nav-link">Collection</a>
-      <a href="/home"      class="nav-link">Watches</a>
-      <a href="/home"      class="nav-link">About</a>
-      <a href="/home"      class="nav-link">Contact</a>
-      <a href="/profile"   class="nav-link">My Profile</a>
-      <a href="/wishlist"  class="nav-link">Wishlist</a>
-      <a href="/cart"      class="nav-link">Cart</a>
-      <a href="/logout"    class="nav-link" style="color:rgba(201,169,110,0.6);">Logout</a>
+    <a href="/home" class="nav-logo md:absolute md:left-1/2 md:-translate-x-1/2">Velmora Chroné</a>
+    <div class="flex items-center gap-4 md:gap-5 ml-auto md:ml-0">
+      <a href="/profile" class="nav-icon" aria-label="Profile">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </a>
+      <a href="/wishlist" class="nav-icon" aria-label="Wishlist" style="position:relative">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      </a>
+      <a href="/cart" class="nav-icon relative" aria-label="Cart">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <span class="cart-badge" id="cartBadge">0</span>
+      </a>
+      <a href="/logout" class="nav-link hidden md:inline">Logout</a>
+      <button class="hamburger md:hidden" id="hamburger"><span></span><span></span><span></span></button>
     </div>
-  </nav>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="/products" class="nav-link">Collection</a>
+    <a href="/home"     class="nav-link">Watches</a>
+    <a href="/home"     class="nav-link">About</a>
+    <a href="/home"     class="nav-link">Contact</a>
+    <a href="/profile"  class="nav-link">My Profile</a>
+    <a href="/wishlist" class="nav-link">Wishlist</a>
+    <a href="/cart"     class="nav-link">Cart</a>
+    <a href="/logout"   class="nav-link" style="color:rgba(201,169,110,.6)">Logout</a>
+  </div>
+</nav>
 
-  <!-- ══ HERO ══ -->
-  <section class="hero">
-    <img class="hero-img"
-      src="https://res.cloudinary.com/dwb0hd0m6/image/upload/v1774866520/Rolex_Cosmograph_Daytona___Triumph_of_Performance___Rolex_bbqplm.jpg"
-      alt="Velmora Chroné Hero"
-      onerror="this.style.display='none'"/>
-    <div class="hero-overlay"></div>
-    <div class="hero-content">
-      <p class="hero-tag fade-up d1">Swiss Made Heritage · Est. 1882</p>
-      <h1 class="hero-title fade-up d2">A Legacy of<br/><em>Precision</em></h1>
-      <p class="hero-sub fade-up d3">Handcrafted timepieces born from generations of mastery. Each watch a testament to the pursuit of perfection.</p>
-      <div class="hero-btns fade-up d3">
-        <a href="/home"     class="btn-gold">Shop Now</a>
-        <a href="/products" class="btn-dark">Explore the Collection</a>
-      </div>
+<!-- HERO -->
+<section class="hero">
+  <img class="hero-img"
+    src="https://res.cloudinary.com/dwb0hd0m6/image/upload/v1774866520/Rolex_Cosmograph_Daytona___Triumph_of_Performance___Rolex_bbqplm.jpg"
+    alt="Velmora Chroné Hero" onerror="this.style.display='none'"/>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <p class="hero-tag fade-up d1">Swiss Made Heritage · Est. 1882</p>
+    <h1 class="hero-title fade-up d2">A Legacy of<br/><em>Precision</em></h1>
+    <p class="hero-sub fade-up d3">Handcrafted timepieces born from generations of mastery. Each watch a testament to the pursuit of perfection.</p>
+    <div class="hero-btns fade-up d3">
+      <a href="/products" class="btn-gold">Shop Now</a>
+      <a href="/products" class="btn-dark">Explore the Collection</a>
     </div>
-    <div class="hero-scroll-hint fade-up d4">
-      <span>Scroll</span>
-      <div class="scroll-line"></div>
-    </div>
-  </section>
+  </div>
+  <div class="hero-scroll-hint fade-up d4">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
 
-  <!-- ══ SELECTED MASTERPIECES ══ -->
-  <section class="masterpieces">
-    <div style="max-width:1200px; margin:0 auto;">
-      <div class="masterpieces-header reveal">
-        <div>
-          <p class="masterpieces-title">Now Available</p>
-          <h2 class="masterpieces-h2">Selected Masterpieces</h2>
+<!-- MASTERPIECES -->
+<section class="masterpieces">
+  <div style="max-width:1200px;margin:0 auto">
+    <div class="masterpieces-header reveal">
+      <div>
+        <p class="masterpieces-title">Now Available</p>
+        <h2 class="masterpieces-h2">Selected Masterpieces</h2>
+      </div>
+      <a href="/products" class="view-all">
+        View All
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+    </div>
+
+    <div class="carousel-outer reveal" id="carouselOuter">
+      <div class="carousel-track" id="carouselTrack">
+        <% if (featuredProducts && featuredProducts.length > 0) { %>
+          <% featuredProducts.forEach((p) => { %>
+          <div class="prod-card" style="width:25%">
+            <button class="card-wish-btn" onclick="toggleWishlist(event,this)" title="Save to Wishlist">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            </button>
+            <a href="/products/<%= p._id %>" style="text-decoration:none">
+              <div class="prod-img-wrap">
+                <% if (p.images && p.images.length > 0) { %>
+                  <img class="prod-img" src="<%= p.images[0] %>" alt="<%= p.name %>"/>
+                <% } else { %>
+                  <div class="watch-placeholder">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="rgba(245,242,235,0.08)" stroke-width="0.5"><circle cx="12" cy="12" r="10"/></svg>
+                  </div>
+                <% } %>
+              </div>
+              <div class="prod-body">
+                <div class="prod-cat"><%= p.category?.name || '' %></div>
+                <div class="prod-name"><%= p.name %></div>
+                <div class="prod-price">₹<%= p.price.toLocaleString('en-IN') %></div>
+              </div>
+            </a>
+          </div>
+          <% }) %>
+        <% } else { %>
+          <div class="no-products">
+            <p style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:300;color:rgba(245,242,235,.2)">No products available yet</p>
+            <p style="font-family:'Jost',sans-serif;font-size:.55rem;color:rgba(245,242,235,.12);margin-top:.5rem;letter-spacing:.1em">Check back soon for our curated collection</p>
+          </div>
+        <% } %>
+      </div>
+      <div class="carousel-dots" id="carouselDots"></div>
+    </div>
+  </div>
+</section>
+
+<!-- SHOP BY CATEGORY -->
+<section class="cat-section">
+  <div style="max-width:1200px;margin:0 auto">
+    <div class="reveal" style="margin-bottom:2.5rem">
+      <p class="sec-label" style="color:rgba(245,242,235,.3);margin-bottom:.5rem">Browse</p>
+      <h2 class="cat-section-title"><span>Shop by</span><span>Category</span></h2>
+    </div>
+    <div class="cat-grid reveal">
+      <%
+        const homeCategories = [
+          { name:"Formal Watches", tag:"Elegance Redefined", img:"https://res.cloudinary.com/dwb0hd0m6/image/upload/v1774611384/download_18_cqo3mr.jpg" },
+          { name:"For Him",        tag:"Bold & Powerful",    img:"https://res.cloudinary.com/dwb0hd0m6/image/upload/v1774607627/%E6%99%82%E8%A8%88_bidkje.jpg" },
+          { name:"For Her",        tag:"Graceful Precision", img:"https://res.cloudinary.com/dwb0hd0m6/image/upload/v1774528987/_follow_my_Whatsapp_channel____foryou_androidwallpaper_wallpaperiphone_iphonewallpaper_pc_wallpaper_Pinterest_Aesthetic_view_ExplorePage_trending_Explore_3d_nature___zmn7d4.jpg" },
+          { name:"Partywear",      tag:"Statement Watches",  img:"https://res.cloudinary.com/dwb0hd0m6/image/upload/v1774935664/ROLEX_COSMOGRAPH_csacv2.jpg" },
+        ];
+      %>
+      <% homeCategories.forEach(c => { %>
+      <a href="/products" style="text-decoration:none">
+        <div class="cat-card">
+          <img src="<%= c.img %>" alt="<%= c.name %>" onerror="this.style.display='none';this.parentElement.style.background='#1a1a18'"/>
+          <div class="cat-overlay"></div>
+          <div class="cat-label">
+            <p class="cat-label-tag"><%= c.tag %></p>
+            <p class="cat-label-name"><%= c.name %></p>
+          </div>
         </div>
-        <a href="/products" class="view-all">
-          View All
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-        </a>
-      </div>
+      </a>
+      <% }) %>
+    </div>
+  </div>
+</section>
 
-      <div class="prod-grid reveal">
-        <%
-          const featuredProducts = [
-            { name: "The Charisma Diver",       sub: "Professional Diver Pro Model",    price: "₹4,500", img: "https://res.cloudinary.com/dwb0hd0m6/image/upload/v1774607282/download_17_rzpb1h.jpg" },
-            { name: "The Statesman Dress Watch", sub: "The New Bold Power",              price: "₹8,000", img: "https://res.cloudinary.com/dwb0hd0m6/image/upload/v1774527532/The_Speedmaster_Apollo_11_50th_Anniversary_Limited_Edition_in_stainless_steel_and_18K_Moonshine_gold__Notice_the_number_11_on_the_dial_of_the_watch_and_the_laser-engraved_image_of_Buzz_Aldrin_climbing_down_o_2_eibhvm.jpg" },
-            { name: "The Velocity Chronograph",  sub: "High Performance Czech Watch",   price: "₹9,100", img: "https://res.cloudinary.com/dwb0hd0m6/image/upload/v1774607373/Vincero_The_Harper_Bracelet_Watch_29mm_in_Gold_green_at_Nordstrom_zdrnoy.jpg" },
-            { name: "The Heritage Classic",      sub: "Timeless and Prestigious",       price: "₹3,200", img: "https://res.cloudinary.com/dwb0hd0m6/image/upload/v1774607517/Titan_premium_watch_photography_umihbi.jpg" },
-          ];
-        %>
-        <% featuredProducts.forEach((p, i) => { %>
-        <div class="prod-card" style="position:relative">
-          <!-- Wishlist heart button -->
-          <button class="card-wish-btn" id="homeWishBtn-<%= i %>" onclick="toggleHomeWishlist(event, this)" title="Save to Wishlist">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-          </button>
-          <a href="/products" style="text-decoration:none;">
-            <div class="prod-img-wrap">
-              <img class="prod-img" src="<%= p.img %>" alt="<%= p.name %>"
-                onerror="this.parentElement.innerHTML='<div class=\'watch-placeholder\'><svg width=\'40\' height=\'40\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'rgba(245,242,235,0.1)\' stroke-width=\'0.5\'><circle cx=\'12\' cy=\'12\' r=\'10\'/></svg></div>'"/>
-            </div>
-            <div class="prod-body">
-              <div class="prod-name"><%= p.name %></div>
-              <div class="prod-sub"><%= p.sub %></div>
-              <div class="prod-price"><%= p.price %></div>
-            </div>
+<!-- CRAFTSMANSHIP -->
+<section class="craft-section">
+  <div class="craft-wrap">
+    <div class="craft-text reveal">
+      <span class="craft-tag">Swiss Made Heritage</span>
+      <h2 class="craft-title">Generations of<br/><em>Craftsmanship</em></h2>
+      <div class="craft-divider"></div>
+      <p class="craft-body">Every Velmora Chroné is a testament to the pursuit of perfection. Founded in 1882, each of our dials are hand-crafted by master artisans. Over 400 hand-finishing steps before earning the Velmora seal of excellence.</p>
+      <div class="craft-stats">
+        <div><div class="stat-num">1882</div><div class="stat-label">Est. Year</div></div>
+        <div><div class="stat-num">400+</div><div class="stat-label">Components</div></div>
+        <div><div class="stat-num">5yr</div><div class="stat-label">Warranty</div></div>
+      </div>
+      <a href="/products" class="btn-gold" style="font-size:.52rem;letter-spacing:.2em">Discover Our Craftsmanship</a>
+    </div>
+    <div class="craft-img-wrap">
+      <img class="craft-img" src="https://res.cloudinary.com/dwb0hd0m6/image/upload/v1774607517/Titan_premium_watch_photography_umihbi.jpg" alt="Craftsmanship" onerror="this.style.display='none'"/>
+      <div class="craft-img-overlay"></div>
+      <div style="position:absolute;bottom:1.5rem;right:1.5rem;text-align:right">
+        <div style="width:32px;height:1px;background:rgba(201,169,110,.3);margin-left:auto;margin-bottom:5px"></div>
+        <span class="sec-label" style="color:rgba(201,169,110,.35);font-size:.44rem">Est. 1882</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- QUOTE -->
+<div class="quote-bar">
+  <p class="quote-text">"Time is the only luxury that cannot be manufactured — only honoured."</p>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div style="max-width:1200px;margin:0 auto">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <p class="footer-brand-name">Velmora Chroné</p>
+        <p class="footer-brand-desc">Geneva-made timepieces for those who understand that true luxury is measured not in price, but in permanence.</p>
+        <div style="display:flex;gap:1rem;align-items:center;margin-top:1.25rem">
+          <a href="#" class="footer-link" aria-label="Instagram">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/></svg>
+          </a>
+          <a href="#" class="footer-link" aria-label="Facebook">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
           </a>
         </div>
-        <% }) %>
       </div>
-    </div>
-  </section>
-
-  
-  <section class="cat-section">
-    <div style="max-width:1200px; margin:0 auto;">
-      <div class="reveal" style="margin-bottom:2.5rem;">
-        <p class="sec-label" style="color:rgba(245,242,235,0.3); margin-bottom:0.5rem;">Browse</p>
-        <h2 class="cat-section-title"><span>Shop by</span><span>Category</span></h2>
-      </div>
-      <div class="cat-grid reveal">
-        <%
-          const homeCategories = [
-            { name: "Formal Watches", tag: "Elegance Redefined", img: "https://res.cloudinary.com/dwb0hd0m6/image/upload/v1774611384/download_18_cqo3mr.jpg" },
-            { name: "For Him",        tag: "Bold & Powerful",    img: "https://res.cloudinary.com/dwb0hd0m6/image/upload/v1774607627/%E6%99%82%E8%A8%88_bidkje.jpg" },
-            { name: "For Her",        tag: "Graceful Precision", img: "https://res.cloudinary.com/dwb0hd0m6/image/upload/v1774528987/_follow_my_Whatsapp_channel____foryou_androidwallpaper_wallpaperiphone_iphonewallpaper_pc_wallpaper_Pinterest_Aesthetic_view_ExplorePage_trending_Explore_3d_nature___zmn7d4.jpg" },
-            { name: "Partywear",      tag: "Statement Watches",  img: "https://res.cloudinary.com/dwb0hd0m6/image/upload/v1774935664/ROLEX_COSMOGRAPH_csacv2.jpg" },
-          ];
-        %>
-        <% homeCategories.forEach(c => { %>
-        <a href="/products" style="text-decoration:none;">
-          <div class="cat-card">
-            <img src="<%= c.img %>" alt="<%= c.name %>" onerror="this.style.display='none'; this.parentElement.style.background='#1a1a18';"/>
-            <div class="cat-overlay"></div>
-            <div class="cat-label">
-              <p class="cat-label-tag"><%= c.tag %></p>
-              <p class="cat-label-name"><%= c.name %></p>
-            </div>
-          </div>
-        </a>
-        <% }) %>
-      </div>
-    </div>
-  </section>
-
-  
-  <section class="craft-section">
-    <div class="craft-wrap">
-      <div class="craft-text reveal">
-        <span class="craft-tag">Swiss Made Heritage</span>
-        <h2 class="craft-title">Generations of<br/><em>Craftsmanship</em></h2>
-        <div class="craft-divider"></div>
-        <p class="craft-body">Every Velmora Chroné is a testament to the pursuit of perfection. Founded in 1882, each of our dials are hand-crafted. Our master craftsmen, each of our dials showcase over 400 hand-finishing parts, before earning the Velmora seal of excellence.</p>
-        <div class="craft-stats">
-          <div><div class="stat-num">1882</div><div class="stat-label">Est. Year</div></div>
-          <div><div class="stat-num">400+</div><div class="stat-label">Components</div></div>
-          <div><div class="stat-num">5yr</div><div class="stat-label">Warranty</div></div>
+      <div class="footer-nav">
+        <div class="footer-col">
+          <span class="footer-col-title">Customer Service</span>
+          <a href="#" class="footer-link">Our Story</a>
+          <a href="#" class="footer-link">Store Blog</a>
+          <a href="#" class="footer-link">Sustainability</a>
+          <a href="#" class="footer-link">Contact Us</a>
         </div>
-        <a href="/home" class="btn-gold" style="font-size:0.52rem; letter-spacing:0.2em;">Discover Our Craftsmanship</a>
+        <div class="footer-col">
+          <span class="footer-col-title">About Us</span>
+          <a href="#" class="footer-link">Size Guide</a>
+          <a href="#" class="footer-link">Return Policy</a>
+          <a href="#" class="footer-link">Order Status</a>
+          <a href="#" class="footer-link">Track Order</a>
+        </div>
       </div>
-      <div class="craft-img-wrap">
-        <img class="craft-img" src="https://res.cloudinary.com/dwb0hd0m6/image/upload/v1774607517/Titan_premium_watch_photography_umihbi.jpg" alt="Craftsmanship" onerror="this.style.display='none'"/>
-        <div class="craft-img-overlay"></div>
-        <div style="position:absolute; bottom:1.5rem; right:1.5rem; text-align:right;">
-          <div style="width:32px; height:1px; background:rgba(201,169,110,0.3); margin-left:auto; margin-bottom:5px;"></div>
-          <span class="sec-label" style="color:rgba(201,169,110,0.35); font-size:0.44rem;">Est. 1882</span>
+      <div style="min-width:200px">
+        <p class="footer-col-title" style="margin-bottom:.75rem">Newsletter</p>
+        <p style="font-family:'Jost',sans-serif;font-size:.6rem;color:rgba(245,242,235,.25);line-height:1.7;margin-bottom:.75rem;font-weight:300">Subscribe for exclusive deals.</p>
+        <div style="display:flex;border-bottom:1px solid rgba(245,242,235,.15);padding-bottom:.3rem">
+          <input type="email" placeholder="Enter your email address" style="background:transparent;border:none;outline:none;font-family:'Jost',sans-serif;font-size:.65rem;font-weight:300;color:#f5f2eb;flex:1;min-width:0"/>
+          <button style="background:none;border:none;cursor:pointer;color:#c9a96e;padding:0 .2rem;flex-shrink:0">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
         </div>
       </div>
     </div>
-  </section>
-
-  
-  <div class="quote-bar">
-    <p class="quote-text">"Time is the only luxury that cannot be manufactured — only honoured."</p>
+    <div class="footer-bottom">
+      <span class="footer-copy">&copy; <%= new Date().getFullYear() %> Velmora Chroné. All rights reserved.</span>
+      <div style="display:flex;gap:1.25rem">
+        <a href="#" class="footer-link">Privacy</a>
+        <a href="#" class="footer-link">Terms of Service</a>
+        <a href="#" class="footer-link">Accessibility</a>
+      </div>
+    </div>
   </div>
+</footer>
 
-  
-  <footer class="footer">
-    <div style="max-width:1200px; margin:0 auto;">
-      <div class="footer-top">
-        <div class="footer-brand">
-          <p class="footer-brand-name">Velmora Chroné</p>
-          <p class="footer-brand-desc">Geneva-made timepieces for those who understand that true luxury is measured not in price, but in permanence.</p>
-          <div class="footer-social" style="margin-top:1.25rem;">
-            <a href="#" class="footer-link" aria-label="Instagram">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/></svg>
-            </a>
-            <a href="#" class="footer-link" aria-label="Facebook">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
-            </a>
-          </div>
-        </div>
-        <div class="footer-nav">
-          <div class="footer-col">
-            <span class="footer-col-title">Customer Service</span>
-            <a href="#" class="footer-link">Our Story</a>
-            <a href="#" class="footer-link">Store Blog</a>
-            <a href="#" class="footer-link">Sustainability</a>
-            <a href="#" class="footer-link">Contact Us</a>
-          </div>
-          <div class="footer-col">
-            <span class="footer-col-title">About Us</span>
-            <a href="#" class="footer-link">Size Guide</a>
-            <a href="#" class="footer-link">Return Policy</a>
-            <a href="#" class="footer-link">Order Status</a>
-            <a href="#" class="footer-link">Track Order</a>
-            <a href="#" class="footer-link">Metal Finishes</a>
-          </div>
-        </div>
-        <div style="min-width:200px;">
-          <p class="footer-col-title" style="margin-bottom:0.75rem;">Newsletter</p>
-          <p style="font-family:'Jost',sans-serif; font-size:0.6rem; color:rgba(245,242,235,0.25); line-height:1.7; margin-bottom:0.75rem; font-weight:300;">Subscribe for exclusive deals.</p>
-          <div style="display:flex; border-bottom:1px solid rgba(245,242,235,0.15); padding-bottom:0.3rem;">
-            <input type="email" placeholder="Enter your email address" style="background:transparent; border:none; outline:none; font-family:'Jost',sans-serif; font-size:0.65rem; font-weight:300; color:#f5f2eb; flex:1; min-width:0;"/>
-            <button style="background:none; border:none; cursor:pointer; color:#c9a96e; padding:0 0.2rem; flex-shrink:0;">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-            </button>
-          </div>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        <span class="footer-copy">&copy; <%= new Date().getFullYear() %> Velmora Chroné. All rights reserved.</span>
-        <div style="display:flex; gap:1.25rem;">
-          <a href="#" class="footer-link">Privacy</a>
-          <a href="#" class="footer-link">Terms of Service</a>
-          <a href="#" class="footer-link">Accessibility</a>
-        </div>
-      </div>
-    </div>
-  </footer>
+<div class="toast" id="toast"></div>
 
-  <div class="toast" id="toast"></div>
+<script>
+  /* ── Nav ── */
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', scrollY > 50), { passive:true });
+  const hamburger  = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobileMenu');
+  hamburger.addEventListener('click', () => {
+    hamburger.classList.toggle('open');
+    mobileMenu.classList.toggle('open');
+  });
+  mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+    hamburger.classList.remove('open');
+    mobileMenu.classList.remove('open');
+  }));
 
-  <script>
-    
-    const navbar = document.getElementById('navbar');
-    window.addEventListener('scroll', () => {
-      navbar.classList.toggle('scrolled', window.scrollY > 50);
-    }, { passive: true });
-    const hamburger  = document.getElementById('hamburger');
-    const mobileMenu = document.getElementById('mobileMenu');
-    hamburger.addEventListener('click', () => {
-      hamburger.classList.toggle('open');
-      mobileMenu.classList.toggle('open');
+  /* ── Scroll reveal ── */
+  const revealEls = document.querySelectorAll('.reveal');
+  const observer  = new IntersectionObserver(entries => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 80);
+        observer.unobserve(entry.target);
+      }
     });
-    mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
-      hamburger.classList.remove('open');
-      mobileMenu.classList.remove('open');
-    }));
+  }, { threshold: 0.08 });
+  revealEls.forEach(el => observer.observe(el));
 
-    
-    const revealEls = document.querySelectorAll('.reveal');
-    const observer  = new IntersectionObserver((entries) => {
-      entries.forEach((entry, i) => {
-        if (entry.isIntersecting) {
-          setTimeout(() => entry.target.classList.add('visible'), i * 80);
-          observer.unobserve(entry.target);
-        }
+  /* ── Toast ── */
+  let toastTimer;
+  function showToast(msg, type = '') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className   = 'toast show' + (type ? ' ' + type : '');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  /* ── Wishlist toggle (UI only) ── */
+  function toggleWishlist(e, btn) {
+    e.preventDefault();
+    e.stopPropagation();
+    const active = btn.classList.toggle('active');
+    const svg    = btn.querySelector('svg');
+    svg.setAttribute('fill',   active ? '#f87171' : 'none');
+    svg.setAttribute('stroke', active ? '#f87171' : 'currentColor');
+    showToast(active ? 'Saved to wishlist' : 'Removed from wishlist', active ? 'gold' : '');
+  }
+
+  /* ── Product Carousel ── */
+  (function () {
+    const track    = document.getElementById('carouselTrack');
+    const dotsWrap = document.getElementById('carouselDots');
+    const outer    = document.getElementById('carouselOuter');
+    if (!track) return;
+
+    const cards = track.querySelectorAll('.prod-card');
+    const total = cards.length;
+    if (total === 0) return;
+
+    const visible = () => window.innerWidth < 640 ? 2 : 4;
+
+    function setCardWidths() {
+      const w = window.innerWidth < 640 ? '50%' : '25%';
+      cards.forEach(c => c.style.width = w);
+    }
+    setCardWidths();
+    window.addEventListener('resize', setCardWidths);
+
+    let current = 0;
+    let autoTimer;
+
+    function buildDots() {
+      dotsWrap.innerHTML = '';
+      const vis     = visible();
+      const numDots = Math.ceil(total / vis);
+      for (let i = 0; i < numDots; i++) {
+        const dot            = document.createElement('button');
+        dot.className        = 'carousel-dot';
+        dot.style.width      = i === 0 ? '18px' : '6px';
+        dot.style.background = i === 0 ? '#c9a96e' : 'rgba(245,242,235,0.15)';
+        dot.addEventListener('click', () => goTo(i * vis));
+        dotsWrap.appendChild(dot);
+      }
+    }
+
+    function updateDots() {
+      const vis       = visible();
+      const activeDot = Math.floor(current / vis);
+      dotsWrap.querySelectorAll('.carousel-dot').forEach((d, i) => {
+        d.style.background = i === activeDot ? '#c9a96e' : 'rgba(245,242,235,0.15)';
+        d.style.width      = i === activeDot ? '18px' : '6px';
       });
-    }, { threshold: 0.08 });
-    revealEls.forEach(el => observer.observe(el));
-
-    
-    let toastTimer;
-    function showToast(msg, type = '') {
-      const t = document.getElementById('toast');
-      t.textContent = msg;
-      t.className = 'toast show' + (type ? ' ' + type : '');
-      clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
     }
 
-    
-    function toggleHomeWishlist(e, btn) {
-      e.preventDefault();
-      e.stopPropagation();
-      const active = btn.classList.toggle('active');
-      const svg    = btn.querySelector('svg');
-      svg.setAttribute('fill',   active ? '#f87171' : 'none');
-      svg.setAttribute('stroke', active ? '#f87171' : 'currentColor');
-      showToast(active ? 'Saved to wishlist' : 'Removed from wishlist', active ? 'gold' : '');
+    function goTo(index) {
+      const vis      = visible();
+      const maxSlide = Math.max(0, total - vis);
+      current = Math.min(Math.max(0, index), maxSlide);
+      track.style.transform = `translateX(-${(current / total) * 100}%)`;
+      updateDots();
     }
 
-   
-    history.pushState(null, null, window.location.href);
-    window.addEventListener('popstate', () => history.pushState(null, null, window.location.href));
-  </script>
+    function next() {
+      const vis      = visible();
+      const maxSlide = Math.max(0, total - vis);
+      const nextIdx  = current + vis > maxSlide ? 0 : current + vis;
+      goTo(nextIdx);
+    }
+
+    function startAuto() { autoTimer = setInterval(next, 3000); }
+    function stopAuto()  { clearInterval(autoTimer); }
+
+    outer.addEventListener('mouseenter', stopAuto);
+    outer.addEventListener('mouseleave', startAuto);
+
+    // Touch swipe
+    let touchStartX = 0;
+    track.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive:true });
+    track.addEventListener('touchend', e => {
+      const diff = touchStartX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 40) diff > 0 ? next() : goTo(Math.max(0, current - visible()));
+    });
+
+    buildDots();
+    window.addEventListener('resize', () => { buildDots(); goTo(0); });
+    startAuto();
+  })();
+
+  /* ── Back-button guard ── */
+  history.pushState(null, null, window.location.href);
+  window.addEventListener('popstate', () => history.pushState(null, null, window.location.href));
+</script>
 </body>
 </html>

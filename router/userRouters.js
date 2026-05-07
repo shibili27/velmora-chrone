@@ -5,7 +5,7 @@ import passport from '../config/passport.js';
 import { isAuth, isGuest, noCache, hasOtpSession, hasOtpVerified } from '../middlewares/authMiddleware.js';
 import authController from '../controller/usercontroller/authController.js';
 import profileController, { upload } from '../controller/usercontroller/profileController.js';
-import { getProducts, getProductDetail } from '../controller/usercontroller/productController.js';
+import { getHomePage, getProducts, getProductDetail } from '../controller/usercontroller/productController.js';
 import {
   getCart,
   addToCart,
@@ -22,7 +22,6 @@ import {
   checkInWishlist,
   moveToCart,
   getWishlistCount,
-  // ── NEW: two functions used by the product detail page ──
   toggleWishlist,
   getWishlistStatus,
 } from '../controller/usercontroller/wishlistController.js';
@@ -93,8 +92,8 @@ router.post('/reset-password', authController.resetPassword);
 // ─────────────────────────────────────────
 // Home / Products
 // ─────────────────────────────────────────
-router.get('/',     isAuth, (req, res) => res.render('user/home'));
-router.get('/home', isAuth, (req, res) => res.render('user/home'));
+router.get('/',     isAuth, getHomePage);  // ✅ FIXED
+router.get('/home', isAuth, getHomePage);  // ✅ FIXED
 
 router.get('/products',     isAuth, getProducts);
 router.get('/products/:id', isAuth, getProductDetail);
@@ -119,11 +118,8 @@ router.delete('/wishlist/remove-product/:productId', isAuth, removeFromWishlistB
 router.get('/wishlist/check/:productId',             isAuth, checkInWishlist);
 router.post('/wishlist/move-to-cart',                isAuth, moveToCart);
 router.get('/api/wishlist/count',                    isAuth, getWishlistCount);
-
-// ── NEW: used by product detail page heart button ──────────────────
-router.get('/wishlist/status/:productId', isAuth, getWishlistStatus);
-router.post('/wishlist/toggle',           isAuth, toggleWishlist);
-// ──────────────────────────────────────────────────────────────────
+router.get('/wishlist/status/:productId',            isAuth, getWishlistStatus);
+router.post('/wishlist/toggle',                      isAuth, toggleWishlist);
 
 // ─────────────────────────────────────────
 // Profile routes
@@ -132,7 +128,6 @@ router.get('/profile',          isAuth, profileController.getProfile);
 router.post('/profile/update',  isAuth, profileController.updateProfile);
 router.post('/change-password', isAuth, profileController.changePassword);
 
-// ── Image upload (permanent via Cloudinary) ──
 router.post(
   '/profile/upload-image',
   isAuth,
@@ -140,7 +135,6 @@ router.post(
   profileController.uploadProfileImage
 );
 
-// ── Email change with OTP ──
 router.post('/profile/request-email-change', isAuth, profileController.requestEmailChange);
 router.post('/profile/verify-email-change',  isAuth, profileController.verifyEmailChange);
 

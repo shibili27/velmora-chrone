@@ -1,7 +1,37 @@
-
 import Product  from '../../models/product.js';
 import Category from '../../models/category.js';
 
+// ─────────────────────────────────────────
+// Home page — featured products carousel
+// ─────────────────────────────────────────
+export const getHomePage = async (req, res) => {
+  try {
+    const products = await Product.find({
+      isDeleted: false,
+      isListed:  { $ne: false },
+      stock:     { $gt: 0 },
+    })
+      .populate({
+        path:  'category',
+        match: { isDeleted: false, isListed: { $ne: false } },
+      })
+      .populate('brand')
+      .sort({ createdAt: -1 })
+      .limit(12)
+      .lean();
+
+    const featuredProducts = products.filter(p => p.category !== null);
+
+    res.render('user/home', { featuredProducts });
+  } catch (err) {
+    console.error('[getHomePage]', err);
+    res.render('user/home', { featuredProducts: [] });
+  }
+};
+
+// ─────────────────────────────────────────
+// Products listing page
+// ─────────────────────────────────────────
 export const getProducts = async (req, res) => {
   try {
     const search   = req.query.search?.trim()       || '';
@@ -39,15 +69,13 @@ export const getProducts = async (req, res) => {
           path:  'category',
           match: { isDeleted: false, isListed: { $ne: false } },
         })
-        .populate('brand')   
+        .populate('brand')
         .sort(sortOption),
       Category.find({ isDeleted: false, isListed: { $ne: false } }).sort({ name: 1 }),
     ]);
 
-    
     let visibleProducts = allProducts.filter(p => p.category !== null);
 
-    
     const brandNames = [
       ...new Set(
         visibleProducts
@@ -56,7 +84,6 @@ export const getProducts = async (req, res) => {
       ),
     ].sort();
 
-    
     if (brand) {
       visibleProducts = visibleProducts.filter(
         p => p.brand?.name?.toLowerCase() === brand.toLowerCase()
@@ -87,7 +114,6 @@ export const getProducts = async (req, res) => {
     res.status(500).render('user/error', { message: 'Failed to load products.' });
   }
 };
-
 
 export const getProductDetail = async (req, res) => {
   try {
