@@ -1,5 +1,15 @@
-// models/product.js
 import mongoose from 'mongoose';
+
+// ── Each color variant carries its own images + stock ──────────────────────
+const colorVariantSchema = new mongoose.Schema(
+  {
+    name:   { type: String, trim: true, required: true },
+    hex:    { type: String, trim: true, required: true },
+    images: { type: [String], default: [] },
+    stock:  { type: Number,  default: 0, min: 0 },
+  },
+  { _id: true }
+);
 
 const productSchema = new mongoose.Schema(
   {
@@ -27,23 +37,37 @@ const productSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref:  'Category',
     },
+    brand: {
+      type:    mongoose.Schema.Types.ObjectId,
+      ref:     'Brand',
+      default: null,
+    },
     images: {
-      type:     [String],
-      validate: {
-        validator: (arr) => arr.length >= 3,
-        message:   'At least 3 images are required',
-      },
+      type:    [String],
+      default: [],
     },
-    isDeleted: {
-      type:    Boolean,
-      default: false,
+    colorVariants: {
+      type:    [colorVariantSchema],
+      default: [],
     },
-    isListed: {
-      type:    Boolean,
-      default: true,   // true = visible to users
+    colors: {
+      type:    [{ name: String, hex: String }],
+      default: [],
     },
+    isDeleted: { type: Boolean, default: false },
+    isListed:  { type: Boolean, default: true  },
   },
   { timestamps: true }
 );
 
-export default mongoose.model('Product', productSchema);
+// ✅ FIXED: removed `next` parameter — modern Mongoose does not need it
+// for synchronous pre-save hooks. Calling an undefined `next()` was
+// throwing "TypeError: next is not a function" and crashing every save.
+productSchema.pre('save', function () {
+  if (this.colorVariants && this.colorVariants.length > 0) {
+    this.stock = this.colorVariants.reduce((sum, v) => sum + (v.stock || 0), 0);
+  }
+});
+
+// ── Guard against OverwriteModelError on hot reload ────────────────────────
+export default mongoose.models.Product || mongoose.model('Product', productSchema);

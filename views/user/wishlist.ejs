@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Wishlist — Velmora Chroné</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet"/>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { display: ['Cormorant Garamond','serif'], body: ['Jost','sans-serif'] },
+          colors: { cream:'#f5f2eb', vault:'#1a1a18', pine:'#0e1f18', gold:'#c9a96e' },
+        }
+      }
+    };
+  </script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:'Jost',sans-serif;background:#111110;color:#f5f2eb;overflow-x:hidden}
+    ::-webkit-scrollbar{width:2px}
+    ::-webkit-scrollbar-track{background:#111110}
+    ::-webkit-scrollbar-thumb{background:#c9a96e}
+
+    /* NAV */
+    .nav-root{position:fixed;top:0;left:0;right:0;z-index:200;background:#111110;border-bottom:1px solid rgba(245,242,235,0.06);transition:box-shadow .3s}
+    .nav-root.scrolled{box-shadow:0 2px 20px rgba(0,0,0,.3)}
+    .nav-inner{display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem}
+    @media(min-width:768px){.nav-inner{padding:1rem 3rem}}
+    .nav-logo{font-family:'Cormorant Garamond',serif;font-size:.85rem;font-weight:300;letter-spacing:.25em;text-transform:uppercase;color:#f5f2eb;text-decoration:none}
+    .nav-link{font-family:'Jost',sans-serif;font-size:.55rem;font-weight:400;letter-spacing:.2em;text-transform:uppercase;color:rgba(245,242,235,.55);text-decoration:none;transition:color .2s}
+    .nav-link:hover{color:#f5f2eb}
+    .nav-icon{color:rgba(245,242,235,.6);background:none;border:none;cursor:pointer;transition:color .2s;text-decoration:none;display:flex;align-items:center}
+    .nav-icon:hover{color:#c9a96e}
+    .cart-badge{position:absolute;top:-4px;right:-5px;width:13px;height:13px;border-radius:50%;background:#c9a96e;font-size:.4rem;font-weight:600;color:#111110;display:flex;align-items:center;justify-content:center}
+    .hamburger{display:flex;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:3px}
+    .hamburger span{display:block;width:20px;height:1px;background:rgba(245,242,235,.7);transition:transform .3s,opacity .3s}
+    .hamburger.open span:nth-child(1){transform:translateY(6px) rotate(45deg)}
+    .hamburger.open span:nth-child(2){opacity:0}
+    .hamburger.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+    .mobile-menu{display:none;flex-direction:column;background:#0d0d0c;padding:1.5rem 2rem;gap:1rem;border-top:1px solid rgba(245,242,235,.05)}
+    .mobile-menu.open{display:flex}
+    .mobile-menu .nav-link{font-size:.7rem;padding:.4rem 0;border-bottom:1px solid rgba(245,242,235,.04);color:rgba(245,242,235,.5)}
+
+    /* BREADCRUMB */
+    .breadcrumb{padding:5.5rem 3rem 0;max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+    .bc-item{font-family:'Jost',sans-serif;font-size:.5rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(245,242,235,.28);text-decoration:none;transition:color .2s}
+    .bc-item:hover{color:rgba(245,242,235,.6)}
+    .bc-sep{color:rgba(245,242,235,.15);font-size:.5rem}
+    .bc-current{font-family:'Jost',sans-serif;font-size:.5rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(201,169,110,.7)}
+
+    /* PAGE HEAD */
+    .page-head{max-width:1200px;margin:0 auto;padding:1.5rem 3rem 0}
+    .page-title{font-family:'Cormorant Garamond',serif;font-size:clamp(1.8rem,3vw,2.4rem);font-weight:300;color:#f5f2eb}
+    .page-subtitle{font-family:'Jost',sans-serif;font-size:.55rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(245,242,235,.25);margin-top:.3rem}
+
+    /* WISHLIST GRID */
+    .wishlist-wrap{max-width:1200px;margin:0 auto;padding:2rem 2rem 6rem}
+    @media(min-width:768px){.wishlist-wrap{padding:2rem 3rem 6rem}}
+
+    .wishlist-header{display:flex;align-items:center;justify-content:space-between;padding-bottom:.75rem;border-bottom:1px solid rgba(245,242,235,.06);margin-bottom:1.5rem}
+    .wishlist-label{font-family:'Jost',sans-serif;font-size:.5rem;letter-spacing:.25em;text-transform:uppercase;color:rgba(245,242,235,.25)}
+    .clear-all-btn{font-family:'Jost',sans-serif;font-size:.48rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(248,113,113,.5);background:none;border:none;cursor:pointer;transition:color .2s}
+    .clear-all-btn:hover{color:#f87171}
+
+    /* Product grid */
+    .wishlist-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1.5rem}
+    @media(min-width:768px){.wishlist-grid{gap:2rem}}
+
+    /* Card */
+    .wish-card{background:#1a1a18;border:1px solid rgba(245,242,235,.04);position:relative;transition:border-color .3s,transform .3s}
+    .wish-card:hover{border-color:rgba(201,169,110,.15);transform:translateY(-2px)}
+    .wish-card.removing{opacity:0;transform:scale(.96);transition:opacity .3s,transform .3s;pointer-events:none}
+
+    /* Image area */
+    .card-img-wrap{position:relative;width:100%;aspect-ratio:1/1;overflow:hidden;background:#141413}
+    .card-img{width:100%;height:100%;object-fit:cover;transition:transform .5s ease}
+    .wish-card:hover .card-img{transform:scale(1.04)}
+
+    /* Remove button (top-right X) */
+    .card-remove{position:absolute;top:10px;right:10px;width:28px;height:28px;background:rgba(17,17,16,.8);border:1px solid rgba(245,242,235,.08);border-radius:0;display:flex;align-items:center;justify-content:center;cursor:pointer;color:rgba(245,242,235,.4);transition:color .2s,background .2s;z-index:2}
+    .card-remove:hover{color:#f87171;background:rgba(248,113,113,.1);border-color:rgba(248,113,113,.2)}
+
+    /* In-cart badge */
+    .in-cart-badge{position:absolute;top:10px;left:10px;font-family:'Jost',sans-serif;font-size:.38rem;letter-spacing:.15em;text-transform:uppercase;background:rgba(201,169,110,.15);border:1px solid rgba(201,169,110,.3);color:#c9a96e;padding:3px 8px;z-index:2}
+
+    /* OOS overlay */
+    .oos-overlay{position:absolute;inset:0;background:rgba(17,17,16,.65);display:flex;align-items:center;justify-content:center;z-index:1}
+    .oos-overlay span{font-family:'Jost',sans-serif;font-size:.48rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(245,242,235,.5);border:1px solid rgba(245,242,235,.15);padding:4px 12px}
+
+    /* Card body */
+    .card-body{padding:1rem}
+    .card-brand{font-family:'Jost',sans-serif;font-size:.42rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(201,169,110,.6);margin-bottom:.2rem}
+    .card-name{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:300;color:#f5f2eb;line-height:1.25;margin-bottom:.2rem}
+    .card-category{font-family:'Jost',sans-serif;font-size:.42rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(245,242,235,.22);margin-bottom:.75rem}
+    .card-price{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:300;color:#f5f2eb;margin-bottom:.75rem}
+
+    /* Stock badge */
+    .stock-low{font-family:'Jost',sans-serif;font-size:.42rem;letter-spacing:.1em;text-transform:uppercase;color:#fbbf24;border:1px solid rgba(251,191,36,.2);padding:2px 7px;display:inline-block;margin-bottom:.75rem}
+
+    /* CTA buttons */
+    .card-actions{display:flex;flex-direction:column;gap:.5rem}
+    .btn-add-cart{display:block;width:100%;background:#c9a96e;color:#111110;font-family:'Jost',sans-serif;font-size:.5rem;letter-spacing:.22em;text-transform:uppercase;padding:.7rem;border:none;cursor:pointer;transition:background .2s;text-align:center}
+    .btn-add-cart:hover:not(:disabled){background:#d4b97e}
+    .btn-add-cart:disabled{background:rgba(201,169,110,.15);color:rgba(245,242,235,.2);cursor:not-allowed}
+    .btn-view{display:block;width:100%;background:none;color:rgba(245,242,235,.3);font-family:'Jost',sans-serif;font-size:.48rem;letter-spacing:.18em;text-transform:uppercase;padding:.55rem;border:1px solid rgba(245,242,235,.08);cursor:pointer;transition:all .2s;text-align:center;text-decoration:none}
+    .btn-view:hover{border-color:rgba(245,242,235,.2);color:rgba(245,242,235,.6)}
+    .btn-in-cart{display:block;width:100%;background:none;color:rgba(201,169,110,.6);font-family:'Jost',sans-serif;font-size:.5rem;letter-spacing:.22em;text-transform:uppercase;padding:.7rem;border:1px solid rgba(201,169,110,.2);cursor:default;text-align:center}
+
+    /* EMPTY STATE */
+    .empty-wish{text-align:center;padding:5rem 1rem}
+
+    /* TOAST */
+    .toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(8px);background:#1a1a18;border:1px solid rgba(245,242,235,.08);font-family:'Jost',sans-serif;font-size:.58rem;letter-spacing:.08em;color:rgba(245,242,235,.7);padding:.65rem 1.5rem;box-shadow:0 8px 32px rgba(0,0,0,.5);z-index:999;opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;white-space:nowrap}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    .toast.gold{border-color:rgba(201,169,110,.3);color:#c9a96e}
+    .toast.err{border-color:rgba(248,113,113,.3);color:#f87171}
+
+    /* FOOTER */
+    .footer{background:#0a0a09;padding:4rem 2rem 1.5rem;border-top:1px solid rgba(245,242,235,.05)}
+    @media(min-width:768px){.footer{padding:4rem 3rem 1.5rem}}
+    .footer-inner{max-width:1200px;margin:0 auto}
+    .footer-top{display:grid;grid-template-columns:1fr;gap:2.5rem;padding-bottom:2.5rem;border-bottom:1px solid rgba(245,242,235,.05)}
+    @media(min-width:768px){.footer-top{grid-template-columns:1.2fr 1fr 1fr 1.2fr;gap:3rem}}
+    .footer-logo{font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:300;letter-spacing:.2em;text-transform:uppercase;color:#f5f2eb;line-height:1.4;margin-bottom:.75rem}
+    .footer-desc{font-family:'Jost',sans-serif;font-size:.6rem;font-weight:300;color:rgba(245,242,235,.25);line-height:1.85;margin-bottom:1rem}
+    .footer-col-title{font-family:'Jost',sans-serif;font-size:.48rem;letter-spacing:.28em;text-transform:uppercase;color:rgba(245,242,235,.35);margin-bottom:1rem;display:block}
+    .footer-link{display:block;font-family:'Jost',sans-serif;font-size:.55rem;letter-spacing:.1em;color:rgba(245,242,235,.25);text-decoration:none;transition:color .2s;margin-bottom:.5rem}
+    .footer-link:hover{color:rgba(245,242,235,.6)}
+    .footer-bottom{display:flex;flex-direction:column;gap:.75rem;padding-top:1.5rem;align-items:center;text-align:center}
+    @media(min-width:768px){.footer-bottom{flex-direction:row;justify-content:space-between;text-align:left}}
+    .footer-copy{font-family:'Jost',sans-serif;font-size:.48rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(245,242,235,.15)}
+    .footer-legal{display:flex;gap:1.25rem}
+    .footer-legal a{font-family:'Jost',sans-serif;font-size:.48rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(245,242,235,.2);text-decoration:none;transition:color .2s}
+    .footer-legal a:hover{color:rgba(245,242,235,.5)}
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav-root" id="navbar">
+  <div class="nav-inner">
+    <div class="hidden md:flex items-center gap-8">
+      <a href="/products" class="nav-link">Collection</a>
+      <a href="/home"     class="nav-link">Watches</a>
+      <a href="/home"     class="nav-link">About</a>
+      <a href="/home"     class="nav-link">Contact</a>
+    </div>
+    <a href="/home" class="nav-logo md:absolute md:left-1/2 md:-translate-x-1/2">Velmora Chroné</a>
+    <div class="flex items-center gap-4 md:gap-5 ml-auto md:ml-0">
+      <a href="/profile" class="nav-icon" aria-label="Profile">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </a>
+      <!-- Wishlist icon (active on this page) -->
+      <a href="/wishlist" class="nav-icon" aria-label="Wishlist" style="color:#c9a96e">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      </a>
+      <a href="/cart" class="nav-icon relative" aria-label="Cart">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <span class="cart-badge" id="cartBadge">0</span>
+      </a>
+      <a href="/logout" class="nav-link hidden md:inline">Logout</a>
+      <button class="hamburger md:hidden" id="hamburger"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="/products"  class="nav-link">Collection</a>
+    <a href="/home"      class="nav-link">Watches</a>
+    <a href="/profile"   class="nav-link">My Profile</a>
+    <a href="/wishlist"  class="nav-link">Wishlist</a>
+    <a href="/cart"      class="nav-link">Cart</a>
+    <a href="/logout"    class="nav-link" style="color:rgba(201,169,110,.6)">Logout</a>
+  </div>
+</nav>
+
+<!-- BREADCRUMB -->
+<div class="breadcrumb">
+  <a href="/home"     class="bc-item">Home</a>
+  <span class="bc-sep">·</span>
+  <a href="/products" class="bc-item">Collection</a>
+  <span class="bc-sep">·</span>
+  <span class="bc-current">Wishlist</span>
+</div>
+
+<!-- PAGE HEAD -->
+<div class="page-head">
+  <h1 class="page-title">Wishlist</h1>
+  <p class="page-subtitle" id="pageSubtitle"><%= wishlistItems.length %> item<%= wishlistItems.length !== 1 ? 's' : '' %></p>
+</div>
+
+<!-- WISHLIST CONTENT -->
+<div class="wishlist-wrap">
+  <% if (wishlistItems.length > 0) { %>
+
+  <div class="wishlist-header">
+    <span class="wishlist-label">Saved Timepieces</span>
+    <button class="clear-all-btn" onclick="clearWishlist()">Remove All</button>
+  </div>
+
+  <div class="wishlist-grid" id="wishlistGrid">
+    <% wishlistItems.forEach(item => {
+      const p        = item.product;
+      const isOOS    = p.stock === 0;
+      const isLow    = p.stock > 0 && p.stock <= 5;
+      const inCart   = cartProductIds.includes(p._id.toString());
+      const mainImg  = p.images?.[0] || (p.colorVariants?.[0]?.images?.[0]) || null;
+    %>
+    <div class="wish-card" id="wishCard-<%= item._id %>">
+
+      <!-- Image -->
+      <div class="card-img-wrap">
+        <% if (inCart) { %>
+          <div class="in-cart-badge">In Cart</div>
+        <% } %>
+
+        <% if (isOOS) { %>
+          <div class="oos-overlay"><span>Out of Stock</span></div>
+        <% } %>
+
+        <button class="card-remove" onclick="removeItem('<%= item._id %>')" title="Remove from wishlist">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+
+        <% if (mainImg) { %>
+          <a href="/products/<%= p._id %>">
+            <img class="card-img" src="<%= mainImg %>" alt="<%= p.name %>"
+              onerror="this.parentElement.style.background='#222220'"/>
+          </a>
+        <% } else { %>
+          <a href="/products/<%= p._id %>" style="display:flex;align-items:center;justify-content:center;width:100%;height:100%">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="rgba(245,242,235,0.06)" stroke-width="0.5"><circle cx="12" cy="12" r="10"/></svg>
+          </a>
+        <% } %>
+      </div>
+
+      <!-- Body -->
+      <div class="card-body">
+        <% if (p.brand?.name) { %><div class="card-brand"><%= p.brand.name %></div><% } %>
+        <a href="/products/<%= p._id %>" style="text-decoration:none">
+          <div class="card-name"><%= p.name %></div>
+        </a>
+        <div class="card-category"><%= p.category?.name || '' %></div>
+        <div class="card-price">₹<%= p.price.toLocaleString('en-IN') %></div>
+
+        <% if (isLow) { %>
+          <div class="stock-low">Only <%= p.stock %> left</div>
+        <% } %>
+
+        <div class="card-actions">
+          <% if (inCart) { %>
+            <div class="btn-in-cart">Already in Cart</div>
+          <% } else { %>
+            <button class="btn-add-cart"
+              <%= isOOS ? 'disabled' : '' %>
+              onclick="moveToCart('<%= item._id %>')">
+              <%= isOOS ? 'Out of Stock' : 'Add to Cart' %>
+            </button>
+          <% } %>
+          <a href="/products/<%= p._id %>" class="btn-view">View Details</a>
+        </div>
+      </div>
+
+    </div>
+    <% }) %>
+  </div>
+
+  <% } else { %>
+  <!-- EMPTY STATE -->
+  <div class="empty-wish">
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="rgba(245,242,235,0.08)" stroke-width="0.6" style="margin:0 auto 1.5rem;display:block">
+      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+    </svg>
+    <p style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:300;color:rgba(245,242,235,.2);margin-bottom:.5rem">Your wishlist is empty</p>
+    <p style="font-family:'Jost',sans-serif;font-size:.58rem;color:rgba(245,242,235,.15);margin-bottom:2rem;letter-spacing:.1em">Save timepieces you love and revisit them anytime</p>
+    <a href="/products" style="font-family:'Jost',sans-serif;font-size:.55rem;letter-spacing:.22em;text-transform:uppercase;color:#c9a96e;text-decoration:none;border:1px solid rgba(201,169,110,.2);padding:.7rem 2rem;transition:all .2s">Explore Collection</a>
+  </div>
+  <% } %>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div>
+        <div class="footer-logo">Velmora<br/>Chroné</div>
+        <p class="footer-desc">Velmora Chroné represents the pinnacle of luxury horology. Each timepiece is a testament to centuries of watchmaking tradition.</p>
+      </div>
+      <div>
+        <span class="footer-col-title">Customer Service</span>
+        <a href="#" class="footer-link">Shipping & Returns</a>
+        <a href="#" class="footer-link">Watch Care Guide</a>
+        <a href="#" class="footer-link">Warranty Registration</a>
+        <a href="#" class="footer-link">Track Order</a>
+      </div>
+      <div>
+        <span class="footer-col-title">About Us</span>
+        <a href="#" class="footer-link">Our Story</a>
+        <a href="#" class="footer-link">Craftsmanship</a>
+        <a href="#" class="footer-link">Sustainability</a>
+        <a href="#" class="footer-link">Retail Partners</a>
+      </div>
+      <div>
+        <span class="footer-col-title">Newsletter</span>
+        <p style="font-family:'Jost',sans-serif;font-size:.58rem;font-weight:300;color:rgba(245,242,235,.25);line-height:1.7;margin-bottom:.75rem">Join our inner circle for exclusive previews.</p>
+        <div style="display:flex;align-items:center;border-bottom:1px solid rgba(245,242,235,.12);padding-bottom:.3rem">
+          <input style="flex:1;background:transparent;border:none;outline:none;font-family:'Jost',sans-serif;font-size:.62rem;color:#f5f2eb;font-weight:300;min-width:0" type="email" placeholder="Your address"/>
+          <button style="background:none;border:none;cursor:pointer;color:rgba(245,242,235,.4);padding:0 .2rem;flex-shrink:0">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span class="footer-copy">&copy; <%= new Date().getFullYear() %> Velmora Chroné. All rights reserved.</span>
+      <div class="footer-legal">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Cookie Policy</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  /* NAV */
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', scrollY > 20), { passive: true });
+  document.getElementById('hamburger').addEventListener('click', function () {
+    this.classList.toggle('open');
+    document.getElementById('mobileMenu').classList.toggle('open');
+  });
+
+  /* TOAST */
+  let toastTimer;
+  function showToast(msg, type = '') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast show' + (type ? ' ' + type : '');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  /* UPDATE subtitle count */
+  function updateSubtitle(count) {
+    const el = document.getElementById('pageSubtitle');
+    if (el) el.textContent = `${count} item${count !== 1 ? 's' : ''}`;
+  }
+
+  /* UPDATE cart badge */
+  function updateCartBadge(count) {
+    const el = document.getElementById('cartBadge');
+    if (el) el.textContent = count;
+  }
+
+  /* REMOVE from wishlist */
+  async function removeItem(itemId) {
+    const card = document.getElementById(`wishCard-${itemId}`);
+    if (card) card.classList.add('removing');
+
+    try {
+      const res  = await fetch(`/wishlist/remove/${itemId}`, { method: 'DELETE' });
+      const data = await res.json();
+
+      if (!res.ok) {
+        if (card) card.classList.remove('removing');
+        showToast(data.message || 'Failed to remove item', 'err');
+        return;
+      }
+
+      setTimeout(() => {
+        if (card) card.remove();
+        const remaining = document.querySelectorAll('.wish-card').length;
+        updateSubtitle(remaining);
+        if (remaining === 0) window.location.reload();
+      }, 300);
+
+      showToast('Removed from wishlist');
+    } catch (_) {
+      if (card) card.classList.remove('removing');
+      showToast('Something went wrong', 'err');
+    }
+  }
+
+  /* MOVE to cart (add to cart + remove from wishlist) */
+  async function moveToCart(itemId) {
+    try {
+      const res  = await fetch('/wishlist/move-to-cart', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ itemId }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        showToast(data.message || 'Could not add to cart', 'err');
+        return;
+      }
+
+      // Animate card out
+      const card = document.getElementById(`wishCard-${itemId}`);
+      if (card) {
+        card.classList.add('removing');
+        setTimeout(() => {
+          card.remove();
+          const remaining = document.querySelectorAll('.wish-card').length;
+          updateSubtitle(remaining);
+          if (remaining === 0) window.location.reload();
+        }, 300);
+      }
+
+      if (data.cartCount !== undefined) updateCartBadge(data.cartCount);
+      showToast('Added to cart', 'gold');
+    } catch (_) {
+      showToast('Something went wrong', 'err');
+    }
+  }
+
+  /* CLEAR entire wishlist */
+  async function clearWishlist() {
+    if (!confirm('Remove all items from your wishlist?')) return;
+    const items = document.querySelectorAll('.wish-card');
+    // Remove one by one using individual delete calls
+    const promises = [...items].map(card => {
+      const itemId = card.id.replace('wishCard-', '');
+      return fetch(`/wishlist/remove/${itemId}`, { method: 'DELETE' });
+    });
+    try {
+      await Promise.all(promises);
+      items.forEach(card => card.classList.add('removing'));
+      setTimeout(() => window.location.reload(), 350);
+      showToast('Wishlist cleared');
+    } catch (_) {
+      showToast('Something went wrong', 'err');
+    }
+  }
+
+  /* Fetch and set cart badge on load */
+  fetch('/cart/count')
+    .then(r => r.json())
+    .then(d => updateCartBadge(d.count || 0))
+    .catch(() => {});
+</script>
+</body>
+</html>

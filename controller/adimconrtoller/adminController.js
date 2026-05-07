@@ -1,7 +1,7 @@
-// controller/adimconrtoller/adminController.js
 import User     from '../../models/user.js';
 import Category from '../../models/category.js';
 import Product  from '../../models/product.js';
+import Brand    from '../../models/brand.js';
 import cloudinary from '../../config/cloudinary.js';
 
 /* ═══════════════════════════════════════════════════
@@ -53,14 +53,12 @@ export const getDashboard = async (req, res) => {
 /* ═══════════════════════════════════════════════════
    CATEGORIES
 ═══════════════════════════════════════════════════ */
-
-// GET /admin/categories
 export const getCategories = async (req, res) => {
   try {
-    const search  = req.query.search?.trim() || '';
-    const page    = Math.max(1, parseInt(req.query.page) || 1);
-    const limit   = 8;
-    const skip    = (page - 1) * limit;
+    const search = req.query.search?.trim() || '';
+    const page   = Math.max(1, parseInt(req.query.page) || 1);
+    const limit  = 8;
+    const skip   = (page - 1) * limit;
 
     const query = { isDeleted: false };
     if (search) query.name = { $regex: search, $options: 'i' };
@@ -78,6 +76,8 @@ export const getCategories = async (req, res) => {
       page,
       totalPages: Math.ceil(total / limit),
       total,
+      error:   req.flash('error')[0]   || null,
+      success: req.flash('success')[0] || null,
     });
   } catch (err) {
     console.error('Get categories error:', err);
@@ -86,7 +86,6 @@ export const getCategories = async (req, res) => {
   }
 };
 
-// POST /admin/categories/add
 export const addCategory = async (req, res) => {
   try {
     const { name, description } = req.body;
@@ -108,7 +107,6 @@ export const addCategory = async (req, res) => {
   }
 };
 
-// POST /admin/categories/:id/edit
 export const editCategory = async (req, res) => {
   try {
     const { name, description } = req.body;
@@ -134,7 +132,6 @@ export const editCategory = async (req, res) => {
   }
 };
 
-// POST /admin/categories/:id/delete
 export const deleteCategory = async (req, res) => {
   try {
     await Category.findByIdAndUpdate(req.params.id, { isDeleted: true });
@@ -150,22 +147,26 @@ export const deleteCategory = async (req, res) => {
 /* ═══════════════════════════════════════════════════
    PRODUCTS
 ═══════════════════════════════════════════════════ */
-
-// GET /admin/products
 export const getProducts = async (req, res) => {
   try {
-    const search  = req.query.search?.trim() || '';
-    const page    = Math.max(1, parseInt(req.query.page) || 1);
-    const limit   = 8;
-    const skip    = (page - 1) * limit;
+    const search = req.query.search?.trim() || '';
+    const page   = Math.max(1, parseInt(req.query.page) || 1);
+    const limit  = 8;
+    const skip   = (page - 1) * limit;
 
     const query = { isDeleted: false };
     if (search) query.name = { $regex: search, $options: 'i' };
 
-    const [products, total, categories] = await Promise.all([
-      Product.find(query).populate('category').sort({ createdAt: -1 }).skip(skip).limit(limit),
+    const [products, total, categories, brands] = await Promise.all([
+      Product.find(query)
+        .populate('category')
+        .populate('brand')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
       Product.countDocuments(query),
       Category.find({ isDeleted: false }).sort({ name: 1 }),
+      Brand.find({ isDeleted: false }).sort({ name: 1 }),
     ]);
 
     res.render('admin/products', {
@@ -173,10 +174,13 @@ export const getProducts = async (req, res) => {
       adminName:  req.session.adminName,
       products,
       categories,
+      brands,
       search,
       page,
       totalPages: Math.ceil(total / limit),
       total,
+      error:   req.flash('error')[0]   || null,
+      success: req.flash('success')[0] || null,
     });
   } catch (err) {
     console.error('Get products error:', err);
@@ -185,88 +189,201 @@ export const getProducts = async (req, res) => {
   }
 };
 
-// POST /admin/products/add
+/* ── Helper: upload a single base64 string to Cloudinary ─────────────────── */
+async function uploadBase64(base64String, folder = 'velmora/products') {
+  const result = await cloudinary.uploader.upload(base64String, {
+    folder,
+    transformation: [{ width: 800, height: 800, crop: 'fill' }],
+  });
+  return result.secure_url;
+}
+
+/* ── Helper: parse & upload colorVariants ────────────────────────────────────
+   Handles BOTH payload formats:
+
+   NEW format (products.ejs fix):
+     { name, hex, stock, images: ["data:image/...", "https://..."] }
+
+   OLD format (original frontend):
+     { name, hex, stock, existingImages: ["https://..."], newImages: ["data:..."] }
+
+   For each image string:
+     - starts with "data:image/" → upload to Cloudinary, use returned URL
+     - starts with "http"        → already a Cloudinary URL, keep as-is
+─────────────────────────────────────────────────────────────────────────── */
+async function parseAndUploadVariants(raw) {
+  if (!raw) return [];
+
+  let variants;
+  try {
+    variants = JSON.parse(raw);
+  } catch (e) {
+    console.error('Failed to parse colorVariants JSON:', e.message);
+    return [];
+  }
+
+  if (!Array.isArray(variants) || variants.length === 0) return [];
+
+  const result = [];
+
+  for (const v of variants) {
+    if (!v.name || !v.hex) {
+      console.warn('Skipping variant — missing name or hex:', v);
+      continue;
+    }
+
+    // ── Collect raw image strings from whichever format was sent ──────────
+    let rawImages = [];
+
+    if (Array.isArray(v.images) && v.images.length > 0) {
+      // NEW format: single mixed array
+      rawImages = v.images;
+    } else {
+      // OLD format: two separate arrays
+      rawImages = [
+        ...(Array.isArray(v.existingImages) ? v.existingImages : []),
+        ...(Array.isArray(v.newImages)      ? v.newImages      : []),
+      ];
+    }
+
+    // ── Process each image ────────────────────────────────────────────────
+    const finalImages = [];
+
+    for (const img of rawImages) {
+      if (!img || typeof img !== 'string') continue;
+
+      if (img.startsWith('data:image/')) {
+        // New image — upload to Cloudinary
+        try {
+          const url = await uploadBase64(img);
+          finalImages.push(url);
+        } catch (uploadErr) {
+          console.error(`Cloudinary upload failed for variant "${v.name}":`, uploadErr.message);
+          // Skip this image but continue processing others
+        }
+      } else if (img.startsWith('http://') || img.startsWith('https://')) {
+        // Existing URL — keep as-is
+        finalImages.push(img);
+      }
+      // Ignore anything else
+    }
+
+    // ── Require at least 3 images per variant ────────────────────────────
+    if (finalImages.length < 3) {
+      console.warn(`Variant "${v.name}" only has ${finalImages.length} valid image(s) — need at least 3. Skipping.`);
+      continue;
+    }
+
+    result.push({
+      name:   v.name.trim(),
+      hex:    v.hex.trim(),
+      stock:  Math.max(0, parseInt(v.stock) || 0),
+      images: finalImages,
+    });
+  }
+
+  return result;
+}
+
+/* ── addProduct ─────────────────────────────────────────────────────────── */
 export const addProduct = async (req, res) => {
   try {
-    const { name, description, price, stock, images } = req.body;
-    const category = req.body.category || null; // ✅ empty string becomes null
+    const { name, description, price, colorVariants: rawVariants } = req.body;
+    const category = req.body.category || null;
+    const brand    = req.body.brand    || null;
 
-    if (!category) {
-      req.flash('error', 'Please select a category.');
+    // ── Basic validation ──────────────────────────────────────────────────
+    if (!name || !price || !category) {
+      req.flash('error', 'Name, price, and category are required.');
       return res.redirect('/admin/products');
     }
 
-    let imageUrls = [];
-    if (images) {
-      const parsed = JSON.parse(images);
-      for (const b64 of parsed) {
-        const result = await cloudinary.uploader.upload(b64, {
-          folder: 'velmora/products',
-          transformation: [{ width: 800, height: 800, crop: 'fill' }],
-        });
-        imageUrls.push(result.secure_url);
-      }
-    }
+    // ── Parse + upload variants ───────────────────────────────────────────
+    const colorVariants = await parseAndUploadVariants(rawVariants);
 
-    if (imageUrls.length < 3) {
-      req.flash('error', 'Please upload at least 3 product images.');
+    if (colorVariants.length === 0) {
+      req.flash('error', 'Please add at least one colour variant with 3 or more images.');
       return res.redirect('/admin/products');
     }
 
-    await Product.create({ name, description, price, stock, category, images: imageUrls });
+    const totalStock = colorVariants.reduce((s, v) => s + v.stock, 0);
+    const colors     = colorVariants.map(v => ({ name: v.name, hex: v.hex }));
+
+    await Product.create({
+      name:         name.trim(),
+      description:  description?.trim() || '',
+      price:        parseFloat(price),
+      stock:        totalStock,
+      category,
+      brand:        brand || null,
+      images:       colorVariants[0].images,   // first variant's images as top-level
+      colorVariants,
+      colors,
+    });
+
     req.flash('success', 'Product added successfully.');
     res.redirect('/admin/products');
+
   } catch (err) {
     console.error('Add product error:', err);
-    req.flash('error', 'Failed to add product.');
+    req.flash('error', `Failed to add product: ${err.message}`);
     res.redirect('/admin/products');
   }
 };
 
-// POST /admin/products/:id/edit
+/* ── editProduct ────────────────────────────────────────────────────────── */
 export const editProduct = async (req, res) => {
   try {
-    const { name, description, price, stock, images, existingImages } = req.body;
-    const category = req.body.category || null; // ✅ empty string becomes null
+    const { name, description, price, colorVariants: rawVariants } = req.body;
+    const category = req.body.category || null;
+    const brand    = req.body.brand    || null;
 
-    if (!category) {
-      req.flash('error', 'Please select a category.');
+    // ── Basic validation ──────────────────────────────────────────────────
+    if (!name || !price || !category) {
+      req.flash('error', 'Name, price, and category are required.');
       return res.redirect('/admin/products');
     }
 
-    let imageUrls = existingImages ? JSON.parse(existingImages) : [];
+    // ── Parse + upload variants ───────────────────────────────────────────
+    // Existing https:// URLs are passed through unchanged.
+    // New base64 images are uploaded to Cloudinary.
+    const colorVariants = await parseAndUploadVariants(rawVariants);
 
-    if (images) {
-      const parsed = JSON.parse(images);
-      for (const b64 of parsed) {
-        if (b64.startsWith('data:')) {
-          const result = await cloudinary.uploader.upload(b64, {
-            folder: 'velmora/products',
-            transformation: [{ width: 800, height: 800, crop: 'fill' }],
-          });
-          imageUrls.push(result.secure_url);
-        }
-      }
-    }
-
-    if (imageUrls.length < 3) {
-      req.flash('error', 'Product must have at least 3 images.');
+    if (colorVariants.length === 0) {
+      req.flash('error', 'Please add at least one colour variant with 3 or more images.');
       return res.redirect('/admin/products');
     }
 
-    await Product.findByIdAndUpdate(req.params.id, {
-      name, description, price, stock, category, images: imageUrls,
-    });
+    const totalStock = colorVariants.reduce((s, v) => s + v.stock, 0);
+    const colors     = colorVariants.map(v => ({ name: v.name, hex: v.hex }));
+
+    await Product.findByIdAndUpdate(
+      req.params.id,
+      {
+        name:         name.trim(),
+        description:  description?.trim() || '',
+        price:        parseFloat(price),
+        stock:        totalStock,
+        category,
+        brand:        brand || null,
+        images:       colorVariants[0].images,
+        colorVariants,
+        colors,
+      },
+      { new: true, runValidators: true }
+    );
+
     req.flash('success', 'Product updated successfully.');
     res.redirect('/admin/products');
+
   } catch (err) {
     console.error('Edit product error:', err);
-    req.flash('error', 'Failed to update product.');
+    req.flash('error', `Failed to update product: ${err.message}`);
     res.redirect('/admin/products');
   }
 };
 
-// POST /admin/products/:id/delete
+/* ── deleteProduct ──────────────────────────────────────────────────────── */
 export const deleteProduct = async (req, res) => {
   try {
     await Product.findByIdAndUpdate(req.params.id, { isDeleted: true });
@@ -276,5 +393,99 @@ export const deleteProduct = async (req, res) => {
     console.error('Delete product error:', err);
     req.flash('error', 'Failed to delete product.');
     res.redirect('/admin/products');
+  }
+};
+
+/* ═══════════════════════════════════════════════════
+   BRANDS
+═══════════════════════════════════════════════════ */
+export const getBrands = async (req, res) => {
+  try {
+    const search = req.query.search?.trim() || '';
+    const page   = Math.max(1, parseInt(req.query.page) || 1);
+    const limit  = 8;
+    const skip   = (page - 1) * limit;
+
+    const query = { isDeleted: false };
+    if (search) query.name = { $regex: search, $options: 'i' };
+
+    const [brands, total] = await Promise.all([
+      Brand.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit),
+      Brand.countDocuments(query),
+    ]);
+
+    res.render('admin/brands', {
+      title:      'Brands — Velmora Chroné',
+      adminName:  req.session.adminName,
+      brands,
+      search,
+      page,
+      totalPages: Math.ceil(total / limit),
+      total,
+      error:   req.flash('error')[0]   || null,
+      success: req.flash('success')[0] || null,
+    });
+  } catch (err) {
+    console.error('Get brands error:', err);
+    req.flash('error', 'Failed to load brands.');
+    res.redirect('/admin/dashboard');
+  }
+};
+
+export const addBrand = async (req, res) => {
+  try {
+    const { name, description } = req.body;
+    const exists = await Brand.findOne({
+      name:      { $regex: `^${name.trim()}$`, $options: 'i' },
+      isDeleted: false,
+    });
+    if (exists) {
+      req.flash('error', 'Brand with this name already exists.');
+      return res.redirect('/admin/brands');
+    }
+    await Brand.create({ name: name.trim(), description: description?.trim() });
+    req.flash('success', 'Brand added successfully.');
+    res.redirect('/admin/brands');
+  } catch (err) {
+    console.error('Add brand error:', err);
+    req.flash('error', 'Failed to add brand.');
+    res.redirect('/admin/brands');
+  }
+};
+
+export const editBrand = async (req, res) => {
+  try {
+    const { name, description } = req.body;
+    const duplicate = await Brand.findOne({
+      name:      { $regex: `^${name.trim()}$`, $options: 'i' },
+      isDeleted: false,
+      _id:       { $ne: req.params.id },
+    });
+    if (duplicate) {
+      req.flash('error', 'Another brand with this name already exists.');
+      return res.redirect('/admin/brands');
+    }
+    await Brand.findByIdAndUpdate(req.params.id, {
+      name:        name.trim(),
+      description: description?.trim(),
+    });
+    req.flash('success', 'Brand updated successfully.');
+    res.redirect('/admin/brands');
+  } catch (err) {
+    console.error('Edit brand error:', err);
+    req.flash('error', 'Failed to update brand.');
+    res.redirect('/admin/brands');
+  }
+};
+
+export const deleteBrand = async (req, res) => {
+  try {
+    await Brand.findByIdAndUpdate(req.params.id, { isDeleted: true });
+    req.flash('success', 'Brand deleted.');
+    res.redirect('/admin/brands');
+  } catch (err) {
+    console.error('Delete brand error:', err);
+    req.flash('error', 'Failed to delete brand.');
+    res.redirect('/admin/brands');
   }
 };

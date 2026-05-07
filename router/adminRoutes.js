@@ -1,4 +1,3 @@
-// router/adminRoutes.js
 import express from 'express';
 import Admin    from '../models/admin.js';
 import User     from '../models/user.js';
@@ -9,6 +8,7 @@ import {
   getDashboard,
   getCategories, addCategory, editCategory, deleteCategory,
   getProducts,   addProduct,  editProduct,  deleteProduct,
+  getBrands,     addBrand,    editBrand,    deleteBrand,
 } from '../controller/adimconrtoller/adminController.js';
 
 const router = express.Router();
@@ -77,17 +77,38 @@ router.get('/logout', isAuthenticated, (req, res) => {
 // ── Dashboard ─────────────────────────────────────────────────────────────────
 router.get('/dashboard', isAuthenticated, getDashboard);
 
-
-
 // ── Customers ─────────────────────────────────────────────────────────────────
 router.get('/customers', isAuthenticated, async (req, res) => {
   try {
-    const customers = await User.find().sort({ createdAt: -1 });
-    res.render('admin/customers', {
+    const page   = parseInt(req.query.page) || 1;
+    const limit  = 8;
+    const search = req.query.search || '';
+
+    let query = {};
+    if (search) {
+      query = {
+        $or: [
+          { name:  { $regex: search, $options: 'i' } },
+          { email: { $regex: search, $options: 'i' } },
+        ],
+      };
+    }
+
+    const total     = await User.countDocuments(query);
+    const customers = await User.find(query)
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    res.render('admin/dashboard', {
       title:     'Customers — Velmora Chroné Admin',
       adminName: req.session.adminName,
       adminRole: req.session.adminRole,
       customers,
+      total,
+      page,
+      pages: Math.ceil(total / limit),
+      search,
     });
   } catch (err) {
     console.error('Customers error:', err);
@@ -96,13 +117,13 @@ router.get('/customers', isAuthenticated, async (req, res) => {
   }
 });
 
-router.post('/customers/:id/block', isAuthenticated, async (req, res) => {
+router.post('/dashboard/:id/block', isAuthenticated, async (req, res) => {
   await User.findByIdAndUpdate(req.params.id, { isBlocked: true });
   req.flash('success', 'Customer blocked.');
   res.redirect('/admin/customers');
 });
 
-router.post('/customers/:id/unblock', isAuthenticated, async (req, res) => {
+router.post('/dashboard/:id/unblock', isAuthenticated, async (req, res) => {
   await User.findByIdAndUpdate(req.params.id, { isBlocked: false });
   req.flash('success', 'Customer unblocked.');
   res.redirect('/admin/customers');
@@ -119,5 +140,11 @@ router.get('/products',             isAuthenticated, getProducts);
 router.post('/products/add',        isAuthenticated, addProduct);
 router.post('/products/:id/edit',   isAuthenticated, editProduct);
 router.post('/products/:id/delete', isAuthenticated, deleteProduct);
+
+// ── Brands ────────────────────────────────────────────────────────────────────
+router.get('/brands',             isAuthenticated, getBrands);
+router.post('/brands/add',        isAuthenticated, addBrand);
+router.post('/brands/:id/edit',   isAuthenticated, editBrand);
+router.post('/brands/:id/delete', isAuthenticated, deleteBrand);
 
 export default router;

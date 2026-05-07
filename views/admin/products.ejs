@@ -76,7 +76,12 @@
     .thumb { width: 38px; height: 38px; border-radius: 4px; object-fit: cover; border: 1px solid var(--border); }
 
     .badge { display: inline-flex; align-items: center; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
-    .badge--cat { background: var(--teal-light); color: var(--teal-dark); }
+    .badge--cat   { background: var(--teal-light); color: var(--teal-dark); }
+    .badge--brand { background: #f0ebfe; color: #5b21b6; }
+
+    .color-dots { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; }
+    .color-dot { width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid rgba(0,0,0,0.12); flex-shrink: 0; position: relative; cursor: default; }
+    .color-dot[title]:hover::after { content: attr(title); position: absolute; bottom: 22px; left: 50%; transform: translateX(-50%); background: #1a1f1e; color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 3px; white-space: nowrap; pointer-events: none; z-index: 10; }
 
     .actions { display: flex; gap: 6px; }
     .btn-action { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; padding: 5px 10px; border-radius: 3px; border: 1px solid transparent; cursor: pointer; background: none; font-family: 'Jost', sans-serif; transition: opacity 0.15s; }
@@ -94,9 +99,10 @@
     .empty-state { padding: 48px 24px; text-align: center; color: var(--text-light); font-size: 13px; }
     .footer { text-align: center; padding: 20px; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); border-top: 1px solid var(--border); }
 
+    /* ══ MODAL BASE ══ */
     .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: flex-start; justify-content: center; overflow-y: auto; padding: 40px 16px; }
     .modal-overlay.open { display: flex; }
-    .modal { background: var(--white); border-radius: 8px; width: 100%; max-width: 620px; padding: 32px; margin: auto; }
+    .modal { background: var(--white); border-radius: 8px; width: 100%; max-width: 780px; padding: 32px; margin: auto; }
     .modal__title { font-size: 16px; font-weight: 600; margin-bottom: 24px; color: var(--text); }
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
     .form-group { margin-bottom: 16px; }
@@ -107,22 +113,55 @@
     textarea.form-input { height: 80px; padding: 10px 14px; resize: vertical; }
     .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
 
-    .upload-section { margin-bottom: 16px; }
-    .upload-label { display: block; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text); margin-bottom: 8px; }
-    .upload-hint { font-size: 11px; color: var(--text-light); margin-bottom: 10px; }
-    .upload-zone { border: 2px dashed var(--border); border-radius: 6px; padding: 24px; text-align: center; cursor: pointer; transition: border-color 0.2s; background: #fafcfb; }
-    .upload-zone:hover { border-color: var(--teal); }
-    .upload-zone p { font-size: 13px; color: var(--text-mid); margin-top: 8px; }
-    .upload-zone svg { width: 28px; height: 28px; color: var(--text-light); }
-    #fileInput, #editFileInput { display: none; }
+    /* ══ SECTION DIVIDER ══ */
+    .section-divider { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-mid); padding: 10px 0 8px; border-bottom: 1px solid var(--border); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .section-divider svg { width: 13px; height: 13px; color: var(--teal); }
 
-    .preview-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 12px; }
-    .preview-item { position: relative; aspect-ratio: 1; }
-    .preview-item img { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; border: 1px solid var(--border); }
-    .preview-item .remove-img { position: absolute; top: -6px; right: -6px; width: 18px; height: 18px; border-radius: 50%; background: var(--red); color: #fff; border: none; cursor: pointer; font-size: 11px; display: flex; align-items: center; justify-content: center; }
-    .img-count { font-size: 11px; color: var(--text-mid); margin-top: 6px; }
-    .img-count.warn { color: var(--red); }
+    /* ══ COLOR VARIANT BUILDER ══ */
+    .variant-builder { border: 1px solid var(--border); border-radius: 6px; background: #fafcfb; padding: 0; margin-bottom: 16px; overflow: hidden; }
+    .variant-builder-header { padding: 12px 16px; background: var(--teal-light); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .variant-builder-header span { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--teal-dark); }
+    .variant-add-row { padding: 14px 16px; display: flex; align-items: flex-end; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid var(--border); background: #fff; }
+    .variant-add-row .form-group { margin-bottom: 0; flex: 1; min-width: 120px; }
+    .variant-add-row .form-label { margin-bottom: 5px; }
+    .color-native-btn { width: 40px; height: 40px; border: 1px solid var(--border); border-radius: 4px; padding: 2px; cursor: pointer; background: none; flex-shrink: 0; }
+    .variant-btn-add { height: 40px; padding: 0 16px; border-radius: 4px; background: var(--teal); color: #fff; border: none; font-family: 'Jost', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+    .variant-btn-add:hover { background: var(--teal-dark); }
 
+    /* Tabs for each variant */
+    .variant-tabs { display: flex; border-bottom: 1px solid var(--border); overflow-x: auto; background: #fff; }
+    .variant-tab { padding: 9px 14px; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; cursor: pointer; border-right: 1px solid var(--border); display: flex; align-items: center; gap: 6px; white-space: nowrap; color: var(--text-mid); background: none; border-top: none; border-left: none; border-bottom: 3px solid transparent; transition: background 0.15s, color 0.15s; font-family: 'Jost', sans-serif; }
+    .variant-tab:hover { background: var(--teal-light); color: var(--teal); }
+    .variant-tab.active { background: var(--teal-light); color: var(--teal); border-bottom-color: var(--teal); }
+    .variant-tab-swatch { width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid rgba(0,0,0,0.15); flex-shrink: 0; }
+    .variant-tab-close { width: 14px; height: 14px; border-radius: 50%; background: rgba(220,38,38,0.08); border: 1px solid #fecaca; color: var(--red); font-size: 9px; cursor: pointer; display: flex; align-items: center; justify-content: center; margin-left: 2px; flex-shrink: 0; }
+    .variant-tab-close:hover { background: var(--red); color: #fff; border-color: var(--red); }
+
+    .variant-panel { display: none; padding: 16px; background: #fafcfb; }
+    .variant-panel.active { display: block; }
+
+    /* Per-variant image upload */
+    .variant-upload-zone { border: 2px dashed var(--border); border-radius: 6px; padding: 18px; text-align: center; cursor: pointer; transition: border-color 0.2s; background: #fff; }
+    .variant-upload-zone:hover { border-color: var(--teal); }
+    .variant-upload-zone p { font-size: 12px; color: var(--text-mid); margin-top: 6px; }
+    .variant-upload-zone svg { width: 22px; height: 22px; color: var(--text-light); }
+    .variant-preview-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 10px; }
+    .variant-preview-item { position: relative; aspect-ratio: 1; }
+    .variant-preview-item img { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; border: 1px solid var(--border); }
+    .variant-preview-item .remove-vimg { position: absolute; top: -5px; right: -5px; width: 16px; height: 16px; border-radius: 50%; background: var(--red); color: #fff; border: none; cursor: pointer; font-size: 9px; display: flex; align-items: center; justify-content: center; }
+    .variant-img-count { font-size: 11px; color: var(--text-mid); margin-top: 5px; }
+    .variant-img-count.warn { color: var(--red); font-weight: 600; }
+
+    /* Stock input inside variant */
+    .variant-stock-row { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
+    .variant-stock-row label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text); white-space: nowrap; }
+    .variant-stock-input { width: 120px; height: 38px; border: 1px solid var(--border); border-radius: 4px; padding: 0 12px; font-family: 'Jost', sans-serif; font-size: 13px; outline: none; }
+    .variant-stock-input:focus { border-color: var(--teal); }
+
+    .variant-empty { padding: 24px; text-align: center; font-size: 12px; color: var(--text-light); }
+    .variant-hint { font-size: 11px; color: var(--text-light); padding: 10px 16px; background: #fff; }
+
+    /* Cropper */
     .cropper-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 300; align-items: center; justify-content: center; }
     .cropper-modal-overlay.open { display: flex; }
     .cropper-box { background: var(--white); border-radius: 8px; padding: 24px; max-width: 560px; width: 100%; }
@@ -131,6 +170,7 @@
     #cropperImage { display: block; max-width: 100%; }
     .cropper-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px; }
 
+    /* Confirm */
     .confirm-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 400; align-items: center; justify-content: center; }
     .confirm-overlay.open { display: flex; }
     .confirm-box { background: var(--white); border-radius: 12px; padding: 32px 28px; max-width: 380px; width: 100%; box-shadow: 0 8px 40px rgba(0,0,0,0.18); text-align: center; animation: popIn 0.2s ease; }
@@ -142,6 +182,17 @@
     .confirm-box p strong { color: var(--text); font-weight: 600; }
     .confirm-actions { display: flex; gap: 10px; justify-content: center; }
     .confirm-actions .btn { min-width: 110px; justify-content: center; }
+
+    /* Preset swatches for adding variant */
+    .color-preset-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+    .color-preset { width: 22px; height: 22px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; transition: transform 0.12s, border-color 0.12s; flex-shrink: 0; outline: none; }
+    .color-preset:hover { transform: scale(1.18); }
+    .color-preset.selected { border-color: var(--text); box-shadow: 0 0 0 2px var(--white), 0 0 0 4px var(--text); }
+
+    /* ══ SUBMIT SPINNER ══ */
+    .btn--loading { opacity: 0.7; pointer-events: none; }
+    .btn--loading::after { content: ''; display: inline-block; width: 12px; height: 12px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.6s linear infinite; margin-left: 8px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
@@ -166,10 +217,6 @@
         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"/></svg>
         Products
       </a>
-      <a href="/admin/reviews" class="nav-item">
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
-        Rating/Review
-      </a>
       <a href="/admin/customers" class="nav-item">
         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
         Customers
@@ -182,6 +229,10 @@
         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
         Categories
       </a>
+      <a href="/admin/brands" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+        Brands
+      </a>
       <a href="/admin/refund" class="nav-item">
         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
         Refund/Return
@@ -189,10 +240,6 @@
       <a href="/admin/banners" class="nav-item">
         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
         Banner
-      </a>
-      <a href="/admin/referral" class="nav-item">
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
-        Referral
       </a>
     </nav>
     <div class="sidebar__footer">
@@ -215,8 +262,8 @@
 
     <div class="content">
 
-      <% if (locals.success && success.length) { %><div class="flash flash--success"><%= success[0] %></div><% } %>
-      <% if (locals.error   && error.length)   { %><div class="flash flash--error"><%=   error[0] %></div><% } %>
+      <% if (locals.success && success && success.length) { %><div class="flash flash--success"><%= success[0] || success %></div><% } %>
+      <% if (locals.error   && error   && error.length)   { %><div class="flash flash--error"><%=   error[0] || error %></div><% } %>
 
       <div class="page-header">
         <h1>Products</h1>
@@ -231,10 +278,7 @@
             Search
           </button>
           <% if (search) { %>
-            <a href="/admin/products" class="btn btn--outline">
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-              Clear
-            </a>
+            <a href="/admin/products" class="btn btn--outline">Clear</a>
           <% } %>
         </form>
         <button class="btn btn--teal" onclick="openAddModal()">
@@ -255,7 +299,9 @@
                 <th>#</th>
                 <th>Images</th>
                 <th>Name</th>
+                <th>Brand</th>
                 <th>Category</th>
+                <th>Variants</th>
                 <th>Price</th>
                 <th>Stock</th>
                 <th>Action</th>
@@ -268,13 +314,35 @@
                   <td style="color:var(--text-light)"><%= (page-1)*8+i+1 %></td>
                   <td>
                     <div class="thumb-row">
-                      <% p.images.slice(0,3).forEach(img => { %>
+                      <%
+                        const thumbImgs = (p.colorVariants && p.colorVariants.length > 0)
+                          ? p.colorVariants.flatMap(v => v.images).slice(0,3)
+                          : p.images.slice(0,3);
+                      %>
+                      <% thumbImgs.forEach(img => { %>
                         <img class="thumb" src="<%= img %>" alt="product"/>
                       <% }) %>
                     </div>
                   </td>
                   <td style="font-weight:500"><%= p.name %></td>
+                  <td>
+                    <% if (p.brand && p.brand.name) { %>
+                      <span class="badge badge--brand"><%= p.brand.name %></span>
+                    <% } else { %><span style="color:var(--text-light)">—</span><% } %>
+                  </td>
                   <td><span class="badge badge--cat"><%= p.category ? p.category.name : '—' %></span></td>
+                  <td>
+                    <% if (p.colorVariants && p.colorVariants.length > 0) { %>
+                      <div class="color-dots">
+                        <% p.colorVariants.slice(0,6).forEach(v => { %>
+                          <span class="color-dot" style="background:<%= v.hex %>;" title="<%= v.name %>"></span>
+                        <% }) %>
+                        <% if (p.colorVariants.length > 6) { %>
+                          <span style="font-size:10px;color:var(--text-light)">+<%= p.colorVariants.length - 6 %></span>
+                        <% } %>
+                      </div>
+                    <% } else { %><span style="color:var(--text-light)">—</span><% } %>
+                  </td>
                   <td>&#8377;<%= p.price.toLocaleString() %></td>
                   <td><%= p.stock %></td>
                   <td>
@@ -285,9 +353,9 @@
                         data-name="<%- JSON.stringify(p.name).replace(/"/g, '&quot;') %>"
                         data-desc="<%- JSON.stringify(p.description || '').replace(/"/g, '&quot;') %>"
                         data-price="<%= p.price %>"
-                        data-stock="<%= p.stock %>"
                         data-cat="<%= p.category ? p.category._id : '' %>"
-                        data-images="<%- JSON.stringify(p.images).replace(/"/g, '&quot;') %>"
+                        data-brand="<%= p.brand ? p.brand._id : '' %>"
+                        data-variants="<%- JSON.stringify(p.colorVariants || []).replace(/"/g, '&quot;') %>"
                         onclick="openEditFromBtn(this)">
                         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                         Edit
@@ -305,7 +373,7 @@
                 </tr>
                 <% }) %>
               <% } else { %>
-                <tr><td colspan="7"><div class="empty-state">No products found.</div></td></tr>
+                <tr><td colspan="9"><div class="empty-state">No products found.</div></td></tr>
               <% } %>
             </tbody>
           </table>
@@ -327,14 +395,11 @@
   </div>
 </div>
 
-<!-- ══ DELETE CONFIRM MODAL ══ -->
+<!-- ══ DELETE CONFIRM ══ -->
 <div class="confirm-overlay" id="confirmModal">
   <div class="confirm-box">
     <div class="confirm-icon">
-      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-        <polyline points="3 6 5 6 21 6"/>
-        <path stroke-linecap="round" stroke-linejoin="round" d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6m5 0V4h4v2"/>
-      </svg>
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path stroke-linecap="round" stroke-linejoin="round" d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6m5 0V4h4v2"/></svg>
     </div>
     <h3>Delete Product?</h3>
     <p>You are about to delete <strong id="confirmProductName"></strong>. This action cannot be undone.</p>
@@ -351,7 +416,8 @@
 <div class="modal-overlay" id="addModal">
   <div class="modal">
     <h2 class="modal__title">Add Product</h2>
-    <form id="addForm" action="/admin/products/add" method="POST" onsubmit="submitProductForm(event,'addForm','addImagesInput','addExistingImages')">
+    <form id="addForm" action="/admin/products/add" method="POST" onsubmit="submitForm(event,'add')">
+
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Product Name *</label>
@@ -367,36 +433,74 @@
           </select>
         </div>
       </div>
+
       <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Brand</label>
+          <select class="form-input" name="brand" id="addBrandInput">
+            <option value="">— Select Brand —</option>
+            <% if (locals.brands) { brands.forEach(b => { %>
+              <option value="<%= b._id %>"><%= b.name %></option>
+            <% }) } %>
+          </select>
+        </div>
         <div class="form-group">
           <label class="form-label">Price (₹) *</label>
           <input class="form-input" type="number" name="price" required min="0" placeholder="0"/>
         </div>
-        <div class="form-group">
-          <label class="form-label">Stock</label>
-          <input class="form-input" type="number" name="stock" min="0" placeholder="0"/>
-        </div>
       </div>
+
       <div class="form-group">
         <label class="form-label">Description</label>
         <textarea class="form-input" name="description" placeholder="Product description…"></textarea>
       </div>
-      <div class="upload-section">
-        <label class="upload-label">Product Images * <span style="font-weight:400;text-transform:none;letter-spacing:0">(min. 3)</span></label>
-        <p class="upload-hint">Click or drag to upload. Each image will be cropped before saving.</p>
-        <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
-          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
-          <p>Click to select images</p>
-        </div>
-        <input type="file" id="fileInput" accept="image/*" multiple onchange="handleFiles(event,'addPreviewGrid','addImgCount')"/>
-        <div class="preview-grid" id="addPreviewGrid"></div>
-        <p class="img-count" id="addImgCount"></p>
-        <input type="hidden" name="images" id="addImagesInput"/>
-        <input type="hidden" name="existingImages" id="addExistingImages" value="[]"/>
+
+      <!-- ══ COLOR VARIANTS ══ -->
+      <div class="section-divider">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path stroke-linecap="round" d="M12 2v2M12 20v2M2 12h2M20 12h2"/></svg>
+        Color Variants
+        <span style="font-size:9px;font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-light);margin-left:4px">— each variant needs its own images &amp; stock (min 3 images)</span>
       </div>
+
+      <div class="variant-builder" id="addVariantBuilder">
+        <div class="variant-builder-header">
+          <span>Add a New Color Variant</span>
+        </div>
+        <div class="variant-add-row">
+          <div>
+            <div class="form-label" style="font-size:9px;letter-spacing:0.1em;text-transform:uppercase;font-weight:600;margin-bottom:6px">Presets</div>
+            <div class="color-preset-row" id="addVPresets"></div>
+          </div>
+          <div class="form-group" style="min-width:50px;max-width:54px">
+            <label class="form-label">Colour</label>
+            <input type="color" class="color-native-btn" id="addVNative" value="#000000"/>
+          </div>
+          <div class="form-group" style="min-width:100px;max-width:120px">
+            <label class="form-label">Hex</label>
+            <input class="form-input" type="text" id="addVHex" placeholder="#000000" maxlength="7"/>
+          </div>
+          <div class="form-group" style="min-width:130px">
+            <label class="form-label">Label *</label>
+            <input class="form-input" type="text" id="addVName" placeholder="e.g. Midnight Black"/>
+          </div>
+          <div class="form-group" style="min-width:80px;max-width:100px">
+            <label class="form-label">Stock *</label>
+            <input class="form-input" type="number" id="addVStock" placeholder="0" min="0"/>
+          </div>
+          <button type="button" class="variant-btn-add" onclick="addVariant('add')">+ Add Variant</button>
+        </div>
+
+        <div id="addVariantTabs" class="variant-tabs" style="display:none"></div>
+        <div id="addVariantPanels"></div>
+        <div id="addVariantEmpty" class="variant-empty">No colour variants yet. Add at least one variant above.</div>
+        <p class="variant-hint">Each colour variant needs at least 3 images. Stock is set per variant.</p>
+      </div>
+
+      <input type="hidden" name="colorVariants" id="addColorVariantsInput"/>
+
       <div class="modal-footer">
         <button type="button" class="btn btn--outline" onclick="closeModal('addModal')">Cancel</button>
-        <button type="submit" class="btn btn--teal">Add Product</button>
+        <button type="submit" class="btn btn--teal" id="addSubmitBtn">Add Product</button>
       </div>
     </form>
   </div>
@@ -406,7 +510,8 @@
 <div class="modal-overlay" id="editModal">
   <div class="modal">
     <h2 class="modal__title">Edit Product</h2>
-    <form id="editForm" method="POST" onsubmit="submitProductForm(event,'editForm','editImagesInput','editExistingImages')">
+    <form id="editForm" method="POST" onsubmit="submitForm(event,'edit')">
+
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Product Name *</label>
@@ -422,42 +527,80 @@
           </select>
         </div>
       </div>
+
       <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Brand</label>
+          <select class="form-input" name="brand" id="editBrand">
+            <option value="">— Select Brand —</option>
+            <% if (locals.brands) { brands.forEach(b => { %>
+              <option value="<%= b._id %>"><%= b.name %></option>
+            <% }) } %>
+          </select>
+        </div>
         <div class="form-group">
           <label class="form-label">Price (₹) *</label>
           <input class="form-input" type="number" name="price" id="editPrice" required min="0"/>
         </div>
-        <div class="form-group">
-          <label class="form-label">Stock</label>
-          <input class="form-input" type="number" name="stock" id="editStock" min="0"/>
-        </div>
       </div>
+
       <div class="form-group">
         <label class="form-label">Description</label>
         <textarea class="form-input" name="description" id="editDesc"></textarea>
       </div>
-      <div class="upload-section">
-        <label class="upload-label">Product Images * <span style="font-weight:400;text-transform:none;letter-spacing:0">(min. 3)</span></label>
-        <p class="upload-hint">Existing images shown below. Upload new ones to add more.</p>
-        <div class="upload-zone" onclick="document.getElementById('editFileInput').click()">
-          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
-          <p>Click to add more images</p>
-        </div>
-        <input type="file" id="editFileInput" accept="image/*" multiple onchange="handleFiles(event,'editPreviewGrid','editImgCount')"/>
-        <div class="preview-grid" id="editPreviewGrid"></div>
-        <p class="img-count" id="editImgCount"></p>
-        <input type="hidden" name="images" id="editImagesInput"/>
-        <input type="hidden" name="existingImages" id="editExistingImages"/>
+
+      <!-- ══ COLOR VARIANTS — EDIT ══ -->
+      <div class="section-divider">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path stroke-linecap="round" d="M12 2v2M12 20v2M2 12h2M20 12h2"/></svg>
+        Color Variants
+        <span style="font-size:9px;font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-light);margin-left:4px">— each variant needs its own images &amp; stock (min 3 images)</span>
       </div>
+
+      <div class="variant-builder" id="editVariantBuilder">
+        <div class="variant-builder-header">
+          <span>Add a New Color Variant</span>
+        </div>
+        <div class="variant-add-row">
+          <div>
+            <div class="form-label" style="font-size:9px;letter-spacing:0.1em;text-transform:uppercase;font-weight:600;margin-bottom:6px">Presets</div>
+            <div class="color-preset-row" id="editVPresets"></div>
+          </div>
+          <div class="form-group" style="min-width:50px;max-width:54px">
+            <label class="form-label">Colour</label>
+            <input type="color" class="color-native-btn" id="editVNative" value="#000000"/>
+          </div>
+          <div class="form-group" style="min-width:100px;max-width:120px">
+            <label class="form-label">Hex</label>
+            <input class="form-input" type="text" id="editVHex" placeholder="#000000" maxlength="7"/>
+          </div>
+          <div class="form-group" style="min-width:130px">
+            <label class="form-label">Label *</label>
+            <input class="form-input" type="text" id="editVName" placeholder="e.g. Midnight Black"/>
+          </div>
+          <div class="form-group" style="min-width:80px;max-width:100px">
+            <label class="form-label">Stock *</label>
+            <input class="form-input" type="number" id="editVStock" placeholder="0" min="0"/>
+          </div>
+          <button type="button" class="variant-btn-add" onclick="addVariant('edit')">+ Add Variant</button>
+        </div>
+
+        <div id="editVariantTabs" class="variant-tabs" style="display:none"></div>
+        <div id="editVariantPanels"></div>
+        <div id="editVariantEmpty" class="variant-empty">No colour variants. Add at least one above.</div>
+        <p class="variant-hint">Each colour variant needs at least 3 images. Stock is set per variant.</p>
+      </div>
+
+      <input type="hidden" name="colorVariants" id="editColorVariantsInput"/>
+
       <div class="modal-footer">
         <button type="button" class="btn btn--outline" onclick="closeModal('editModal')">Cancel</button>
-        <button type="submit" class="btn btn--teal">Save Changes</button>
+        <button type="submit" class="btn btn--teal" id="editSubmitBtn">Save Changes</button>
       </div>
     </form>
   </div>
 </div>
 
-<!-- ══ CROPPER MODAL ══ -->
+<!-- ══ CROPPER ══ -->
 <div class="cropper-modal-overlay" id="cropperModal">
   <div class="cropper-box">
     <h3>Crop Image</h3>
@@ -466,194 +609,391 @@
     </div>
     <div class="cropper-actions">
       <button type="button" class="btn btn--outline" onclick="cancelCrop()">Skip</button>
-      <button type="button" class="btn btn--teal" onclick="applyCrop()">Crop & Use</button>
+      <button type="button" class="btn btn--teal"    onclick="applyCrop()">Crop &amp; Use</button>
     </div>
   </div>
 </div>
 
-<!-- ══ SINGLE script load — duplicate removed ══ -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 <script>
-  let croppedImages  = [];
-  let currentGridId  = '';
-  let currentCountId = '';
-  let cropQueue      = [];
-  let currentCropper = null;
-  let currentFileObj = null;
+/* ═══════════════════════════════════════════════════════════════
+   PRESET COLOURS
+═══════════════════════════════════════════════════════════════ */
+const PRESETS = [
+  { hex: '#000000', name: 'Black'        },
+  { hex: '#ffffff', name: 'White'        },
+  { hex: '#c0c0c0', name: 'Silver'       },
+  { hex: '#d4af37', name: 'Gold'         },
+  { hex: '#c9956c', name: 'Rose Gold'    },
+  { hex: '#1a1a2e', name: 'Navy'         },
+  { hex: '#1b4332', name: 'Forest Green' },
+  { hex: '#6b1c1c', name: 'Burgundy'     },
+  { hex: '#4b3a2a', name: 'Brown'        },
+  { hex: '#607d8b', name: 'Slate'        },
+  { hex: '#e0c8a0', name: 'Champagne'    },
+  { hex: '#2c2c54', name: 'Midnight'     },
+];
 
-  function openEditFromBtn(btn) {
-    try {
-      const id     = btn.dataset.id;
-      const name   = JSON.parse(btn.dataset.name.replace(/&quot;/g, '"'));
-      const desc   = JSON.parse(btn.dataset.desc.replace(/&quot;/g, '"'));
-      const price  = btn.dataset.price;
-      const stock  = btn.dataset.stock;
-      const catId  = btn.dataset.cat;
-      const images = JSON.parse(btn.dataset.images.replace(/&quot;/g, '"'));
-      openEditModal(id, name, desc, price, stock, catId, images);
-    } catch(err) {
-      console.error('Edit parse error:', err);
-      alert('Could not open editor. Check the browser console for details.');
-    }
-  }
-
-  function openAddModal() {
-    croppedImages  = [];
-    currentGridId  = 'addPreviewGrid';
-    currentCountId = 'addImgCount';
-    document.getElementById('addPreviewGrid').innerHTML = '';
-    document.getElementById('addImgCount').textContent  = '';
-    document.getElementById('addImagesInput').value     = '';
-    document.getElementById('addExistingImages').value  = '[]';
-    document.getElementById('addForm').reset();
-    document.getElementById('addModal').classList.add('open');
-  }
-
-  function openEditModal(id, name, desc, price, stock, catId, images) {
-    currentGridId  = 'editPreviewGrid';
-    currentCountId = 'editImgCount';
-    croppedImages  = [];
-
-    document.getElementById('editForm').action    = '/admin/products/' + id + '/edit';
-    document.getElementById('editName').value     = name;
-    document.getElementById('editDesc').value     = desc;
-    document.getElementById('editPrice').value    = price;
-    document.getElementById('editStock').value    = stock;
-
-    setTimeout(() => {
-      document.getElementById('editCategory').value = catId;
-    }, 0);
-
-    const grid = document.getElementById('editPreviewGrid');
-    grid.innerHTML = '';
-    images.forEach(url => addPreviewItem(url, true));
-    document.getElementById('editExistingImages').value = JSON.stringify(images);
-    updateCount();
-    document.getElementById('editModal').classList.add('open');
-  }
-
-  function closeModal(id) {
-    document.getElementById(id).classList.remove('open');
-    cropQueue = [];
-  }
-
-  document.querySelectorAll('.modal-overlay').forEach(el => {
-    el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); });
-  });
-
-  function openDeleteConfirm(btn) {
-    document.getElementById('confirmProductName').textContent = btn.dataset.name;
-    document.getElementById('confirmDeleteForm').action = btn.dataset.action;
-    document.getElementById('confirmModal').classList.add('open');
-  }
-  function closeDeleteConfirm() {
-    document.getElementById('confirmModal').classList.remove('open');
-  }
-  document.getElementById('confirmModal').addEventListener('click', function(e) {
-    if (e.target === this) closeDeleteConfirm();
-  });
-
-  function handleFiles(event, gridId, countId) {
-    currentGridId  = gridId;
-    currentCountId = countId;
-    const files = Array.from(event.target.files);
-    cropQueue   = files.slice();
-    event.target.value = '';
-    processNextInQueue();
-  }
-
-  function processNextInQueue() {
-    if (cropQueue.length === 0) return;
-    const file   = cropQueue.shift();
-    const reader = new FileReader();
-    reader.onload = e => openCropper(e.target.result, file);
-    reader.readAsDataURL(file);
-  }
-
-  function openCropper(src, file) {
-    currentFileObj = file;
-    const img = document.getElementById('cropperImage');
-    img.src = src;
-    document.getElementById('cropperModal').classList.add('open');
-    if (currentCropper) { currentCropper.destroy(); currentCropper = null; }
-    currentCropper = new Cropper(img, { aspectRatio: 1, viewMode: 1, autoCropArea: 0.9 });
-  }
-
-  function applyCrop() {
-    if (!currentCropper) return;
-    const canvas = currentCropper.getCroppedCanvas({ width: 800, height: 800 });
-    const b64    = canvas.toDataURL('image/jpeg', 0.85);
-    croppedImages.push(b64);
-    addPreviewItem(b64, false);
-    updateCount();
-    closeCropper();
-    processNextInQueue();
-  }
-
-  function cancelCrop() {
-    const reader = new FileReader();
-    reader.onload = e => {
-      croppedImages.push(e.target.result);
-      addPreviewItem(e.target.result, false);
-      updateCount();
+function initPresets(prefix) {
+  const row = document.getElementById(prefix + 'VPresets');
+  if (!row) return;
+  row.innerHTML = '';
+  PRESETS.forEach(p => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'color-preset';
+    btn.style.background = p.hex;
+    if (p.hex === '#ffffff') btn.style.border = '2px solid #ccc';
+    btn.title = p.name;
+    btn.onclick = () => {
+      document.querySelectorAll('#' + prefix + 'VPresets .color-preset').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      document.getElementById(prefix + 'VNative').value = p.hex;
+      document.getElementById(prefix + 'VHex').value    = p.hex;
+      document.getElementById(prefix + 'VName').value   = p.name;
     };
-    reader.readAsDataURL(currentFileObj);
-    closeCropper();
-    processNextInQueue();
+    row.appendChild(btn);
+  });
+  const native = document.getElementById(prefix + 'VNative');
+  const hexEl  = document.getElementById(prefix + 'VHex');
+  native.addEventListener('input', () => { hexEl.value = native.value; });
+  hexEl.addEventListener('input', () => {
+    let v = hexEl.value.trim();
+    if (!v.startsWith('#')) v = '#' + v;
+    if (/^#[0-9a-fA-F]{6}$/.test(v)) native.value = v;
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   VARIANT STATE
+═══════════════════════════════════════════════════════════════ */
+const variantState = { add: [], edit: [] };
+let activeTab      = { add: 0, edit: 0 };
+
+/* ── Normalise hex to 6-digit lowercase ── */
+function normaliseHex(raw) {
+  let h = raw.trim();
+  if (!h.startsWith('#')) h = '#' + h;
+  if (/^#[0-9a-fA-F]{3}$/.test(h)) {
+    h = '#' + h[1]+h[1]+h[2]+h[2]+h[3]+h[3];
+  }
+  return h.toLowerCase();
+}
+
+/* ── Add a new variant ── */
+function addVariant(prefix) {
+  let rawHex = document.getElementById(prefix + 'VHex').value.trim()
+            || document.getElementById(prefix + 'VNative').value;
+  const name  = document.getElementById(prefix + 'VName').value.trim();
+  const stock = parseInt(document.getElementById(prefix + 'VStock').value) || 0;
+
+  if (!/^#?([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(rawHex.replace('#',''))) {
+    alert('Enter a valid hex colour (e.g. #c9a96e).');
+    return;
+  }
+  const hex = normaliseHex(rawHex);
+
+  if (!name) { alert('Enter a colour label.'); return; }
+
+  // FIX: compare normalised hex values so #000 and #000000 are treated the same
+  if (variantState[prefix].some(v => normaliseHex(v.hex) === hex)) {
+    alert('A variant with that colour already exists.');
+    return;
   }
 
-  function closeCropper() {
-    document.getElementById('cropperModal').classList.remove('open');
-    if (currentCropper) { currentCropper.destroy(); currentCropper = null; }
+  variantState[prefix].push({ name, hex, stock, images: [], existing: [] });
+  activeTab[prefix] = variantState[prefix].length - 1;
+
+  document.getElementById(prefix + 'VHex').value   = '';
+  document.getElementById(prefix + 'VName').value  = '';
+  document.getElementById(prefix + 'VStock').value = '';
+  document.querySelectorAll('#' + prefix + 'VPresets .color-preset').forEach(b => b.classList.remove('selected'));
+
+  renderVariantUI(prefix);
+}
+
+/* ── Remove a variant ── */
+function removeVariant(prefix, idx) {
+  variantState[prefix].splice(idx, 1);
+  if (activeTab[prefix] >= variantState[prefix].length) {
+    activeTab[prefix] = Math.max(0, variantState[prefix].length - 1);
+  }
+  renderVariantUI(prefix);
+}
+
+function switchTab(prefix, idx) {
+  activeTab[prefix] = idx;
+  renderVariantUI(prefix);
+}
+
+/* ── Render tabs + panels ── */
+function renderVariantUI(prefix) {
+  const tabs   = document.getElementById(prefix + 'VariantTabs');
+  const panels = document.getElementById(prefix + 'VariantPanels');
+  const empty  = document.getElementById(prefix + 'VariantEmpty');
+  const state  = variantState[prefix];
+
+  if (state.length === 0) {
+    tabs.style.display  = 'none';
+    panels.innerHTML    = '';
+    empty.style.display = 'block';
+    return;
   }
 
-  function addPreviewItem(src, isExisting) {
-    const grid = document.getElementById(currentGridId);
-    const wrap = document.createElement('div');
-    wrap.className        = 'preview-item';
-    wrap.dataset.src      = src;
-    wrap.dataset.existing = isExisting ? '1' : '0';
-    wrap.innerHTML = `
-      <img src="${src}" alt="preview"/>
-      <button type="button" class="remove-img" onclick="removeImage(this)">&#x2715;</button>
-    `;
-    grid.appendChild(wrap);
+  empty.style.display = 'none';
+  tabs.style.display  = 'flex';
+
+  tabs.innerHTML = state.map((v, i) => `
+    <button type="button"
+      class="variant-tab ${i === activeTab[prefix] ? 'active' : ''}"
+      onclick="switchTab('${prefix}', ${i})">
+      <span class="variant-tab-swatch" style="background:${v.hex};${v.hex === '#ffffff' ? 'border:1.5px solid #ccc;' : ''}"></span>
+      ${escHtml(v.name)}
+      <span class="variant-tab-close" onclick="event.stopPropagation();removeVariant('${prefix}',${i})" title="Remove">✕</span>
+    </button>
+  `).join('');
+
+  panels.innerHTML = state.map((v, i) => `
+    <div class="variant-panel ${i === activeTab[prefix] ? 'active' : ''}" id="${prefix}Panel${i}">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <span style="width:20px;height:20px;border-radius:50%;background:${v.hex};border:1.5px solid rgba(0,0,0,0.12);display:inline-block;flex-shrink:0"></span>
+        <span style="font-size:13px;font-weight:600;color:var(--text)">${escHtml(v.name)}</span>
+        <span style="font-size:11px;color:var(--text-light)">${v.hex}</span>
+        <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+          <label style="font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--text)">Stock</label>
+          <input type="number" class="variant-stock-input" value="${v.stock}" min="0"
+            onchange="updateVariantStock('${prefix}',${i},this.value)"
+            oninput="updateVariantStock('${prefix}',${i},this.value)"/>
+        </div>
+      </div>
+
+      <div class="variant-upload-zone" onclick="triggerVariantUpload('${prefix}',${i})">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
+        </svg>
+        <p>Click to add images for <strong>${escHtml(v.name)}</strong></p>
+      </div>
+      <input type="file" id="${prefix}VFileInput${i}" accept="image/*" multiple style="display:none"
+        onchange="handleVariantFiles(event,'${prefix}',${i})"/>
+
+      <div class="variant-preview-grid" id="${prefix}VGrid${i}">
+        ${v.images.map((src, imgIdx) => `
+          <div class="variant-preview-item">
+            <img src="${src}" alt=""/>
+            <button type="button" class="remove-vimg"
+              onclick="removeVariantImage('${prefix}',${i},${imgIdx})">✕</button>
+          </div>
+        `).join('')}
+      </div>
+      <p class="variant-img-count ${v.images.length < 3 ? 'warn' : ''}" id="${prefix}VCount${i}">
+        ${v.images.length} image${v.images.length !== 1 ? 's' : ''} ${v.images.length < 3 ? '— need at least 3' : '✓'}
+      </p>
+    </div>
+  `).join('');
+}
+
+function updateVariantStock(prefix, idx, val) {
+  variantState[prefix][idx].stock = parseInt(val) || 0;
+}
+
+function removeVariantImage(prefix, varIdx, imgIdx) {
+  variantState[prefix][varIdx].images.splice(imgIdx, 1);
+  variantState[prefix][varIdx].existing.splice(imgIdx, 1);
+  renderVariantUI(prefix);
+}
+
+function triggerVariantUpload(prefix, idx) {
+  document.getElementById(prefix + 'VFileInput' + idx).click();
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CROPPER
+═══════════════════════════════════════════════════════════════ */
+let cropQueue      = [];
+let cropCtx        = null;
+let currentCropper = null;
+let currentFileObj = null;
+
+function handleVariantFiles(event, prefix, varIdx) {
+  cropCtx   = { prefix, varIdx };
+  cropQueue = Array.from(event.target.files);
+  event.target.value = '';
+  processNextCrop();
+}
+
+function processNextCrop() {
+  if (cropQueue.length === 0) return;
+  const file   = cropQueue.shift();
+  const reader = new FileReader();
+  reader.onload = e => openCropper(e.target.result, file);
+  reader.readAsDataURL(file);
+}
+
+function openCropper(src, file) {
+  currentFileObj = file;
+  const img = document.getElementById('cropperImage');
+  img.src = src;
+  document.getElementById('cropperModal').classList.add('open');
+  if (currentCropper) { currentCropper.destroy(); currentCropper = null; }
+  currentCropper = new Cropper(img, { aspectRatio: 1, viewMode: 1, autoCropArea: 0.9 });
+}
+
+function applyCrop() {
+  if (!currentCropper) return;
+  const canvas = currentCropper.getCroppedCanvas({ width: 800, height: 800 });
+  const b64    = canvas.toDataURL('image/jpeg', 0.85);
+  pushVariantImage(b64, false);
+  closeCropper();
+  processNextCrop();
+}
+
+function cancelCrop() {
+  // Skip cropping — use original file as-is
+  const reader = new FileReader();
+  reader.onload = e => pushVariantImage(e.target.result, false);
+  reader.readAsDataURL(currentFileObj);
+  closeCropper();
+  processNextCrop();
+}
+
+function closeCropper() {
+  document.getElementById('cropperModal').classList.remove('open');
+  if (currentCropper) { currentCropper.destroy(); currentCropper = null; }
+}
+
+function pushVariantImage(src, isExisting) {
+  const { prefix, varIdx } = cropCtx;
+  variantState[prefix][varIdx].images.push(src);
+  variantState[prefix][varIdx].existing.push(isExisting);
+  activeTab[prefix] = varIdx;
+  renderVariantUI(prefix);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FORM SUBMIT
+═══════════════════════════════════════════════════════════════ */
+function submitForm(e, prefix) {
+  e.preventDefault();
+  const state = variantState[prefix];
+
+  // FIX: clear, user-visible validation messages instead of bare alerts
+  if (state.length === 0) {
+    alert('Please add at least one colour variant before saving.');
+    return;
   }
 
-  function removeImage(btn) {
-    const item = btn.closest('.preview-item');
-    item.remove();
-    const grid = document.getElementById(currentGridId);
-    croppedImages = Array.from(grid.querySelectorAll('[data-existing="0"]')).map(el => el.dataset.src);
-    updateCount();
-  }
-
-  function updateCount() {
-    const grid  = document.getElementById(currentGridId);
-    const count = grid.children.length;
-    const el    = document.getElementById(currentCountId);
-    el.textContent = count + ' image' + (count !== 1 ? 's' : '') + ' selected' + (count < 3 ? ' (need at least 3)' : '');
-    el.className   = 'img-count' + (count < 3 ? ' warn' : '');
-  }
-
-  function submitProductForm(e, formId, imagesInputId, existingInputId) {
-    e.preventDefault();
-    const gridId   = formId === 'editForm' ? 'editPreviewGrid' : 'addPreviewGrid';
-    const grid     = document.getElementById(gridId);
-    const allItems = Array.from(grid.querySelectorAll('.preview-item'));
-
-    if (allItems.length < 3) {
-      alert('Please upload at least 3 product images.');
+  for (const v of state) {
+    if (v.images.length < 3) {
+      alert(`"${v.name}" only has ${v.images.length} image(s). Each variant needs at least 3 images.`);
       return;
     }
-
-    const existing = allItems.filter(i => i.dataset.existing === '1').map(i => i.dataset.src);
-    const newImgs  = allItems.filter(i => i.dataset.existing === '0').map(i => i.dataset.src);
-
-    document.getElementById(existingInputId).value = JSON.stringify(existing);
-    document.getElementById(imagesInputId).value   = JSON.stringify(newImgs);
-    document.getElementById(formId).submit();
   }
+
+  // Serialize: separate existing Cloudinary URLs from new base64 images
+  const payload = state.map(v => ({
+    name:           v.name,
+    hex:            v.hex,
+    stock:          v.stock,
+    existingImages: v.images.filter((_, i) =>  v.existing[i]),
+    newImages:      v.images.filter((_, i) => !v.existing[i]),
+  }));
+
+  document.getElementById(prefix + 'ColorVariantsInput').value = JSON.stringify(payload);
+
+  // Show loading state on submit button
+  const btn = document.getElementById(prefix + 'SubmitBtn');
+  if (btn) {
+    btn.classList.add('btn--loading');
+    btn.textContent = prefix === 'add' ? 'Uploading…' : 'Saving…';
+  }
+
+  document.getElementById(prefix + 'Form').submit();
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MODAL HELPERS
+═══════════════════════════════════════════════════════════════ */
+function openAddModal() {
+  variantState.add = [];
+  activeTab.add    = 0;
+  document.getElementById('addForm').reset();
+  document.getElementById('addBrandInput').value = '';
+  renderVariantUI('add');
+  document.getElementById('addModal').classList.add('open');
+}
+
+function openEditFromBtn(btn) {
+  try {
+    const id       = btn.dataset.id;
+    const name     = JSON.parse(btn.dataset.name.replace(/&quot;/g, '"'));
+    const desc     = JSON.parse(btn.dataset.desc.replace(/&quot;/g, '"'));
+    const price    = btn.dataset.price;
+    const catId    = btn.dataset.cat;
+    const brand    = btn.dataset.brand || '';
+    const variants = JSON.parse(btn.dataset.variants.replace(/&quot;/g, '"'));
+    openEditModal(id, name, desc, price, catId, brand, variants);
+  } catch(err) {
+    console.error('Edit parse error:', err);
+    alert('Could not open editor. Please refresh the page and try again.');
+  }
+}
+
+function openEditModal(id, name, desc, price, catId, brand, variants) {
+  document.getElementById('editForm').action = '/admin/products/' + id + '/edit';
+  document.getElementById('editName').value  = name;
+  document.getElementById('editDesc').value  = desc;
+  document.getElementById('editPrice').value = price;
+  document.getElementById('editBrand').value = brand;
+  setTimeout(() => { document.getElementById('editCategory').value = catId; }, 0);
+
+  // Load existing variants — all pre-loaded images are marked as "existing" (already on Cloudinary)
+  variantState.edit = variants.map(v => ({
+    name:     v.name,
+    hex:      normaliseHex(v.hex),
+    stock:    v.stock || 0,
+    images:   [...(v.images || [])],
+    existing: (v.images || []).map(() => true),
+  }));
+  activeTab.edit = 0;
+  renderVariantUI('edit');
+  document.getElementById('editModal').classList.add('open');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  cropQueue = [];
+}
+
+document.querySelectorAll('.modal-overlay').forEach(el => {
+  el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); });
+});
+
+function openDeleteConfirm(btn) {
+  document.getElementById('confirmProductName').textContent = btn.dataset.name;
+  document.getElementById('confirmDeleteForm').action      = btn.dataset.action;
+  document.getElementById('confirmModal').classList.add('open');
+}
+function closeDeleteConfirm() {
+  document.getElementById('confirmModal').classList.remove('open');
+}
+document.getElementById('confirmModal').addEventListener('click', function(e) {
+  if (e.target === this) closeDeleteConfirm();
+});
+
+/* ── Utility ── */
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
+}
+
+/* ── Init ── */
+initPresets('add');
+initPresets('edit');
+renderVariantUI('add');
+renderVariantUI('edit');
 </script>
 </body>
 </html>
