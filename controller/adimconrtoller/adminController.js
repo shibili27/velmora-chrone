@@ -36,6 +36,7 @@ export const getDashboard = async (req, res) => {
       stats: { totalUsers, blockedUsers, newUsersToday, totalProducts, totalCategories },
       adminName: req.session.adminName,
       adminRole: req.session.adminRole,
+      
       customers,
       search,
       page,

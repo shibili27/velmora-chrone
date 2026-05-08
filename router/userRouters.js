@@ -26,9 +26,7 @@ import {
   getWishlistStatus,
 } from '../controller/usercontroller/wishlistController.js';
 
-// ─────────────────────────────────────────
-// Auth routes
-// ─────────────────────────────────────────
+
 router.get('/login', isGuest, noCache, (req, res) => {
   const authError   = req.flash('authError')[0]   || null;
   const errorSource = req.flash('errorSource')[0] || null;
@@ -89,18 +87,14 @@ router.post('/verify-reset-otp', noCache, authController.verifyResetOTP);
 router.get('/reset-password',  isGuest, noCache, hasOtpVerified, (req, res) => res.render('user/newPassword'));
 router.post('/reset-password', authController.resetPassword);
 
-// ─────────────────────────────────────────
-// Home / Products
-// ─────────────────────────────────────────
-router.get('/',     isAuth, getHomePage);  // ✅ FIXED
-router.get('/home', isAuth, getHomePage);  // ✅ FIXED
+
+router.get('/',     isAuth, getHomePage);  
+router.get('/home', isAuth, getHomePage);  
 
 router.get('/products',     isAuth, getProducts);
 router.get('/products/:id', isAuth, getProductDetail);
 
-// ─────────────────────────────────────────
-// Cart routes
-// ─────────────────────────────────────────
+
 router.get('/cart',                   isAuth, getCart);
 router.post('/cart/add',              isAuth, addToCart);
 router.patch('/cart/update/:itemId',  isAuth, updateCartItem);
@@ -108,9 +102,7 @@ router.delete('/cart/remove/:itemId', isAuth, removeFromCart);
 router.delete('/cart/clear',          isAuth, clearCart);
 router.get('/api/cart/count',         isAuth, getCartCount);
 
-// ─────────────────────────────────────────
-// Wishlist routes
-// ─────────────────────────────────────────
+
 router.get('/wishlist',                              isAuth, getWishlist);
 router.post('/wishlist/add',                         isAuth, addToWishlist);
 router.delete('/wishlist/remove/:itemId',            isAuth, removeFromWishlist);
@@ -121,9 +113,7 @@ router.get('/api/wishlist/count',                    isAuth, getWishlistCount);
 router.get('/wishlist/status/:productId',            isAuth, getWishlistStatus);
 router.post('/wishlist/toggle',                      isAuth, toggleWishlist);
 
-// ─────────────────────────────────────────
-// Profile routes
-// ─────────────────────────────────────────
+
 router.get('/profile',          isAuth, profileController.getProfile);
 router.post('/profile/update',  isAuth, profileController.updateProfile);
 router.post('/change-password', isAuth, profileController.changePassword);
@@ -138,17 +128,13 @@ router.post(
 router.post('/profile/request-email-change', isAuth, profileController.requestEmailChange);
 router.post('/profile/verify-email-change',  isAuth, profileController.verifyEmailChange);
 
-// ─────────────────────────────────────────
-// Address routes
-// ─────────────────────────────────────────
+
 router.post('/profile/address',              isAuth, profileController.addAddress);
 router.put('/profile/address/:id',           isAuth, profileController.updateAddress);
 router.delete('/profile/address/:id',        isAuth, profileController.deleteAddress);
 router.patch('/profile/address/:id/default', isAuth, profileController.setDefaultAddress);
 
-// ─────────────────────────────────────────
-// Logout
-// ─────────────────────────────────────────
+
 router.get('/logout', (req, res) => {
   req.session.destroy(() => {
     res.clearCookie('connect.sid');
