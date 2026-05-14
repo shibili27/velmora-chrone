@@ -2,10 +2,23 @@ import express from 'express';
 const router = express.Router();
 
 import passport from '../config/passport.js';
-import { isAuth, isGuest, noCache, hasOtpSession, hasOtpVerified } from '../middlewares/authMiddleware.js';
+import {
+  isAuth,
+  isGuest,
+  noCache,
+  hasOtpSession,
+  hasOtpVerified,
+  isOptionalAuth,
+} from '../middlewares/authMiddleware.js';
+
 import authController from '../controller/usercontroller/authController.js';
 import profileController, { upload } from '../controller/usercontroller/profileController.js';
-import { getHomePage, getProducts, getProductDetail } from '../controller/usercontroller/productController.js';
+import {
+  getHomePage,
+  getProducts,
+  getProductDetail,
+  getProductStatus,          // ← ADD THIS IMPORT
+} from '../controller/usercontroller/productController.js';
 import {
   getCart,
   addToCart,
@@ -27,6 +40,8 @@ import {
 } from '../controller/usercontroller/wishlistController.js';
 
 
+// ─── Auth pages (guests only) ─────────────────────────────────────────────────
+
 router.get('/login', isGuest, noCache, (req, res) => {
   const authError   = req.flash('authError')[0]   || null;
   const errorSource = req.flash('errorSource')[0] || null;
@@ -38,17 +53,13 @@ router.get('/login', isGuest, noCache, (req, res) => {
 });
 router.post('/login', authController.login);
 
-// Google OAuth
 router.get('/auth/google',
   isGuest,
   passport.authenticate('google', { scope: ['profile', 'email'] })
 );
 
 router.get('/auth/google/callback',
-  passport.authenticate('google', {
-    failureRedirect: '/login',
-    failureFlash:    false
-  }),
+  passport.authenticate('google', { failureRedirect: '/login', failureFlash: false }),
   async (req, res) => {
     try {
       req.session.user = req.user._id;
@@ -88,12 +99,18 @@ router.get('/reset-password',  isGuest, noCache, hasOtpVerified, (req, res) => r
 router.post('/reset-password', authController.resetPassword);
 
 
-router.get('/',     isAuth, getHomePage);  
-router.get('/home', isAuth, getHomePage);  
+// ─── Public pages ─────────────────────────────────────────────────────────────
 
-router.get('/products',     isAuth, getProducts);
-router.get('/products/:id', isAuth, getProductDetail);
+router.get('/',         isOptionalAuth, getHomePage);
+router.get('/home',     isOptionalAuth, getHomePage);
+router.get('/products', isOptionalAuth, getProducts);
 
+// ↓ MUST be before /products/:id — otherwise Express treats "status" as a product id
+router.get('/products/:id/status', isOptionalAuth, getProductStatus);
+router.get('/products/:id',        isOptionalAuth, getProductDetail);
+
+
+// ─── Cart (login required) ────────────────────────────────────────────────────
 
 router.get('/cart',                   isAuth, getCart);
 router.post('/cart/add',              isAuth, addToCart);
@@ -102,6 +119,8 @@ router.delete('/cart/remove/:itemId', isAuth, removeFromCart);
 router.delete('/cart/clear',          isAuth, clearCart);
 router.get('/api/cart/count',         isAuth, getCartCount);
 
+
+// ─── Wishlist (login required) ────────────────────────────────────────────────
 
 router.get('/wishlist',                              isAuth, getWishlist);
 router.post('/wishlist/add',                         isAuth, addToWishlist);
@@ -113,6 +132,8 @@ router.get('/api/wishlist/count',                    isAuth, getWishlistCount);
 router.get('/wishlist/status/:productId',            isAuth, getWishlistStatus);
 router.post('/wishlist/toggle',                      isAuth, toggleWishlist);
 
+
+// ─── Profile (login required) ─────────────────────────────────────────────────
 
 router.get('/profile',          isAuth, profileController.getProfile);
 router.post('/profile/update',  isAuth, profileController.updateProfile);
@@ -128,12 +149,13 @@ router.post(
 router.post('/profile/request-email-change', isAuth, profileController.requestEmailChange);
 router.post('/profile/verify-email-change',  isAuth, profileController.verifyEmailChange);
 
-
 router.post('/profile/address',              isAuth, profileController.addAddress);
 router.put('/profile/address/:id',           isAuth, profileController.updateAddress);
 router.delete('/profile/address/:id',        isAuth, profileController.deleteAddress);
 router.patch('/profile/address/:id/default', isAuth, profileController.setDefaultAddress);
 
+
+// ─── Logout ───────────────────────────────────────────────────────────────────
 
 router.get('/logout', (req, res) => {
   req.session.destroy(() => {

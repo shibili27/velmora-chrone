@@ -44,9 +44,13 @@
     .page-header h1 { font-size: 22px; font-weight: 600; }
     .page-header p { font-size: 13px; color: var(--text-mid); margin-top: 4px; }
 
-    .flash { padding: 10px 16px; border-radius: 4px; font-size: 12.5px; margin-bottom: 20px; }
+    /* ── Flash messages ── */
+    .flash { padding: 12px 16px; border-radius: 4px; font-size: 13px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
     .flash--error   { background: #fdecea; color: #b00020; border: 1px solid #f5c6cb; }
     .flash--success { background: #e8f5e9; color: #1b5e20; border: 1px solid #c8e6c9; }
+    .flash svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .flash__close { margin-left: auto; background: none; border: none; cursor: pointer; color: inherit; opacity: 0.6; font-size: 16px; padding: 0 4px; }
+    .flash__close:hover { opacity: 1; }
 
     .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
     .search-form { display: flex; align-items: center; gap: 8px; }
@@ -58,7 +62,7 @@
     .btn--teal:hover { background: var(--teal-dark); }
     .btn--outline { background: none; border: 1px solid var(--border); color: var(--text-mid); }
     .btn--outline:hover { background: var(--bg); }
-    .btn--danger  { background: var(--red); color: #fff; border: none; }
+    .btn--danger  { background: var(--red); color: #fff; }
     .btn--danger:hover { background: #b91c1c; }
 
     .card { background: var(--white); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
@@ -67,10 +71,12 @@
     .table-wrap { overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; }
     thead tr { background: #f8faf9; }
-    th { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); padding: 12px 20px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
-    td { padding: 12px 20px; font-size: 13px; color: var(--text); border-bottom: 1px solid var(--border); vertical-align: middle; }
+    th { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+    td { padding: 12px 16px; font-size: 13px; color: var(--text); border-bottom: 1px solid var(--border); vertical-align: middle; }
     tbody tr:last-child td { border-bottom: none; }
     tbody tr:hover { background: #fafcfb; }
+    tbody tr.row--blocked { background: #fff8f8; }
+    tbody tr.row--blocked:hover { background: #fff0f0; }
 
     .thumb-row { display: flex; gap: 4px; }
     .thumb { width: 38px; height: 38px; border-radius: 4px; object-fit: cover; border: 1px solid var(--border); }
@@ -78,17 +84,21 @@
     .badge { display: inline-flex; align-items: center; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
     .badge--cat   { background: var(--teal-light); color: var(--teal-dark); }
     .badge--brand { background: #f0ebfe; color: #5b21b6; }
+    .badge--blocked { background: var(--red-bg); color: var(--red); }
+    .badge--active  { background: var(--green-bg); color: var(--green); }
 
     .color-dots { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; }
-    .color-dot { width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid rgba(0,0,0,0.12); flex-shrink: 0; position: relative; cursor: default; }
-    .color-dot[title]:hover::after { content: attr(title); position: absolute; bottom: 22px; left: 50%; transform: translateX(-50%); background: #1a1f1e; color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 3px; white-space: nowrap; pointer-events: none; z-index: 10; }
+    .color-dot { width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid rgba(0,0,0,0.12); flex-shrink: 0; }
 
-    .actions { display: flex; gap: 6px; }
-    .btn-action { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; padding: 5px 10px; border-radius: 3px; border: 1px solid transparent; cursor: pointer; background: none; font-family: 'Jost', sans-serif; transition: opacity 0.15s; }
+    /* ── Action buttons ── */
+    .actions { display: flex; gap: 5px; flex-wrap: wrap; }
+    .btn-action { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; padding: 5px 9px; border-radius: 3px; border: 1px solid transparent; cursor: pointer; background: none; font-family: 'Jost', sans-serif; transition: opacity 0.15s; white-space: nowrap; }
     .btn-action:hover { opacity: 0.75; }
-    .btn-action svg { width: 12px; height: 12px; }
-    .btn-action--edit   { background: var(--blue-bg);  color: var(--blue);  border-color: #bfdbfe; }
-    .btn-action--delete { background: var(--red-bg);   color: var(--red);   border-color: #fecaca; }
+    .btn-action svg { width: 11px; height: 11px; }
+    .btn-action--edit    { background: var(--blue-bg);   color: var(--blue);  border-color: #bfdbfe; }
+    .btn-action--delete  { background: var(--red-bg);    color: var(--red);   border-color: #fecaca; }
+    .btn-action--block   { background: var(--orange-bg); color: var(--orange);border-color: #fde68a; }
+    .btn-action--unblock { background: var(--green-bg);  color: var(--green); border-color: #bbf7d0; }
 
     .pagination { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 20px; border-top: 1px solid var(--border); }
     .page-btn { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 4px; border: 1px solid var(--border); font-size: 13px; font-weight: 500; color: var(--text-mid); text-decoration: none; transition: background 0.15s; }
@@ -99,7 +109,35 @@
     .empty-state { padding: 48px 24px; text-align: center; color: var(--text-light); font-size: 13px; }
     .footer { text-align: center; padding: 20px; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); border-top: 1px solid var(--border); }
 
-    /* ══ MODAL BASE ══ */
+    /* ══ CONFIRM MODAL ══ */
+    .confirm-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 400; align-items: center; justify-content: center; }
+    .confirm-overlay.open { display: flex; }
+    .confirm-box { background: var(--white); border-radius: 12px; padding: 32px 28px; max-width: 400px; width: 90%; box-shadow: 0 8px 40px rgba(0,0,0,0.18); text-align: center; animation: popIn 0.18s ease; }
+    @keyframes popIn { from { transform: scale(0.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .confirm-icon { width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; }
+    .confirm-icon--red    { background: var(--red-bg); }
+    .confirm-icon--orange { background: var(--orange-bg); }
+    .confirm-icon--green  { background: var(--green-bg); }
+    .confirm-icon svg { width: 26px; height: 26px; }
+    .confirm-icon--red    svg { color: var(--red); }
+    .confirm-icon--orange svg { color: var(--orange); }
+    .confirm-icon--green  svg { color: var(--green); }
+    .confirm-box h3 { font-size: 17px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+    .confirm-box p { font-size: 13px; color: var(--text-mid); line-height: 1.5; margin-bottom: 24px; }
+    .confirm-box p strong { color: var(--text); font-weight: 600; }
+    .confirm-actions { display: flex; gap: 10px; justify-content: center; }
+    .confirm-actions .btn { min-width: 110px; justify-content: center; height: 40px; }
+
+    /* ══ TOAST NOTIFICATION ══ */
+    .toast-container { position: fixed; top: 20px; right: 20px; z-index: 500; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+    .toast { background: var(--white); border: 1px solid var(--border); border-radius: 6px; padding: 12px 16px; font-size: 13px; font-weight: 500; box-shadow: 0 4px 16px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 10px; pointer-events: all; min-width: 260px; max-width: 380px; animation: slideIn 0.25s ease; }
+    .toast--success { border-left: 3px solid var(--green); color: #1b5e20; }
+    .toast--error   { border-left: 3px solid var(--red);   color: #b00020; }
+    .toast svg { width: 16px; height: 16px; flex-shrink: 0; }
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    @keyframes slideOut { to { transform: translateX(110%); opacity: 0; } }
+
+    /* ══ PRODUCT MODAL ══ */
     .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: flex-start; justify-content: center; overflow-y: auto; padding: 40px 16px; }
     .modal-overlay.open { display: flex; }
     .modal { background: var(--white); border-radius: 8px; width: 100%; max-width: 780px; padding: 32px; margin: auto; }
@@ -112,25 +150,23 @@
     select.form-input { cursor: pointer; }
     textarea.form-input { height: 80px; padding: 10px 14px; resize: vertical; }
     .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
+    .modal-error { background: #fdecea; color: #b00020; border: 1px solid #f5c6cb; border-radius: 4px; padding: 10px 14px; font-size: 13px; margin-bottom: 16px; display: none; }
+    .modal-error.show { display: block; }
 
-    /* ══ SECTION DIVIDER ══ */
     .section-divider { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-mid); padding: 10px 0 8px; border-bottom: 1px solid var(--border); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
     .section-divider svg { width: 13px; height: 13px; color: var(--teal); }
 
-    /* ══ COLOR VARIANT BUILDER ══ */
-    .variant-builder { border: 1px solid var(--border); border-radius: 6px; background: #fafcfb; padding: 0; margin-bottom: 16px; overflow: hidden; }
-    .variant-builder-header { padding: 12px 16px; background: var(--teal-light); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .variant-builder { border: 1px solid var(--border); border-radius: 6px; background: #fafcfb; margin-bottom: 16px; overflow: hidden; }
+    .variant-builder-header { padding: 12px 16px; background: var(--teal-light); border-bottom: 1px solid var(--border); }
     .variant-builder-header span { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--teal-dark); }
     .variant-add-row { padding: 14px 16px; display: flex; align-items: flex-end; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid var(--border); background: #fff; }
     .variant-add-row .form-group { margin-bottom: 0; flex: 1; min-width: 120px; }
-    .variant-add-row .form-label { margin-bottom: 5px; }
     .color-native-btn { width: 40px; height: 40px; border: 1px solid var(--border); border-radius: 4px; padding: 2px; cursor: pointer; background: none; flex-shrink: 0; }
     .variant-btn-add { height: 40px; padding: 0 16px; border-radius: 4px; background: var(--teal); color: #fff; border: none; font-family: 'Jost', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
     .variant-btn-add:hover { background: var(--teal-dark); }
 
-    /* Tabs for each variant */
     .variant-tabs { display: flex; border-bottom: 1px solid var(--border); overflow-x: auto; background: #fff; }
-    .variant-tab { padding: 9px 14px; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; cursor: pointer; border-right: 1px solid var(--border); display: flex; align-items: center; gap: 6px; white-space: nowrap; color: var(--text-mid); background: none; border-top: none; border-left: none; border-bottom: 3px solid transparent; transition: background 0.15s, color 0.15s; font-family: 'Jost', sans-serif; }
+    .variant-tab { padding: 9px 14px; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; cursor: pointer; border-right: 1px solid var(--border); display: flex; align-items: center; gap: 6px; white-space: nowrap; color: var(--text-mid); background: none; border-top: none; border-left: none; border-bottom: 3px solid transparent; transition: background 0.15s; font-family: 'Jost', sans-serif; }
     .variant-tab:hover { background: var(--teal-light); color: var(--teal); }
     .variant-tab.active { background: var(--teal-light); color: var(--teal); border-bottom-color: var(--teal); }
     .variant-tab-swatch { width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid rgba(0,0,0,0.15); flex-shrink: 0; }
@@ -139,8 +175,6 @@
 
     .variant-panel { display: none; padding: 16px; background: #fafcfb; }
     .variant-panel.active { display: block; }
-
-    /* Per-variant image upload */
     .variant-upload-zone { border: 2px dashed var(--border); border-radius: 6px; padding: 18px; text-align: center; cursor: pointer; transition: border-color 0.2s; background: #fff; }
     .variant-upload-zone:hover { border-color: var(--teal); }
     .variant-upload-zone p { font-size: 12px; color: var(--text-mid); margin-top: 6px; }
@@ -151,17 +185,16 @@
     .variant-preview-item .remove-vimg { position: absolute; top: -5px; right: -5px; width: 16px; height: 16px; border-radius: 50%; background: var(--red); color: #fff; border: none; cursor: pointer; font-size: 9px; display: flex; align-items: center; justify-content: center; }
     .variant-img-count { font-size: 11px; color: var(--text-mid); margin-top: 5px; }
     .variant-img-count.warn { color: var(--red); font-weight: 600; }
-
-    /* Stock input inside variant */
-    .variant-stock-row { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
-    .variant-stock-row label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text); white-space: nowrap; }
     .variant-stock-input { width: 120px; height: 38px; border: 1px solid var(--border); border-radius: 4px; padding: 0 12px; font-family: 'Jost', sans-serif; font-size: 13px; outline: none; }
     .variant-stock-input:focus { border-color: var(--teal); }
-
     .variant-empty { padding: 24px; text-align: center; font-size: 12px; color: var(--text-light); }
     .variant-hint { font-size: 11px; color: var(--text-light); padding: 10px 16px; background: #fff; }
 
-    /* Cropper */
+    .color-preset-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+    .color-preset { width: 22px; height: 22px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; transition: transform 0.12s; flex-shrink: 0; outline: none; }
+    .color-preset:hover { transform: scale(1.18); }
+    .color-preset.selected { border-color: var(--text); box-shadow: 0 0 0 2px var(--white), 0 0 0 4px var(--text); }
+
     .cropper-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 300; align-items: center; justify-content: center; }
     .cropper-modal-overlay.open { display: flex; }
     .cropper-box { background: var(--white); border-radius: 8px; padding: 24px; max-width: 560px; width: 100%; }
@@ -170,26 +203,6 @@
     #cropperImage { display: block; max-width: 100%; }
     .cropper-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px; }
 
-    /* Confirm */
-    .confirm-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 400; align-items: center; justify-content: center; }
-    .confirm-overlay.open { display: flex; }
-    .confirm-box { background: var(--white); border-radius: 12px; padding: 32px 28px; max-width: 380px; width: 100%; box-shadow: 0 8px 40px rgba(0,0,0,0.18); text-align: center; animation: popIn 0.2s ease; }
-    @keyframes popIn { from { transform: scale(0.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-    .confirm-icon { width: 56px; height: 56px; border-radius: 50%; background: var(--red-bg); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; }
-    .confirm-icon svg { width: 26px; height: 26px; color: var(--red); }
-    .confirm-box h3 { font-size: 17px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
-    .confirm-box p { font-size: 13px; color: var(--text-mid); line-height: 1.5; margin-bottom: 24px; }
-    .confirm-box p strong { color: var(--text); font-weight: 600; }
-    .confirm-actions { display: flex; gap: 10px; justify-content: center; }
-    .confirm-actions .btn { min-width: 110px; justify-content: center; }
-
-    /* Preset swatches for adding variant */
-    .color-preset-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
-    .color-preset { width: 22px; height: 22px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; transition: transform 0.12s, border-color 0.12s; flex-shrink: 0; outline: none; }
-    .color-preset:hover { transform: scale(1.18); }
-    .color-preset.selected { border-color: var(--text); box-shadow: 0 0 0 2px var(--white), 0 0 0 4px var(--text); }
-
-    /* ══ SUBMIT SPINNER ══ */
     .btn--loading { opacity: 0.7; pointer-events: none; }
     .btn--loading::after { content: ''; display: inline-block; width: 12px; height: 12px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.6s linear infinite; margin-left: 8px; }
     @keyframes spin { to { transform: rotate(360deg); } }
@@ -199,7 +212,7 @@
 <div class="layout">
 
   <!-- Sidebar -->
-  <aside class="sidebar">
+ <aside class="sidebar">
     <div class="sidebar__brand">
       <div class="sidebar__brand-name">Velmora<br>Chroné</div>
       <div class="sidebar__brand-sub">Admin Dashboard</div>
@@ -217,7 +230,11 @@
         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"/></svg>
         Products
       </a>
-      <a href="/admin/customers" class="nav-item">
+      <a href="/admin/reviews" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+        Rating/Review
+      </a>
+      <a href="/admin/dashboard" class="nav-item">
         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
         Customers
       </a>
@@ -230,16 +247,20 @@
         Categories
       </a>
       <a href="/admin/brands" class="nav-item">
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 4H7a2 2 0 01-2-2V6a2 2 0 012-2h5l2 2h3a2 2 0 012 2v12a2 2 0 01-2 2z"/></svg>
         Brands
       </a>
-      <a href="/admin/refund" class="nav-item">
+      <a href="/admin/refunds" class="nav-item">
         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
         Refund/Return
       </a>
       <a href="/admin/banners" class="nav-item">
         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
         Banner
+      </a>
+      <a href="/admin/referrals" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+        Referral
       </a>
     </nav>
     <div class="sidebar__footer">
@@ -262,12 +283,25 @@
 
     <div class="content">
 
-      <% if (locals.success && success && success.length) { %><div class="flash flash--success"><%= success[0] || success %></div><% } %>
-      <% if (locals.error   && error   && error.length)   { %><div class="flash flash--error"><%=   error[0] || error %></div><% } %>
+      <!-- Flash messages (from redirect) -->
+      <% if (locals.success && success && success.length) { %>
+        <div class="flash flash--success" id="flashSuccess">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+          <%= Array.isArray(success) ? success[0] : success %>
+          <button class="flash__close" onclick="this.parentElement.remove()">×</button>
+        </div>
+      <% } %>
+      <% if (locals.error && error && error.length) { %>
+        <div class="flash flash--error" id="flashError">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <%= Array.isArray(error) ? error[0] : error %>
+          <button class="flash__close" onclick="this.parentElement.remove()">×</button>
+        </div>
+      <% } %>
 
       <div class="page-header">
         <h1>Products</h1>
-        <p>Manage your product catalogue — add, edit, or soft-delete products.</p>
+        <p>Manage your product catalogue — add, edit, block, or delete products.</p>
       </div>
 
       <div class="toolbar">
@@ -301,16 +335,17 @@
                 <th>Name</th>
                 <th>Brand</th>
                 <th>Category</th>
-                <th>Variants</th>
+                <th>Colours</th>
                 <th>Price</th>
                 <th>Stock</th>
-                <th>Action</th>
+                <th>Status</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               <% if (products.length > 0) { %>
                 <% products.forEach((p, i) => { %>
-                <tr>
+                <tr class="<%= !p.isListed ? 'row--blocked' : '' %>">
                   <td style="color:var(--text-light)"><%= (page-1)*8+i+1 %></td>
                   <td>
                     <div class="thumb-row">
@@ -320,7 +355,7 @@
                           : p.images.slice(0,3);
                       %>
                       <% thumbImgs.forEach(img => { %>
-                        <img class="thumb" src="<%= img %>" alt="product"/>
+                        <img class="thumb" src="<%= img %>" alt="product" style="<%= !p.isListed ? 'opacity:0.5;filter:grayscale(0.4)' : '' %>"/>
                       <% }) %>
                     </div>
                   </td>
@@ -346,7 +381,15 @@
                   <td>&#8377;<%= p.price.toLocaleString() %></td>
                   <td><%= p.stock %></td>
                   <td>
+                    <% if (p.isListed !== false) { %>
+                      <span class="badge badge--active">Active</span>
+                    <% } else { %>
+                      <span class="badge badge--blocked">Blocked</span>
+                    <% } %>
+                  </td>
+                  <td>
                     <div class="actions">
+                      <!-- Edit -->
                       <button
                         class="btn-action btn-action--edit"
                         data-id="<%= p._id %>"
@@ -360,11 +403,37 @@
                         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                         Edit
                       </button>
+
+                      <!-- Block / Unblock -->
+                      <% if (p.isListed !== false) { %>
+                        <button
+                          class="btn-action btn-action--block"
+                          data-action="/admin/products/<%= p._id %>/block"
+                          data-name="<%= p.name %>"
+                          data-type="block"
+                          onclick="openActionConfirm(this)">
+                          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+                          Block
+                        </button>
+                      <% } else { %>
+                        <button
+                          class="btn-action btn-action--unblock"
+                          data-action="/admin/products/<%= p._id %>/unblock"
+                          data-name="<%= p.name %>"
+                          data-type="unblock"
+                          onclick="openActionConfirm(this)">
+                          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                          Unblock
+                        </button>
+                      <% } %>
+
+                      <!-- Delete -->
                       <button
                         class="btn-action btn-action--delete"
                         data-action="/admin/products/<%= p._id %>/delete"
                         data-name="<%= p.name %>"
-                        onclick="openDeleteConfirm(this)">
+                        data-type="delete"
+                        onclick="openActionConfirm(this)">
                         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path stroke-linecap="round" stroke-linejoin="round" d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6m5 0V4h4v2"/></svg>
                         Delete
                       </button>
@@ -373,7 +442,7 @@
                 </tr>
                 <% }) %>
               <% } else { %>
-                <tr><td colspan="9"><div class="empty-state">No products found.</div></td></tr>
+                <tr><td colspan="10"><div class="empty-state">No products found.</div></td></tr>
               <% } %>
             </tbody>
           </table>
@@ -391,22 +460,25 @@
       </div>
 
     </div>
-    <footer class="footer">© 2024 Velmora Chroné. Admin Panel.</footer>
+    <footer class="footer">© 2026 Velmora Chroné. Admin Panel.</footer>
   </div>
 </div>
 
-<!-- ══ DELETE CONFIRM ══ -->
+<!-- ══ TOAST CONTAINER ══ -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ══ ACTION CONFIRM MODAL ══ -->
 <div class="confirm-overlay" id="confirmModal">
   <div class="confirm-box">
-    <div class="confirm-icon">
-      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path stroke-linecap="round" stroke-linejoin="round" d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6m5 0V4h4v2"/></svg>
+    <div class="confirm-icon" id="confirmIcon">
+      <svg id="confirmIconSvg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"></svg>
     </div>
-    <h3>Delete Product?</h3>
-    <p>You are about to delete <strong id="confirmProductName"></strong>. This action cannot be undone.</p>
+    <h3 id="confirmTitle"></h3>
+    <p id="confirmMessage"></p>
     <div class="confirm-actions">
-      <button class="btn btn--outline" onclick="closeDeleteConfirm()">Cancel</button>
-      <form id="confirmDeleteForm" method="POST" style="margin:0">
-        <button type="submit" class="btn btn--danger">Yes, Delete</button>
+      <button class="btn btn--outline" onclick="closeConfirm()">Cancel</button>
+      <form id="confirmForm" method="POST" style="margin:0">
+        <button type="submit" class="btn" id="confirmBtn"></button>
       </form>
     </div>
   </div>
@@ -416,8 +488,8 @@
 <div class="modal-overlay" id="addModal">
   <div class="modal">
     <h2 class="modal__title">Add Product</h2>
+    <div class="modal-error" id="addModalError"></div>
     <form id="addForm" action="/admin/products/add" method="POST" onsubmit="submitForm(event,'add')">
-
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Product Name *</label>
@@ -433,7 +505,6 @@
           </select>
         </div>
       </div>
-
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Brand</label>
@@ -449,26 +520,22 @@
           <input class="form-input" type="number" name="price" required min="0" placeholder="0"/>
         </div>
       </div>
-
       <div class="form-group">
         <label class="form-label">Description</label>
         <textarea class="form-input" name="description" placeholder="Product description…"></textarea>
       </div>
 
-      <!-- ══ COLOR VARIANTS ══ -->
       <div class="section-divider">
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path stroke-linecap="round" d="M12 2v2M12 20v2M2 12h2M20 12h2"/></svg>
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/></svg>
         Color Variants
         <span style="font-size:9px;font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-light);margin-left:4px">— each variant needs its own images &amp; stock (min 3 images)</span>
       </div>
 
       <div class="variant-builder" id="addVariantBuilder">
-        <div class="variant-builder-header">
-          <span>Add a New Color Variant</span>
-        </div>
+        <div class="variant-builder-header"><span>Add a New Color Variant</span></div>
         <div class="variant-add-row">
           <div>
-            <div class="form-label" style="font-size:9px;letter-spacing:0.1em;text-transform:uppercase;font-weight:600;margin-bottom:6px">Presets</div>
+            <div class="form-label" style="font-size:9px">Presets</div>
             <div class="color-preset-row" id="addVPresets"></div>
           </div>
           <div class="form-group" style="min-width:50px;max-width:54px">
@@ -489,13 +556,11 @@
           </div>
           <button type="button" class="variant-btn-add" onclick="addVariant('add')">+ Add Variant</button>
         </div>
-
         <div id="addVariantTabs" class="variant-tabs" style="display:none"></div>
         <div id="addVariantPanels"></div>
-        <div id="addVariantEmpty" class="variant-empty">No colour variants yet. Add at least one variant above.</div>
+        <div id="addVariantEmpty" class="variant-empty">No colour variants yet. Add at least one above.</div>
         <p class="variant-hint">Each colour variant needs at least 3 images. Stock is set per variant.</p>
       </div>
-
       <input type="hidden" name="colorVariants" id="addColorVariantsInput"/>
 
       <div class="modal-footer">
@@ -510,8 +575,8 @@
 <div class="modal-overlay" id="editModal">
   <div class="modal">
     <h2 class="modal__title">Edit Product</h2>
+    <div class="modal-error" id="editModalError"></div>
     <form id="editForm" method="POST" onsubmit="submitForm(event,'edit')">
-
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Product Name *</label>
@@ -527,7 +592,6 @@
           </select>
         </div>
       </div>
-
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Brand</label>
@@ -543,26 +607,22 @@
           <input class="form-input" type="number" name="price" id="editPrice" required min="0"/>
         </div>
       </div>
-
       <div class="form-group">
         <label class="form-label">Description</label>
         <textarea class="form-input" name="description" id="editDesc"></textarea>
       </div>
 
-      <!-- ══ COLOR VARIANTS — EDIT ══ -->
       <div class="section-divider">
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path stroke-linecap="round" d="M12 2v2M12 20v2M2 12h2M20 12h2"/></svg>
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/></svg>
         Color Variants
         <span style="font-size:9px;font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-light);margin-left:4px">— each variant needs its own images &amp; stock (min 3 images)</span>
       </div>
 
       <div class="variant-builder" id="editVariantBuilder">
-        <div class="variant-builder-header">
-          <span>Add a New Color Variant</span>
-        </div>
+        <div class="variant-builder-header"><span>Add a New Color Variant</span></div>
         <div class="variant-add-row">
           <div>
-            <div class="form-label" style="font-size:9px;letter-spacing:0.1em;text-transform:uppercase;font-weight:600;margin-bottom:6px">Presets</div>
+            <div class="form-label" style="font-size:9px">Presets</div>
             <div class="color-preset-row" id="editVPresets"></div>
           </div>
           <div class="form-group" style="min-width:50px;max-width:54px">
@@ -583,13 +643,11 @@
           </div>
           <button type="button" class="variant-btn-add" onclick="addVariant('edit')">+ Add Variant</button>
         </div>
-
         <div id="editVariantTabs" class="variant-tabs" style="display:none"></div>
         <div id="editVariantPanels"></div>
         <div id="editVariantEmpty" class="variant-empty">No colour variants. Add at least one above.</div>
         <p class="variant-hint">Each colour variant needs at least 3 images. Stock is set per variant.</p>
       </div>
-
       <input type="hidden" name="colorVariants" id="editColorVariantsInput"/>
 
       <div class="modal-footer">
@@ -603,9 +661,7 @@
 <div class="cropper-modal-overlay" id="cropperModal">
   <div class="cropper-box">
     <h3>Crop Image</h3>
-    <div class="cropper-container-wrap">
-      <img id="cropperImage" src="" alt="crop"/>
-    </div>
+    <div class="cropper-container-wrap"><img id="cropperImage" src="" alt="crop"/></div>
     <div class="cropper-actions">
       <button type="button" class="btn btn--outline" onclick="cancelCrop()">Skip</button>
       <button type="button" class="btn btn--teal"    onclick="applyCrop()">Crop &amp; Use</button>
@@ -616,6 +672,102 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 <script>
 
+// ══ TOAST ══════════════════════════════════════════════════════════════════════
+function showToast(message, type = 'success') {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = `toast toast--${type}`;
+  const icon = type === 'success'
+    ? '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>'
+    : '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
+  toast.innerHTML = icon + '<span>' + escHtml(message) + '</span>';
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.style.animation = 'slideOut 0.3s ease forwards';
+    setTimeout(() => toast.remove(), 300);
+  }, 3500);
+}
+
+// Auto-dismiss flash messages after 4s
+setTimeout(() => {
+  ['flashSuccess', 'flashError'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.remove();
+  });
+}, 4000);
+
+// ══ ACTION CONFIRM (block / unblock / delete) ══════════════════════════════════
+const confirmConfig = {
+  block: {
+    iconClass: 'confirm-icon--orange',
+    iconSvg:   '<circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>',
+    title:     'Block Product?',
+    message:   name => `"<strong>${escHtml(name)}</strong>" will be hidden from customers immediately. You can unblock it at any time.`,
+    btnClass:  'btn--outline',
+    btnStyle:  'border-color:#fde68a;color:#d97706;background:#fef3c7',
+    btnText:   'Yes, Block',
+  },
+  unblock: {
+    iconClass: 'confirm-icon--green',
+    iconSvg:   '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>',
+    title:     'Unblock Product?',
+    message:   name => `"<strong>${escHtml(name)}</strong>" will be visible to customers again.`,
+    btnClass:  'btn--teal',
+    btnStyle:  '',
+    btnText:   'Yes, Unblock',
+  },
+  delete: {
+    iconClass: 'confirm-icon--red',
+    iconSvg:   '<polyline points="3 6 5 6 21 6"/><path stroke-linecap="round" stroke-linejoin="round" d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6m5 0V4h4v2"/>',
+    title:     'Delete Product?',
+    message:   name => `You are about to permanently delete "<strong>${escHtml(name)}</strong>". This action cannot be undone.`,
+    btnClass:  'btn--danger',
+    btnStyle:  '',
+    btnText:   'Yes, Delete',
+  },
+};
+
+function openActionConfirm(btn) {
+  const type   = btn.dataset.type;
+  const name   = btn.dataset.name;
+  const action = btn.dataset.action;
+  const cfg    = confirmConfig[type];
+  if (!cfg) return;
+
+  const icon = document.getElementById('confirmIcon');
+  icon.className = 'confirm-icon ' + cfg.iconClass;
+  document.getElementById('confirmIconSvg').innerHTML = cfg.iconSvg;
+  document.getElementById('confirmTitle').textContent = cfg.title;
+  document.getElementById('confirmMessage').innerHTML = cfg.message(name);
+
+  const confirmBtn = document.getElementById('confirmBtn');
+  confirmBtn.className = 'btn ' + cfg.btnClass;
+  if (cfg.btnStyle) confirmBtn.style.cssText = cfg.btnStyle;
+  else confirmBtn.removeAttribute('style');
+  confirmBtn.textContent = cfg.btnText;
+
+  document.getElementById('confirmForm').action = action;
+  document.getElementById('confirmModal').classList.add('open');
+}
+
+function closeConfirm() {
+  document.getElementById('confirmModal').classList.remove('open');
+}
+document.getElementById('confirmModal').addEventListener('click', function(e) {
+  if (e.target === this) closeConfirm();
+});
+
+// ══ MODAL ══════════════════════════════════════════════════════════════════════
+function showModalError(prefix, message) {
+  const el = document.getElementById(prefix + 'ModalError');
+  if (el) { el.textContent = message; el.classList.add('show'); }
+}
+function clearModalError(prefix) {
+  const el = document.getElementById(prefix + 'ModalError');
+  if (el) { el.textContent = ''; el.classList.remove('show'); }
+}
+
+// ══ VARIANT PRESETS ════════════════════════════════════════════════════════════
 const PRESETS = [
   { hex: '#000000', name: 'Black'        },
   { hex: '#ffffff', name: 'White'        },
@@ -680,18 +832,17 @@ function addVariant(prefix) {
   const stock = parseInt(document.getElementById(prefix + 'VStock').value) || 0;
 
   if (!/^#?([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(rawHex.replace('#',''))) {
-    alert('Enter a valid hex colour (e.g. #c9a96e).');
+    showModalError(prefix, 'Enter a valid hex colour (e.g. #c9a96e).');
     return;
   }
   const hex = normaliseHex(rawHex);
-
-  if (!name) { alert('Enter a colour label.'); return; }
-
+  if (!name) { showModalError(prefix, 'Enter a colour label.'); return; }
   if (variantState[prefix].some(v => normaliseHex(v.hex) === hex)) {
-    alert('A variant with that colour already exists.');
+    showModalError(prefix, 'A variant with that colour already exists.');
     return;
   }
 
+  clearModalError(prefix);
   variantState[prefix].push({ name, hex, stock, images: [], existing: [] });
   activeTab[prefix] = variantState[prefix].length - 1;
 
@@ -743,7 +894,7 @@ function renderVariantUI(prefix) {
   `).join('');
 
   panels.innerHTML = state.map((v, i) => `
-    <div class="variant-panel ${i === activeTab[prefix] ? 'active' : ''}" id="${prefix}Panel${i}">
+    <div class="variant-panel ${i === activeTab[prefix] ? 'active' : ''}">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
         <span style="width:20px;height:20px;border-radius:50%;background:${v.hex};border:1.5px solid rgba(0,0,0,0.12);display:inline-block;flex-shrink:0"></span>
         <span style="font-size:13px;font-weight:600;color:var(--text)">${escHtml(v.name)}</span>
@@ -755,7 +906,6 @@ function renderVariantUI(prefix) {
             oninput="updateVariantStock('${prefix}',${i},this.value)"/>
         </div>
       </div>
-
       <div class="variant-upload-zone" onclick="triggerVariantUpload('${prefix}',${i})">
         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
           <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
@@ -764,7 +914,6 @@ function renderVariantUI(prefix) {
       </div>
       <input type="file" id="${prefix}VFileInput${i}" accept="image/*" multiple style="display:none"
         onchange="handleVariantFiles(event,'${prefix}',${i})"/>
-
       <div class="variant-preview-grid" id="${prefix}VGrid${i}">
         ${v.images.map((src, imgIdx) => `
           <div class="variant-preview-item">
@@ -774,7 +923,7 @@ function renderVariantUI(prefix) {
           </div>
         `).join('')}
       </div>
-      <p class="variant-img-count ${v.images.length < 3 ? 'warn' : ''}" id="${prefix}VCount${i}">
+      <p class="variant-img-count ${v.images.length < 3 ? 'warn' : ''}">
         ${v.images.length} image${v.images.length !== 1 ? 's' : ''} ${v.images.length < 3 ? '— need at least 3' : '✓'}
       </p>
     </div>
@@ -795,11 +944,7 @@ function triggerVariantUpload(prefix, idx) {
   document.getElementById(prefix + 'VFileInput' + idx).click();
 }
 
-
-let cropQueue      = [];
-let cropCtx        = null;
-let currentCropper = null;
-let currentFileObj = null;
+let cropQueue = [], cropCtx = null, currentCropper = null, currentFileObj = null;
 
 function handleVariantFiles(event, prefix, varIdx) {
   cropCtx   = { prefix, varIdx };
@@ -810,7 +955,7 @@ function handleVariantFiles(event, prefix, varIdx) {
 
 function processNextCrop() {
   if (cropQueue.length === 0) return;
-  const file   = cropQueue.shift();
+  const file = cropQueue.shift();
   const reader = new FileReader();
   reader.onload = e => openCropper(e.target.result, file);
   reader.readAsDataURL(file);
@@ -855,18 +1000,20 @@ function pushVariantImage(src, isExisting) {
   renderVariantUI(prefix);
 }
 
+// ── Replace alert() with modal error messages ─────────────────────────────────
 function submitForm(e, prefix) {
   e.preventDefault();
+  clearModalError(prefix);
   const state = variantState[prefix];
 
   if (state.length === 0) {
-    alert('Please add at least one colour variant before saving.');
+    showModalError(prefix, 'Please add at least one colour variant before saving.');
     return;
   }
 
   for (const v of state) {
     if (v.images.length < 3) {
-      alert(`"${v.name}" only has ${v.images.length} image(s). Each variant needs at least 3 images.`);
+      showModalError(prefix, `"${v.name}" only has ${v.images.length} image(s). Each variant needs at least 3 images.`);
       return;
     }
   }
@@ -895,6 +1042,7 @@ function openAddModal() {
   activeTab.add    = 0;
   document.getElementById('addForm').reset();
   document.getElementById('addBrandInput').value = '';
+  clearModalError('add');
   renderVariantUI('add');
   document.getElementById('addModal').classList.add('open');
 }
@@ -911,7 +1059,7 @@ function openEditFromBtn(btn) {
     openEditModal(id, name, desc, price, catId, brand, variants);
   } catch(err) {
     console.error('Edit parse error:', err);
-    alert('Could not open editor. Please refresh the page and try again.');
+    showToast('Could not open editor. Please refresh the page.', 'error');
   }
 }
 
@@ -921,6 +1069,7 @@ function openEditModal(id, name, desc, price, catId, brand, variants) {
   document.getElementById('editDesc').value  = desc;
   document.getElementById('editPrice').value = price;
   document.getElementById('editBrand').value = brand;
+  clearModalError('edit');
   setTimeout(() => { document.getElementById('editCategory').value = catId; }, 0);
 
   variantState.edit = variants.map(v => ({
@@ -944,24 +1093,9 @@ document.querySelectorAll('.modal-overlay').forEach(el => {
   el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); });
 });
 
-function openDeleteConfirm(btn) {
-  document.getElementById('confirmProductName').textContent = btn.dataset.name;
-  document.getElementById('confirmDeleteForm').action      = btn.dataset.action;
-  document.getElementById('confirmModal').classList.add('open');
-}
-function closeDeleteConfirm() {
-  document.getElementById('confirmModal').classList.remove('open');
-}
-document.getElementById('confirmModal').addEventListener('click', function(e) {
-  if (e.target === this) closeDeleteConfirm();
-});
-
 function escHtml(str) {
   return String(str)
-    .replace(/&/g,'&amp;')
-    .replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;');
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 initPresets('add');
@@ -970,4 +1104,22 @@ renderVariantUI('add');
 renderVariantUI('edit');
 </script>
 </body>
+<script>
+  function fetchData() {
+    fetch('/your-endpoint.json')
+      .then(res => res.json())
+      .then(data => {
+        // update your DOM here
+        console.log('Refreshed:', data);
+      });
+  }
+
+  fetchData();
+  setInterval(fetchData, 20000);
+
+  // Full page reload (optional: remove if data-only is enough)
+  setTimeout(function() {
+    location.reload();
+  }, 20000);
+</script>
 </html>

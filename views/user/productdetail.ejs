@@ -15,7 +15,6 @@
     ::-webkit-scrollbar { width: 2px; }
     ::-webkit-scrollbar-track { background: #111110; }
     ::-webkit-scrollbar-thumb { background: #c9a96e; }
-
     .nav-root { position: fixed; top: 0; left: 0; right: 0; z-index: 200; background: #111110; border-bottom: 1px solid rgba(245,242,235,0.06); transition: box-shadow 0.3s; }
     .nav-root.scrolled { box-shadow: 0 2px 20px rgba(0,0,0,0.3); }
     .nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 1rem 2rem; }
@@ -36,18 +35,15 @@
     .mobile-menu { display: none; flex-direction: column; background: #0d0d0c; padding: 1.5rem 2rem; gap: 1rem; border-top: 1px solid rgba(245,242,235,0.05); }
     .mobile-menu.open { display: flex; }
     .mobile-menu .nav-link { font-size: 0.7rem; padding: 0.4rem 0; border-bottom: 1px solid rgba(245,242,235,0.04); color: rgba(245,242,235,0.5); }
-
     .breadcrumb { padding: 5.5rem 3rem 0; max-width: 1200px; margin: 0 auto; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
     .breadcrumb a { font-family: 'Jost', sans-serif; font-size: 0.5rem; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(245,242,235,0.3); text-decoration: none; transition: color 0.2s; }
     .breadcrumb a:hover { color: rgba(245,242,235,0.6); }
     .breadcrumb span.sep { font-size: 0.5rem; color: rgba(245,242,235,0.15); }
     .breadcrumb-current { font-family: 'Jost', sans-serif; font-size: 0.5rem; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(201,169,110,0.7); }
-
     .detail-wrap { max-width: 1200px; margin: 0 auto; padding: 2rem 2rem 5rem; }
     @media(min-width:768px) { .detail-wrap { padding: 2rem 3rem 5rem; } }
     .detail-grid { display: grid; grid-template-columns: 1fr; gap: 3rem; }
     @media(min-width:900px) { .detail-grid { grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; } }
-
     .gallery { display: flex; flex-direction: column; gap: 0.75rem; }
     .main-img-wrap { width: 100%; aspect-ratio: 4/3; overflow: hidden; background: #1a1a18; position: relative; cursor: zoom-in; border: 1px solid rgba(245,242,235,0.05); }
     .main-img-wrap.zoomed { cursor: zoom-out; }
@@ -56,10 +52,9 @@
     .zoom-hint { position: absolute; bottom: 10px; right: 12px; font-family: 'Jost', sans-serif; font-size: 0.42rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(245,242,235,0.2); display: flex; align-items: center; gap: 4px; pointer-events: none; transition: opacity 0.3s; }
     .main-img-wrap.zoomed .zoom-hint { opacity: 0; }
     .img-badge { position: absolute; top: 12px; left: 12px; z-index: 2; font-family: 'Jost', sans-serif; font-size: 0.42rem; letter-spacing: 0.18em; text-transform: uppercase; padding: 3px 9px; }
-    .badge-oos      { background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.3); color: #f87171; }
-    .badge-low      { background: rgba(251,191,36,0.1);  border: 1px solid rgba(251,191,36,0.3);  color: #fbbf24; }
-    .badge-discount { background: rgba(201,169,110,0.12);border: 1px solid rgba(201,169,110,0.3); color: #c9a96e; }
-
+    .badge-oos { background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.3); color: #f87171; }
+    .badge-low { background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.3); color: #fbbf24; }
+    .badge-discount { background: rgba(201,169,110,0.12); border: 1px solid rgba(201,169,110,0.3); color: #c9a96e; }
     .thumb-row { display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 4px; }
     .thumb { width: 70px; height: 55px; overflow: hidden; background: #1a1a18; cursor: pointer; border: 1px solid transparent; transition: border-color 0.2s, opacity 0.2s; flex-shrink: 0; }
     .thumb.active { border-color: #c9a96e; }
@@ -67,36 +62,31 @@
     .thumb:not(.active) img { opacity: 0.5; }
     .thumb:hover img { opacity: 1; }
     .watch-ph { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #1a1a18; }
-
     .info-col { display: flex; flex-direction: column; gap: 0; }
     .prod-category { font-family: 'Jost', sans-serif; font-size: 0.45rem; letter-spacing: 0.28em; text-transform: uppercase; color: rgba(245,242,235,0.3); margin-bottom: 0.5rem; }
     .prod-brand-tag { font-family: 'Jost', sans-serif; font-size: 0.42rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(201,169,110,0.65); margin-bottom: 0.6rem; border: 1px solid rgba(201,169,110,0.15); padding: 2px 8px; display: inline-block; }
     .prod-name { font-family: 'Cormorant Garamond', serif; font-size: clamp(1.8rem, 3.5vw, 2.6rem); font-weight: 300; color: #f5f2eb; line-height: 1.15; margin-bottom: 0.75rem; }
     .divider { width: 40px; height: 1px; background: rgba(201,169,110,0.4); margin-bottom: 1rem; }
-
     .rating-row { display: flex; align-items: center; gap: 10px; margin-bottom: 1.25rem; flex-wrap: wrap; }
     .stars { display: flex; gap: 2px; }
     .star { width: 11px; height: 11px; }
-    .star polygon.filled  { fill: #c9a96e; }
-    .star polygon.empty   { fill: none; stroke: rgba(201,169,110,0.3); stroke-width: 1.5; }
+    .star polygon.filled { fill: #c9a96e; }
+    .star polygon.empty { fill: none; stroke: rgba(201,169,110,0.3); stroke-width: 1.5; }
     .rating-num { font-family: 'Jost', sans-serif; font-size: 0.6rem; color: rgba(245,242,235,0.5); }
     .review-link { font-family: 'Jost', sans-serif; font-size: 0.52rem; color: rgba(245,242,235,0.3); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; transition: color 0.2s; }
     .review-link:hover { color: rgba(245,242,235,0.6); }
-
     .price-block { margin-bottom: 0.35rem; }
     .price-row { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
     .prod-price { font-family: 'Jost', sans-serif; font-size: 1.4rem; font-weight: 300; color: #f5f2eb; letter-spacing: 0.05em; }
     .prod-price-label { font-family: 'Jost', sans-serif; font-size: 0.45rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(245,242,235,0.2); margin-bottom: 1rem; margin-top: 3px; }
-
     .stock-badge { display: inline-flex; align-items: center; gap: 6px; font-family: 'Jost', sans-serif; font-size: 0.5rem; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1.5rem; }
     .stock-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-    .stock-dot.in  { background: #4ade80; box-shadow: 0 0 6px rgba(74,222,128,0.5); }
+    .stock-dot.in { background: #4ade80; box-shadow: 0 0 6px rgba(74,222,128,0.5); }
     .stock-dot.low { background: #fbbf24; box-shadow: 0 0 6px rgba(251,191,36,0.4); }
     .stock-dot.out { background: #f87171; }
-    .stock-badge.in  { color: rgba(74,222,128,0.8); }
+    .stock-badge.in { color: rgba(74,222,128,0.8); }
     .stock-badge.low { color: rgba(251,191,36,0.8); }
     .stock-badge.out { color: rgba(248,113,113,0.8); }
-
     .color-variants { margin-bottom: 1.5rem; }
     .color-variants-label { font-family: 'Jost', sans-serif; font-size: 0.48rem; letter-spacing: 0.28em; text-transform: uppercase; color: rgba(245,242,235,0.35); margin-bottom: 0.75rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(245,242,235,0.06); }
     .color-selected-name { font-family: 'Jost', sans-serif; font-size: 0.52rem; color: rgba(245,242,235,0.5); margin-bottom: 0.75rem; letter-spacing: 0.08em; }
@@ -109,10 +99,8 @@
     .color-swatch[data-oos="true"]::after { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 1.5px; background: rgba(248,113,113,0.7); transform: rotate(-45deg); }
     .color-swatch[title]::before { content: attr(title); position: absolute; bottom: 110%; left: 50%; transform: translateX(-50%); background: #1a1a18; border: 1px solid rgba(245,242,235,0.08); color: rgba(245,242,235,0.7); font-family: 'Jost', sans-serif; font-size: 0.42rem; letter-spacing: 0.1em; white-space: nowrap; padding: 3px 8px; pointer-events: none; opacity: 0; transition: opacity 0.2s; }
     .color-swatch:hover::before { opacity: 1; }
-
     .gallery-fade { opacity: 0; transition: opacity 0.25s; }
     .gallery-fade.visible { opacity: 1; }
-
     .action-row { display: flex; gap: 0.75rem; align-items: stretch; margin-bottom: 1rem; }
     .qty-wrap { display: flex; align-items: center; border: 1px solid rgba(245,242,235,0.12); }
     .qty-btn { width: 36px; height: 48px; background: none; border: none; color: rgba(245,242,235,0.5); font-size: 1rem; cursor: pointer; transition: color 0.2s, background 0.2s; display: flex; align-items: center; justify-content: center; }
@@ -127,14 +115,11 @@
     .wishlist-btn:hover { color: #c9a96e; border-color: rgba(201,169,110,0.4); }
     .wishlist-btn.active { color: #f87171; border-color: rgba(248,113,113,0.3); }
     .wishlist-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
     .section-title { font-family: 'Jost', sans-serif; font-size: 0.48rem; letter-spacing: 0.28em; text-transform: uppercase; color: rgba(245,242,235,0.35); margin-bottom: 0.75rem; margin-top: 2rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(245,242,235,0.06); }
     .prod-desc { font-family: 'Jost', sans-serif; font-size: 0.7rem; font-weight: 300; color: rgba(245,242,235,0.45); line-height: 1.9; letter-spacing: 0.03em; }
-
     .service-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid rgba(245,242,235,0.05); }
     .service-pill { display: flex; align-items: center; gap: 5px; font-family: 'Jost', sans-serif; font-size: 0.46rem; letter-spacing: 0.1em; color: rgba(245,242,235,0.3); }
     .service-pill svg { color: rgba(201,169,110,0.5); }
-
     .tabs-root { max-width: 1200px; margin: 0 auto; padding: 0 2rem 3rem; }
     @media(min-width:768px) { .tabs-root { padding: 0 3rem 3rem; } }
     .tab-nav { display: flex; border-bottom: 1px solid rgba(245,242,235,0.07); overflow-x: auto; }
@@ -150,7 +135,6 @@
     .specs-table td { padding: 0.65rem 0.5rem; font-family: 'Jost', sans-serif; font-size: 0.58rem; }
     .specs-table td:first-child { color: rgba(245,242,235,0.3); letter-spacing: 0.12em; text-transform: uppercase; font-size: 0.48rem; width: 40%; }
     .specs-table td:last-child { color: rgba(245,242,235,0.65); }
-
     .related-section { max-width: 1200px; margin: 0 auto; padding: 0 2rem 5rem; }
     @media(min-width:768px) { .related-section { padding: 0 3rem 5rem; } }
     .related-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; padding-bottom: 0.75rem; border-bottom: 1px solid rgba(245,242,235,0.06); }
@@ -170,13 +154,11 @@
     .prod-price-sm { font-family: 'Jost', sans-serif; font-size: 0.6rem; color: rgba(245,242,235,0.45); }
     .view-btn { display: block; width: 100%; margin-top: 0.75rem; background: #111110; color: rgba(245,242,235,0.5); font-family: 'Jost', sans-serif; font-size: 0.48rem; letter-spacing: 0.2em; text-transform: uppercase; padding: 0.65rem; border: none; cursor: pointer; text-align: center; text-decoration: none; border-top: 1px solid rgba(245,242,235,0.06); transition: background 0.2s, color 0.2s; }
     .view-btn:hover { background: #c9a96e; color: #111110; }
-
     .toast { position: fixed; bottom: 2rem; right: 2rem; z-index: 999; background: #1a1a18; border: 1px solid rgba(201,169,110,0.25); color: #f5f2eb; font-family: 'Jost', sans-serif; font-size: 0.58rem; letter-spacing: 0.08em; padding: 0.8rem 1.25rem; display: flex; align-items: center; gap: 10px; transform: translateY(80px); opacity: 0; transition: transform 0.35s, opacity 0.35s; pointer-events: none; min-width: 220px; }
     .toast.show { transform: translateY(0); opacity: 1; }
     .toast.err { border-color: rgba(248,113,113,0.3); }
     .toast-dot { width: 5px; height: 5px; border-radius: 50%; background: #c9a96e; flex-shrink: 0; }
     .toast.err .toast-dot { background: #f87171; }
-
     .footer { background: #0a0a09; padding: 4rem 2rem 1.5rem; border-top: 1px solid rgba(245,242,235,0.05); }
     @media(min-width:768px) { .footer { padding: 4rem 3rem 1.5rem; } }
     .footer-inner { max-width: 1200px; margin: 0 auto; }
@@ -200,32 +182,19 @@
 <%
   const hasVariants = product.colorVariants && product.colorVariants.length > 0;
   const variants = hasVariants
-    ? product.colorVariants.map(v => ({
-        name:   v.name,
-        hex:    v.hex,
-        images: v.images || [],
-        stock:  v.stock  || 0,
-      }))
+    ? product.colorVariants.map(v => ({ name: v.name, hex: v.hex, images: v.images || [], stock: v.stock || 0 }))
     : [];
-
   const initialImages = hasVariants ? (variants[0].images || []) : (product.images || []);
   const initialStock  = hasVariants ? variants[0].stock : product.stock;
-
-  const isOOS       = initialStock === 0;
-  const isLow       = initialStock > 0 && initialStock <= 5;
-  const hasDiscount = product.originalPrice && product.originalPrice > product.price;
-  const discPct     = hasDiscount ? Math.round((1 - product.price / product.originalPrice) * 100) : 0;
-
-  const avgRating   = product.avgRating  || 0;
-  const reviewCount = product.reviewCount || (product.reviews ? product.reviews.length : 0);
-  const reviews     = product.reviews    || [];
-  const rc = {5:0, 4:0, 3:0, 2:0, 1:0};
-  let rSum = 0;
-  reviews.forEach(r => { rc[r.rating] = (rc[r.rating]||0)+1; rSum += r.rating; });
-
-  const brandName = product.brand
-    ? (typeof product.brand === 'object' ? product.brand.name : product.brand)
-    : null;
+  const isOOS         = initialStock === 0;
+  const isLow         = initialStock > 0 && initialStock <= 5;
+  const hasDiscount   = product.originalPrice && product.originalPrice > product.price;
+  const discPct       = hasDiscount ? Math.round((1 - product.price / product.originalPrice) * 100) : 0;
+  const avgRating     = product.avgRating || 0;
+  const reviewCount   = product.reviewCount || (product.reviews ? product.reviews.length : 0);
+  const reviews       = product.reviews || [];
+  const brandName     = product.brand ? (typeof product.brand === 'object' ? product.brand.name : product.brand) : null;
+  const isLoggedIn    = !!currentUser;
 %>
 
 <svg width="0" height="0" style="position:absolute">
@@ -237,75 +206,65 @@
   </defs>
 </svg>
 
-<!-- NAV -->
 <nav class="nav-root" id="navbar">
   <div class="nav-inner">
     <div class="hidden md:flex items-center gap-8">
       <a href="/products" class="nav-link active">Collection</a>
-      <a href="/home"     class="nav-link">Watches</a>
-      <a href="/home"     class="nav-link">About</a>
-      <a href="/home"     class="nav-link">Contact</a>
+      <a href="/home" class="nav-link">Watches</a>
+      <a href="/home" class="nav-link">About</a>
+      <a href="/home" class="nav-link">Contact</a>
     </div>
     <a href="/home" class="nav-logo md:absolute md:left-1/2 md:-translate-x-1/2">Velmora Chroné</a>
     <div class="flex items-center gap-4 md:gap-5 ml-auto md:ml-0">
-      <a href="/profile" class="nav-icon" aria-label="Profile">
+      <a href="<%= isLoggedIn ? '/profile' : '/login' %>" class="nav-icon" aria-label="Profile">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       </a>
-      <!-- ── Wishlist nav icon ── -->
-      <a href="/wishlist" class="nav-icon relative" aria-label="Wishlist" id="navWishlistIcon">
+      <a href="<%= isLoggedIn ? '/wishlist' : '/login' %>" class="nav-icon relative" aria-label="Wishlist" id="navWishlistIcon">
         <svg id="navHeartSvg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
         <span class="wishlist-nav-badge" id="wishlistNavCount"></span>
       </a>
-      <a href="/cart" class="nav-icon relative" aria-label="Cart">
+      <a href="<%= isLoggedIn ? '/cart' : '/login' %>" class="nav-icon relative" aria-label="Cart">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
         <span class="cart-badge" id="cartCount">0</span>
       </a>
-      <a href="/logout" class="nav-link hidden md:inline">Logout</a>
+      <% if (isLoggedIn) { %><a href="/logout" class="nav-link hidden md:inline">Logout</a><% } else { %><a href="/login" class="nav-link hidden md:inline">Login</a><% } %>
       <button class="hamburger md:hidden" id="hamburger"><span></span><span></span><span></span></button>
     </div>
   </div>
   <div class="mobile-menu" id="mobileMenu">
-    <a href="/products"  class="nav-link">Collection</a>
-    <a href="/home"      class="nav-link">Watches</a>
-    <a href="/profile"   class="nav-link">My Profile</a>
-    <a href="/wishlist"  class="nav-link">Wishlist</a>
-    <a href="/cart"      class="nav-link">Cart</a>
-    <a href="/logout"    class="nav-link" style="color:rgba(201,169,110,0.6)">Logout</a>
+    <a href="/products" class="nav-link">Collection</a>
+    <a href="/home" class="nav-link">Watches</a>
+    <% if (isLoggedIn) { %>
+      <a href="/profile" class="nav-link">My Profile</a>
+      <a href="/wishlist" class="nav-link">Wishlist</a>
+      <a href="/cart" class="nav-link">Cart</a>
+      <a href="/logout" class="nav-link" style="color:rgba(201,169,110,0.6)">Logout</a>
+    <% } else { %>
+      <a href="/login" class="nav-link" style="color:rgba(201,169,110,0.6)">Login</a>
+      <a href="/signup" class="nav-link">Sign Up</a>
+    <% } %>
   </div>
 </nav>
 
-<!-- BREADCRUMB -->
 <div class="breadcrumb">
   <a href="/home">Home</a><span class="sep">›</span>
   <a href="/products">Collection</a>
-  <% if (product.category) { %>
-    <span class="sep">›</span>
-    <a href="/products?category=<%= product.category._id %>"><%= product.category.name %></a>
-  <% } %>
+  <% if (product.category) { %><span class="sep">›</span><a href="/products?category=<%= product.category._id %>"><%= product.category.name %></a><% } %>
   <span class="sep">›</span>
   <span class="breadcrumb-current"><%= product.name %></span>
 </div>
 
-<!-- PRODUCT DETAIL -->
 <div class="detail-wrap">
   <div class="detail-grid">
-
-    <!-- LEFT: GALLERY -->
     <div class="gallery">
       <div class="main-img-wrap gallery-fade visible" id="mainImgWrap" onclick="toggleZoom(event)">
-        <% if (isOOS) { %>
-          <span class="img-badge badge-oos">Out of Stock</span>
-        <% } else if (isLow) { %>
-          <span class="img-badge badge-low" id="lowBadge">Only <%= initialStock %> Left</span>
-        <% } else if (hasDiscount) { %>
-          <span class="img-badge badge-discount">−<%= discPct %>%</span>
-        <% } %>
+        <% if (isOOS) { %><span class="img-badge badge-oos">Out of Stock</span>
+        <% } else if (isLow) { %><span class="img-badge badge-low" id="lowBadge">Only <%= initialStock %> Left</span>
+        <% } else if (hasDiscount) { %><span class="img-badge badge-discount">−<%= discPct %>%</span><% } %>
         <% if (initialImages.length > 0) { %>
           <img class="main-img" id="mainImg" src="<%= initialImages[0] %>" alt="<%= product.name %>"/>
         <% } else { %>
-          <div class="watch-ph">
-            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="rgba(245,242,235,0.06)" stroke-width="0.5"><circle cx="12" cy="12" r="10"/></svg>
-          </div>
+          <div class="watch-ph"><svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="rgba(245,242,235,0.06)" stroke-width="0.5"><circle cx="12" cy="12" r="10"/></svg></div>
         <% } %>
         <div class="zoom-hint">
           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="M21 21l-4.35-4.35"/></svg>
@@ -321,70 +280,46 @@
       </div>
     </div>
 
-    
     <div class="info-col">
-      <% if (product.category) { %>
-        <div class="prod-category"><%= product.category.name %></div>
-      <% } %>
-      <% if (brandName) { %>
-        <span class="prod-brand-tag"><%= brandName %></span>
-      <% } %>
-
+      <% if (product.category) { %><div class="prod-category"><%= product.category.name %></div><% } %>
+      <% if (brandName) { %><span class="prod-brand-tag"><%= brandName %></span><% } %>
       <h1 class="prod-name"><%= product.name %></h1>
       <div class="divider"></div>
-
-      <!-- Rating -->
       <div class="rating-row">
         <div class="stars">
           <% for (let s = 1; s <= 5; s++) { %>
             <svg class="star" viewBox="0 0 24 24">
-              <% if (s <= Math.floor(avgRating)) { %>
-                <polygon class="filled" points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
-              <% } else if (s - 0.5 <= avgRating) { %>
-                <polygon class="half" points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
-              <% } else { %>
-                <polygon class="empty" points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
-              <% } %>
+              <% if (s <= Math.floor(avgRating)) { %><polygon class="filled" points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+              <% } else if (s - 0.5 <= avgRating) { %><polygon class="half" points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+              <% } else { %><polygon class="empty" points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/><% } %>
             </svg>
           <% } %>
         </div>
         <span class="rating-num"><%= avgRating.toFixed(1) %></span>
         <span class="review-link" onclick="openTab('reviews')">(<%= reviewCount %> review<%= reviewCount !== 1 ? 's' : '' %>)</span>
       </div>
-
-      <!-- Price -->
       <div class="price-block">
-        <div class="price-row">
-          <span class="prod-price">₹<%= product.price.toLocaleString('en-IN') %></span>
-        </div>
+        <div class="price-row"><span class="prod-price">₹<%= product.price.toLocaleString('en-IN') %></span></div>
         <div class="prod-price-label">Inclusive of all taxes</div>
       </div>
-
-      <!-- Stock badge -->
       <div class="stock-badge <%= isOOS ? 'out' : isLow ? 'low' : 'in' %>" id="stockBadge">
         <span class="stock-dot <%= isOOS ? 'out' : isLow ? 'low' : 'in' %>" id="stockDot"></span>
         <span id="stockText">
-          <% if (isOOS) { %>Out of Stock
-          <% } else if (isLow) { %>Low Stock — Only <%= initialStock %> left
-          <% } else { %>In Stock · <%= initialStock %> available<% } %>
+          <% if (isOOS) { %>Out of Stock<% } else if (isLow) { %>Low Stock — Only <%= initialStock %> left<% } else { %>In Stock · <%= initialStock %> available<% } %>
         </span>
       </div>
 
-      <!-- Colour variants -->
       <% if (hasVariants) { %>
       <div class="color-variants">
         <div class="color-variants-label">Colour</div>
         <div class="color-selected-name">Selected: <span id="selectedColorName"><%= variants[0].name %></span></div>
         <div class="color-swatches">
           <% variants.forEach((v, i) => { %>
-            <div
-              class="color-swatch <%= i === 0 ? 'active' : '' %>"
+            <div class="color-swatch <%= i === 0 ? 'active' : '' %>"
               style="background:<%= v.hex %>;<%= v.hex === '#ffffff' || v.hex === '#fff' ? 'border:2px solid rgba(245,242,235,0.2);' : '' %>"
               title="<%= v.name %><%= v.stock === 0 ? ' — Out of Stock' : '' %>"
-              data-index="<%= i %>"
-              data-oos="<%= v.stock === 0 ? 'true' : 'false' %>"
-              onclick="selectVariant(<%= i %>)"
-            ></div>
+              data-index="<%= i %>" data-oos="<%= v.stock === 0 ? 'true' : 'false' %>"
+              onclick="selectVariant(<%= i %>)"></div>
           <% }) %>
         </div>
       </div>
@@ -394,34 +329,25 @@
         <div class="color-selected-name">Selected: <span id="selectedColorName"><%= product.colors[0].name %></span></div>
         <div class="color-swatches">
           <% product.colors.forEach((c, i) => { %>
-            <div
-              class="color-swatch <%= i === 0 ? 'active' : '' %>"
-              style="background:<%= c.hex %>;"
-              title="<%= c.name %>"
-              onclick="selectFlatColor(this, '<%= c.name %>')"
-            ></div>
+            <div class="color-swatch <%= i === 0 ? 'active' : '' %>" style="background:<%= c.hex %>;" title="<%= c.name %>" onclick="selectFlatColor(this, '<%= c.name %>')"></div>
           <% }) %>
         </div>
       </div>
       <% } %>
 
-      <!-- Add to cart row -->
       <div class="action-row">
         <div class="qty-wrap">
           <button class="qty-btn" id="qtyMinus" onclick="changeQty(-1)" <%= isOOS ? 'disabled' : '' %>>−</button>
-          <input  class="qty-input" type="number" id="qtyInput" value="1" min="1" max="<%= initialStock %>" <%= isOOS ? 'disabled' : '' %>/>
-          <button class="qty-btn" id="qtyPlus"  onclick="changeQty(1)"  <%= isOOS ? 'disabled' : '' %>>+</button>
+          <input class="qty-input" type="number" id="qtyInput" value="1" min="1" max="<%= initialStock %>" <%= isOOS ? 'disabled' : '' %>/>
+          <button class="qty-btn" id="qtyPlus" onclick="changeQty(1)" <%= isOOS ? 'disabled' : '' %>>+</button>
         </div>
-        <button class="add-cart-btn" id="addCartBtn" onclick="addToCart('<%= product._id %>')" <%= isOOS ? 'disabled' : '' %>>
+        <button class="add-cart-btn" id="addCartBtn" onclick="handleAddToCart('<%= product._id %>')" <%= isOOS ? 'disabled' : '' %>>
           <%= isOOS ? 'Out of Stock' : 'Add to Cart' %>
         </button>
-        <!-- Wishlist heart button -->
-        <button class="wishlist-btn" id="wishlistBtn" onclick="toggleWishlist()" aria-label="Add to wishlist">
+        <button class="wishlist-btn" id="wishlistBtn" onclick="handleWishlistToggle()" aria-label="Add to wishlist">
           <svg id="heartSvg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
         </button>
       </div>
-
-      <!-- Service pills -->
       <div class="service-row">
         <span class="service-pill"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>Free Shipping</span>
         <span class="service-pill"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.75"/></svg>30-Day Returns</span>
@@ -431,19 +357,18 @@
   </div>
 </div>
 
-<!-- TABS -->
 <div class="tabs-root">
   <div class="tab-nav">
-    <button class="tab-btn active" id="tab-desc"    onclick="openTab('desc')">Description</button>
-    <button class="tab-btn"        id="tab-specs"   onclick="openTab('specs')">Specifications</button>
-    <button class="tab-btn"        id="tab-reviews" onclick="openTab('reviews')">Reviews (<%= reviewCount %>)</button>
+    <button class="tab-btn active" id="tab-desc" onclick="openTab('desc')">Description</button>
+    <button class="tab-btn" id="tab-specs" onclick="openTab('specs')">Specifications</button>
+    <button class="tab-btn" id="tab-reviews" onclick="openTab('reviews')">Reviews (<%= reviewCount %>)</button>
   </div>
   <div class="tab-panel active" id="panel-desc">
     <p class="desc-text"><%= product.description || 'A masterpiece of horology, this timepiece reflects the pinnacle of Velmora Chroné\'s craft.' %></p>
   </div>
   <div class="tab-panel" id="panel-specs">
     <table class="specs-table">
-      <% if (brandName)        { %><tr><td>Brand</td><td><%= brandName %></td></tr><% } %>
+      <% if (brandName) { %><tr><td>Brand</td><td><%= brandName %></td></tr><% } %>
       <% if (product.category) { %><tr><td>Category</td><td><%= product.category.name %></td></tr><% } %>
       <tr><td>Warranty</td><td><%= product.warranty || '2 Years' %></td></tr>
       <tr><td>Box Included</td><td><%= product.boxIncluded !== false ? 'Yes' : 'No' %></td></tr>
@@ -466,7 +391,6 @@
   </div>
 </div>
 
-<!-- RELATED PRODUCTS -->
 <% if (related && related.length > 0) { %>
 <div class="related-section">
   <div class="related-header">
@@ -479,11 +403,8 @@
       <div class="prod-card">
         <div class="prod-img-wrap">
           <% const rImg = (p.colorVariants && p.colorVariants.length > 0) ? p.colorVariants[0].images[0] : (p.images && p.images[0]); %>
-          <% if (rImg) { %>
-            <img class="prod-img" src="<%= rImg %>" alt="<%= p.name %>"/>
-          <% } else { %>
-            <div class="watch-ph"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="rgba(245,242,235,0.06)" stroke-width="0.5"><circle cx="12" cy="12" r="10"/></svg></div>
-          <% } %>
+          <% if (rImg) { %><img class="prod-img" src="<%= rImg %>" alt="<%= p.name %>"/>
+          <% } else { %><div class="watch-ph"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="rgba(245,242,235,0.06)" stroke-width="0.5"><circle cx="12" cy="12" r="10"/></svg></div><% } %>
         </div>
         <div class="prod-body">
           <div class="prod-cat"><%= p.category ? p.category.name : '' %></div>
@@ -498,7 +419,6 @@
 </div>
 <% } %>
 
-<!-- FOOTER -->
 <footer class="footer">
   <div class="footer-inner">
     <div class="footer-top">
@@ -531,9 +451,7 @@
     </div>
     <div class="footer-bottom">
       <span class="footer-copy">&copy; <%= new Date().getFullYear() %> Velmora Chroné. All rights reserved.</span>
-      <div class="footer-legal">
-        <a href="#">Privacy Policy</a><a href="#">Terms of Service</a>
-      </div>
+      <div class="footer-legal"><a href="#">Privacy Policy</a><a href="#">Terms of Service</a></div>
     </div>
   </div>
 </footer>
@@ -544,13 +462,12 @@
 </div>
 
 <script>
-  const PRODUCT_ID = '<%= product._id %>';
-  const MAX_QTY    = 5;
-
+  const PRODUCT_ID   = '<%= product._id %>';
+  const MAX_QTY      = 5;
+  const IS_LOGGED_IN = <%= isLoggedIn %>;
   const COLOR_VARIANTS = <%- JSON.stringify(variants) %>;
   let activeVariantIndex = 0;
 
-  /* ── Nav scroll ── */
   const navbar = document.getElementById('navbar');
   window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', scrollY > 20), { passive: true });
   document.getElementById('hamburger').addEventListener('click', function () {
@@ -558,7 +475,6 @@
     document.getElementById('mobileMenu').classList.toggle('open');
   });
 
-  /* ── Zoom ── */
   let zoomed = false;
   const mainWrap = document.getElementById('mainImgWrap');
   const mainImg  = document.getElementById('mainImg');
@@ -577,31 +493,19 @@
     if (mainImg) mainImg.style.transformOrigin = `${((e.clientX-r.left)/r.width)*100}% ${((e.clientY-r.top)/r.height)*100}%`;
   }
 
-  /* ── Thumbnail click ── */
   function switchImg(thumb, src) {
-    if (mainImg) {
-      mainImg.src = src;
-      zoomed = false;
-      mainWrap && mainWrap.classList.remove('zoomed');
-      mainImg.classList.remove('zoomed');
-    }
+    if (mainImg) { mainImg.src = src; zoomed = false; mainWrap && mainWrap.classList.remove('zoomed'); mainImg.classList.remove('zoomed'); }
     document.querySelectorAll('.thumb').forEach(t => t.classList.remove('active'));
     thumb.classList.add('active');
   }
 
-  /* ── Select colour variant ── */
   function selectVariant(idx) {
     const v = COLOR_VARIANTS[idx];
     if (!v) return;
     activeVariantIndex = idx;
-
-    document.querySelectorAll('.color-swatch').forEach((s, i) => {
-      s.classList.toggle('active', i === idx);
-    });
-
+    document.querySelectorAll('.color-swatch').forEach((s, i) => s.classList.toggle('active', i === idx));
     const nameEl = document.getElementById('selectedColorName');
     if (nameEl) nameEl.textContent = v.name;
-
     const wrap = document.getElementById('mainImgWrap');
     if (wrap) {
       wrap.classList.remove('visible');
@@ -609,11 +513,7 @@
         if (mainImg && v.images.length > 0) mainImg.src = v.images[0];
         const thumbRow = document.getElementById('thumbRow');
         if (thumbRow) {
-          thumbRow.innerHTML = v.images.map((src, i) => `
-            <div class="thumb ${i === 0 ? 'active' : ''}" onclick="switchImg(this,'${src}')">
-              <img src="${src}" alt="View ${i+1}"/>
-            </div>
-          `).join('');
+          thumbRow.innerHTML = v.images.map((src, i) => `<div class="thumb ${i === 0 ? 'active' : ''}" onclick="switchImg(this,'${src}')"><img src="${src}" alt="View ${i+1}"/></div>`).join('');
         }
         zoomed = false;
         wrap.classList.remove('zoomed');
@@ -631,7 +531,6 @@
     if (nameEl) nameEl.textContent = name;
   }
 
-  /* ── Stock UI ── */
   function updateStockUI(stock) {
     const badge    = document.getElementById('stockBadge');
     const dot      = document.getElementById('stockDot');
@@ -641,10 +540,8 @@
     const qtyPlus  = document.getElementById('qtyPlus');
     const addBtn   = document.getElementById('addCartBtn');
     const specsStk = document.getElementById('specsStock');
-
     const isOOS = stock === 0;
     const isLow = stock > 0 && stock <= 5;
-
     if (badge)   badge.className = 'stock-badge ' + (isOOS ? 'out' : isLow ? 'low' : 'in');
     if (dot)     dot.className   = 'stock-dot '   + (isOOS ? 'out' : isLow ? 'low' : 'in');
     if (text) {
@@ -659,7 +556,6 @@
     if (specsStk) specsStk.textContent = isOOS ? 'Sold Out' : stock + ' units';
   }
 
-  /* ── Quantity ── */
   function changeQty(delta) {
     const input = document.getElementById('qtyInput');
     const stock = COLOR_VARIANTS.length > 0 ? COLOR_VARIANTS[activeVariantIndex].stock : <%= initialStock %>;
@@ -670,113 +566,83 @@
     document.getElementById('qtyPlus').disabled  = val >= cap;
   }
 
-  /* ── Add to Cart ── */
-  async function addToCart(productId) {
+  async function handleAddToCart(productId) {
+    if (!IS_LOGGED_IN) { window.location.href = '/login'; return; }
     const qty = parseInt(document.getElementById('qtyInput').value) || 1;
     const btn = document.getElementById('addCartBtn');
-    btn.disabled = true;
-    btn.textContent = 'Adding…';
+    btn.disabled = true; btn.textContent = 'Adding…';
     try {
       const body = { productId, quantity: qty };
-      if (COLOR_VARIANTS.length > 0) {
-        body.variantIndex = activeVariantIndex;
-        body.variantName  = COLOR_VARIANTS[activeVariantIndex].name;
-      }
-      const res  = await fetch('/cart/add', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      if (COLOR_VARIANTS.length > 0) { body.variantIndex = activeVariantIndex; body.variantName = COLOR_VARIANTS[activeVariantIndex].name; }
+      const res  = await fetch('/cart/add', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify(body) });
       const data = await res.json();
+      if (res.status === 401) { window.location.href = data.redirectUrl || '/login'; return; }
       if (!res.ok) { showToast(data.message || 'Could not add to cart', true); return; }
       showToast('Added to cart ✓');
       if (data.cartCount !== undefined) document.getElementById('cartCount').textContent = data.cartCount;
-    } catch (err) {
-      showToast('Something went wrong', true);
-    } finally {
-      btn.disabled    = false;
+    } catch (err) { showToast('Something went wrong', true); }
+    finally {
+      btn.disabled = false;
       btn.textContent = COLOR_VARIANTS.length > 0 && COLOR_VARIANTS[activeVariantIndex].stock === 0 ? 'Out of Stock' : 'Add to Cart';
     }
   }
 
-
   let wishlisted = false;
-
-  
   function applyWishlistUI(state) {
-    // Product page heart button
-    const btn      = document.getElementById('wishlistBtn');
+    const btn = document.getElementById('wishlistBtn');
     const heartSvg = document.getElementById('heartSvg');
-    if (btn)      btn.classList.toggle('active', state);
-    if (heartSvg) {
-      heartSvg.setAttribute('fill',   state ? '#f87171' : 'none');
-      heartSvg.setAttribute('stroke', state ? '#f87171' : 'currentColor');
-    }
-    
-    const navIcon    = document.getElementById('navWishlistIcon');
-    const navHeart   = document.getElementById('navHeartSvg');
-    if (navIcon)  navIcon.classList.toggle('wishlisted', state);
-    if (navHeart) {
-      navHeart.setAttribute('fill',   state ? '#f87171' : 'none');
-      navHeart.setAttribute('stroke', state ? '#f87171' : 'currentColor');
-    }
+    if (btn) btn.classList.toggle('active', state);
+    if (heartSvg) { heartSvg.setAttribute('fill', state ? '#f87171' : 'none'); heartSvg.setAttribute('stroke', state ? '#f87171' : 'currentColor'); }
+    const navIcon  = document.getElementById('navWishlistIcon');
+    const navHeart = document.getElementById('navHeartSvg');
+    if (navIcon) navIcon.classList.toggle('wishlisted', state);
+    if (navHeart) { navHeart.setAttribute('fill', state ? '#f87171' : 'none'); navHeart.setAttribute('stroke', state ? '#f87171' : 'currentColor'); }
   }
-
-  
   function updateWishlistNavBadge(count) {
     const badge = document.getElementById('wishlistNavCount');
     if (!badge) return;
-    if (count > 0) {
-      badge.textContent  = count > 9 ? '9+' : count;
-      badge.style.display = 'flex';
-    } else {
-      badge.style.display = 'none';
-    }
+    if (count > 0) { badge.textContent = count > 9 ? '9+' : count; badge.style.display = 'flex'; }
+    else { badge.style.display = 'none'; }
   }
-
-  
   async function checkWishlistStatus() {
+    if (!IS_LOGGED_IN) return;
     try {
-      const res  = await fetch(`/wishlist/status/${PRODUCT_ID}`);
+      const res  = await fetch(`/wishlist/status/${PRODUCT_ID}`, { headers: { 'Accept': 'application/json' } });
       if (!res.ok) return;
       const data = await res.json();
       wishlisted = !!data.wishlisted;
       applyWishlistUI(wishlisted);
       if (data.count !== undefined) updateWishlistNavBadge(data.count);
-    } catch (e) { /* silent user may not be logged in */ }
+    } catch (e) {}
   }
-
-  async function toggleWishlist() {
+  async function handleWishlistToggle() {
+    if (!IS_LOGGED_IN) { window.location.href = '/login'; return; }
     const btn = document.getElementById('wishlistBtn');
     if (btn) btn.disabled = true;
     try {
-      const res  = await fetch('/wishlist/toggle', {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ productId: PRODUCT_ID }),
-      });
+      const res  = await fetch('/wishlist/toggle', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify({ productId: PRODUCT_ID }) });
       const data = await res.json();
-      if (!res.ok) {
-
-        if (res.status === 401) { window.location.href = '/login'; return; }
-        showToast(data.message || 'Could not update wishlist', true);
-        return;
-      }
+      if (res.status === 401) { window.location.href = data.redirectUrl || '/login'; return; }
+      if (!res.ok) { showToast(data.message || 'Could not update wishlist', true); return; }
       wishlisted = !!data.wishlisted;
       applyWishlistUI(wishlisted);
       if (data.count !== undefined) updateWishlistNavBadge(data.count);
       showToast(wishlisted ? 'Added to wishlist ♥' : 'Removed from wishlist');
-    } catch (e) {
-      showToast('Something went wrong', true);
-    } finally {
-      if (btn) btn.disabled = false;
-    }
+    } catch (e) { showToast('Something went wrong', true); }
+    finally { if (btn) btn.disabled = false; }
   }
-
-  
   checkWishlistStatus();
 
-  // Tabs 
+  if (IS_LOGGED_IN) {
+    fetch('/api/cart/count', { headers: { 'Accept': 'application/json' } })
+      .then(r => r.json()).then(d => { if (d.count !== undefined) document.getElementById('cartCount').textContent = d.count; })
+      .catch(() => {});
+  }
+
   function openTab(id) {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-    document.getElementById('tab-'   + id).classList.add('active');
+    document.getElementById('tab-' + id).classList.add('active');
     document.getElementById('panel-' + id).classList.add('active');
     document.querySelector('.tabs-root').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
@@ -789,6 +655,39 @@
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
   }
+
+  // ── SSE: live updates from admin without page reload ──
+  (function () {
+    const es = new EventSource('/sse/products');
+    es.addEventListener('productUpdate', function (e) {
+      const data = JSON.parse(e.data);
+      if (data.productId !== PRODUCT_ID) return;
+
+      // Update per-variant stock so +/- buttons stay correct
+      if (data.colorVariants && COLOR_VARIANTS.length > 0) {
+        data.colorVariants.forEach(updated => {
+          const match = COLOR_VARIANTS.find(v => v.name === updated.name);
+          if (match) match.stock = updated.stock;
+        });
+        updateStockUI(COLOR_VARIANTS[activeVariantIndex].stock);
+      } else {
+        updateStockUI(data.stock);
+      }
+
+      // Update price if changed
+      if (data.price !== undefined) {
+        const priceEl = document.querySelector('.prod-price');
+        if (priceEl) priceEl.textContent = '₹' + Number(data.price).toLocaleString('en-IN');
+      }
+
+      // Disable add to cart if delisted or deleted
+      if (data.isDeleted || data.isListed === false) {
+        const addBtn = document.getElementById('addCartBtn');
+        if (addBtn) { addBtn.disabled = true; addBtn.textContent = 'No Longer Available'; }
+      }
+    });
+    es.onerror = function () {};
+  })();
 </script>
 </body>
 </html>

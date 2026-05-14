@@ -310,6 +310,26 @@
         mobileMenu.classList.remove('open');
       });
     });
+
+    // ── SSE: live updates from admin ──
+    (function () {
+      const es = new EventSource('/sse/products');
+      es.addEventListener('productUpdate', function (e) {
+        const data = JSON.parse(e.data);
+        if (data.stock !== 0 && !data.isDeleted && data.isListed !== false) return;
+        const card = document.querySelector(`.product-card[href="/products/${data.productId}"]`);
+        if (!card) return;
+        const imgWrap = card.querySelector('.product-card__img-wrap');
+        if (!imgWrap || imgWrap.querySelector('.oos-card-label')) return;
+        imgWrap.style.position = 'relative';
+        const label = document.createElement('div');
+        label.className = 'oos-card-label';
+        label.style.cssText = 'position:absolute;inset:0;background:rgba(17,17,16,.65);display:flex;align-items:center;justify-content:center;font-family:Jost,sans-serif;font-size:.48rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(245,242,235,.6);pointer-events:none;';
+        label.textContent = data.isDeleted || data.isListed === false ? 'Unavailable' : 'Out of Stock';
+        imgWrap.appendChild(label);
+      });
+      es.onerror = function () {};
+    })();
   </script>
 </body>
 </html>

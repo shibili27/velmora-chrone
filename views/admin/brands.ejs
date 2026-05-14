@@ -17,7 +17,6 @@
     html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--bg); color: var(--text); }
     .layout { display: flex; min-height: 100vh; }
 
-    /* Sidebar */
     .sidebar { width: var(--sidebar-w); background: var(--white); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; }
     .sidebar__brand { padding: 24px 20px 18px; border-bottom: 1px solid var(--border); }
     .sidebar__brand-name { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 600; letter-spacing: 0.06em; color: var(--text); line-height: 1.2; }
@@ -36,7 +35,6 @@
     .btn-logout:hover { background: var(--red); color: #fff; border-color: var(--red); }
     .btn-logout svg { width: 14px; height: 14px; }
 
-    /* Main */
     .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
     .topbar { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 32px; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
     .topbar__title { font-size: 13px; font-weight: 500; color: var(--text-mid); letter-spacing: 0.04em; }
@@ -46,9 +44,12 @@
     .page-header p { font-size: 13px; color: var(--text-mid); margin-top: 4px; }
 
     /* Flash */
-    .flash { padding: 10px 16px; border-radius: 4px; font-size: 12.5px; margin-bottom: 20px; }
+    .flash { padding: 12px 16px; border-radius: 4px; font-size: 13px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
     .flash--error   { background: #fdecea; color: #b00020; border: 1px solid #f5c6cb; }
     .flash--success { background: #e8f5e9; color: #1b5e20; border: 1px solid #c8e6c9; }
+    .flash svg { width: 15px; height: 15px; flex-shrink: 0; }
+    .flash__close { margin-left: auto; background: none; border: none; cursor: pointer; color: inherit; opacity: 0.6; font-size: 16px; line-height: 1; padding: 0 4px; }
+    .flash__close:hover { opacity: 1; }
 
     /* Toolbar */
     .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
@@ -61,13 +62,12 @@
     .btn--teal:hover { background: var(--teal-dark); }
     .btn--outline { background: none; border: 1px solid var(--border); color: var(--text-mid); }
     .btn--outline:hover { background: var(--bg); }
+    .btn--danger  { background: var(--red); color: #fff; }
+    .btn--danger:hover { background: #b91c1c; }
 
-    /* Card */
     .card { background: var(--white); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
     .card__header { padding: 16px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
     .card__title { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-mid); }
-
-    /* Table */
     .table-wrap { overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; }
     thead tr { background: #f8faf9; }
@@ -76,7 +76,6 @@
     tbody tr:last-child td { border-bottom: none; }
     tbody tr:hover { background: #fafcfb; }
 
-    /* Actions */
     .actions { display: flex; gap: 6px; }
     .btn-action { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; padding: 5px 10px; border-radius: 3px; border: 1px solid transparent; cursor: pointer; transition: opacity 0.15s; background: none; font-family: 'Jost', sans-serif; }
     .btn-action:hover { opacity: 0.75; }
@@ -84,14 +83,12 @@
     .btn-action--edit   { background: var(--blue-bg);  color: var(--blue);  border-color: #bfdbfe; }
     .btn-action--delete { background: var(--red-bg);   color: var(--red);   border-color: #fecaca; }
 
-    /* Pagination */
     .pagination { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 20px; border-top: 1px solid var(--border); }
     .page-btn { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 4px; border: 1px solid var(--border); font-size: 13px; font-weight: 500; color: var(--text-mid); text-decoration: none; transition: background 0.15s, color 0.15s; }
     .page-btn:hover { background: var(--teal-light); color: var(--teal); border-color: var(--teal); }
     .page-btn.active { background: var(--teal); color: #fff; border-color: var(--teal); }
     .page-btn.disabled { opacity: 0.4; pointer-events: none; }
 
-    /* Empty */
     .empty-state { padding: 48px 24px; text-align: center; color: var(--text-light); font-size: 13px; }
 
     /* Modal */
@@ -99,12 +96,29 @@
     .modal-overlay.open { display: flex; }
     .modal { background: var(--white); border-radius: 8px; width: 100%; max-width: 460px; padding: 32px; box-shadow: 0 4px 24px rgba(0,0,0,0.12); }
     .modal__title { font-size: 16px; font-weight: 600; margin-bottom: 20px; color: var(--text); }
+    .modal-error { background: #fdecea; color: #b00020; border: 1px solid #f5c6cb; border-radius: 4px; padding: 10px 14px; font-size: 13px; margin-bottom: 16px; display: none; align-items: center; gap: 8px; }
+    .modal-error.show { display: flex; }
+    .modal-error svg { width: 15px; height: 15px; flex-shrink: 0; }
     .form-group { margin-bottom: 16px; }
     .form-label { display: block; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text); margin-bottom: 6px; }
     .form-input { width: 100%; height: 40px; border: 1px solid var(--border); border-radius: 4px; padding: 0 14px; font-family: 'Jost', sans-serif; font-size: 13px; color: var(--text); outline: none; transition: border-color 0.2s; }
     .form-input:focus { border-color: var(--teal); }
+    .form-input--error { border-color: var(--red) !important; background: #fff8f8; }
     textarea.form-input { height: 80px; padding: 10px 14px; resize: vertical; }
     .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
+
+    /* Confirm */
+    .confirm-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 400; align-items: center; justify-content: center; }
+    .confirm-overlay.open { display: flex; }
+    .confirm-box { background: var(--white); border-radius: 12px; padding: 32px 28px; max-width: 380px; width: 90%; box-shadow: 0 8px 40px rgba(0,0,0,0.18); text-align: center; animation: popIn 0.18s ease; }
+    @keyframes popIn { from { transform: scale(0.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .confirm-icon { width: 56px; height: 56px; border-radius: 50%; background: var(--red-bg); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; }
+    .confirm-icon svg { width: 26px; height: 26px; color: var(--red); }
+    .confirm-box h3 { font-size: 17px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+    .confirm-box p { font-size: 13px; color: var(--text-mid); line-height: 1.5; margin-bottom: 24px; }
+    .confirm-box p strong { color: var(--text); font-weight: 600; }
+    .confirm-actions { display: flex; gap: 10px; justify-content: center; }
+    .confirm-actions .btn { min-width: 110px; justify-content: center; height: 40px; }
 
     .footer { text-align: center; padding: 20px; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); border-top: 1px solid var(--border); }
   </style>
@@ -135,7 +149,7 @@
         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
         Rating/Review
       </a>
-      <a href="/admin/customers" class="nav-item">
+      <a href="/admin/dashboard" class="nav-item">
         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
         Customers
       </a>
@@ -184,8 +198,23 @@
 
     <div class="content">
 
-      <% if (locals.success && success) { %><div class="flash flash--success"><%= success %></div><% } %>
-      <% if (locals.error   && error)   { %><div class="flash flash--error"><%= error %></div><% } %>
+      <%
+        /* ── Safely extract first message from flash arrays ── */
+        const flashError   = (Array.isArray(error)   ? error[0]   : error)   || '';
+        const flashSuccess = (Array.isArray(success) ? success[0] : success) || '';
+      %>
+
+      <!-- ✅ Only render if there is actually a message -->
+      <% if (flashSuccess) { %>
+        <div class="flash flash--success" id="pageFlashSuccess">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+          <%= flashSuccess %>
+          <button class="flash__close" onclick="this.parentElement.remove()">×</button>
+        </div>
+      <% } %>
+
+      <!-- Page-level error banner only for non-duplicate errors -->
+      <!-- Duplicate errors are shown inside the Add modal via JS below -->
 
       <div class="page-header">
         <h1>Brands</h1>
@@ -240,8 +269,6 @@
                   <td style="color:var(--text-mid)"><%= new Date(brand.createdAt).toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' }) %></td>
                   <td>
                     <div class="actions">
-                      <%# FIX: use data-* attributes instead of inline onclick strings %>
-                      <%# This safely handles brand names/descriptions with apostrophes, quotes, etc. %>
                       <button
                         class="btn-action btn-action--edit js-edit-brand"
                         data-id="<%= brand._id %>"
@@ -250,12 +277,13 @@
                         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                         Edit
                       </button>
-                      <form action="/admin/brands/<%= brand._id %>/delete" method="POST" onsubmit="return confirm('Delete this brand?')">
-                        <button type="submit" class="btn-action btn-action--delete">
-                          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path stroke-linecap="round" stroke-linejoin="round" d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6m5 0V4h4v2"/></svg>
-                          Delete
-                        </button>
-                      </form>
+                      <button
+                        class="btn-action btn-action--delete js-delete-brand"
+                        data-action="/admin/brands/<%= brand._id %>/delete"
+                        data-name="<%= brand.name %>">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path stroke-linecap="round" stroke-linejoin="round" d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6m5 0V4h4v2"/></svg>
+                        Delete
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -267,7 +295,6 @@
           </table>
         </div>
 
-        <!-- Pagination -->
         <% if (totalPages > 1) { %>
         <div class="pagination">
           <a href="/admin/brands?page=<%= page-1 %>&search=<%= search %>" class="page-btn <%= page===1?'disabled':'' %>">&#8592;</a>
@@ -284,14 +311,19 @@
   </div>
 </div>
 
-<!-- Add Modal -->
+<!-- ══ ADD MODAL ══ -->
 <div class="modal-overlay" id="addModal">
   <div class="modal">
     <h2 class="modal__title">Add Brand</h2>
+    <!-- ✅ Duplicate error shows here -->
+    <div class="modal-error" id="addModalError">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span id="addModalErrorText"></span>
+    </div>
     <form action="/admin/brands/add" method="POST">
       <div class="form-group">
         <label class="form-label">Name *</label>
-        <input class="form-input" type="text" name="name" required placeholder="e.g. Rolex"/>
+        <input class="form-input" type="text" name="name" id="addName" required placeholder="e.g. Rolex"/>
       </div>
       <div class="form-group">
         <label class="form-label">Description</label>
@@ -305,10 +337,14 @@
   </div>
 </div>
 
-<!-- Edit Modal -->
+<!-- ══ EDIT MODAL ══ -->
 <div class="modal-overlay" id="editModal">
   <div class="modal">
     <h2 class="modal__title">Edit Brand</h2>
+    <div class="modal-error" id="editModalError">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span id="editModalErrorText"></span>
+    </div>
     <form id="editForm" method="POST">
       <div class="form-group">
         <label class="form-label">Name *</label>
@@ -326,23 +362,87 @@
   </div>
 </div>
 
+<!-- ══ DELETE CONFIRM ══ -->
+<div class="confirm-overlay" id="confirmModal">
+  <div class="confirm-box">
+    <div class="confirm-icon">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path stroke-linecap="round" stroke-linejoin="round" d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6m5 0V4h4v2"/></svg>
+    </div>
+    <h3>Delete Brand?</h3>
+    <p>You are about to delete <strong id="confirmBrandName"></strong>. This action cannot be undone.</p>
+    <div class="confirm-actions">
+      <button class="btn btn--outline" onclick="closeDeleteConfirm()">Cancel</button>
+      <form id="confirmDeleteForm" method="POST" style="margin:0">
+        <button type="submit" class="btn btn--danger">Yes, Delete</button>
+      </form>
+    </div>
+  </div>
+</div>
+
 <script>
-  function openAddModal() {
+  // ── Flash values injected safely from server ──────────────────────────────
+  const serverError   = <%- JSON.stringify((Array.isArray(error)   ? error[0]   : error)   || '') %>;
+  const serverSuccess = <%- JSON.stringify((Array.isArray(success) ? success[0] : success) || '') %>;
+
+  const DUPLICATE_KEYWORDS = ['already exists', 'duplicate', 'already taken', 'in use'];
+
+  function isDuplicateError(msg) {
+    return DUPLICATE_KEYWORDS.some(k => (msg || '').toLowerCase().includes(k));
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    // Auto-dismiss success flash after 4s
+    const successEl = document.getElementById('pageFlashSuccess');
+    if (successEl) setTimeout(() => successEl.remove(), 4000);
+
+    if (serverError) {
+      if (isDuplicateError(serverError)) {
+        // ✅ Show error INSIDE the Add modal and open it
+        openAddModal(serverError);
+      } else {
+        // Other errors → page banner
+        showPageBanner(serverError);
+      }
+    }
+  });
+
+  // ── Open Add modal (optionally with an error message) ────────────────────
+  function openAddModal(errorMsg) {
+    const errBox = document.getElementById('addModalError');
+    errBox.classList.remove('show');
+    document.getElementById('addName').classList.remove('form-input--error');
+
+    if (errorMsg) {
+      document.getElementById('addModalErrorText').textContent = errorMsg;
+      errBox.classList.add('show');
+      document.getElementById('addName').classList.add('form-input--error');
+    }
+
     document.getElementById('addModal').classList.add('open');
   }
 
+  // ── Close any modal ───────────────────────────────────────────────────────
   function closeModal(id) {
     document.getElementById(id).classList.remove('open');
   }
 
-  // Close on backdrop click
+  // ── Close modal on backdrop click ─────────────────────────────────────────
   document.querySelectorAll('.modal-overlay').forEach(el => {
     el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); });
   });
 
-  // FIX: delegate edit button clicks — reads data-* attributes safely
-  // This avoids the inline onclick string-escaping bug entirely
-  document.addEventListener('click', function(e) {
+  // ── Clear error highlight when user starts retyping ───────────────────────
+  document.getElementById('addName').addEventListener('input', function () {
+    this.classList.remove('form-input--error');
+    document.getElementById('addModalError').classList.remove('show');
+  });
+  document.getElementById('editName').addEventListener('input', function () {
+    this.classList.remove('form-input--error');
+    document.getElementById('editModalError').classList.remove('show');
+  });
+
+  // ── Edit modal — open via data-* attributes ───────────────────────────────
+  document.addEventListener('click', function (e) {
     const btn = e.target.closest('.js-edit-brand');
     if (!btn) return;
 
@@ -353,8 +453,65 @@
     document.getElementById('editForm').action = '/admin/brands/' + id + '/edit';
     document.getElementById('editName').value  = name;
     document.getElementById('editDesc').value  = desc;
+
+    // Clear any previous error
+    document.getElementById('editModalError').classList.remove('show');
+    document.getElementById('editName').classList.remove('form-input--error');
+
     document.getElementById('editModal').classList.add('open');
   });
+
+  // ── Delete confirm modal ──────────────────────────────────────────────────
+  document.addEventListener('click', function (e) {
+    const btn = e.target.closest('.js-delete-brand');
+    if (!btn) return;
+    document.getElementById('confirmBrandName').textContent  = btn.dataset.name;
+    document.getElementById('confirmDeleteForm').action      = btn.dataset.action;
+    document.getElementById('confirmModal').classList.add('open');
+  });
+
+  function closeDeleteConfirm() {
+    document.getElementById('confirmModal').classList.remove('open');
+  }
+
+  document.getElementById('confirmModal').addEventListener('click', function (e) {
+    if (e.target === this) closeDeleteConfirm();
+  });
+
+  // ── Page-level error banner (for non-duplicate errors) ────────────────────
+  function showPageBanner(msg) {
+    const existing = document.getElementById('dynamicErrorBanner');
+    if (existing) existing.remove();
+    const banner = document.createElement('div');
+    banner.id = 'dynamicErrorBanner';
+    banner.className = 'flash flash--error';
+    banner.innerHTML = `
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      ${String(msg).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+      <button class="flash__close" onclick="this.parentElement.remove()">×</button>
+    `;
+    const content = document.querySelector('.content');
+    content.insertBefore(banner, content.firstChild);
+    setTimeout(() => banner.remove(), 6000);
+  }
 </script>
 </body>
+<script>
+  function fetchData() {
+    fetch('/your-endpoint.json')
+      .then(res => res.json())
+      .then(data => {
+        // update your DOM here
+        console.log('Refreshed:', data);
+      });
+  }
+
+  fetchData();
+  setInterval(fetchData, 20000);
+
+  // Full page reload (optional: remove if data-only is enough)
+  setTimeout(function() {
+    location.reload();
+  }, 20000);
+</script>
 </html>

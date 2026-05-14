@@ -800,4 +800,22 @@
   window.addEventListener('popstate', () => history.pushState(null, null, window.location.href));
 </script>
 </body>
+<script>
+  function fetchData() {
+    fetch('/your-endpoint.json')
+      .then(res => res.json())
+      .then(data => {
+        // update your DOM here
+        console.log('Refreshed:', data);
+      });
+  }
+
+  fetchData();
+  setInterval(fetchData, 4000);
+
+  // Full page reload (optional: remove if data-only is enough)
+  setTimeout(function() {
+    location.reload();
+  }, 4000);
+</script>
 </html>

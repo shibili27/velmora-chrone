@@ -10,23 +10,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet"/>
   <script>
     tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: { display: ['Cormorant Garamond','serif'], body: ['Jost','sans-serif'] },
-          colors: { cream:'#f5f2eb', vault:'#1a1a18', pine:'#0e1f18', gold:'#c9a96e' },
-        }
-      }
+      theme: { extend: { fontFamily: { display: ['Cormorant Garamond','serif'], body: ['Jost','sans-serif'] }, colors: { cream:'#f5f2eb', vault:'#1a1a18', pine:'#0e1f18', gold:'#c9a96e' } } }
     };
   </script>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     html{scroll-behavior:smooth}
     body{font-family:'Jost',sans-serif;background:#111110;color:#f5f2eb;overflow-x:hidden}
-    ::-webkit-scrollbar{width:2px}
-    ::-webkit-scrollbar-track{background:#111110}
-    ::-webkit-scrollbar-thumb{background:#c9a96e}
-
-    /* NAV */
+    ::-webkit-scrollbar{width:2px} ::-webkit-scrollbar-track{background:#111110} ::-webkit-scrollbar-thumb{background:#c9a96e}
     .nav-root{position:fixed;top:0;left:0;right:0;z-index:200;background:#111110;border-bottom:1px solid rgba(245,242,235,0.06);transition:box-shadow .3s}
     .nav-root.scrolled{box-shadow:0 2px 20px rgba(0,0,0,.3)}
     .nav-inner{display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem}
@@ -45,64 +36,39 @@
     .mobile-menu{display:none;flex-direction:column;background:#0d0d0c;padding:1.5rem 2rem;gap:1rem;border-top:1px solid rgba(245,242,235,.05)}
     .mobile-menu.open{display:flex}
     .mobile-menu .nav-link{font-size:.7rem;padding:.4rem 0;border-bottom:1px solid rgba(245,242,235,.04);color:rgba(245,242,235,.5)}
-
-    /* BREADCRUMB */
     .breadcrumb{padding:5.5rem 3rem 0;max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
     .bc-item{font-family:'Jost',sans-serif;font-size:.5rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(245,242,235,.28);text-decoration:none;transition:color .2s}
     .bc-item:hover{color:rgba(245,242,235,.6)}
     .bc-sep{color:rgba(245,242,235,.15);font-size:.5rem}
     .bc-current{font-family:'Jost',sans-serif;font-size:.5rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(201,169,110,.7)}
-
-    /* PAGE HEAD */
     .page-head{max-width:1200px;margin:0 auto;padding:1.5rem 3rem 0}
     .page-title{font-family:'Cormorant Garamond',serif;font-size:clamp(1.8rem,3vw,2.4rem);font-weight:300;color:#f5f2eb}
     .page-subtitle{font-family:'Jost',sans-serif;font-size:.55rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(245,242,235,.25);margin-top:.3rem}
-
-    /* WISHLIST GRID */
     .wishlist-wrap{max-width:1200px;margin:0 auto;padding:2rem 2rem 6rem}
     @media(min-width:768px){.wishlist-wrap{padding:2rem 3rem 6rem}}
-
     .wishlist-header{display:flex;align-items:center;justify-content:space-between;padding-bottom:.75rem;border-bottom:1px solid rgba(245,242,235,.06);margin-bottom:1.5rem}
     .wishlist-label{font-family:'Jost',sans-serif;font-size:.5rem;letter-spacing:.25em;text-transform:uppercase;color:rgba(245,242,235,.25)}
     .clear-all-btn{font-family:'Jost',sans-serif;font-size:.48rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(248,113,113,.5);background:none;border:none;cursor:pointer;transition:color .2s}
     .clear-all-btn:hover{color:#f87171}
-
-    /* Product grid */
     .wishlist-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1.5rem}
     @media(min-width:768px){.wishlist-grid{gap:2rem}}
-
-    /* Card */
     .wish-card{background:#1a1a18;border:1px solid rgba(245,242,235,.04);position:relative;transition:border-color .3s,transform .3s}
     .wish-card:hover{border-color:rgba(201,169,110,.15);transform:translateY(-2px)}
     .wish-card.removing{opacity:0;transform:scale(.96);transition:opacity .3s,transform .3s;pointer-events:none}
-
-    /* Image area */
     .card-img-wrap{position:relative;width:100%;aspect-ratio:1/1;overflow:hidden;background:#141413}
     .card-img{width:100%;height:100%;object-fit:cover;transition:transform .5s ease}
     .wish-card:hover .card-img{transform:scale(1.04)}
-
-    /* Remove button (top-right X) */
     .card-remove{position:absolute;top:10px;right:10px;width:28px;height:28px;background:rgba(17,17,16,.8);border:1px solid rgba(245,242,235,.08);border-radius:0;display:flex;align-items:center;justify-content:center;cursor:pointer;color:rgba(245,242,235,.4);transition:color .2s,background .2s;z-index:2}
     .card-remove:hover{color:#f87171;background:rgba(248,113,113,.1);border-color:rgba(248,113,113,.2)}
-
-    /* In-cart badge */
     .in-cart-badge{position:absolute;top:10px;left:10px;font-family:'Jost',sans-serif;font-size:.38rem;letter-spacing:.15em;text-transform:uppercase;background:rgba(201,169,110,.15);border:1px solid rgba(201,169,110,.3);color:#c9a96e;padding:3px 8px;z-index:2}
-
-    /* OOS overlay */
     .oos-overlay{position:absolute;inset:0;background:rgba(17,17,16,.65);display:flex;align-items:center;justify-content:center;z-index:1}
     .oos-overlay span{font-family:'Jost',sans-serif;font-size:.48rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(245,242,235,.5);border:1px solid rgba(245,242,235,.15);padding:4px 12px}
-
-    /* Card body */
     .card-body{padding:1rem}
     .card-brand{font-family:'Jost',sans-serif;font-size:.42rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(201,169,110,.6);margin-bottom:.2rem}
     .card-name{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:300;color:#f5f2eb;line-height:1.25;margin-bottom:.2rem}
     .card-category{font-family:'Jost',sans-serif;font-size:.42rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(245,242,235,.22);margin-bottom:.75rem}
     .card-price{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:300;color:#f5f2eb;margin-bottom:.75rem}
-
-    /* Stock badge */
     .stock-low{font-family:'Jost',sans-serif;font-size:.42rem;letter-spacing:.1em;text-transform:uppercase;color:#fbbf24;border:1px solid rgba(251,191,36,.2);padding:2px 7px;display:inline-block;margin-bottom:.75rem}
-
-    /* CTA buttons */
     .card-actions{display:flex;flex-direction:column;gap:.5rem}
     .btn-add-cart{display:block;width:100%;background:#c9a96e;color:#111110;font-family:'Jost',sans-serif;font-size:.5rem;letter-spacing:.22em;text-transform:uppercase;padding:.7rem;border:none;cursor:pointer;transition:background .2s;text-align:center}
     .btn-add-cart:hover:not(:disabled){background:#d4b97e}
@@ -110,17 +76,10 @@
     .btn-view{display:block;width:100%;background:none;color:rgba(245,242,235,.3);font-family:'Jost',sans-serif;font-size:.48rem;letter-spacing:.18em;text-transform:uppercase;padding:.55rem;border:1px solid rgba(245,242,235,.08);cursor:pointer;transition:all .2s;text-align:center;text-decoration:none}
     .btn-view:hover{border-color:rgba(245,242,235,.2);color:rgba(245,242,235,.6)}
     .btn-in-cart{display:block;width:100%;background:none;color:rgba(201,169,110,.6);font-family:'Jost',sans-serif;font-size:.5rem;letter-spacing:.22em;text-transform:uppercase;padding:.7rem;border:1px solid rgba(201,169,110,.2);cursor:default;text-align:center}
-
-    /* EMPTY STATE */
     .empty-wish{text-align:center;padding:5rem 1rem}
-
-    /* TOAST */
     .toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(8px);background:#1a1a18;border:1px solid rgba(245,242,235,.08);font-family:'Jost',sans-serif;font-size:.58rem;letter-spacing:.08em;color:rgba(245,242,235,.7);padding:.65rem 1.5rem;box-shadow:0 8px 32px rgba(0,0,0,.5);z-index:999;opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;white-space:nowrap}
     .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-    .toast.gold{border-color:rgba(201,169,110,.3);color:#c9a96e}
-    .toast.err{border-color:rgba(248,113,113,.3);color:#f87171}
-
-    /* FOOTER */
+    .toast.gold{border-color:rgba(201,169,110,.3);color:#c9a96e} .toast.err{border-color:rgba(248,113,113,.3);color:#f87171}
     .footer{background:#0a0a09;padding:4rem 2rem 1.5rem;border-top:1px solid rgba(245,242,235,.05)}
     @media(min-width:768px){.footer{padding:4rem 3rem 1.5rem}}
     .footer-inner{max-width:1200px;margin:0 auto}
@@ -141,21 +100,19 @@
 </head>
 <body>
 
-<!-- NAV -->
 <nav class="nav-root" id="navbar">
   <div class="nav-inner">
     <div class="hidden md:flex items-center gap-8">
       <a href="/products" class="nav-link">Collection</a>
-      <a href="/home"     class="nav-link">Watches</a>
-      <a href="/home"     class="nav-link">About</a>
-      <a href="/home"     class="nav-link">Contact</a>
+      <a href="/home" class="nav-link">Watches</a>
+      <a href="/home" class="nav-link">About</a>
+      <a href="/home" class="nav-link">Contact</a>
     </div>
     <a href="/home" class="nav-logo md:absolute md:left-1/2 md:-translate-x-1/2">Velmora Chroné</a>
     <div class="flex items-center gap-4 md:gap-5 ml-auto md:ml-0">
       <a href="/profile" class="nav-icon" aria-label="Profile">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       </a>
-      <!-- Wishlist icon (active on this page) -->
       <a href="/wishlist" class="nav-icon" aria-label="Wishlist" style="color:#c9a96e">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
       </a>
@@ -168,108 +125,77 @@
     </div>
   </div>
   <div class="mobile-menu" id="mobileMenu">
-    <a href="/products"  class="nav-link">Collection</a>
-    <a href="/home"      class="nav-link">Watches</a>
-    <a href="/profile"   class="nav-link">My Profile</a>
-    <a href="/wishlist"  class="nav-link">Wishlist</a>
-    <a href="/cart"      class="nav-link">Cart</a>
-    <a href="/logout"    class="nav-link" style="color:rgba(201,169,110,.6)">Logout</a>
+    <a href="/products" class="nav-link">Collection</a>
+    <a href="/home" class="nav-link">Watches</a>
+    <a href="/profile" class="nav-link">My Profile</a>
+    <a href="/wishlist" class="nav-link">Wishlist</a>
+    <a href="/cart" class="nav-link">Cart</a>
+    <a href="/logout" class="nav-link" style="color:rgba(201,169,110,.6)">Logout</a>
   </div>
 </nav>
 
-<!-- BREADCRUMB -->
 <div class="breadcrumb">
-  <a href="/home"     class="bc-item">Home</a>
-  <span class="bc-sep">·</span>
-  <a href="/products" class="bc-item">Collection</a>
-  <span class="bc-sep">·</span>
+  <a href="/home" class="bc-item">Home</a><span class="bc-sep">·</span>
+  <a href="/products" class="bc-item">Collection</a><span class="bc-sep">·</span>
   <span class="bc-current">Wishlist</span>
 </div>
 
-<!-- PAGE HEAD -->
 <div class="page-head">
   <h1 class="page-title">Wishlist</h1>
   <p class="page-subtitle" id="pageSubtitle"><%= wishlistItems.length %> item<%= wishlistItems.length !== 1 ? 's' : '' %></p>
 </div>
 
-<!-- WISHLIST CONTENT -->
 <div class="wishlist-wrap">
   <% if (wishlistItems.length > 0) { %>
-
   <div class="wishlist-header">
     <span class="wishlist-label">Saved Timepieces</span>
     <button class="clear-all-btn" onclick="clearWishlist()">Remove All</button>
   </div>
-
   <div class="wishlist-grid" id="wishlistGrid">
     <% wishlistItems.forEach(item => {
-      const p        = item.product;
-      const isOOS    = p.stock === 0;
-      const isLow    = p.stock > 0 && p.stock <= 5;
-      const inCart   = cartProductIds.includes(p._id.toString());
-      const mainImg  = p.images?.[0] || (p.colorVariants?.[0]?.images?.[0]) || null;
+      const p       = item.product;
+      const isOOS   = p.stock === 0;
+      const isLow   = p.stock > 0 && p.stock <= 5;
+      const inCart  = cartProductIds.includes(p._id.toString());
+      const mainImg = p.images?.[0] || (p.colorVariants?.[0]?.images?.[0]) || null;
     %>
-    <div class="wish-card" id="wishCard-<%= item._id %>">
-
-      <!-- Image -->
+    <div class="wish-card" id="wishCard-<%= item._id %>" data-product-id="<%= p._id %>">
       <div class="card-img-wrap">
-        <% if (inCart) { %>
-          <div class="in-cart-badge">In Cart</div>
-        <% } %>
-
-        <% if (isOOS) { %>
-          <div class="oos-overlay"><span>Out of Stock</span></div>
-        <% } %>
-
+        <% if (inCart) { %><div class="in-cart-badge">In Cart</div><% } %>
+        <% if (isOOS) { %><div class="oos-overlay"><span>Out of Stock</span></div><% } %>
         <button class="card-remove" onclick="removeItem('<%= item._id %>')" title="Remove from wishlist">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
-
         <% if (mainImg) { %>
-          <a href="/products/<%= p._id %>">
-            <img class="card-img" src="<%= mainImg %>" alt="<%= p.name %>"
-              onerror="this.parentElement.style.background='#222220'"/>
-          </a>
+          <a href="/products/<%= p._id %>"><img class="card-img" src="<%= mainImg %>" alt="<%= p.name %>" onerror="this.parentElement.style.background='#222220'"/></a>
         <% } else { %>
           <a href="/products/<%= p._id %>" style="display:flex;align-items:center;justify-content:center;width:100%;height:100%">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="rgba(245,242,235,0.06)" stroke-width="0.5"><circle cx="12" cy="12" r="10"/></svg>
           </a>
         <% } %>
       </div>
-
-      <!-- Body -->
       <div class="card-body">
         <% if (p.brand?.name) { %><div class="card-brand"><%= p.brand.name %></div><% } %>
-        <a href="/products/<%= p._id %>" style="text-decoration:none">
-          <div class="card-name"><%= p.name %></div>
-        </a>
+        <a href="/products/<%= p._id %>" style="text-decoration:none"><div class="card-name"><%= p.name %></div></a>
         <div class="card-category"><%= p.category?.name || '' %></div>
         <div class="card-price">₹<%= p.price.toLocaleString('en-IN') %></div>
-
-        <% if (isLow) { %>
-          <div class="stock-low">Only <%= p.stock %> left</div>
-        <% } %>
-
+        <% if (isLow) { %><div class="stock-low">Only <%= p.stock %> left</div><% } %>
         <div class="card-actions">
           <% if (inCart) { %>
             <div class="btn-in-cart">Already in Cart</div>
           <% } else { %>
-            <button class="btn-add-cart"
-              <%= isOOS ? 'disabled' : '' %>
-              onclick="moveToCart('<%= item._id %>')">
+            <button class="btn-add-cart" <%= isOOS ? 'disabled' : '' %> onclick="moveToCart('<%= item._id %>')">
               <%= isOOS ? 'Out of Stock' : 'Add to Cart' %>
             </button>
           <% } %>
           <a href="/products/<%= p._id %>" class="btn-view">View Details</a>
         </div>
       </div>
-
     </div>
     <% }) %>
   </div>
 
   <% } else { %>
-  <!-- EMPTY STATE -->
   <div class="empty-wish">
     <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="rgba(245,242,235,0.08)" stroke-width="0.6" style="margin:0 auto 1.5rem;display:block">
       <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
@@ -281,7 +207,6 @@
   <% } %>
 </div>
 
-<!-- FOOTER -->
 <footer class="footer">
   <div class="footer-inner">
     <div class="footer-top">
@@ -317,9 +242,7 @@
     <div class="footer-bottom">
       <span class="footer-copy">&copy; <%= new Date().getFullYear() %> Velmora Chroné. All rights reserved.</span>
       <div class="footer-legal">
-        <a href="#">Privacy Policy</a>
-        <a href="#">Terms of Service</a>
-        <a href="#">Cookie Policy</a>
+        <a href="#">Privacy Policy</a><a href="#">Terms of Service</a><a href="#">Cookie Policy</a>
       </div>
     </div>
   </div>
@@ -335,7 +258,6 @@
     document.getElementById('mobileMenu').classList.toggle('open');
   });
 
- 
   let toastTimer;
   function showToast(msg, type = '') {
     const t = document.getElementById('toast');
@@ -345,12 +267,10 @@
     toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
   }
 
-
   function updateSubtitle(count) {
     const el = document.getElementById('pageSubtitle');
     if (el) el.textContent = `${count} item${count !== 1 ? 's' : ''}`;
   }
-
 
   function updateCartBadge(count) {
     const el = document.getElementById('cartBadge');
@@ -360,46 +280,25 @@
   async function removeItem(itemId) {
     const card = document.getElementById(`wishCard-${itemId}`);
     if (card) card.classList.add('removing');
-
     try {
       const res  = await fetch(`/wishlist/remove/${itemId}`, { method: 'DELETE' });
       const data = await res.json();
-
-      if (!res.ok) {
-        if (card) card.classList.remove('removing');
-        showToast(data.message || 'Failed to remove item', 'err');
-        return;
-      }
-
+      if (!res.ok) { if (card) card.classList.remove('removing'); showToast(data.message || 'Failed to remove item', 'err'); return; }
       setTimeout(() => {
         if (card) card.remove();
         const remaining = document.querySelectorAll('.wish-card').length;
         updateSubtitle(remaining);
         if (remaining === 0) window.location.reload();
       }, 300);
-
       showToast('Removed from wishlist');
-    } catch (_) {
-      if (card) card.classList.remove('removing');
-      showToast('Something went wrong', 'err');
-    }
+    } catch (_) { if (card) card.classList.remove('removing'); showToast('Something went wrong', 'err'); }
   }
 
-  
   async function moveToCart(itemId) {
     try {
-      const res  = await fetch('/wishlist/move-to-cart', {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ itemId }),
-      });
+      const res  = await fetch('/wishlist/move-to-cart', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ itemId }) });
       const data = await res.json();
-
-      if (!res.ok) {
-        showToast(data.message || 'Could not add to cart', 'err');
-        return;
-      }
-
+      if (!res.ok) { showToast(data.message || 'Could not add to cart', 'err'); return; }
       const card = document.getElementById(`wishCard-${itemId}`);
       if (card) {
         card.classList.add('removing');
@@ -410,19 +309,14 @@
           if (remaining === 0) window.location.reload();
         }, 300);
       }
-
       if (data.cartCount !== undefined) updateCartBadge(data.cartCount);
       showToast('Added to cart', 'gold');
-    } catch (_) {
-      showToast('Something went wrong', 'err');
-    }
+    } catch (_) { showToast('Something went wrong', 'err'); }
   }
 
-  
   async function clearWishlist() {
     if (!confirm('Remove all items from your wishlist?')) return;
     const items = document.querySelectorAll('.wish-card');
-   
     const promises = [...items].map(card => {
       const itemId = card.id.replace('wishCard-', '');
       return fetch(`/wishlist/remove/${itemId}`, { method: 'DELETE' });
@@ -432,16 +326,59 @@
       items.forEach(card => card.classList.add('removing'));
       setTimeout(() => window.location.reload(), 350);
       showToast('Wishlist cleared');
-    } catch (_) {
-      showToast('Something went wrong', 'err');
-    }
+    } catch (_) { showToast('Something went wrong', 'err'); }
   }
 
- 
-  fetch('/cart/count')
-    .then(r => r.json())
-    .then(d => updateCartBadge(d.count || 0))
-    .catch(() => {});
+  fetch('/cart/count').then(r => r.json()).then(d => updateCartBadge(d.count || 0)).catch(() => {});
+
+  // ── SSE: live updates from admin ──
+  (function () {
+    const es = new EventSource('/sse/products');
+    es.addEventListener('productUpdate', function (e) {
+      const data = JSON.parse(e.data);
+      const card = document.querySelector(`.wish-card[data-product-id="${data.productId}"]`);
+      if (!card) return;
+
+      const imgWrap = card.querySelector('.card-img-wrap');
+      const addBtn  = card.querySelector('.btn-add-cart');
+      const isOOS   = data.stock === 0 || data.isDeleted || data.isListed === false;
+      const isLow   = !isOOS && data.stock > 0 && data.stock <= 5;
+
+      // OOS overlay
+      let overlay = imgWrap.querySelector('.oos-overlay');
+      if (isOOS) {
+        if (!overlay) {
+          overlay = document.createElement('div');
+          overlay.className = 'oos-overlay';
+          overlay.innerHTML = '<span>Out of Stock</span>';
+          imgWrap.appendChild(overlay);
+        }
+      } else {
+        if (overlay) overlay.remove();
+      }
+
+      // Add to cart button
+      if (addBtn) {
+        addBtn.disabled    = isOOS;
+        addBtn.textContent = isOOS ? 'Out of Stock' : 'Add to Cart';
+      }
+
+      // Low stock badge
+      const priceEl = card.querySelector('.card-price');
+      let lowBadge  = card.querySelector('.stock-low');
+      if (isLow) {
+        if (!lowBadge) {
+          lowBadge = document.createElement('div');
+          lowBadge.className = 'stock-low';
+          if (priceEl) priceEl.after(lowBadge);
+        }
+        lowBadge.textContent = `Only ${data.stock} left`;
+      } else {
+        if (lowBadge) lowBadge.remove();
+      }
+    });
+    es.onerror = function () {};
+  })();
 </script>
 </body>
 </html>

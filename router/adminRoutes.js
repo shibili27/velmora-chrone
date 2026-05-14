@@ -8,6 +8,7 @@ import {
   getDashboard,
   getCategories, addCategory, editCategory, deleteCategory,
   getProducts,   addProduct,  editProduct,  deleteProduct,
+  blockProduct,  unblockProduct,
   getBrands,     addBrand,    editBrand,    deleteBrand,
 } from '../controller/adimconrtoller/adminController.js';
 
@@ -47,9 +48,12 @@ router.post('/login', async (req, res) => {
       req.flash('formData', { email });
       return res.redirect('/admin/login');
     }
+
+    // ── Admin session uses adminId — completely separate from user session ──
     req.session.adminId   = admin._id.toString();
     req.session.adminName = admin.name;
     req.session.adminRole = admin.role;
+
     req.session.save(async (err) => {
       if (err) {
         req.flash('error', 'Something went wrong. Please try again.');
@@ -100,7 +104,7 @@ router.get('/customers', isAuthenticated, async (req, res) => {
       .skip((page - 1) * limit)
       .limit(limit);
 
-    res.render('admin/dashboard', {
+    res.render('admin/customers', {
       title:     'Customers — Velmora Chroné Admin',
       adminName: req.session.adminName,
       adminRole: req.session.adminRole,
@@ -109,6 +113,8 @@ router.get('/customers', isAuthenticated, async (req, res) => {
       page,
       pages: Math.ceil(total / limit),
       search,
+      error:   req.flash('error')[0]   || null,
+      success: req.flash('success')[0] || null,
     });
   } catch (err) {
     console.error('Customers error:', err);
@@ -117,13 +123,13 @@ router.get('/customers', isAuthenticated, async (req, res) => {
   }
 });
 
-router.post('/dashboard/:id/block', isAuthenticated, async (req, res) => {
+router.post('/customers/:id/block', isAuthenticated, async (req, res) => {
   await User.findByIdAndUpdate(req.params.id, { isBlocked: true });
   req.flash('success', 'Customer blocked.');
   res.redirect('/admin/customers');
 });
 
-router.post('/dashboard/:id/unblock', isAuthenticated, async (req, res) => {
+router.post('/customers/:id/unblock', isAuthenticated, async (req, res) => {
   await User.findByIdAndUpdate(req.params.id, { isBlocked: false });
   req.flash('success', 'Customer unblocked.');
   res.redirect('/admin/customers');
@@ -136,10 +142,13 @@ router.post('/categories/:id/edit',   isAuthenticated, editCategory);
 router.post('/categories/:id/delete', isAuthenticated, deleteCategory);
 
 // ── Products ──────────────────────────────────────────────────────────────────
-router.get('/products',             isAuthenticated, getProducts);
-router.post('/products/add',        isAuthenticated, addProduct);
-router.post('/products/:id/edit',   isAuthenticated, editProduct);
-router.post('/products/:id/delete', isAuthenticated, deleteProduct);
+router.get('/products',               isAuthenticated, getProducts);
+router.post('/products/add',          isAuthenticated, addProduct);
+router.post('/products/:id/edit',     isAuthenticated, editProduct);
+router.post('/products/:id/delete',   isAuthenticated, deleteProduct);
+// Block / Unblock (soft toggle — does NOT delete)
+router.post('/products/:id/block',    isAuthenticated, blockProduct);
+router.post('/products/:id/unblock',  isAuthenticated, unblockProduct);
 
 // ── Brands ────────────────────────────────────────────────────────────────────
 router.get('/brands',             isAuthenticated, getBrands);

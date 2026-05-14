@@ -6,6 +6,7 @@ const MAX_QTY = 5;
 async function getValidProduct(productId) {
   const product = await Product.findById(productId)
     .populate('category', 'name isBlocked')
+    .populate('brand', 'name')          // ← populate brand name
     .lean();
 
   if (!product)          return { error: 'Product not found',                     code: 404 };
@@ -23,7 +24,10 @@ export const getCart = async (req, res) => {
 
     let cart = await Cart.findOne({ user: userId }).populate({
       path: 'items.product',
-      populate: { path: 'category', select: 'name isBlocked' },
+      populate: [
+        { path: 'category', select: 'name isBlocked' },
+        { path: 'brand',    select: 'name' },          // ← populate brand name
+      ],
     });
 
     if (!cart) {
@@ -66,7 +70,7 @@ export const getCart = async (req, res) => {
 
 export const addToCart = async (req, res) => {
   try {
-    const userId = req.session.user || req.user?._id;
+    const userId = req.session.user;
     const { productId, quantity = 1 } = req.body;
     const qty = Math.max(1, parseInt(quantity, 10) || 1);
 
@@ -128,7 +132,6 @@ export const updateCartItem = async (req, res) => {
     const item    = cart.items[itemIndex];
     const product = item.product;
 
-    
     if (!product || product.isDeleted || !product.isListed) {
       cart.items.splice(itemIndex, 1);
       await cart.save();

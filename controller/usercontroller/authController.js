@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import nodemailer from 'nodemailer';
 
 
+
 const generateOTP = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
 };
@@ -314,6 +315,7 @@ const resendOTP = async (req, res) => {
     res.json({ success: false, message: "Failed to resend OTP." });
   }
 };
+
 
 export default {
   login,

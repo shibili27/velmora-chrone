@@ -87,9 +87,8 @@ export const getProducts = async (req, res) => {
       );
     }
 
-    const total      = visibleProducts.length;
-    
-    const totalPages = Math.ceil(total / limit);
+    const total             = visibleProducts.length;
+    const totalPages        = Math.ceil(total / limit);
     const paginatedProducts = visibleProducts.slice(skip, skip + limit);
 
     res.render('user/products', {
@@ -113,21 +112,41 @@ export const getProducts = async (req, res) => {
   }
 };
 
+
 export const getProductDetail = async (req, res) => {
   try {
     const product = await Product.findOne({
       _id:       req.params.id,
       isDeleted: false,
-      isListed:  { $ne: false },
     })
-    .populate({
-      path:  'category',
-      match: { isDeleted: false, isListed: { $ne: false } },
-    })
+    .populate('category')
     .populate('brand');
 
-    if (!product || !product.category) {
-      return res.status(404).render('user/error', { message: 'Product not found.' });
+    // Hard-deleted or truly doesn't exist
+    if (!product) {
+      return res.status(404).render('user/productUnavailable', {
+        title:  'Product Not Found — Velmora Chroné',
+        reason: 'notfound',
+        // no product passed — polling won't start (correct)
+      });
+    }
+
+    // Blocked by admin
+    if (product.isListed === false) {
+      return res.status(410).render('user/productUnavailable', {
+        title:   'Product Unavailable — Velmora Chroné',
+        reason:  'blocked',
+        product, // ← pass FULL doc so _id is available for polling
+      });
+    }
+
+    // Category deleted or unlisted
+    if (!product.category || product.category.isDeleted || product.category.isListed === false) {
+      return res.status(410).render('user/productUnavailable', {
+        title:   'Product Unavailable — Velmora Chroné',
+        reason:  'category',
+        product, // ← pass FULL doc so _id is available for polling
+      });
     }
 
     const related = await Product.find({
@@ -148,5 +167,46 @@ export const getProductDetail = async (req, res) => {
   } catch (err) {
     console.error('Get product detail error:', err);
     res.status(500).render('user/error', { message: 'Failed to load product.' });
+  }
+};
+
+
+/*
+ * GET /products/:id/status
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Lightweight JSON endpoint polled by productUnavailable.ejs every 3 s.
+ * Returns { status: 'available' | 'blocked' | 'category' | 'notfound' }
+ *
+ * ADD THIS ROUTE in your products router BEFORE the /:id detail route:
+ *   router.get('/:id/status', getProductStatus);
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+export const getProductStatus = async (req, res) => {
+  try {
+    const product = await Product.findOne({
+      _id:       req.params.id,
+      isDeleted: false,
+    })
+    .populate('category')
+    .lean();
+
+    if (!product) {
+      return res.json({ status: 'notfound' });
+    }
+
+    if (product.isListed === false) {
+      return res.json({ status: 'blocked' });
+    }
+
+    if (!product.category || product.category.isDeleted || product.category.isListed === false) {
+      return res.json({ status: 'category' });
+    }
+
+    // Product is fully available — polling page should redirect
+    return res.json({ status: 'available' });
+
+  } catch (err) {
+    console.error('[getProductStatus]', err);
+    return res.status(500).json({ status: 'error' });
   }
 };
