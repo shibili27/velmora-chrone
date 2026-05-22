@@ -7,7 +7,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Jost:wght@200;300;400;500&family=Playfair+Display:ital,wght@0,400;1,400&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -15,175 +15,291 @@
     ::-webkit-scrollbar { width: 2px; }
     ::-webkit-scrollbar-track { background: #111110; }
     ::-webkit-scrollbar-thumb { background: #c9a96e; }
-    .nav-root { position: fixed; top: 0; left: 0; right: 0; z-index: 200; background: #111110; border-bottom: 1px solid rgba(245,242,235,0.06); transition: box-shadow 0.3s; }
-    .nav-root.scrolled { box-shadow: 0 2px 20px rgba(0,0,0,0.3); }
+
+    /* ── GRAIN ── */
+    body::before {
+      content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity: .016;
+    }
+
+    /* ═══ NAV ═══ */
+    .nav-root { position: fixed; top: 0; left: 0; right: 0; z-index: 200; background: rgba(17,17,16,0.92); backdrop-filter: blur(18px) saturate(1.4); -webkit-backdrop-filter: blur(18px) saturate(1.4); border-bottom: 1px solid rgba(245,242,235,0.06); transition: box-shadow 0.3s; }
+    .nav-root.scrolled { box-shadow: 0 2px 24px rgba(0,0,0,0.5); }
     .nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 1rem 2rem; }
     @media(min-width:768px) { .nav-inner { padding: 1rem 3rem; } }
     .nav-logo { font-family: 'Cormorant Garamond', serif; font-size: 0.85rem; font-weight: 300; letter-spacing: 0.25em; text-transform: uppercase; color: #f5f2eb; text-decoration: none; }
-    .nav-link { font-family: 'Jost', sans-serif; font-size: 0.55rem; font-weight: 400; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(245,242,235,0.55); text-decoration: none; transition: color 0.2s; }
-    .nav-link:hover, .nav-link.active { color: #f5f2eb; }
-    .nav-icon { color: rgba(245,242,235,0.6); background: none; border: none; cursor: pointer; transition: color 0.2s; text-decoration: none; display: flex; align-items: center; }
-    .nav-icon:hover { color: #c9a96e; }
-    .nav-icon.wishlisted { color: #f87171; }
-    .cart-badge { position: absolute; top: -4px; right: -5px; width: 13px; height: 13px; border-radius: 50%; background: #c9a96e; font-size: 0.4rem; font-weight: 600; color: #111110; display: flex; align-items: center; justify-content: center; }
-    .wishlist-nav-badge { position: absolute; top: -4px; right: -5px; width: 13px; height: 13px; border-radius: 50%; background: #f87171; font-size: 0.4rem; font-weight: 600; color: #fff; display: none; align-items: center; justify-content: center; }
+    .nav-link { font-family: 'Jost', sans-serif; font-size: 0.53rem; font-weight: 400; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(245,242,235,0.45); text-decoration: none; transition: color 0.2s; position: relative; padding-bottom: 2px; }
+    .nav-link::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 0; height: 1px; background: #c9a96e; transition: width 0.3s; }
+    .nav-link:hover { color: rgba(245,242,235,0.9); }
+    .nav-link:hover::after { width: 100%; }
+    .nav-link.active { color: #c9a96e; }
+    .nav-link.active::after { width: 100%; }
+    .nav-icon-btn { position: relative; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; color: rgba(245,242,235,0.5); background: rgba(255,255,255,0.03); border: 1px solid rgba(201,169,110,0.12); border-radius: 10px; cursor: pointer; text-decoration: none; transition: color 0.22s, background 0.22s, border-color 0.22s, transform 0.18s cubic-bezier(.34,1.56,.64,1), box-shadow 0.22s; box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 2px 6px rgba(0,0,0,0.35); }
+    .nav-icon-btn::before { content: ''; position: absolute; inset: 0; border-radius: 10px; background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 55%); pointer-events: none; }
+    .nav-icon-btn:hover { color: #c9a96e; background: rgba(201,169,110,0.08); border-color: rgba(201,169,110,0.35); transform: translateY(-2px) scale(1.06); box-shadow: 0 1px 0 rgba(255,255,255,0.06) inset, 0 6px 20px rgba(0,0,0,0.5), 0 0 14px rgba(201,169,110,0.15); }
+    .nav-icon-btn:active { transform: translateY(0px) scale(0.97); }
+    .nav-icon-btn.wishlisted { color: #f87171; border-color: rgba(248,113,113,0.3); }
+    .cart-badge { position: absolute; top: -5px; right: -5px; width: 14px; height: 14px; border-radius: 50%; background: linear-gradient(135deg, #d4b97e, #c9a96e); font-size: 0.38rem; font-weight: 600; color: #111110; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(201,169,110,0.4); }
     .hamburger { display: flex; flex-direction: column; gap: 5px; background: none; border: none; cursor: pointer; padding: 3px; }
-    .hamburger span { display: block; width: 20px; height: 1px; background: rgba(245,242,235,0.7); transition: transform 0.3s, opacity 0.3s; }
+    .hamburger span { display: block; width: 20px; height: 1px; background: rgba(245,242,235,0.6); transition: transform 0.3s, opacity 0.3s; }
     .hamburger.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
     .hamburger.open span:nth-child(2) { opacity: 0; }
     .hamburger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
     .mobile-menu { display: none; flex-direction: column; background: #0d0d0c; padding: 1.5rem 2rem; gap: 1rem; border-top: 1px solid rgba(245,242,235,0.05); }
     .mobile-menu.open { display: flex; }
-    .mobile-menu .nav-link { font-size: 0.7rem; padding: 0.4rem 0; border-bottom: 1px solid rgba(245,242,235,0.04); color: rgba(245,242,235,0.5); }
-    .breadcrumb { padding: 5.5rem 3rem 0; max-width: 1200px; margin: 0 auto; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
-    .breadcrumb a { font-family: 'Jost', sans-serif; font-size: 0.5rem; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(245,242,235,0.3); text-decoration: none; transition: color 0.2s; }
-    .breadcrumb a:hover { color: rgba(245,242,235,0.6); }
-    .breadcrumb span.sep { font-size: 0.5rem; color: rgba(245,242,235,0.15); }
-    .breadcrumb-current { font-family: 'Jost', sans-serif; font-size: 0.5rem; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(201,169,110,0.7); }
-    .detail-wrap { max-width: 1200px; margin: 0 auto; padding: 2rem 2rem 5rem; }
-    @media(min-width:768px) { .detail-wrap { padding: 2rem 3rem 5rem; } }
+    .mobile-menu .nav-link { font-size: 0.68rem; padding: 0.45rem 0; border-bottom: 1px solid rgba(245,242,235,0.04); color: rgba(245,242,235,0.5); }
+
+    /* ═══ BREADCRUMB ═══ */
+    .breadcrumb { padding: 5.5rem 2rem 0; max-width: 1200px; margin: 0 auto; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; position: relative; z-index: 1; }
+    @media(min-width:768px) { .breadcrumb { padding: 5.5rem 3rem 0; } }
+    .breadcrumb a { font-family: 'Jost', sans-serif; font-size: 0.46rem; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(245,242,235,0.25); text-decoration: none; transition: color 0.2s; }
+    .breadcrumb a:hover { color: rgba(201,169,110,0.6); }
+    .breadcrumb .sep { font-size: 0.46rem; color: rgba(245,242,235,0.12); }
+    .breadcrumb-current { font-family: 'Jost', sans-serif; font-size: 0.46rem; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(201,169,110,0.6); }
+
+    /* ═══ DETAIL GRID ═══ */
+    .detail-wrap { max-width: 1200px; margin: 0 auto; padding: 2rem 2rem 4rem; position: relative; z-index: 1; }
+    @media(min-width:768px) { .detail-wrap { padding: 2rem 3rem 4rem; } }
     .detail-grid { display: grid; grid-template-columns: 1fr; gap: 3rem; }
     @media(min-width:900px) { .detail-grid { grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; } }
+
+    /* ═══ GALLERY ═══ */
     .gallery { display: flex; flex-direction: column; gap: 0.75rem; }
-    .main-img-wrap { width: 100%; aspect-ratio: 4/3; overflow: hidden; background: #1a1a18; position: relative; cursor: zoom-in; border: 1px solid rgba(245,242,235,0.05); }
+
+    /* Main image wrapper */
+    .main-img-wrap {
+      width: 100%; aspect-ratio: 4/3; overflow: hidden;
+      background: #1a1a18; position: relative; cursor: zoom-in;
+      border: 1px solid rgba(245,242,235,0.06); border-radius: 16px;
+    }
     .main-img-wrap.zoomed { cursor: zoom-out; }
-    .main-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.45s cubic-bezier(0.25,0.46,0.45,0.94); transform-origin: center center; pointer-events: none; user-select: none; }
-    .main-img.zoomed { transform: scale(2.4); }
-    .zoom-hint { position: absolute; bottom: 10px; right: 12px; font-family: 'Jost', sans-serif; font-size: 0.42rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(245,242,235,0.2); display: flex; align-items: center; gap: 4px; pointer-events: none; transition: opacity 0.3s; }
+    .main-img-wrap::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent); z-index: 2; pointer-events: none; border-radius: 16px 16px 0 0; }
+
+    /* Crossfade overlay for slide transition */
+    .slide-overlay {
+      position: absolute; inset: 0; z-index: 1;
+      background-size: cover; background-position: center;
+      opacity: 0; transition: opacity 0.55s ease; pointer-events: none;
+      border-radius: 16px;
+    }
+    .slide-overlay.fading { opacity: 1; }
+
+    .main-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.45s cubic-bezier(0.25,0.46,0.45,0.94); transform-origin: center; pointer-events: none; user-select: none; filter: brightness(.92) contrast(1.04) saturate(.85); display: block; }
+    .main-img.zoomed { transform: scale(2.4); filter: brightness(1) contrast(1.04) saturate(.85); }
+
+    /* progress bar removed */
+
+    /* Slide counter */
+    .slide-counter {
+      position: absolute; bottom: 12px; left: 14px; z-index: 4;
+      font-family: 'Jost', sans-serif; font-size: 0.42rem; letter-spacing: 0.15em;
+      color: rgba(245,242,235,0.4); background: rgba(17,17,16,0.55);
+      backdrop-filter: blur(6px); padding: 3px 9px; border-radius: 100px;
+      pointer-events: none;
+    }
+
+    /* Prev / Next arrows */
+    .slide-arrow {
+      position: absolute; top: 50%; z-index: 4; transform: translateY(-50%);
+      width: 32px; height: 32px; background: rgba(17,17,16,0.6);
+      border: 1px solid rgba(245,242,235,0.12); border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      color: rgba(245,242,235,0.45); cursor: pointer;
+      transition: color 0.2s, background 0.2s, border-color 0.2s, opacity 0.2s;
+      opacity: 0; backdrop-filter: blur(6px);
+    }
+    .main-img-wrap:hover .slide-arrow { opacity: 1; }
+    .slide-arrow:hover { color: #c9a96e; background: rgba(17,17,16,0.85); border-color: rgba(201,169,110,0.35); }
+    .slide-arrow.prev { left: 10px; }
+    .slide-arrow.next { right: 10px; }
+
+    /* Slide dots */
+    .slide-dots {
+      position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 5px; z-index: 4; pointer-events: none;
+    }
+    .slide-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: rgba(245,242,235,0.25); transition: background 0.3s, transform 0.3s;
+      pointer-events: all; cursor: pointer;
+    }
+    .slide-dot.active { background: #c9a96e; transform: scale(1.3); }
+
+    .zoom-hint { position: absolute; bottom: 12px; right: 14px; font-family: 'Jost', sans-serif; font-size: 0.4rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(245,242,235,0.18); display: flex; align-items: center; gap: 4px; pointer-events: none; transition: opacity 0.3s; z-index: 4; }
     .main-img-wrap.zoomed .zoom-hint { opacity: 0; }
-    .img-badge { position: absolute; top: 12px; left: 12px; z-index: 2; font-family: 'Jost', sans-serif; font-size: 0.42rem; letter-spacing: 0.18em; text-transform: uppercase; padding: 3px 9px; }
-    .badge-oos { background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.3); color: #f87171; }
-    .badge-low { background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.3); color: #fbbf24; }
-    .badge-discount { background: rgba(201,169,110,0.12); border: 1px solid rgba(201,169,110,0.3); color: #c9a96e; }
-    .thumb-row { display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 4px; }
-    .thumb { width: 70px; height: 55px; overflow: hidden; background: #1a1a18; cursor: pointer; border: 1px solid transparent; transition: border-color 0.2s, opacity 0.2s; flex-shrink: 0; }
-    .thumb.active { border-color: #c9a96e; }
-    .thumb img { width: 100%; height: 100%; object-fit: cover; }
-    .thumb:not(.active) img { opacity: 0.5; }
-    .thumb:hover img { opacity: 1; }
+
+    /* Image badge */
+    .img-badge { position: absolute; top: 12px; left: 12px; z-index: 5; font-family: 'Jost', sans-serif; font-size: 0.4rem; letter-spacing: 0.18em; text-transform: uppercase; padding: 3px 10px; border-radius: 100px; }
+    .badge-oos { background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.28); color: #f87171; }
+    .badge-low { background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.28); color: #fbbf24; }
+    .badge-discount { background: rgba(201,169,110,0.1); border: 1px solid rgba(201,169,110,0.28); color: #c9a96e; }
+
+    /* Thumbnails */
+    .thumb-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
+    .thumb-row::-webkit-scrollbar { height: 2px; }
+    .thumb-row::-webkit-scrollbar-thumb { background: rgba(201,169,110,0.3); }
+    .thumb { width: 68px; height: 54px; overflow: hidden; background: #1a1a18; cursor: pointer; border: 1px solid rgba(245,242,235,0.06); border-radius: 8px; transition: border-color 0.2s; flex-shrink: 0; }
+    .thumb.active { border-color: rgba(201,169,110,0.5); }
+    .thumb img { width: 100%; height: 100%; object-fit: cover; opacity: 0.5; transition: opacity 0.2s; filter: brightness(.9) saturate(.8); }
+    .thumb.active img, .thumb:hover img { opacity: 1; }
     .watch-ph { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #1a1a18; }
-    .info-col { display: flex; flex-direction: column; gap: 0; }
-    .prod-category { font-family: 'Jost', sans-serif; font-size: 0.45rem; letter-spacing: 0.28em; text-transform: uppercase; color: rgba(245,242,235,0.3); margin-bottom: 0.5rem; }
-    .prod-brand-tag { font-family: 'Jost', sans-serif; font-size: 0.42rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(201,169,110,0.65); margin-bottom: 0.6rem; border: 1px solid rgba(201,169,110,0.15); padding: 2px 8px; display: inline-block; }
-    .prod-name { font-family: 'Cormorant Garamond', serif; font-size: clamp(1.8rem, 3.5vw, 2.6rem); font-weight: 300; color: #f5f2eb; line-height: 1.15; margin-bottom: 0.75rem; }
-    .divider { width: 40px; height: 1px; background: rgba(201,169,110,0.4); margin-bottom: 1rem; }
-    .rating-row { display: flex; align-items: center; gap: 10px; margin-bottom: 1.25rem; flex-wrap: wrap; }
-    .stars { display: flex; gap: 2px; }
-    .star { width: 11px; height: 11px; }
-    .star polygon.filled { fill: #c9a96e; }
-    .star polygon.empty { fill: none; stroke: rgba(201,169,110,0.3); stroke-width: 1.5; }
-    .rating-num { font-family: 'Jost', sans-serif; font-size: 0.6rem; color: rgba(245,242,235,0.5); }
-    .review-link { font-family: 'Jost', sans-serif; font-size: 0.52rem; color: rgba(245,242,235,0.3); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; transition: color 0.2s; }
-    .review-link:hover { color: rgba(245,242,235,0.6); }
-    .price-block { margin-bottom: 0.35rem; }
-    .price-row { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
-    .prod-price { font-family: 'Jost', sans-serif; font-size: 1.4rem; font-weight: 300; color: #f5f2eb; letter-spacing: 0.05em; }
-    .prod-price-label { font-family: 'Jost', sans-serif; font-size: 0.45rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(245,242,235,0.2); margin-bottom: 1rem; margin-top: 3px; }
-    .stock-badge { display: inline-flex; align-items: center; gap: 6px; font-family: 'Jost', sans-serif; font-size: 0.5rem; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1.5rem; }
-    .stock-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-    .stock-dot.in { background: #4ade80; box-shadow: 0 0 6px rgba(74,222,128,0.5); }
-    .stock-dot.low { background: #fbbf24; box-shadow: 0 0 6px rgba(251,191,36,0.4); }
-    .stock-dot.out { background: #f87171; }
-    .stock-badge.in { color: rgba(74,222,128,0.8); }
-    .stock-badge.low { color: rgba(251,191,36,0.8); }
-    .stock-badge.out { color: rgba(248,113,113,0.8); }
-    .color-variants { margin-bottom: 1.5rem; }
-    .color-variants-label { font-family: 'Jost', sans-serif; font-size: 0.48rem; letter-spacing: 0.28em; text-transform: uppercase; color: rgba(245,242,235,0.35); margin-bottom: 0.75rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(245,242,235,0.06); }
-    .color-selected-name { font-family: 'Jost', sans-serif; font-size: 0.52rem; color: rgba(245,242,235,0.5); margin-bottom: 0.75rem; letter-spacing: 0.08em; }
-    .color-selected-name span { color: #f5f2eb; }
-    .color-swatches { display: flex; flex-wrap: wrap; gap: 10px; }
-    .color-swatch { width: 32px; height: 32px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: all 0.2s; position: relative; flex-shrink: 0; }
-    .color-swatch:hover { transform: scale(1.1); }
-    .color-swatch.active { border-color: rgba(245,242,235,0.6); box-shadow: 0 0 0 3px rgba(245,242,235,0.1); }
-    .color-swatch[data-oos="true"] { opacity: 0.35; cursor: not-allowed; }
-    .color-swatch[data-oos="true"]::after { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 1.5px; background: rgba(248,113,113,0.7); transform: rotate(-45deg); }
-    .color-swatch[title]::before { content: attr(title); position: absolute; bottom: 110%; left: 50%; transform: translateX(-50%); background: #1a1a18; border: 1px solid rgba(245,242,235,0.08); color: rgba(245,242,235,0.7); font-family: 'Jost', sans-serif; font-size: 0.42rem; letter-spacing: 0.1em; white-space: nowrap; padding: 3px 8px; pointer-events: none; opacity: 0; transition: opacity 0.2s; }
-    .color-swatch:hover::before { opacity: 1; }
     .gallery-fade { opacity: 0; transition: opacity 0.25s; }
     .gallery-fade.visible { opacity: 1; }
-    .action-row { display: flex; gap: 0.75rem; align-items: stretch; margin-bottom: 1rem; }
-    .qty-wrap { display: flex; align-items: center; border: 1px solid rgba(245,242,235,0.12); }
-    .qty-btn { width: 36px; height: 48px; background: none; border: none; color: rgba(245,242,235,0.5); font-size: 1rem; cursor: pointer; transition: color 0.2s, background 0.2s; display: flex; align-items: center; justify-content: center; }
+
+    /* ═══ INFO COLUMN ═══ */
+    .info-col { display: flex; flex-direction: column; }
+    .prod-eyebrow { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.6rem; flex-wrap: wrap; }
+    .prod-category { font-family: 'Jost', sans-serif; font-size: 0.42rem; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(245,242,235,0.28); }
+    .prod-brand-tag { font-family: 'Jost', sans-serif; font-size: 0.4rem; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(201,169,110,0.7); border: 1px solid rgba(201,169,110,0.2); padding: 2px 9px; border-radius: 100px; background: rgba(201,169,110,0.05); }
+    .prod-name { font-family: 'Playfair Display', serif; font-size: clamp(1.7rem, 3.2vw, 2.4rem); font-weight: 400; color: #f5f2eb; line-height: 1.15; margin-bottom: 0.8rem; }
+    .gold-rule { width: 40px; height: 1px; background: linear-gradient(90deg, #c9a96e, rgba(201,169,110,0.2)); margin-bottom: 1.1rem; }
+
+    .rating-row { display: flex; align-items: center; gap: 10px; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .stars { display: flex; gap: 3px; }
+    .star { width: 11px; height: 11px; }
+    .star polygon.filled { fill: #c9a96e; }
+    .star polygon.half { fill: url(#halfGrad); }
+    .star polygon.empty { fill: none; stroke: rgba(201,169,110,0.3); stroke-width: 1.5; }
+    .rating-num { font-family: 'Jost', sans-serif; font-size: 0.58rem; color: rgba(245,242,235,0.4); }
+    .review-link { font-family: 'Jost', sans-serif; font-size: 0.5rem; color: rgba(245,242,235,0.25); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; transition: color 0.2s; }
+    .review-link:hover { color: rgba(201,169,110,0.6); }
+
+    .price-block { margin-bottom: 0.4rem; }
+    .prod-price { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 300; color: #f5f2eb; letter-spacing: 0.04em; }
+    .prod-price-label { font-family: 'Jost', sans-serif; font-size: 0.42rem; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(245,242,235,0.18); margin-top: 3px; margin-bottom: 1.1rem; }
+
+    .stock-badge { display: inline-flex; align-items: center; gap: 7px; font-family: 'Jost', sans-serif; font-size: 0.48rem; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1.5rem; }
+    .stock-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .stock-dot.in  { background: #4ade80; box-shadow: 0 0 6px rgba(74,222,128,0.5); }
+    .stock-dot.low { background: #fbbf24; box-shadow: 0 0 6px rgba(251,191,36,0.4); }
+    .stock-dot.out { background: #f87171; }
+    .stock-badge.in  { color: rgba(74,222,128,0.75); }
+    .stock-badge.low { color: rgba(251,191,36,0.75); }
+    .stock-badge.out { color: rgba(248,113,113,0.75); }
+
+    .color-variants { margin-bottom: 1.5rem; }
+    .color-block-title { font-family: 'Jost', sans-serif; font-size: 0.44rem; letter-spacing: 0.28em; text-transform: uppercase; color: rgba(245,242,235,0.3); margin-bottom: 0.75rem; padding-bottom: 0.45rem; border-bottom: 1px solid rgba(245,242,235,0.05); }
+    .color-selected-name { font-family: 'Jost', sans-serif; font-size: 0.5rem; color: rgba(245,242,235,0.35); margin-bottom: 0.75rem; letter-spacing: 0.06em; }
+    .color-selected-name span { color: rgba(245,242,235,0.75); }
+    .color-swatches { display: flex; flex-wrap: wrap; gap: 10px; }
+    .color-swatch { width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: all 0.2s; position: relative; flex-shrink: 0; }
+    .color-swatch:hover { transform: scale(1.12); }
+    .color-swatch.active { border-color: rgba(245,242,235,0.55); box-shadow: 0 0 0 3px rgba(245,242,235,0.08); }
+    .color-swatch[data-oos="true"] { opacity: 0.3; cursor: not-allowed; }
+    .color-swatch[data-oos="true"]::after { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 1.5px; background: rgba(248,113,113,0.7); transform: rotate(-45deg); }
+    .color-swatch::before { content: attr(title); position: absolute; bottom: 115%; left: 50%; transform: translateX(-50%); background: #1a1a18; border: 1px solid rgba(245,242,235,0.08); color: rgba(245,242,235,0.6); font-family: 'Jost', sans-serif; font-size: 0.4rem; letter-spacing: 0.1em; white-space: nowrap; padding: 3px 8px; border-radius: 4px; pointer-events: none; opacity: 0; transition: opacity 0.2s; }
+    .color-swatch:hover::before { opacity: 1; }
+
+    .action-row { display: flex; gap: 0.65rem; align-items: stretch; margin-bottom: 1rem; }
+    .qty-wrap { display: flex; align-items: center; border: 1px solid rgba(245,242,235,0.1); border-radius: 10px; overflow: hidden; }
+    .qty-btn { width: 38px; height: 50px; background: none; border: none; color: rgba(245,242,235,0.45); font-size: 1rem; cursor: pointer; transition: color 0.2s, background 0.2s; display: flex; align-items: center; justify-content: center; }
     .qty-btn:hover:not(:disabled) { color: #f5f2eb; background: rgba(245,242,235,0.05); }
     .qty-btn:disabled { opacity: 0.2; cursor: not-allowed; }
-    .qty-input { width: 44px; height: 48px; background: transparent; border: none; border-left: 1px solid rgba(245,242,235,0.12); border-right: 1px solid rgba(245,242,235,0.12); text-align: center; font-family: 'Jost', sans-serif; font-size: 0.75rem; color: #f5f2eb; outline: none; }
+    .qty-input { width: 42px; height: 50px; background: transparent; border: none; border-left: 1px solid rgba(245,242,235,0.08); border-right: 1px solid rgba(245,242,235,0.08); text-align: center; font-family: 'Jost', sans-serif; font-size: 0.75rem; color: #f5f2eb; outline: none; }
     .qty-input::-webkit-outer-spin-button, .qty-input::-webkit-inner-spin-button { -webkit-appearance: none; }
-    .add-cart-btn { flex: 1; background: #c9a96e; color: #111110; font-family: 'Jost', sans-serif; font-size: 0.55rem; letter-spacing: 0.25em; text-transform: uppercase; border: none; cursor: pointer; padding: 0 1.5rem; height: 48px; transition: background 0.2s; }
-    .add-cart-btn:hover:not(:disabled) { background: #d4b97e; }
-    .add-cart-btn:disabled { background: rgba(245,242,235,0.06); color: rgba(245,242,235,0.18); cursor: not-allowed; }
-    .wishlist-btn { width: 48px; height: 48px; border: 1px solid rgba(245,242,235,0.12); background: none; color: rgba(245,242,235,0.4); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: color 0.2s, border-color 0.2s; }
-    .wishlist-btn:hover { color: #c9a96e; border-color: rgba(201,169,110,0.4); }
-    .wishlist-btn.active { color: #f87171; border-color: rgba(248,113,113,0.3); }
-    .wishlist-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .section-title { font-family: 'Jost', sans-serif; font-size: 0.48rem; letter-spacing: 0.28em; text-transform: uppercase; color: rgba(245,242,235,0.35); margin-bottom: 0.75rem; margin-top: 2rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(245,242,235,0.06); }
-    .prod-desc { font-family: 'Jost', sans-serif; font-size: 0.7rem; font-weight: 300; color: rgba(245,242,235,0.45); line-height: 1.9; letter-spacing: 0.03em; }
-    .service-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid rgba(245,242,235,0.05); }
-    .service-pill { display: flex; align-items: center; gap: 5px; font-family: 'Jost', sans-serif; font-size: 0.46rem; letter-spacing: 0.1em; color: rgba(245,242,235,0.3); }
-    .service-pill svg { color: rgba(201,169,110,0.5); }
-    .tabs-root { max-width: 1200px; margin: 0 auto; padding: 0 2rem 3rem; }
+
+    .add-cart-btn { flex: 1; font-family: 'Jost', sans-serif; font-size: 0.5rem; letter-spacing: 0.24em; text-transform: uppercase; color: #0d0b08; border: none; cursor: pointer; height: 50px; padding: 0 1.5rem; border-radius: 100px; position: relative; overflow: hidden; background: linear-gradient(135deg, #e0c47e 0%, #c9a96e 50%, #b8913d 100%); transition: transform 0.2s cubic-bezier(.34,1.56,.64,1), box-shadow 0.22s; box-shadow: 0 1px 0 rgba(255,255,255,0.35) inset, 0 4px 18px rgba(185,140,55,0.3), 0 1px 4px rgba(0,0,0,0.4); }
+    .add-cart-btn::after { content: ''; position: absolute; top: 0; left: -75%; width: 50%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent); transform: skewX(-18deg); transition: left 0.55s ease; }
+    .add-cart-btn:hover:not(:disabled)::after { left: 130%; }
+    .add-cart-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 1px 0 rgba(255,255,255,0.4) inset, 0 8px 24px rgba(185,140,55,0.4); }
+    .add-cart-btn:active { transform: translateY(1px); }
+    .add-cart-btn:disabled { background: rgba(245,242,235,0.06); color: rgba(245,242,235,0.18); cursor: not-allowed; box-shadow: none; }
+
+    .wishlist-btn { width: 50px; height: 50px; border: 1px solid rgba(245,242,235,0.1); border-radius: 10px; background: rgba(255,255,255,0.02); color: rgba(245,242,235,0.35); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: color 0.22s, border-color 0.22s, background 0.22s, transform 0.18s cubic-bezier(.34,1.56,.64,1); }
+    .wishlist-btn:hover { color: #c9a96e; border-color: rgba(201,169,110,0.35); background: rgba(201,169,110,0.06); transform: translateY(-2px); }
+    .wishlist-btn.active { color: #f87171; border-color: rgba(248,113,113,0.25); background: rgba(248,113,113,0.04); }
+    .wishlist-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .service-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid rgba(245,242,235,0.05); }
+    .service-pill { display: flex; align-items: center; gap: 5px; font-family: 'Jost', sans-serif; font-size: 0.44rem; letter-spacing: 0.1em; color: rgba(245,242,235,0.28); border: 1px solid rgba(245,242,235,0.06); padding: 5px 10px; border-radius: 100px; background: rgba(245,242,235,0.02); }
+    .service-pill svg { color: rgba(201,169,110,0.45); flex-shrink: 0; }
+
+    /* ═══ TABS ═══ */
+    .tabs-root { max-width: 1200px; margin: 0 auto; padding: 0 2rem 3rem; position: relative; z-index: 1; }
     @media(min-width:768px) { .tabs-root { padding: 0 3rem 3rem; } }
-    .tab-nav { display: flex; border-bottom: 1px solid rgba(245,242,235,0.07); overflow-x: auto; }
-    .tab-btn { font-family: 'Jost', sans-serif; font-size: 0.52rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(245,242,235,0.3); background: none; border: none; padding: 0.75rem 1.5rem; cursor: pointer; position: relative; transition: color 0.2s; white-space: nowrap; flex-shrink: 0; }
-    .tab-btn::after { content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 1px; background: #c9a96e; transform: scaleX(0); transition: transform 0.2s; }
-    .tab-btn.active { color: #f5f2eb; }
+    .tab-nav { display: flex; border-bottom: 1px solid rgba(245,242,235,0.07); overflow-x: auto; margin-bottom: 0; }
+    .tab-btn { font-family: 'Jost', sans-serif; font-size: 0.5rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(245,242,235,0.28); background: none; border: none; padding: 0.85rem 1.5rem; cursor: pointer; position: relative; transition: color 0.2s; white-space: nowrap; flex-shrink: 0; }
+    .tab-btn::after { content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 1px; background: #c9a96e; transform: scaleX(0); transition: transform 0.25s; }
+    .tab-btn.active { color: rgba(245,242,235,0.8); }
     .tab-btn.active::after { transform: scaleX(1); }
-    .tab-panel { display: none; padding: 2rem 0; }
+    .tab-panel { display: none; padding: 2rem 0; animation: fadeUp 0.4s ease both; }
     .tab-panel.active { display: block; }
-    .desc-text { font-family: 'Jost', sans-serif; font-size: 0.65rem; color: rgba(245,242,235,0.45); line-height: 1.9; }
-    .specs-table { width: 100%; border-collapse: collapse; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+    .desc-text { font-family: 'Jost', sans-serif; font-size: 0.68rem; color: rgba(245,242,235,0.42); line-height: 1.95; font-weight: 300; max-width: 680px; }
+
+    .specs-table { width: 100%; border-collapse: collapse; max-width: 540px; }
     .specs-table tr { border-bottom: 1px solid rgba(245,242,235,0.04); }
-    .specs-table td { padding: 0.65rem 0.5rem; font-family: 'Jost', sans-serif; font-size: 0.58rem; }
-    .specs-table td:first-child { color: rgba(245,242,235,0.3); letter-spacing: 0.12em; text-transform: uppercase; font-size: 0.48rem; width: 40%; }
-    .specs-table td:last-child { color: rgba(245,242,235,0.65); }
-    .related-section { max-width: 1200px; margin: 0 auto; padding: 0 2rem 5rem; }
+    .specs-table tr:hover { background: rgba(201,169,110,0.02); }
+    .specs-table td { padding: 0.7rem 0.75rem; font-family: 'Jost', sans-serif; font-size: 0.58rem; }
+    .specs-table td:first-child { color: rgba(245,242,235,0.28); letter-spacing: 0.14em; text-transform: uppercase; font-size: 0.44rem; width: 38%; }
+    .specs-table td:last-child { color: rgba(245,242,235,0.62); }
+
+    .review-item { padding: 1.25rem 0; border-bottom: 1px solid rgba(245,242,235,0.04); }
+    .review-item:last-child { border-bottom: none; }
+    .review-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 0.5rem; flex-wrap: wrap; }
+    .reviewer-name { font-family: 'Jost', sans-serif; font-size: 0.56rem; color: rgba(245,242,235,0.55); }
+    .review-date { font-family: 'Jost', sans-serif; font-size: 0.44rem; color: rgba(245,242,235,0.18); margin-left: auto; }
+    .review-body { font-family: 'Jost', sans-serif; font-size: 0.6rem; color: rgba(245,242,235,0.32); line-height: 1.85; font-weight: 300; }
+    .no-reviews { text-align: center; padding: 3rem 0; font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 300; color: rgba(245,242,235,0.15); }
+
+    /* ═══ RELATED ═══ */
+    .related-section { max-width: 1200px; margin: 0 auto; padding: 0 2rem 5rem; position: relative; z-index: 1; }
     @media(min-width:768px) { .related-section { padding: 0 3rem 5rem; } }
     .related-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; padding-bottom: 0.75rem; border-bottom: 1px solid rgba(245,242,235,0.06); }
-    .related-title { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 300; color: rgba(245,242,235,0.7); }
-    .related-all { font-family: 'Jost', sans-serif; font-size: 0.46rem; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(245,242,235,0.28); text-decoration: none; transition: color 0.2s; }
+    .related-eyebrow { font-family: 'Jost', sans-serif; font-size: 0.44rem; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(201,169,110,0.5); display: flex; align-items: center; gap: 0.5rem; }
+    .related-eyebrow::before { content: ''; width: 12px; height: 1px; background: rgba(201,169,110,0.3); }
+    .related-all { font-family: 'Jost', sans-serif; font-size: 0.46rem; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(245,242,235,0.25); text-decoration: none; display: flex; align-items: center; gap: 5px; transition: color 0.2s; }
     .related-all:hover { color: #c9a96e; }
-    .related-grid { display: grid; gap: 1.5rem; grid-template-columns: repeat(2,1fr); }
+    .related-grid { display: grid; gap: 14px; grid-template-columns: repeat(2,1fr); }
     @media(min-width:640px) { .related-grid { grid-template-columns: repeat(4,1fr); } }
-    .prod-card { background: #1a1a18; overflow: hidden; transition: transform 0.3s, box-shadow 0.3s; }
-    .prod-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
-    .prod-card:hover .prod-img { transform: scale(1.04); }
-    .prod-img-wrap { width: 100%; aspect-ratio: 4/3; overflow: hidden; background: #222220; }
-    .prod-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
-    .prod-body { padding: 1rem 1rem 0; text-align: center; }
-    .prod-cat { font-family: 'Jost', sans-serif; font-size: 0.42rem; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(245,242,235,0.25); margin-bottom: 3px; }
+    .prod-card { background: #1c1c1a; overflow: hidden; cursor: pointer; text-decoration: none; color: inherit; transition: transform 0.3s cubic-bezier(.34,1.56,.64,1), box-shadow 0.3s; position: relative; border: 1px solid rgba(245,242,235,0.06); border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.35); display: flex; flex-direction: column; }
+    .prod-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent); z-index: 2; border-radius: 16px 16px 0 0; pointer-events: none; }
+    .prod-card:hover { transform: translateY(-6px) scale(1.02); box-shadow: 0 16px 40px rgba(0,0,0,0.55), 0 0 0 1px rgba(201,169,110,0.18), 0 0 30px rgba(201,169,110,0.06); }
+    .prod-card:hover .prod-img { transform: scale(1.06); }
+    .prod-img-wrap { aspect-ratio: 1/1; overflow: hidden; background: #1a1a18; position: relative; border-radius: 16px 16px 0 0; }
+    .prod-img-wrap::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 55%, rgba(10,10,9,.5) 100%); pointer-events: none; z-index: 1; }
+    .prod-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s cubic-bezier(.25,.46,.45,.94); filter: brightness(.88) contrast(1.04) saturate(.8); display: block; }
+    .prod-body { padding: 0.9rem 1rem 1.1rem; border-top: 1px solid rgba(201,169,110,0.07); }
+    .prod-cat { font-family: 'Jost', sans-serif; font-size: 0.38rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(201,169,110,0.38); margin-bottom: 3px; }
     .prod-name-sm { font-family: 'Cormorant Garamond', serif; font-size: 1rem; font-weight: 300; color: #f5f2eb; line-height: 1.2; margin-bottom: 4px; }
-    .prod-price-sm { font-family: 'Jost', sans-serif; font-size: 0.6rem; color: rgba(245,242,235,0.45); }
-    .view-btn { display: block; width: 100%; margin-top: 0.75rem; background: #111110; color: rgba(245,242,235,0.5); font-family: 'Jost', sans-serif; font-size: 0.48rem; letter-spacing: 0.2em; text-transform: uppercase; padding: 0.65rem; border: none; cursor: pointer; text-align: center; text-decoration: none; border-top: 1px solid rgba(245,242,235,0.06); transition: background 0.2s, color 0.2s; }
-    .view-btn:hover { background: #c9a96e; color: #111110; }
-    .toast { position: fixed; bottom: 2rem; right: 2rem; z-index: 999; background: #1a1a18; border: 1px solid rgba(201,169,110,0.25); color: #f5f2eb; font-family: 'Jost', sans-serif; font-size: 0.58rem; letter-spacing: 0.08em; padding: 0.8rem 1.25rem; display: flex; align-items: center; gap: 10px; transform: translateY(80px); opacity: 0; transition: transform 0.35s, opacity 0.35s; pointer-events: none; min-width: 220px; }
+    .prod-price-sm { font-family: 'Jost', sans-serif; font-size: 0.58rem; color: rgba(201,169,110,0.6); }
+
+    .rule { height: 1px; background: linear-gradient(90deg, transparent, rgba(201,169,110,0.18), transparent); }
+
+    .toast { position: fixed; bottom: 2rem; right: 2rem; z-index: 999; background: #1a1a18; border: 1px solid rgba(201,169,110,0.25); border-radius: 10px; color: #f5f2eb; font-family: 'Jost', sans-serif; font-size: 0.58rem; letter-spacing: 0.08em; padding: 0.8rem 1.25rem; display: flex; align-items: center; gap: 10px; transform: translateY(80px); opacity: 0; transition: transform 0.35s, opacity 0.35s; pointer-events: none; min-width: 200px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
     .toast.show { transform: translateY(0); opacity: 1; }
     .toast.err { border-color: rgba(248,113,113,0.3); }
     .toast-dot { width: 5px; height: 5px; border-radius: 50%; background: #c9a96e; flex-shrink: 0; }
     .toast.err .toast-dot { background: #f87171; }
-    .footer { background: #0a0a09; padding: 4rem 2rem 1.5rem; border-top: 1px solid rgba(245,242,235,0.05); }
+
+    .footer { background: #0a0a09; padding: 4rem 2rem 1.5rem; border-top: 1px solid rgba(245,242,235,0.05); position: relative; z-index: 1; }
     @media(min-width:768px) { .footer { padding: 4rem 3rem 1.5rem; } }
-    .footer-inner { max-width: 1200px; margin: 0 auto; }
-    .footer-top { display: grid; grid-template-columns: 1fr; gap: 2.5rem; padding-bottom: 2.5rem; border-bottom: 1px solid rgba(245,242,235,0.05); }
+    .footer-top { display: grid; grid-template-columns: 1fr; gap: 2.5rem; padding-bottom: 2.5rem; border-bottom: 1px solid rgba(245,242,235,0.05); max-width: 1200px; margin: 0 auto; }
     @media(min-width:768px) { .footer-top { grid-template-columns: 1.2fr 1fr 1fr 1.2fr; gap: 3rem; } }
-    .footer-logo { font-family: 'Cormorant Garamond', serif; font-size: 1rem; font-weight: 300; letter-spacing: 0.2em; text-transform: uppercase; color: #f5f2eb; line-height: 1.4; margin-bottom: 0.75rem; }
-    .footer-desc { font-family: 'Jost', sans-serif; font-size: 0.6rem; font-weight: 300; color: rgba(245,242,235,0.25); line-height: 1.85; margin-bottom: 1rem; }
-    .footer-col-title { font-family: 'Jost', sans-serif; font-size: 0.48rem; letter-spacing: 0.28em; text-transform: uppercase; color: rgba(245,242,235,0.35); margin-bottom: 1rem; display: block; }
-    .footer-link { display: block; font-family: 'Jost', sans-serif; font-size: 0.55rem; letter-spacing: 0.1em; color: rgba(245,242,235,0.25); text-decoration: none; transition: color 0.2s; margin-bottom: 0.5rem; }
-    .footer-link:hover { color: rgba(245,242,235,0.6); }
-    .footer-bottom { display: flex; flex-direction: column; gap: 0.75rem; padding-top: 1.5rem; align-items: center; text-align: center; }
+    .footer-bottom { display: flex; flex-direction: column; gap: 0.75rem; padding-top: 1.5rem; align-items: center; text-align: center; max-width: 1200px; margin: 0 auto; }
     @media(min-width:768px) { .footer-bottom { flex-direction: row; justify-content: space-between; } }
-    .footer-copy { font-family: 'Jost', sans-serif; font-size: 0.48rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(245,242,235,0.15); }
+    .footer-logo { font-family: 'Cormorant Garamond', serif; font-size: 1rem; font-weight: 300; letter-spacing: 0.2em; text-transform: uppercase; color: #f5f2eb; margin-bottom: 0.75rem; }
+    .footer-desc { font-family: 'Jost', sans-serif; font-size: 0.6rem; font-weight: 300; color: rgba(245,242,235,0.22); line-height: 1.85; }
+    .footer-socials { display: flex; gap: 0.9rem; margin-top: 1.25rem; }
+    .footer-social-btn { width: 32px; height: 32px; border: 1px solid rgba(201,169,110,0.15); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: rgba(245,242,235,0.3); text-decoration: none; transition: border-color 0.25s, color 0.25s, transform 0.18s; }
+    .footer-social-btn:hover { border-color: rgba(201,169,110,0.4); color: #c9a96e; transform: scale(1.1); }
+    .footer-col-title { font-family: 'Jost', sans-serif; font-size: 0.44rem; letter-spacing: 0.28em; text-transform: uppercase; color: rgba(201,169,110,0.35); margin-bottom: 1rem; display: block; }
+    .footer-col-link { display: block; font-family: 'Jost', sans-serif; font-size: 0.58rem; letter-spacing: 0.08em; color: rgba(245,242,235,0.25); text-decoration: none; transition: color 0.2s; margin-bottom: 0.5rem; }
+    .footer-col-link:hover { color: rgba(245,242,235,0.6); }
+    .footer-copy { font-family: 'Jost', sans-serif; font-size: 0.44rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(245,242,235,0.12); }
     .footer-legal { display: flex; gap: 1.25rem; }
-    .footer-legal a { font-family: 'Jost', sans-serif; font-size: 0.48rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(245,242,235,0.2); text-decoration: none; transition: color 0.2s; }
+    .footer-legal a { font-family: 'Jost', sans-serif; font-size: 0.44rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(245,242,235,0.18); text-decoration: none; transition: color 0.2s; }
     .footer-legal a:hover { color: rgba(245,242,235,0.5); }
+    .reveal { opacity: 0; transform: translateY(20px); transition: opacity .6s ease, transform .6s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
   </style>
 </head>
 <body>
 
 <%
-  const hasVariants = product.colorVariants && product.colorVariants.length > 0;
-  const variants = hasVariants
-    ? product.colorVariants.map(v => ({ name: v.name, hex: v.hex, images: v.images || [], stock: v.stock || 0 }))
-    : [];
+  const hasVariants  = product.colorVariants && product.colorVariants.length > 0;
+  const variants     = hasVariants ? product.colorVariants.map(v => ({ name: v.name, hex: v.hex, images: v.images || [], stock: v.stock || 0 })) : [];
   const initialImages = hasVariants ? (variants[0].images || []) : (product.images || []);
   const initialStock  = hasVariants ? variants[0].stock : product.stock;
   const isOOS         = initialStock === 0;
@@ -206,46 +322,51 @@
   </defs>
 </svg>
 
+<!-- NAV -->
 <nav class="nav-root" id="navbar">
   <div class="nav-inner">
     <div class="hidden md:flex items-center gap-8">
+      <a href="/home"     class="nav-link">Home</a>
       <a href="/products" class="nav-link active">Collection</a>
-      <a href="/home" class="nav-link">Watches</a>
-      <a href="/home" class="nav-link">About</a>
-      <a href="/home" class="nav-link">Contact</a>
+      <a href="/home"     class="nav-link">About</a>
+      <a href="/home"     class="nav-link">Contact</a>
     </div>
     <a href="/home" class="nav-logo md:absolute md:left-1/2 md:-translate-x-1/2">Velmora Chroné</a>
-    <div class="flex items-center gap-4 md:gap-5 ml-auto md:ml-0">
-      <a href="<%= isLoggedIn ? '/profile' : '/login' %>" class="nav-icon" aria-label="Profile">
+    <div class="flex items-center gap-2 md:gap-3 ml-auto md:ml-0">
+      <a href="<%= isLoggedIn ? '/profile' : '/login' %>" class="nav-icon-btn" aria-label="Profile">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       </a>
-      <a href="<%= isLoggedIn ? '/wishlist' : '/login' %>" class="nav-icon relative" aria-label="Wishlist" id="navWishlistIcon">
+      <a href="<%= isLoggedIn ? '/wishlist' : '/login' %>" class="nav-icon-btn" aria-label="Wishlist" id="navWishlistBtn">
         <svg id="navHeartSvg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-        <span class="wishlist-nav-badge" id="wishlistNavCount"></span>
       </a>
-      <a href="<%= isLoggedIn ? '/cart' : '/login' %>" class="nav-icon relative" aria-label="Cart">
+      <a href="<%= isLoggedIn ? '/cart' : '/login' %>" class="nav-icon-btn" aria-label="Cart" style="position:relative">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
         <span class="cart-badge" id="cartCount">0</span>
       </a>
-      <% if (isLoggedIn) { %><a href="/logout" class="nav-link hidden md:inline">Logout</a><% } else { %><a href="/login" class="nav-link hidden md:inline">Login</a><% } %>
+      <% if (isLoggedIn) { %>
+        <a href="/logout" class="nav-link hidden md:inline" style="margin-left:4px;">Logout</a>
+      <% } else { %>
+        <a href="/login" class="nav-link hidden md:inline" style="margin-left:4px;">Login</a>
+      <% } %>
       <button class="hamburger md:hidden" id="hamburger"><span></span><span></span><span></span></button>
     </div>
   </div>
   <div class="mobile-menu" id="mobileMenu">
-    <a href="/products" class="nav-link">Collection</a>
-    <a href="/home" class="nav-link">Watches</a>
+    <a href="/home"     class="nav-link">Home</a>
+    <a href="/products" class="nav-link active">Collection</a>
     <% if (isLoggedIn) { %>
-      <a href="/profile" class="nav-link">My Profile</a>
+      <a href="/profile"  class="nav-link">My Profile</a>
       <a href="/wishlist" class="nav-link">Wishlist</a>
-      <a href="/cart" class="nav-link">Cart</a>
-      <a href="/logout" class="nav-link" style="color:rgba(201,169,110,0.6)">Logout</a>
+      <a href="/cart"     class="nav-link">Cart</a>
+      <a href="/logout"   class="nav-link" style="color:rgba(201,169,110,0.55)">Logout</a>
     <% } else { %>
-      <a href="/login" class="nav-link" style="color:rgba(201,169,110,0.6)">Login</a>
+      <a href="/login"  class="nav-link" style="color:rgba(201,169,110,0.55)">Login</a>
       <a href="/signup" class="nav-link">Sign Up</a>
     <% } %>
   </div>
 </nav>
 
+<!-- BREADCRUMB -->
 <div class="breadcrumb">
   <a href="/home">Home</a><span class="sep">›</span>
   <a href="/products">Collection</a>
@@ -254,64 +375,103 @@
   <span class="breadcrumb-current"><%= product.name %></span>
 </div>
 
+<!-- DETAIL GRID -->
 <div class="detail-wrap">
   <div class="detail-grid">
-    <div class="gallery">
-      <div class="main-img-wrap gallery-fade visible" id="mainImgWrap" onclick="toggleZoom(event)">
+
+    <!-- GALLERY -->
+    <div class="gallery reveal">
+      <div class="main-img-wrap gallery-fade visible" id="mainImgWrap" onclick="handleImgClick(event)">
+
+        <!-- Status badge -->
         <% if (isOOS) { %><span class="img-badge badge-oos">Out of Stock</span>
         <% } else if (isLow) { %><span class="img-badge badge-low" id="lowBadge">Only <%= initialStock %> Left</span>
         <% } else if (hasDiscount) { %><span class="img-badge badge-discount">−<%= discPct %>%</span><% } %>
+
+        <!-- Crossfade overlay (used during slide transition) -->
+        <div class="slide-overlay" id="slideOverlay"></div>
+
+        <!-- Main image -->
         <% if (initialImages.length > 0) { %>
           <img class="main-img" id="mainImg" src="<%= initialImages[0] %>" alt="<%= product.name %>"/>
         <% } else { %>
-          <div class="watch-ph"><svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="rgba(245,242,235,0.06)" stroke-width="0.5"><circle cx="12" cy="12" r="10"/></svg></div>
+          <div class="watch-ph"><svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="rgba(245,242,235,0.05)" stroke-width="0.5"><circle cx="12" cy="12" r="10"/></svg></div>
         <% } %>
+
+        <!-- Prev / Next arrows -->
+        <button class="slide-arrow prev" id="arrowPrev" onclick="manualSlide(-1, event)" aria-label="Previous">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <button class="slide-arrow next" id="arrowNext" onclick="manualSlide(1, event)" aria-label="Next">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+
+        <!-- Dots -->
+        <div class="slide-dots" id="slideDots"></div>
+
+        <!-- Counter (shown only if >1 image) -->
+        <div class="slide-counter" id="slideCounter" style="display:none">1 / 1</div>
+
+        <!-- Zoom hint -->
         <div class="zoom-hint">
           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="M21 21l-4.35-4.35"/></svg>
           Click to zoom
         </div>
       </div>
+
       <div class="thumb-row" id="thumbRow">
         <% initialImages.forEach((img, i) => { %>
-          <div class="thumb <%= i === 0 ? 'active' : '' %>" onclick="switchImg(this,'<%= img %>')">
+          <div class="thumb <%= i === 0 ? 'active' : '' %>" onclick="thumbClick(this, '<%= img %>', <%= i %>)">
             <img src="<%= img %>" alt="View <%= i+1 %>"/>
           </div>
         <% }) %>
       </div>
     </div>
 
-    <div class="info-col">
-      <% if (product.category) { %><div class="prod-category"><%= product.category.name %></div><% } %>
-      <% if (brandName) { %><span class="prod-brand-tag"><%= brandName %></span><% } %>
+    <!-- INFO COLUMN -->
+    <div class="info-col reveal">
+      <div class="prod-eyebrow">
+        <% if (product.category) { %><span class="prod-category"><%= product.category.name %></span><% } %>
+        <% if (brandName) { %><span class="prod-brand-tag"><%= brandName %></span><% } %>
+      </div>
       <h1 class="prod-name"><%= product.name %></h1>
-      <div class="divider"></div>
+      <div class="gold-rule"></div>
+
       <div class="rating-row">
         <div class="stars">
           <% for (let s = 1; s <= 5; s++) { %>
             <svg class="star" viewBox="0 0 24 24">
-              <% if (s <= Math.floor(avgRating)) { %><polygon class="filled" points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
-              <% } else if (s - 0.5 <= avgRating) { %><polygon class="half" points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
-              <% } else { %><polygon class="empty" points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/><% } %>
+              <% if (s <= Math.floor(avgRating)) { %>
+                <polygon class="filled" points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+              <% } else if (s - 0.5 <= avgRating) { %>
+                <polygon class="half" points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+              <% } else { %>
+                <polygon class="empty" points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+              <% } %>
             </svg>
           <% } %>
         </div>
         <span class="rating-num"><%= avgRating.toFixed(1) %></span>
         <span class="review-link" onclick="openTab('reviews')">(<%= reviewCount %> review<%= reviewCount !== 1 ? 's' : '' %>)</span>
       </div>
+
       <div class="price-block">
-        <div class="price-row"><span class="prod-price">₹<%= product.price.toLocaleString('en-IN') %></span></div>
+        <div class="prod-price">₹<%= product.price.toLocaleString('en-IN') %></div>
         <div class="prod-price-label">Inclusive of all taxes</div>
       </div>
+
       <div class="stock-badge <%= isOOS ? 'out' : isLow ? 'low' : 'in' %>" id="stockBadge">
         <span class="stock-dot <%= isOOS ? 'out' : isLow ? 'low' : 'in' %>" id="stockDot"></span>
         <span id="stockText">
-          <% if (isOOS) { %>Out of Stock<% } else if (isLow) { %>Low Stock — Only <%= initialStock %> left<% } else { %>In Stock · <%= initialStock %> available<% } %>
+          <% if (isOOS) { %>Out of Stock
+          <% } else if (isLow) { %>Low Stock — Only <%= initialStock %> left
+          <% } else { %>In Stock · <%= initialStock %> available<% } %>
         </span>
       </div>
 
       <% if (hasVariants) { %>
       <div class="color-variants">
-        <div class="color-variants-label">Colour</div>
+        <div class="color-block-title">Colour</div>
         <div class="color-selected-name">Selected: <span id="selectedColorName"><%= variants[0].name %></span></div>
         <div class="color-swatches">
           <% variants.forEach((v, i) => { %>
@@ -325,11 +485,11 @@
       </div>
       <% } else if (product.colors && product.colors.length > 0) { %>
       <div class="color-variants">
-        <div class="color-variants-label">Colour</div>
+        <div class="color-block-title">Colour</div>
         <div class="color-selected-name">Selected: <span id="selectedColorName"><%= product.colors[0].name %></span></div>
         <div class="color-swatches">
           <% product.colors.forEach((c, i) => { %>
-            <div class="color-swatch <%= i === 0 ? 'active' : '' %>" style="background:<%= c.hex %>;" title="<%= c.name %>" onclick="selectFlatColor(this, '<%= c.name %>')"></div>
+            <div class="color-swatch <%= i === 0 ? 'active' : '' %>" style="background:<%= c.hex %>;" title="<%= c.name %>" onclick="selectFlatColor(this,'<%= c.name %>')"></div>
           <% }) %>
         </div>
       </div>
@@ -344,27 +504,31 @@
         <button class="add-cart-btn" id="addCartBtn" onclick="handleAddToCart('<%= product._id %>')" <%= isOOS ? 'disabled' : '' %>>
           <%= isOOS ? 'Out of Stock' : 'Add to Cart' %>
         </button>
-        <button class="wishlist-btn" id="wishlistBtn" onclick="handleWishlistToggle()" aria-label="Add to wishlist">
-          <svg id="heartSvg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        <button class="wishlist-btn" id="wishlistBtn" onclick="handleWishlistToggle()" aria-label="Wishlist">
+          <svg id="heartSvg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
         </button>
       </div>
+
       <div class="service-row">
         <span class="service-pill"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>Free Shipping</span>
         <span class="service-pill"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.75"/></svg>30-Day Returns</span>
         <span class="service-pill"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Authenticity Cert.</span>
+        <span class="service-pill"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7"/><path d="M9 12l2 2 4-4"/></svg>5-Year Warranty</span>
       </div>
     </div>
+
   </div>
 </div>
 
-<div class="tabs-root">
+<!-- TABS -->
+<div class="tabs-root reveal">
   <div class="tab-nav">
-    <button class="tab-btn active" id="tab-desc" onclick="openTab('desc')">Description</button>
-    <button class="tab-btn" id="tab-specs" onclick="openTab('specs')">Specifications</button>
-    <button class="tab-btn" id="tab-reviews" onclick="openTab('reviews')">Reviews (<%= reviewCount %>)</button>
+    <button class="tab-btn active" id="tab-desc"    onclick="openTab('desc')">Description</button>
+    <button class="tab-btn"        id="tab-specs"   onclick="openTab('specs')">Specifications</button>
+    <button class="tab-btn"        id="tab-reviews" onclick="openTab('reviews')">Reviews (<%= reviewCount %>)</button>
   </div>
   <div class="tab-panel active" id="panel-desc">
-    <p class="desc-text"><%= product.description || 'A masterpiece of horology, this timepiece reflects the pinnacle of Velmora Chroné\'s craft.' %></p>
+    <p class="desc-text"><%= product.description || "A masterpiece of horology, this timepiece reflects the pinnacle of Velmora Chroné's craft." %></p>
   </div>
   <div class="tab-panel" id="panel-specs">
     <table class="specs-table">
@@ -376,42 +540,49 @@
     </table>
   </div>
   <div class="tab-panel" id="panel-reviews">
-    <div style="text-align:center;padding:2rem 0;color:rgba(245,242,235,0.2);font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:300">
-      <%= reviews.length === 0 ? 'No reviews yet' : '' %>
-    </div>
-    <% reviews.forEach(r => { %>
-    <div style="padding:1rem 0;border-bottom:1px solid rgba(245,242,235,0.04)">
-      <div style="display:flex;gap:8px;align-items:center;margin-bottom:0.4rem;flex-wrap:wrap">
-        <span style="font-family:'Jost',sans-serif;font-size:0.58rem;color:rgba(245,242,235,0.6)"><%= r.userName || 'Verified Buyer' %></span>
-        <span style="font-family:'Jost',sans-serif;font-size:0.46rem;color:rgba(245,242,235,0.2);margin-left:auto"><%= r.createdAt ? new Date(r.createdAt).toLocaleDateString('en-IN') : '' %></span>
+    <% if (reviews.length === 0) { %>
+      <div class="no-reviews">No reviews yet</div>
+    <% } else { %>
+      <% reviews.forEach(r => { %>
+      <div class="review-item">
+        <div class="review-meta">
+          <span class="reviewer-name"><%= r.userName || 'Verified Buyer' %></span>
+          <span class="review-date"><%= r.createdAt ? new Date(r.createdAt).toLocaleDateString('en-IN') : '' %></span>
+        </div>
+        <div class="review-body"><%= r.body || r.comment || '' %></div>
       </div>
-      <div style="font-family:'Jost',sans-serif;font-size:0.58rem;color:rgba(245,242,235,0.35);line-height:1.8"><%= r.body || r.comment || '' %></div>
-    </div>
-    <% }) %>
+      <% }) %>
+    <% } %>
   </div>
 </div>
 
+<div class="rule" style="max-width:1200px;margin:0 auto;padding:0 3rem;"></div>
+
+<!-- RELATED -->
 <% if (related && related.length > 0) { %>
-<div class="related-section">
+<div class="related-section reveal">
   <div class="related-header">
-    <h2 class="related-title">From the Same Collection</h2>
-    <a href="/products<%= product.category ? '?category='+product.category._id : '' %>" class="related-all">View All →</a>
+    <p class="related-eyebrow">You Might Also Like</p>
+    <a href="/products<%= product.category ? '?category='+product.category._id : '' %>" class="related-all">
+      View All
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </a>
   </div>
   <div class="related-grid">
     <% related.forEach(p => { %>
-    <a href="/products/<%= p._id %>" style="text-decoration:none">
-      <div class="prod-card">
-        <div class="prod-img-wrap">
-          <% const rImg = (p.colorVariants && p.colorVariants.length > 0) ? p.colorVariants[0].images[0] : (p.images && p.images[0]); %>
-          <% if (rImg) { %><img class="prod-img" src="<%= rImg %>" alt="<%= p.name %>"/>
-          <% } else { %><div class="watch-ph"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="rgba(245,242,235,0.06)" stroke-width="0.5"><circle cx="12" cy="12" r="10"/></svg></div><% } %>
-        </div>
-        <div class="prod-body">
-          <div class="prod-cat"><%= p.category ? p.category.name : '' %></div>
-          <div class="prod-name-sm"><%= p.name %></div>
-          <div class="prod-price-sm">₹<%= p.price.toLocaleString('en-IN') %></div>
-        </div>
-        <span class="view-btn">View Details</span>
+    <a href="/products/<%= p._id %>" class="prod-card">
+      <div class="prod-img-wrap">
+        <% const rImg = (p.colorVariants && p.colorVariants.length > 0) ? p.colorVariants[0].images[0] : (p.images && p.images[0]); %>
+        <% if (rImg) { %>
+          <img class="prod-img" src="<%= rImg %>" alt="<%= p.name %>"/>
+        <% } else { %>
+          <div class="watch-ph"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="rgba(245,242,235,0.05)" stroke-width="0.5"><circle cx="12" cy="12" r="10"/></svg></div>
+        <% } %>
+      </div>
+      <div class="prod-body">
+        <div class="prod-cat"><%= p.category ? p.category.name : '' %></div>
+        <div class="prod-name-sm"><%= p.name %></div>
+        <div class="prod-price-sm">₹<%= p.price.toLocaleString('en-IN') %></div>
       </div>
     </a>
     <% }) %>
@@ -419,86 +590,224 @@
 </div>
 <% } %>
 
+<!-- FOOTER -->
 <footer class="footer">
-  <div class="footer-inner">
-    <div class="footer-top">
-      <div>
-        <div class="footer-logo">Velmora<br/>Chroné</div>
-        <p class="footer-desc">Velmora Chroné represents the pinnacle of luxury horology.</p>
-      </div>
-      <div>
-        <span class="footer-col-title">Customer Service</span>
-        <a href="#" class="footer-link">Shipping & Returns</a>
-        <a href="#" class="footer-link">Watch Care Guide</a>
-        <a href="#" class="footer-link">Warranty Registration</a>
-      </div>
-      <div>
-        <span class="footer-col-title">About Us</span>
-        <a href="#" class="footer-link">Our Story</a>
-        <a href="#" class="footer-link">Craftsmanship</a>
-        <a href="#" class="footer-link">Sustainability</a>
-      </div>
-      <div>
-        <span class="footer-col-title">Newsletter</span>
-        <p style="font-family:'Jost',sans-serif;font-size:0.58rem;color:rgba(245,242,235,0.25);line-height:1.7;margin-bottom:0.75rem">Join our inner circle for exclusive previews.</p>
-        <div style="display:flex;align-items:center;border-bottom:1px solid rgba(245,242,235,0.12);padding-bottom:0.3rem">
-          <input style="flex:1;background:transparent;border:none;outline:none;font-family:'Jost',sans-serif;font-size:0.62rem;color:#f5f2eb;min-width:0" type="email" placeholder="Your address"/>
-          <button style="background:none;border:none;cursor:pointer;color:rgba(245,242,235,0.4)">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-          </button>
-        </div>
+  <div class="footer-top">
+    <div>
+      <p class="footer-logo">Velmora<br/>Chroné</p>
+      <p class="footer-desc">Geneva-made timepieces for those who understand that true luxury is measured not in price, but in permanence.</p>
+      <div class="footer-socials">
+        <a href="#" class="footer-social-btn" aria-label="Instagram"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/></svg></a>
+        <a href="#" class="footer-social-btn" aria-label="Facebook"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
       </div>
     </div>
-    <div class="footer-bottom">
-      <span class="footer-copy">&copy; <%= new Date().getFullYear() %> Velmora Chroné. All rights reserved.</span>
-      <div class="footer-legal"><a href="#">Privacy Policy</a><a href="#">Terms of Service</a></div>
+    <div>
+      <span class="footer-col-title">Customer Service</span>
+      <a href="#" class="footer-col-link">Our Story</a>
+      <a href="#" class="footer-col-link">Shipping &amp; Returns</a>
+      <a href="#" class="footer-col-link">Watch Care Guide</a>
+      <a href="#" class="footer-col-link">Contact Us</a>
+    </div>
+    <div>
+      <span class="footer-col-title">About Us</span>
+      <a href="#" class="footer-col-link">Craftsmanship</a>
+      <a href="#" class="footer-col-link">Sustainability</a>
+      <a href="#" class="footer-col-link">Store Blog</a>
+      <a href="#" class="footer-col-link">Warranty</a>
+    </div>
+    <div>
+      <span class="footer-col-title">Newsletter</span>
+      <p style="font-family:'Jost',sans-serif;font-size:.6rem;color:rgba(245,242,235,.2);line-height:1.75;margin-bottom:.75rem;font-weight:300">Subscribe for exclusive deals &amp; new arrivals.</p>
+      <div style="display:flex;align-items:center;border-bottom:1px solid rgba(201,169,110,0.2);padding-bottom:.3rem">
+        <input type="email" placeholder="Enter your email address" style="flex:1;background:transparent;border:none;outline:none;font-family:'Jost',sans-serif;font-size:.63rem;color:#f5f2eb;min-width:0"/>
+        <button style="background:none;border:none;cursor:pointer;color:rgba(201,169,110,0.45);" onmouseover="this.style.color='#c9a96e'" onmouseout="this.style.color='rgba(201,169,110,0.45)'">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span class="footer-copy">&copy; <%= new Date().getFullYear() %> Velmora Chroné. All rights reserved.</span>
+    <div class="footer-legal">
+      <a href="#">Privacy Policy</a><a href="#">Terms of Service</a><a href="#">Accessibility</a>
     </div>
   </div>
 </footer>
 
-<div class="toast" id="toast">
-  <span class="toast-dot"></span>
-  <span id="toastMsg">Added to cart</span>
-</div>
+<div class="toast" id="toast"><span class="toast-dot"></span><span id="toastMsg"></span></div>
 
 <script>
-  const PRODUCT_ID   = '<%= product._id %>';
-  const MAX_QTY      = 5;
-  const IS_LOGGED_IN = <%= isLoggedIn %>;
+  const PRODUCT_ID     = '<%= product._id %>';
+  const MAX_QTY        = 5;
+  const IS_LOGGED_IN   = <%= isLoggedIn %>;
   const COLOR_VARIANTS = <%- JSON.stringify(variants) %>;
   let activeVariantIndex = 0;
 
-  const navbar = document.getElementById('navbar');
-  window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', scrollY > 20), { passive: true });
-  document.getElementById('hamburger').addEventListener('click', function () {
-    this.classList.toggle('open');
-    document.getElementById('mobileMenu').classList.toggle('open');
+  /* ══════════════════════════════════════════
+     AUTO SLIDESHOW ENGINE
+  ══════════════════════════════════════════ */
+  const SLIDE_INTERVAL = 3500; // ms between slides
+  let slideImages   = <%- JSON.stringify(initialImages) %>;
+  let slideIndex    = 0;
+  let slideTimer    = null;
+  let isPaused      = false;
+  let isZoomed      = false;
+
+  const mainImg      = document.getElementById('mainImg');
+  const overlay      = document.getElementById('slideOverlay');
+  const counterEl    = document.getElementById('slideCounter');
+  const dotsEl       = document.getElementById('slideDots');
+  const mainWrap     = document.getElementById('mainImgWrap');
+
+  function buildDots() {
+    dotsEl.innerHTML = '';
+    if (slideImages.length <= 1) { dotsEl.style.display = 'none'; return; }
+    dotsEl.style.display = 'flex';
+    slideImages.forEach((_, i) => {
+      const d = document.createElement('div');
+      d.className = 'slide-dot' + (i === 0 ? ' active' : '');
+      d.onclick = () => goToSlide(i, true);
+      dotsEl.appendChild(d);
+    });
+  }
+
+  function updateDots() {
+    document.querySelectorAll('.slide-dot').forEach((d, i) => d.classList.toggle('active', i === slideIndex));
+  }
+
+  function updateCounter() {
+    if (slideImages.length <= 1) { counterEl.style.display = 'none'; return; }
+    counterEl.style.display = 'block';
+    counterEl.textContent = (slideIndex + 1) + ' / ' + slideImages.length;
+  }
+
+  function updateThumbs() {
+    document.querySelectorAll('.thumb').forEach((t, i) => t.classList.toggle('active', i === slideIndex));
+  }
+
+  /* Crossfade to a new src */
+  function crossfadeTo(src, onDone) {
+    if (!mainImg) { if (onDone) onDone(); return; }
+    overlay.style.backgroundImage = `url('${src}')`;
+    overlay.style.backgroundSize  = 'cover';
+    overlay.style.backgroundPosition = 'center';
+    // force reflow then fade in overlay
+    overlay.offsetHeight;
+    overlay.classList.add('fading');
+    setTimeout(() => {
+      mainImg.src = src;
+      overlay.classList.remove('fading');
+      overlay.style.backgroundImage = '';
+      if (onDone) onDone();
+    }, 560);
+  }
+
+  function goToSlide(idx, manual = false) {
+    if (!slideImages.length) return;
+    idx = ((idx % slideImages.length) + slideImages.length) % slideImages.length;
+    if (idx === slideIndex && !manual) return;
+    slideIndex = idx;
+    crossfadeTo(slideImages[slideIndex]);
+    updateDots();
+    updateCounter();
+    updateThumbs();
+    if (manual) { restartSlideshow(); }
+  }
+
+  function startSlideshow() {
+    if (slideImages.length <= 1) return;
+    clearInterval(slideTimer);
+    slideTimer = setInterval(() => {
+      if (!isPaused && !isZoomed) goToSlide(slideIndex + 1);
+    }, SLIDE_INTERVAL);
+  }
+
+  function stopSlideshow() {
+    clearInterval(slideTimer);
+  }
+
+  function restartSlideshow() {
+    stopSlideshow();
+    startSlideshow();
+  }
+
+  /* Pause on hover */
+  mainWrap.addEventListener('mouseenter', () => { isPaused = true; });
+  mainWrap.addEventListener('mouseleave', () => {
+    if (!isZoomed) { isPaused = false; restartSlideshow(); }
   });
 
-  let zoomed = false;
-  const mainWrap = document.getElementById('mainImgWrap');
-  const mainImg  = document.getElementById('mainImg');
-  function toggleZoom(e) {
-    if (!mainImg) return;
-    zoomed = !zoomed;
-    mainWrap.classList.toggle('zoomed', zoomed);
-    mainImg.classList.toggle('zoomed', zoomed);
-    if (zoomed) updateZoomOrigin(e);
+  /* Swipe support (touch) */
+  let touchStartX = 0;
+  mainWrap.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
+  mainWrap.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(dx) > 40) { manualSlide(dx < 0 ? 1 : -1); }
+  }, { passive: true });
+
+  function manualSlide(dir, e) {
+    if (e) e.stopPropagation();
+    goToSlide(slideIndex + dir, true);
   }
-  mainWrap && mainWrap.addEventListener('mousemove', function (e) {
-    if (zoomed && mainImg) updateZoomOrigin(e);
-  });
+
+  /* Thumb clicked — jump to that image & restart */
+  function thumbClick(thumb, src, idx) {
+    if (isZoomed) return;
+    slideIndex = idx;
+    crossfadeTo(src);
+    updateDots();
+    updateCounter();
+    document.querySelectorAll('.thumb').forEach(t => t.classList.remove('active'));
+    thumb.classList.add('active');
+    restartSlideshow();
+  }
+
+  /* Set new image set (called by variant change) */
+  function loadImageSet(images) {
+    slideImages = images;
+    slideIndex  = 0;
+    buildDots();
+    updateCounter();
+    stopSlideshow();
+    if (mainImg && images.length > 0) {
+      const thumbRow = document.getElementById('thumbRow');
+      thumbRow.innerHTML = images.map((src, i) => `<div class="thumb ${i===0?'active':''}" onclick="thumbClick(this,'${src}',${i})"><img src="${src}" alt="View ${i+1}"/></div>`).join('');
+      crossfadeTo(images[0], () => startSlideshow());
+    }
+  }
+
+  /* Init */
+  buildDots();
+  updateCounter();
+  startSlideshow();
+
+  /* ══════════════════════════════════════════
+     ZOOM
+  ══════════════════════════════════════════ */
+  function handleImgClick(e) {
+    // Don't zoom if arrow button clicked
+    if (e.target.closest('.slide-arrow') || e.target.closest('.slide-dot')) return;
+    isZoomed = !isZoomed;
+    mainWrap.classList.toggle('zoomed', isZoomed);
+    if (mainImg) mainImg.classList.toggle('zoomed', isZoomed);
+    if (isZoomed) {
+      isPaused = true;
+      updateZoomOrigin(e);
+      stopSlideshow();
+    } else {
+      isPaused = false;
+      startSlideshow();
+    }
+  }
+  mainWrap.addEventListener('mousemove', e => { if (isZoomed && mainImg) updateZoomOrigin(e); });
   function updateZoomOrigin(e) {
     const r = mainWrap.getBoundingClientRect();
     if (mainImg) mainImg.style.transformOrigin = `${((e.clientX-r.left)/r.width)*100}% ${((e.clientY-r.top)/r.height)*100}%`;
   }
 
-  function switchImg(thumb, src) {
-    if (mainImg) { mainImg.src = src; zoomed = false; mainWrap && mainWrap.classList.remove('zoomed'); mainImg.classList.remove('zoomed'); }
-    document.querySelectorAll('.thumb').forEach(t => t.classList.remove('active'));
-    thumb.classList.add('active');
-  }
-
+  /* ══════════════════════════════════════════
+     VARIANTS
+  ══════════════════════════════════════════ */
   function selectVariant(idx) {
     const v = COLOR_VARIANTS[idx];
     if (!v) return;
@@ -506,21 +815,10 @@
     document.querySelectorAll('.color-swatch').forEach((s, i) => s.classList.toggle('active', i === idx));
     const nameEl = document.getElementById('selectedColorName');
     if (nameEl) nameEl.textContent = v.name;
-    const wrap = document.getElementById('mainImgWrap');
-    if (wrap) {
-      wrap.classList.remove('visible');
-      setTimeout(() => {
-        if (mainImg && v.images.length > 0) mainImg.src = v.images[0];
-        const thumbRow = document.getElementById('thumbRow');
-        if (thumbRow) {
-          thumbRow.innerHTML = v.images.map((src, i) => `<div class="thumb ${i === 0 ? 'active' : ''}" onclick="switchImg(this,'${src}')"><img src="${src}" alt="View ${i+1}"/></div>`).join('');
-        }
-        zoomed = false;
-        wrap.classList.remove('zoomed');
-        if (mainImg) mainImg.classList.remove('zoomed');
-        wrap.classList.add('visible');
-      }, 250);
-    }
+    isZoomed = false;
+    mainWrap.classList.remove('zoomed');
+    if (mainImg) mainImg.classList.remove('zoomed');
+    loadImageSet(v.images || []);
     updateStockUI(v.stock);
   }
 
@@ -531,6 +829,9 @@
     if (nameEl) nameEl.textContent = name;
   }
 
+  /* ══════════════════════════════════════════
+     STOCK UI
+  ══════════════════════════════════════════ */
   function updateStockUI(stock) {
     const badge    = document.getElementById('stockBadge');
     const dot      = document.getElementById('stockDot');
@@ -540,12 +841,11 @@
     const qtyPlus  = document.getElementById('qtyPlus');
     const addBtn   = document.getElementById('addCartBtn');
     const specsStk = document.getElementById('specsStock');
-    const isOOS = stock === 0;
-    const isLow = stock > 0 && stock <= 5;
+    const isOOS = stock === 0, isLow = stock > 0 && stock <= 5;
     if (badge)   badge.className = 'stock-badge ' + (isOOS ? 'out' : isLow ? 'low' : 'in');
     if (dot)     dot.className   = 'stock-dot '   + (isOOS ? 'out' : isLow ? 'low' : 'in');
     if (text) {
-      if (isOOS)      text.textContent = 'Out of Stock';
+      if (isOOS)     text.textContent = 'Out of Stock';
       else if (isLow) text.textContent = `Low Stock — Only ${stock} left`;
       else            text.textContent = `In Stock · ${stock} available`;
     }
@@ -556,6 +856,9 @@
     if (specsStk) specsStk.textContent = isOOS ? 'Sold Out' : stock + ' units';
   }
 
+  /* ══════════════════════════════════════════
+     QTY
+  ══════════════════════════════════════════ */
   function changeQty(delta) {
     const input = document.getElementById('qtyInput');
     const stock = COLOR_VARIANTS.length > 0 ? COLOR_VARIANTS[activeVariantIndex].stock : <%= initialStock %>;
@@ -566,6 +869,9 @@
     document.getElementById('qtyPlus').disabled  = val >= cap;
   }
 
+  /* ══════════════════════════════════════════
+     ADD TO CART
+  ══════════════════════════════════════════ */
   async function handleAddToCart(productId) {
     if (!IS_LOGGED_IN) { window.location.href = '/login'; return; }
     const qty = parseInt(document.getElementById('qtyInput').value) || 1;
@@ -580,40 +886,25 @@
       if (!res.ok) { showToast(data.message || 'Could not add to cart', true); return; }
       showToast('Added to cart ✓');
       if (data.cartCount !== undefined) document.getElementById('cartCount').textContent = data.cartCount;
-    } catch (err) { showToast('Something went wrong', true); }
-    finally {
-      btn.disabled = false;
-      btn.textContent = COLOR_VARIANTS.length > 0 && COLOR_VARIANTS[activeVariantIndex].stock === 0 ? 'Out of Stock' : 'Add to Cart';
-    }
+    } catch { showToast('Something went wrong', true); }
+    finally { btn.disabled = false; btn.textContent = COLOR_VARIANTS.length > 0 && COLOR_VARIANTS[activeVariantIndex].stock === 0 ? 'Out of Stock' : 'Add to Cart'; }
   }
 
+  /* ══════════════════════════════════════════
+     WISHLIST
+  ══════════════════════════════════════════ */
   let wishlisted = false;
   function applyWishlistUI(state) {
-    const btn = document.getElementById('wishlistBtn');
-    const heartSvg = document.getElementById('heartSvg');
+    const btn = document.getElementById('wishlistBtn'), heartSvg = document.getElementById('heartSvg');
     if (btn) btn.classList.toggle('active', state);
     if (heartSvg) { heartSvg.setAttribute('fill', state ? '#f87171' : 'none'); heartSvg.setAttribute('stroke', state ? '#f87171' : 'currentColor'); }
-    const navIcon  = document.getElementById('navWishlistIcon');
-    const navHeart = document.getElementById('navHeartSvg');
-    if (navIcon) navIcon.classList.toggle('wishlisted', state);
+    const navBtn = document.getElementById('navWishlistBtn'), navHeart = document.getElementById('navHeartSvg');
+    if (navBtn)   navBtn.classList.toggle('wishlisted', state);
     if (navHeart) { navHeart.setAttribute('fill', state ? '#f87171' : 'none'); navHeart.setAttribute('stroke', state ? '#f87171' : 'currentColor'); }
-  }
-  function updateWishlistNavBadge(count) {
-    const badge = document.getElementById('wishlistNavCount');
-    if (!badge) return;
-    if (count > 0) { badge.textContent = count > 9 ? '9+' : count; badge.style.display = 'flex'; }
-    else { badge.style.display = 'none'; }
   }
   async function checkWishlistStatus() {
     if (!IS_LOGGED_IN) return;
-    try {
-      const res  = await fetch(`/wishlist/status/${PRODUCT_ID}`, { headers: { 'Accept': 'application/json' } });
-      if (!res.ok) return;
-      const data = await res.json();
-      wishlisted = !!data.wishlisted;
-      applyWishlistUI(wishlisted);
-      if (data.count !== undefined) updateWishlistNavBadge(data.count);
-    } catch (e) {}
+    try { const res = await fetch(`/wishlist/status/${PRODUCT_ID}`, { headers: { 'Accept': 'application/json' } }); if (!res.ok) return; const data = await res.json(); wishlisted = !!data.wishlisted; applyWishlistUI(wishlisted); } catch {}
   }
   async function handleWishlistToggle() {
     if (!IS_LOGGED_IN) { window.location.href = '/login'; return; }
@@ -626,18 +917,29 @@
       if (!res.ok) { showToast(data.message || 'Could not update wishlist', true); return; }
       wishlisted = !!data.wishlisted;
       applyWishlistUI(wishlisted);
-      if (data.count !== undefined) updateWishlistNavBadge(data.count);
       showToast(wishlisted ? 'Added to wishlist ♥' : 'Removed from wishlist');
-    } catch (e) { showToast('Something went wrong', true); }
+    } catch { showToast('Something went wrong', true); }
     finally { if (btn) btn.disabled = false; }
   }
   checkWishlistStatus();
 
+  /* ══════════════════════════════════════════
+     NAV / MISC
+  ══════════════════════════════════════════ */
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', scrollY > 20), { passive: true });
+  document.getElementById('hamburger').addEventListener('click', function () { this.classList.toggle('open'); document.getElementById('mobileMenu').classList.toggle('open'); });
+
   if (IS_LOGGED_IN) {
     fetch('/api/cart/count', { headers: { 'Accept': 'application/json' } })
-      .then(r => r.json()).then(d => { if (d.count !== undefined) document.getElementById('cartCount').textContent = d.count; })
-      .catch(() => {});
+      .then(r => r.json()).then(d => { if (d.count !== undefined) document.getElementById('cartCount').textContent = d.count; }).catch(() => {});
   }
+
+  const revealEls = document.querySelectorAll('.reveal');
+  const revealObs = new IntersectionObserver(entries => {
+    entries.forEach((e, i) => { if (e.isIntersecting) { setTimeout(() => e.target.classList.add('visible'), i * 80); revealObs.unobserve(e.target); } });
+  }, { threshold: 0.06 });
+  revealEls.forEach(el => revealObs.observe(el));
 
   function openTab(id) {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -656,35 +958,18 @@
     toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
   }
 
-  // ── SSE: live updates from admin without page reload ──
+  /* SSE */
   (function () {
     const es = new EventSource('/sse/products');
     es.addEventListener('productUpdate', function (e) {
       const data = JSON.parse(e.data);
       if (data.productId !== PRODUCT_ID) return;
-
-      // Update per-variant stock so +/- buttons stay correct
       if (data.colorVariants && COLOR_VARIANTS.length > 0) {
-        data.colorVariants.forEach(updated => {
-          const match = COLOR_VARIANTS.find(v => v.name === updated.name);
-          if (match) match.stock = updated.stock;
-        });
+        data.colorVariants.forEach(updated => { const match = COLOR_VARIANTS.find(v => v.name === updated.name); if (match) match.stock = updated.stock; });
         updateStockUI(COLOR_VARIANTS[activeVariantIndex].stock);
-      } else {
-        updateStockUI(data.stock);
-      }
-
-      // Update price if changed
-      if (data.price !== undefined) {
-        const priceEl = document.querySelector('.prod-price');
-        if (priceEl) priceEl.textContent = '₹' + Number(data.price).toLocaleString('en-IN');
-      }
-
-      // Disable add to cart if delisted or deleted
-      if (data.isDeleted || data.isListed === false) {
-        const addBtn = document.getElementById('addCartBtn');
-        if (addBtn) { addBtn.disabled = true; addBtn.textContent = 'No Longer Available'; }
-      }
+      } else { updateStockUI(data.stock); }
+      if (data.price !== undefined) { const el = document.querySelector('.prod-price'); if (el) el.textContent = '₹' + Number(data.price).toLocaleString('en-IN'); }
+      if (data.isDeleted || data.isListed === false) { const btn = document.getElementById('addCartBtn'); if (btn) { btn.disabled = true; btn.textContent = 'No Longer Available'; } }
     });
     es.onerror = function () {};
   })();

@@ -6,7 +6,7 @@ export function addClient(res) {
   res.setHeader('Connection', 'keep-alive');
   res.setHeader('X-Accel-Buffering', 'no');
   res.flushHeaders();
-  const keepAlive = setInterval(() => res.write(': ping\n\n'), 25000);
+  const keepAlive = setInterval(() => res.write(': ping\n\n'), 1000);
   clients.add(res);
   res.on('close', () => {
     clearInterval(keepAlive);

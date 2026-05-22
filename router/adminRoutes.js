@@ -14,62 +14,76 @@ import {
 
 const router = express.Router();
 
-// ── Login ─────────────────────────────────────────────────────────────────────
+//login get
 router.get('/login', isGuest, (req, res) => {
   res.render('admin/login', {
-    title:    'Admin Sign In — Velmora Chroné',
-    error:    req.flash('error')[0]   || null,
-    success:  req.flash('success')[0] || null,
-    formData: req.flash('formData')[0] || {},
+    title:      'Admin Sign In — Velmora Chroné',
+    error:      req.flash('adminError')[0]      || null,
+    errorField: req.flash('adminErrorField')[0] || null,
+    success:    req.flash('adminSuccess')[0]    || null,
+    formData:   req.flash('formData')[0]        || {},
   });
 });
 
+//login POST
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
+
   if (!email || !password) {
-    req.flash('error', 'Email and password are required.');
+    req.flash('adminError', 'Email and password are required.');
+    req.flash('adminErrorField', 'both');
     req.flash('formData', { email });
     return res.redirect('/admin/login');
   }
+
   try {
     const admin = await Admin.findOne({ email: email.toLowerCase().trim() });
+
     if (!admin) {
-      req.flash('error', 'Invalid email or password.');
-      req.flash('formData', { email });
-      return res.redirect('/admin/login');
-    }
-    if (admin.isActive === false) {
-      req.flash('error', 'This account has been deactivated.');
-      return res.redirect('/admin/login');
-    }
-    const isMatch = await admin.comparePassword(password);
-    if (!isMatch) {
-      req.flash('error', 'Invalid email or password.');
+      req.flash('adminError', 'No account found with that email address.');
+      req.flash('adminErrorField', 'email');
       req.flash('formData', { email });
       return res.redirect('/admin/login');
     }
 
-    // ── Admin session uses adminId — completely separate from user session ──
+    if (admin.isActive === false) {
+      req.flash('adminError', 'This account has been deactivated.');
+      req.flash('adminErrorField', 'email');
+      req.flash('formData', { email });
+      return res.redirect('/admin/login');
+    }
+
+    const isMatch = await admin.comparePassword(password);
+    if (!isMatch) {
+      req.flash('adminError', 'Incorrect password. Please try again.');
+      req.flash('adminErrorField', 'password');
+      req.flash('formData', { email });
+      return res.redirect('/admin/login');
+    }
+
     req.session.adminId   = admin._id.toString();
     req.session.adminName = admin.name;
     req.session.adminRole = admin.role;
 
     req.session.save(async (err) => {
       if (err) {
-        req.flash('error', 'Something went wrong. Please try again.');
+        req.flash('adminError', 'Something went wrong. Please try again.');
+        req.flash('adminErrorField', 'both');
         return res.redirect('/admin/login');
       }
       await Admin.findByIdAndUpdate(admin._id, { lastLogin: new Date() });
       res.redirect('/admin/dashboard');
     });
+
   } catch (err) {
     console.error('Login error:', err);
-    req.flash('error', 'An unexpected error occurred.');
+    req.flash('adminError', 'An unexpected error occurred.');
+    req.flash('adminErrorField', 'both');
     res.redirect('/admin/login');
   }
 });
 
-// ── Logout ────────────────────────────────────────────────────────────────────
+//logout
 router.get('/logout', isAuthenticated, (req, res) => {
   req.session.destroy((err) => {
     if (err) console.error('Logout error:', err);
@@ -78,10 +92,10 @@ router.get('/logout', isAuthenticated, (req, res) => {
   });
 });
 
-// ── Dashboard ─────────────────────────────────────────────────────────────────
+//dashboard
 router.get('/dashboard', isAuthenticated, getDashboard);
 
-// ── Customers ─────────────────────────────────────────────────────────────────
+//customers
 router.get('/customers', isAuthenticated, async (req, res) => {
   try {
     const page   = parseInt(req.query.page) || 1;
@@ -124,36 +138,53 @@ router.get('/customers', isAuthenticated, async (req, res) => {
 });
 
 router.post('/customers/:id/block', isAuthenticated, async (req, res) => {
-  await User.findByIdAndUpdate(req.params.id, { isBlocked: true });
-  req.flash('success', 'Customer blocked.');
-  res.redirect('/admin/customers');
+  try {
+    await User.findByIdAndUpdate(req.params.id, { isBlocked: true });
+    req.flash('success', 'Customer blocked.');
+    req.session.save((err) => {
+      if (err) console.error('Session save error on block:', err);
+      res.redirect('/admin/customers');
+    });
+  } catch (err) {
+    console.error('Block customer error:', err);
+    req.flash('error', 'Failed to block customer.');
+    res.redirect('/admin/customers');
+  }
 });
 
 router.post('/customers/:id/unblock', isAuthenticated, async (req, res) => {
-  await User.findByIdAndUpdate(req.params.id, { isBlocked: false });
-  req.flash('success', 'Customer unblocked.');
-  res.redirect('/admin/customers');
+  try {
+    await User.findByIdAndUpdate(req.params.id, { isBlocked: false });
+    req.flash('success', 'Customer unblocked.');
+    req.session.save((err) => {
+      if (err) console.error('Session save error on unblock:', err);
+      res.redirect('/admin/customers');
+    });
+  } catch (err) {
+    console.error('Unblock customer error:', err);
+    req.flash('error', 'Failed to unblock customer.');
+    res.redirect('/admin/customers');
+  }
 });
 
-// ── Categories ────────────────────────────────────────────────────────────────
-router.get('/categories',             isAuthenticated, getCategories);
-router.post('/categories/add',        isAuthenticated, addCategory);
-router.post('/categories/:id/edit',   isAuthenticated, editCategory);
-router.post('/categories/:id/delete', isAuthenticated, deleteCategory);
+//categories
+router.get('/categories', isAuthenticated, getCategories);
+router.post('/categories/add',isAuthenticated, addCategory);
+router.post('/categories/:id/edit',isAuthenticated, editCategory);
+router.post('/categories/:id/delete',isAuthenticated, deleteCategory);
 
-// ── Products ──────────────────────────────────────────────────────────────────
-router.get('/products',               isAuthenticated, getProducts);
-router.post('/products/add',          isAuthenticated, addProduct);
-router.post('/products/:id/edit',     isAuthenticated, editProduct);
-router.post('/products/:id/delete',   isAuthenticated, deleteProduct);
-// Block / Unblock (soft toggle — does NOT delete)
-router.post('/products/:id/block',    isAuthenticated, blockProduct);
-router.post('/products/:id/unblock',  isAuthenticated, unblockProduct);
+//products 
+router.get('/products',  isAuthenticated, getProducts);
+router.post('/products/add',  isAuthenticated, addProduct);
+router.post('/products/:id/edit',isAuthenticated, editProduct);
+router.post('/products/:id/delete',isAuthenticated, deleteProduct);
+router.post('/products/:id/block', isAuthenticated, blockProduct);
+router.post('/products/:id/unblock', isAuthenticated, unblockProduct);
 
-// ── Brands ────────────────────────────────────────────────────────────────────
-router.get('/brands',             isAuthenticated, getBrands);
-router.post('/brands/add',        isAuthenticated, addBrand);
-router.post('/brands/:id/edit',   isAuthenticated, editBrand);
-router.post('/brands/:id/delete', isAuthenticated, deleteBrand);
+//brands
+router.get('/brands',  isAuthenticated, getBrands);
+router.post('/brands/add', isAuthenticated, addBrand);
+router.post('/brands/:id/edit',isAuthenticated, editBrand);
+router.post('/brands/:id/delete',isAuthenticated, deleteBrand);
 
 export default router;

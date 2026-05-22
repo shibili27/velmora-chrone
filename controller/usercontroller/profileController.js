@@ -210,7 +210,7 @@ const verifyEmailChange = async (req, res) => {
 
     const newEmail = req.session.emailChangePending;
 
-    // Double-check email isn't taken (race condition guard)
+    
     const existing = await User.findOne({ email: newEmail });
     if (existing) {
       return res.json({ success: false, message: 'This email was just registered by someone else.' });
@@ -218,7 +218,7 @@ const verifyEmailChange = async (req, res) => {
 
     await User.findByIdAndUpdate(getUserId(req), { email: newEmail });
 
-    // Clear email change session data
+  
     req.session.emailChangeOTP       = null;
     req.session.emailChangePending   = null;
     req.session.emailChangeOTPExpiry = null;
@@ -234,10 +234,6 @@ const verifyEmailChange = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Server error. Please try again.' });
   }
 };
-
-// ─────────────────────────────────────────
-// ADDRESS CRUD  (all JSON responses)
-// ─────────────────────────────────────────
 
 const addAddress = async (req, res) => {
   try {

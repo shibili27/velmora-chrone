@@ -5,9 +5,8 @@ import Brand     from '../../models/brand.js';
 import cloudinary from '../../config/cloudinary.js';
 import { broadcast } from '../../public/utils/ssemanager.js';
 
-// ══════════════════════════════════════════════════════
-// DASHBOARD
-// ══════════════════════════════════════════════════════
+       
+// dashh                                                         --
 export const getDashboard = async (req, res) => {
   try {
     const today = new Date();
@@ -41,9 +40,8 @@ export const getDashboard = async (req, res) => {
   }
 };
 
-// ══════════════════════════════════════════════════════
-// CATEGORIES
-// ══════════════════════════════════════════════════════
+// cat                                                        ----
+
 export const getCategories = async (req, res) => {
   try {
     const search = req.query.search?.trim() || '';
@@ -139,9 +137,9 @@ export const deleteCategory = async (req, res) => {
   }
 };
 
-// ══════════════════════════════════════════════════════
-// PRODUCTS
-// ══════════════════════════════════════════════════════
+// product                                                     ---
+
+
 export const getProducts = async (req, res) => {
   try {
     const search = req.query.search?.trim() || '';
@@ -320,7 +318,9 @@ export const editProduct = async (req, res) => {
       },
       { new: true, runValidators: true }
     );
-    // ── SSE broadcast ──
+
+
+    // SSE 
     broadcast('productUpdate', {
       productId:     req.params.id,
       stock:         totalStock,
@@ -329,6 +329,7 @@ export const editProduct = async (req, res) => {
       isDeleted:     updated.isDeleted,
       colorVariants: colorVariants.map(v => ({ name: v.name, hex: v.hex, stock: v.stock })),
     });
+    
     req.flash('success', 'Product updated successfully.');
     res.redirect('/admin/products');
   } catch (err) {
@@ -337,6 +338,9 @@ export const editProduct = async (req, res) => {
     res.redirect('/admin/products');
   }
 };
+
+
+// delete
 
 export const deleteProduct = async (req, res) => {
   try {
@@ -360,9 +364,9 @@ export const deleteProduct = async (req, res) => {
   }
 };
 
-// ══════════════════════════════════════════════════════
-// BRANDS
-// ══════════════════════════════════════════════════════
+// brand                                                     ------
+
+
 export const getBrands = async (req, res) => {
   try {
     const search = req.query.search?.trim() || '';

@@ -122,30 +122,28 @@ export const getProductDetail = async (req, res) => {
     .populate('category')
     .populate('brand');
 
-    // Hard-deleted or truly doesn't exist
+    
     if (!product) {
       return res.status(404).render('user/productUnavailable', {
         title:  'Product Not Found — Velmora Chroné',
         reason: 'notfound',
-        // no product passed — polling won't start (correct)
       });
     }
 
-    // Blocked by admin
+   
     if (product.isListed === false) {
       return res.status(410).render('user/productUnavailable', {
         title:   'Product Unavailable — Velmora Chroné',
         reason:  'blocked',
-        product, // ← pass FULL doc so _id is available for polling
+        product, 
       });
     }
 
-    // Category deleted or unlisted
     if (!product.category || product.category.isDeleted || product.category.isListed === false) {
       return res.status(410).render('user/productUnavailable', {
         title:   'Product Unavailable — Velmora Chroné',
         reason:  'category',
-        product, // ← pass FULL doc so _id is available for polling
+        product, 
       });
     }
 
@@ -171,16 +169,6 @@ export const getProductDetail = async (req, res) => {
 };
 
 
-/*
- * GET /products/:id/status
- * ─────────────────────────────────────────────────────────────────────────────
- * Lightweight JSON endpoint polled by productUnavailable.ejs every 3 s.
- * Returns { status: 'available' | 'blocked' | 'category' | 'notfound' }
- *
- * ADD THIS ROUTE in your products router BEFORE the /:id detail route:
- *   router.get('/:id/status', getProductStatus);
- * ─────────────────────────────────────────────────────────────────────────────
- */
 export const getProductStatus = async (req, res) => {
   try {
     const product = await Product.findOne({
@@ -202,7 +190,6 @@ export const getProductStatus = async (req, res) => {
       return res.json({ status: 'category' });
     }
 
-    // Product is fully available — polling page should redirect
     return res.json({ status: 'available' });
 
   } catch (err) {

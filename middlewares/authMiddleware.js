@@ -25,7 +25,7 @@ export const hasOtpVerified = (req, res, next) => {
   next();
 };
 
-// ─── Helper: detect AJAX / JSON requests ─────────────────────────────────────
+
 function isAjax(req) {
   return (
     req.xhr ||
@@ -35,11 +35,25 @@ function isAjax(req) {
   );
 }
 
-// ─── USER AUTH: Requires user login — AJAX-aware ──────────────────────────────
-// Uses req.session.user (set on user login)
-// Admin session (req.session.adminId) is completely separate — no cross-access
+
+function clearUserSession(req) {
+  return new Promise((resolve) => {
+    delete req.session.user;
+    delete req.session.signupOTP;
+    delete req.session.signupEmail;
+    delete req.session.resetOTP;
+    delete req.session.resetEmail;
+    delete req.session.otpVerified;
+    req.session.save((err) => {
+      if (err) console.error('clearUserSession save error:', err);
+      resolve();
+    });
+  });
+}
+
+
 export const isAuth = async (req, res, next) => {
-  // Explicitly block admin sessions from accessing user routes
+
   if (req.session && req.session.adminId && !req.session.user) {
     if (isAjax(req)) {
       return res.status(401).json({
@@ -68,7 +82,7 @@ export const isAuth = async (req, res, next) => {
     const user = await User.findById(req.session.user);
 
     if (!user) {
-      req.session.destroy();
+      await clearUserSession(req);
       if (isAjax(req)) {
         return res.status(401).json({
           success:     false,
@@ -81,7 +95,7 @@ export const isAuth = async (req, res, next) => {
     }
 
     if (user.isBlocked) {
-      req.session.destroy();
+      await clearUserSession(req);
       if (isAjax(req)) {
         return res.status(403).json({
           success:     false,
@@ -104,9 +118,7 @@ export const isAuth = async (req, res, next) => {
   }
 };
 
-// ─── Loads user if logged in — never blocks guests ───────────────────────────
-// req.user = User object if logged in, null if guest
-// Use on: home, products, product detail pages
+
 export const isOptionalAuth = async (req, res, next) => {
   if (!req.session || !req.session.user) {
     req.user = null;
@@ -117,7 +129,7 @@ export const isOptionalAuth = async (req, res, next) => {
     const user = await User.findById(req.session.user);
 
     if (!user || user.isBlocked) {
-      req.session.destroy();
+      await clearUserSession(req);
       req.user = null;
       return next();
     }
@@ -131,8 +143,7 @@ export const isOptionalAuth = async (req, res, next) => {
   }
 };
 
-// ─── USER GUEST: Blocks logged-in USERS from auth pages ──────────────────────
-// Only checks req.session.user — does NOT block admins
+
 export const isGuest = (req, res, next) => {
   if (req.session && req.session.user) {
     return res.redirect('/');
@@ -140,13 +151,13 @@ export const isGuest = (req, res, next) => {
   next();
 };
 
-// ─── Checks if a logged-in user is blocked (global use) ──────────────────────
+
 export const isNotBlocked = async (req, res, next) => {
   if (req.session && req.session.user) {
     try {
       const user = await User.findById(req.session.user);
       if (user && user.isBlocked) {
-        req.session.destroy();
+        await clearUserSession(req);
         req.flash('authError', 'Your account has been blocked');
         return res.redirect('/login');
       }

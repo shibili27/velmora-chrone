@@ -11,7 +11,7 @@ import userRoutes from './router/userRouters.js';
 import adminRoutes from './router/adminRoutes.js';
 import connectDB from './config/db.js';
 import passport from './config/passport.js';
-import { addClient } from './public/utils/ssemanager.js'; // ← ADD THIS
+import { addClient } from './public/utils/ssemanager.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname  = path.dirname(__filename);
@@ -23,19 +23,22 @@ const app = express();
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(express.json({ limit: '50mb' }));
 
+
 app.use(session({
   secret: process.env.SESSION_SECRET || 'superSecretKey123',
   resave: false,
   saveUninitialized: false,
+  rolling: true, 
   store: MongoStore.create({
     mongoUrl: process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/velmora',
-    ttl: 60 * 30
+    ttl: 60 * 60 * 24,         
+    autoRemove: 'native',        
   }),
   cookie: {
-    maxAge: 100000 * 600 * 300,
+    maxAge: 1000 * 60 * 60 * 24,
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax'
+    sameSite: 'lax',
   }
 }));
 
@@ -59,8 +62,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// ── SSE endpoint — must be BEFORE cache-control middleware ──
-// (already above, but note: SSE needs its own cache headers, handled inside addClient)
+//SSE
 app.get('/sse/products', (req, res) => {
   addClient(res);
 });
