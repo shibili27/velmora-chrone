@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate"/>
+  <meta http-equiv="Pragma" content="no-cache"/>
+  <meta http-equiv="Expires" content="0"/>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Order Confirmed — Velmora Chroné</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Jost:wght@200;300;400;500&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:'Jost',sans-serif;background:#111110;color:#f5f2eb;overflow-x:hidden;min-height:100vh;display:flex;flex-direction:column}
+    ::-webkit-scrollbar{width:2px}::-webkit-scrollbar-track{background:#111110}::-webkit-scrollbar-thumb{background:#c9a96e}
+
+    body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity:.016}
+
+    .nav-root{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(17,17,16,0.92);backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);border-bottom:1px solid rgba(245,242,235,0.06);transition:box-shadow .3s}
+    .nav-root.scrolled{box-shadow:0 2px 24px rgba(0,0,0,.5)}
+    .nav-inner{display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;position:relative;min-height:60px}
+    @media(min-width:768px){.nav-inner{padding:1rem 3rem}}
+    .nav-logo{font-family:'Cormorant Garamond',serif;font-size:.85rem;font-weight:300;letter-spacing:.25em;text-transform:uppercase;color:#f5f2eb;text-decoration:none;position:absolute;left:50%;transform:translateX(-50%);white-space:nowrap}
+    .nav-left{display:none;align-items:center;gap:2rem}
+    @media(min-width:768px){.nav-left{display:flex}}
+    .nav-right{display:flex;align-items:center;gap:.65rem;margin-left:auto}
+    .nav-link{font-family:'Jost',sans-serif;font-size:.53rem;font-weight:400;letter-spacing:.2em;text-transform:uppercase;color:rgba(245,242,235,.45);text-decoration:none;transition:color .2s;position:relative;padding-bottom:2px;white-space:nowrap}
+    .nav-link::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:1px;background:#c9a96e;transition:width .3s}
+    .nav-link:hover{color:rgba(245,242,235,.9)}.nav-link:hover::after{width:100%}
+    .nav-logout{display:none}@media(min-width:768px){.nav-logout{display:inline}}
+    .nav-icon-btn{position:relative;width:36px;height:36px;display:flex;align-items:center;justify-content:center;color:rgba(245,242,235,.5);background:rgba(255,255,255,.03);border:1px solid rgba(201,169,110,.12);border-radius:10px;cursor:pointer;text-decoration:none;transition:color .22s,background .22s,border-color .22s,transform .18s cubic-bezier(.34,1.56,.64,1),box-shadow .22s;box-shadow:0 1px 0 rgba(255,255,255,.04) inset,0 2px 6px rgba(0,0,0,.35)}
+    .nav-icon-btn::before{content:'';position:absolute;inset:0;border-radius:10px;background:linear-gradient(135deg,rgba(255,255,255,.08) 0%,transparent 55%);pointer-events:none}
+    .nav-icon-btn:hover{color:#c9a96e;background:rgba(201,169,110,.08);border-color:rgba(201,169,110,.35);transform:translateY(-2px) scale(1.06)}
+    .hamburger{display:flex;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:3px}
+    @media(min-width:768px){.hamburger{display:none}}
+    .hamburger span{display:block;width:20px;height:1px;background:rgba(245,242,235,.6);transition:transform .3s,opacity .3s}
+    .hamburger.open span:nth-child(1){transform:translateY(6px) rotate(45deg)}
+    .hamburger.open span:nth-child(2){opacity:0}
+    .hamburger.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+    .mobile-menu{display:none;flex-direction:column;background:#0d0d0c;padding:1.5rem 2rem;gap:1rem;border-top:1px solid rgba(245,242,235,.05)}
+    .mobile-menu.open{display:flex}
+    .mobile-menu .nav-link{font-size:.68rem;padding:.45rem 0;border-bottom:1px solid rgba(245,242,235,.04);color:rgba(245,242,235,.5)}
+
+    .page-hero{padding:5.5rem 2rem 2.5rem;background:linear-gradient(180deg,#080807 0%,#111110 100%);border-bottom:1px solid rgba(201,169,110,.08);position:relative;overflow:hidden;text-align:center}
+    @media(min-width:768px){.page-hero{padding:5.5rem 3rem 2.5rem}}
+    .page-hero::before{content:'';position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:700px;height:420px;border-radius:50%;background:radial-gradient(ellipse,rgba(201,169,110,.07) 0%,transparent 70%);pointer-events:none}
+    .page-hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(201,169,110,.25),transparent)}
+    .page-hero-scan{position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(201,169,110,.022),transparent);animation:heroScan 7s ease-in-out infinite;pointer-events:none;z-index:0}
+    @keyframes heroScan{0%{left:-60%}100%{left:140%}}
+    .page-hero-inner{max-width:700px;margin:0 auto;position:relative;z-index:1;display:flex;flex-direction:column;align-items:center}
+    .page-hero-tag{font-family:'Jost',sans-serif;font-size:.42rem;letter-spacing:.38em;text-transform:uppercase;color:rgba(201,169,110,.55);margin-bottom:1.2rem;display:flex;align-items:center;gap:.65rem}
+    .page-hero-tag::before,.page-hero-tag::after{content:'';width:24px;height:1px;background:#c9a96e;opacity:.45}
+
+    .hero-steps{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:1.6rem}
+    .hero-step{display:flex;flex-direction:column;align-items:center;gap:.55rem;position:relative}
+    .hero-step-line{width:clamp(48px,8vw,100px);height:1px;background:rgba(245,242,235,.08);flex-shrink:0;margin-top:-18px}
+    .hero-step-line.done{background:linear-gradient(90deg,rgba(201,169,110,.5),rgba(201,169,110,.2))}
+    .hero-step-circle{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1.5px solid rgba(245,242,235,.1);background:rgba(245,242,235,.03);font-family:'Jost',sans-serif;font-size:.55rem;color:rgba(245,242,235,.2);position:relative;z-index:1;transition:border-color .3s,background .3s,box-shadow .3s}
+    .hero-step.done .hero-step-circle{border-color:rgba(201,169,110,.5);background:rgba(201,169,110,.08);color:#c9a96e;box-shadow:0 0 18px rgba(201,169,110,.18)}
+    .hero-step.active .hero-step-circle{border-color:#c9a96e;background:linear-gradient(135deg,rgba(201,169,110,.18),rgba(201,169,110,.06));color:#e0c47e;box-shadow:0 0 28px rgba(201,169,110,.28),0 0 8px rgba(201,169,110,.15)}
+    .hero-step-label{font-family:'Jost',sans-serif;font-size:.42rem;letter-spacing:.22em;text-transform:uppercase;color:rgba(245,242,235,.2);white-space:nowrap}
+    .hero-step.done .hero-step-label{color:rgba(201,169,110,.5)}
+    .hero-step.active .hero-step-label{color:rgba(201,169,110,.85)}
+
+    .success-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3.5rem 1.5rem 5rem;position:relative;z-index:1;text-align:center}
+
+    /* ── NEW ANIMATION STYLES ── */
+    .success-illus{width:130px;height:130px;margin:0 auto 2.2rem;position:relative;animation:fadeUp .8s ease both}
+    .success-glow{animation:fadeGlow 3s ease-in-out infinite}
+    .success-ring-outer{transform-origin:65px 65px;animation:rotateSlow 10s linear infinite}
+    .success-ticks{transform-origin:65px 65px;animation:rotateSlow 16s linear infinite reverse}
+    .success-sweep{transform-origin:65px 65px;animation:dashOrbit 4s linear infinite}
+    .success-ring{transform-origin:65px 65px;animation:pulseRing 2.8s ease-in-out infinite}
+    .success-check{animation:popIn .65s cubic-bezier(.34,1.56,.64,1) .25s both}
+
+    @keyframes rotateSlow{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+    @keyframes dashOrbit{from{stroke-dashoffset:0}to{stroke-dashoffset:-270}}
+    @keyframes pulseRing{0%,100%{opacity:.35;transform:scale(.94)}50%{opacity:.9;transform:scale(1.06)}}
+    @keyframes popIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+    @keyframes fadeGlow{0%,100%{opacity:.25}50%{opacity:.85}}
+    /* ── END NEW ANIMATION STYLES ── */
+
+    .success-tag{font-family:'Jost',sans-serif;font-size:.42rem;letter-spacing:.38em;text-transform:uppercase;color:rgba(201,169,110,.55);margin-bottom:.8rem;display:flex;align-items:center;justify-content:center;gap:.65rem;animation:fadeUp .8s ease .2s both}
+    .success-tag::before,.success-tag::after{content:'';width:24px;height:1px;background:#c9a96e;opacity:.45}
+    .success-title{font-family:'Playfair Display',serif;font-weight:400;font-size:clamp(1.8rem,4.5vw,3rem);line-height:1.05;color:#f5f2eb;margin-bottom:.6rem;animation:fadeUp .8s ease .3s both}
+    .success-title em{font-style:italic;background:linear-gradient(125deg,#edd99e 0%,#c9a96e 45%,#a8873d 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .success-sub{font-family:'Jost',sans-serif;font-size:.65rem;font-weight:300;color:rgba(245,242,235,.3);line-height:1.85;max-width:460px;margin:0 auto 1.75rem;animation:fadeUp .8s ease .4s both}
+
+    .order-ref{display:inline-flex;align-items:center;gap:.75rem;background:rgba(201,169,110,.06);border:1px solid rgba(201,169,110,.2);border-radius:10px;padding:.6rem 1.35rem;margin-bottom:2rem;animation:fadeUp .8s ease .5s both}
+    .order-ref-label{font-family:'Jost',sans-serif;font-size:.38rem;letter-spacing:.22em;text-transform:uppercase;color:rgba(245,242,235,.22)}
+    .order-ref-sep{width:1px;height:14px;background:rgba(201,169,110,.2)}
+    .order-ref-val{font-family:'Jost',sans-serif;font-size:.65rem;font-weight:400;color:#c9a96e;letter-spacing:.1em}
+
+    .delivery-trail-wrap{width:100%;max-width:640px;margin:0 auto 2.5rem;animation:fadeUp .8s ease .6s both;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;padding-bottom:.5rem}
+    .delivery-trail-wrap::-webkit-scrollbar{display:none}
+    .delivery-trail{display:flex;align-items:flex-start;justify-content:center;gap:0;min-width:520px}
+    .del-step{display:flex;flex-direction:column;align-items:center;gap:.45rem;flex:0 0 auto;width:72px;transition:opacity .4s}
+    .del-line{flex:1;min-width:18px;height:2px;margin-top:17px;flex-shrink:0;border-radius:2px;transition:background 0.5s ease}
+    .del-line.pending{background:rgba(245,242,235,.07)}
+    .del-line.done{background:linear-gradient(90deg,rgba(201,169,110,.55),rgba(201,169,110,.2))}
+    .del-line.cancelled-line{background:linear-gradient(90deg,rgba(239,68,68,.4),rgba(239,68,68,.1))}
+
+    .del-dot{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:border-color .45s,background .45s,box-shadow .45s;border:1.5px solid rgba(245,242,235,.1);background:rgba(245,242,235,.03)}
+    .del-dot svg{width:13px;height:13px;transition:stroke .45s}
+    .del-dot svg{stroke:rgba(245,242,235,0.18)}
+
+    .del-step.done    .del-dot{border-color:rgba(201,169,110,.45);background:rgba(201,169,110,.08);box-shadow:0 0 14px rgba(201,169,110,.15)}
+    .del-step.done    .del-dot svg{stroke:#c9a96e}
+    .del-step.active  .del-dot{border-color:#c9a96e;background:linear-gradient(135deg,rgba(201,169,110,.18),rgba(201,169,110,.05));box-shadow:0 0 24px rgba(201,169,110,.3),0 0 8px rgba(201,169,110,.15)}
+    .del-step.active  .del-dot svg{stroke:#e0c47e}
+    .del-step.cancelled .del-dot{border-color:rgba(239,68,68,.5);background:rgba(239,68,68,.08);box-shadow:0 0 18px rgba(239,68,68,.15)}
+    .del-step.cancelled .del-dot svg{stroke:rgba(239,68,68,.8)}
+    .del-step.returned  .del-dot{border-color:rgba(251,146,60,.5);background:rgba(251,146,60,.08);box-shadow:0 0 18px rgba(251,146,60,.15)}
+    .del-step.returned  .del-dot svg{stroke:rgba(251,146,60,.8)}
+
+    .del-label{font-family:'Jost',sans-serif;font-size:.37rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(245,242,235,.2);text-align:center;transition:color .45s;white-space:nowrap}
+    .del-step.done     .del-label{color:rgba(201,169,110,.5)}
+    .del-step.active   .del-label{color:rgba(201,169,110,.9);font-weight:500}
+    .del-step.cancelled .del-label{color:rgba(239,68,68,.7)}
+    .del-step.returned  .del-label{color:rgba(251,146,60,.7)}
+
+    .live-badge{display:inline-flex;align-items:center;gap:.45rem;padding:.35rem .85rem;border-radius:100px;margin-bottom:1.2rem;animation:fadeUp .8s ease .55s both;transition:background .5s,border-color .5s,color .5s}
+    .live-badge.normal{background:rgba(201,169,110,.07);border:1px solid rgba(201,169,110,.2);color:rgba(201,169,110,.8)}
+    .live-badge.cancelled{background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.25);color:rgba(239,68,68,.85)}
+    .live-badge.returned{background:rgba(251,146,60,.07);border:1px solid rgba(251,146,60,.25);color:rgba(251,146,60,.85)}
+    .live-dot{width:6px;height:6px;border-radius:50%;animation:pulseDot 1.8s ease-in-out infinite}
+    .live-badge.normal   .live-dot{background:#c9a96e;box-shadow:0 0 8px rgba(201,169,110,.6)}
+    .live-badge.cancelled .live-dot{background:rgba(239,68,68,.9);box-shadow:0 0 8px rgba(239,68,68,.5)}
+    .live-badge.returned  .live-dot{background:rgba(251,146,60,.9);box-shadow:0 0 8px rgba(251,146,60,.5)}
+    @keyframes pulseDot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+    .live-badge-text{font-family:'Jost',sans-serif;font-size:.4rem;letter-spacing:.2em;text-transform:uppercase}
+
+    .status-toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(120%);z-index:500;background:#1a1916;border:1px solid rgba(201,169,110,.3);border-radius:12px;padding:.85rem 1.5rem;display:flex;align-items:center;gap:.75rem;box-shadow:0 8px 32px rgba(0,0,0,.5);transition:transform .5s cubic-bezier(.34,1.56,.64,1),opacity .4s;opacity:0;min-width:280px;max-width:90vw}
+    .status-toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+    .toast-icon{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(201,169,110,.12);flex-shrink:0}
+    .toast-icon svg{width:14px;height:14px}
+    .toast-text{flex:1}
+    .toast-title{font-family:'Jost',sans-serif;font-size:.55rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:#f5f2eb;margin-bottom:.2rem}
+    .toast-sub{font-family:'Jost',sans-serif;font-size:.48rem;color:rgba(245,242,235,.35);letter-spacing:.04em}
+
+    .order-card{background:rgba(245,242,235,.02);border:1px solid rgba(245,242,235,.06);border-radius:16px;padding:1.5rem;width:100%;max-width:520px;margin:0 auto 2.5rem;animation:fadeUp .8s ease .65s both;text-align:left}
+    .order-card-title{font-family:'Jost',sans-serif;font-size:.4rem;letter-spacing:.28em;text-transform:uppercase;color:rgba(201,169,110,.45);margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
+    .order-card-title::before{content:'';width:12px;height:1px;background:rgba(201,169,110,.3)}
+    .order-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:.55rem}
+    .order-key{font-family:'Jost',sans-serif;font-size:.5rem;color:rgba(245,242,235,.28);letter-spacing:.06em}
+    .order-val{font-family:'Jost',sans-serif;font-size:.58rem;color:rgba(245,242,235,.6);letter-spacing:.04em}
+    .order-val.gold{color:#c9a96e}
+    .order-divider{height:1px;background:rgba(245,242,235,.05);margin:.75rem 0}
+    .order-total-row{display:flex;justify-content:space-between;align-items:baseline}
+    .order-total-key{font-family:'Jost',sans-serif;font-size:.48rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(245,242,235,.3)}
+    .order-total-val{font-family:'Cormorant Garamond',serif;font-size:1.35rem;font-weight:300;color:#f5f2eb}
+    #liveOrderStatus{transition:color .45s}
+
+    .success-btns{display:flex;gap:.85rem;flex-wrap:wrap;justify-content:center;animation:fadeUp .8s ease .75s both}
+    .btn-gold{padding:.85rem 2rem;border:none;border-radius:100px;background:linear-gradient(135deg,#e0c47e 0%,#c9a96e 50%,#b8913d 100%);color:#0d0b08;font-family:'Jost',sans-serif;font-size:.5rem;letter-spacing:.22em;text-transform:uppercase;cursor:pointer;position:relative;overflow:hidden;transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .22s;box-shadow:0 1px 0 rgba(255,255,255,.35) inset,0 4px 14px rgba(185,140,55,.3);text-decoration:none;display:inline-flex;align-items:center;gap:.5rem}
+    .btn-gold::after{content:'';position:absolute;top:0;left:-75%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);transform:skewX(-18deg);transition:left .55s ease}
+    .btn-gold:hover::after{left:130%}
+    .btn-gold:hover{transform:translateY(-2px);box-shadow:0 1px 0 rgba(255,255,255,.4) inset,0 8px 24px rgba(185,140,55,.4)}
+    .btn-outline{padding:.85rem 2rem;border:1px solid rgba(201,169,110,.25);border-radius:100px;background:transparent;color:rgba(201,169,110,.7);font-family:'Jost',sans-serif;font-size:.5rem;letter-spacing:.22em;text-transform:uppercase;cursor:pointer;transition:border-color .25s,color .25s,background .25s;text-decoration:none;display:inline-flex;align-items:center;gap:.5rem}
+    .btn-outline:hover{border-color:rgba(201,169,110,.55);color:#c9a96e;background:rgba(201,169,110,.05)}
+
+    @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+
+    .rule{height:1px;background:linear-gradient(90deg,transparent,rgba(201,169,110,.18),transparent);position:relative;z-index:1}
+    .footer{background:#0a0a09;padding:2.5rem 2rem 1.5rem;border-top:1px solid rgba(245,242,235,.05);position:relative;z-index:1}
+    @media(min-width:768px){.footer{padding:2.5rem 3rem 1.5rem}}
+    .footer-bottom{display:flex;flex-direction:column;gap:.75rem;padding-top:0;align-items:center;text-align:center}
+    @media(min-width:768px){.footer-bottom{flex-direction:row;justify-content:space-between}}
+    .footer-copy{font-family:'Jost',sans-serif;font-size:.44rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(245,242,235,.12)}
+    .footer-legal{display:flex;gap:1.25rem}
+    .footer-legal a{font-family:'Jost',sans-serif;font-size:.44rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(245,242,235,.18);text-decoration:none;transition:color .2s}
+    .footer-legal a:hover{color:rgba(245,242,235,.5)}
+  </style>
+</head>
+<body>
+
+<nav class="nav-root" id="navbar">
+  <div class="nav-inner">
+    <div class="nav-left">
+      <a href="/home"     class="nav-link">Home</a>
+      <a href="/products" class="nav-link">Collection</a>
+      <a href="/home"     class="nav-link">About</a>
+      <a href="/home"     class="nav-link">Contact</a>
+    </div>
+    <a href="/home" class="nav-logo">Velmora Chroné</a>
+    <div class="nav-right">
+      <a href="/profile" class="nav-icon-btn" aria-label="Profile">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </a>
+      <a href="/logout" class="nav-link nav-logout">Logout</a>
+      <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="/home"     class="nav-link">Home</a>
+    <a href="/products" class="nav-link">Collection</a>
+    <a href="/profile"  class="nav-link">My Profile</a>
+    <a href="/logout"   class="nav-link" style="color:rgba(201,169,110,.55)">Logout</a>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <div class="page-hero-scan"></div>
+  <div class="page-hero-inner">
+    <p class="page-hero-tag" style="animation:fadeUp .75s ease .1s both">Order Placed</p>
+    <div class="hero-steps" style="animation:fadeUp .75s ease .22s both">
+      <div class="hero-step done">
+        <div class="hero-step-circle">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <span class="hero-step-label">Cart</span>
+      </div>
+      <div class="hero-step-line done"></div>
+      <div class="hero-step done">
+        <div class="hero-step-circle">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <span class="hero-step-label">Checkout</span>
+      </div>
+      <div class="hero-step-line done"></div>
+      <div class="hero-step active">
+        <div class="hero-step-circle">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <span class="hero-step-label">Confirmed</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="success-wrap">
+
+  <!-- ── NEW ILLUSTRATION ── -->
+  <div class="success-illus">
+    <svg width="130" height="130" viewBox="0 0 130 130" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="glowGrad" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#c9a96e" stop-opacity="0.2"/>
+          <stop offset="100%" stop-color="#c9a96e" stop-opacity="0"/>
+        </radialGradient>
+        <linearGradient id="ringGold" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%"   stop-color="#edd99e"/>
+          <stop offset="50%"  stop-color="#c9a96e"/>
+          <stop offset="100%" stop-color="#a8873d"/>
+        </linearGradient>
+      </defs>
+
+      <!-- Glow backdrop -->
+      <circle cx="65" cy="65" r="63" fill="url(#glowGrad)" class="success-glow"/>
+
+      <!-- Outer dashed orbit (slow clockwise) -->
+      <circle class="success-ring-outer" cx="65" cy="65" r="55"
+              fill="none" stroke="#c9a96e" stroke-width="0.6"
+              stroke-dasharray="3 9" stroke-linecap="round" opacity="0.5"/>
+
+      <!-- Watch bezel tick ring (slow counter-clockwise) -->
+      <g class="success-ticks">
+        <!-- 12 ticks: 4 bold quarter-hour, 8 slim -->
+        <line x1="65" y1="11" x2="65" y2="18"  stroke="#c9a96e" stroke-width="1.8" stroke-linecap="round" opacity="0.9"/>
+        <line x1="65" y1="11" x2="65" y2="16"  stroke="#c9a96e" stroke-width="1"   stroke-linecap="round" opacity="0.55" transform="rotate(30  65 65)"/>
+        <line x1="65" y1="11" x2="65" y2="16"  stroke="#c9a96e" stroke-width="1"   stroke-linecap="round" opacity="0.55" transform="rotate(60  65 65)"/>
+        <line x1="65" y1="11" x2="65" y2="18"  stroke="#c9a96e" stroke-width="1.8" stroke-linecap="round" opacity="0.9"  transform="rotate(90  65 65)"/>
+        <line x1="65" y1="11" x2="65" y2="16"  stroke="#c9a96e" stroke-width="1"   stroke-linecap="round" opacity="0.55" transform="rotate(120 65 65)"/>
+        <line x1="65" y1="11" x2="65" y2="16"  stroke="#c9a96e" stroke-width="1"   stroke-linecap="round" opacity="0.55" transform="rotate(150 65 65)"/>
+        <line x1="65" y1="11" x2="65" y2="18"  stroke="#c9a96e" stroke-width="1.8" stroke-linecap="round" opacity="0.9"  transform="rotate(180 65 65)"/>
+        <line x1="65" y1="11" x2="65" y2="16"  stroke="#c9a96e" stroke-width="1"   stroke-linecap="round" opacity="0.55" transform="rotate(210 65 65)"/>
+        <line x1="65" y1="11" x2="65" y2="16"  stroke="#c9a96e" stroke-width="1"   stroke-linecap="round" opacity="0.55" transform="rotate(240 65 65)"/>
+        <line x1="65" y1="11" x2="65" y2="18"  stroke="#c9a96e" stroke-width="1.8" stroke-linecap="round" opacity="0.9"  transform="rotate(270 65 65)"/>
+        <line x1="65" y1="11" x2="65" y2="16"  stroke="#c9a96e" stroke-width="1"   stroke-linecap="round" opacity="0.55" transform="rotate(300 65 65)"/>
+        <line x1="65" y1="11" x2="65" y2="16"  stroke="#c9a96e" stroke-width="1"   stroke-linecap="round" opacity="0.55" transform="rotate(330 65 65)"/>
+      </g>
+
+      <!-- Sweeping arc (second-hand style orbit) -->
+      <circle class="success-sweep" cx="65" cy="65" r="43"
+              fill="none" stroke="url(#ringGold)" stroke-width="1.5"
+              stroke-dasharray="23 247" stroke-linecap="round" opacity="0.7"/>
+
+      <!-- Pulsing inner ring -->
+      <circle class="success-ring" cx="65" cy="65" r="35"
+              fill="none" stroke="url(#ringGold)" stroke-width="0.8" opacity="0.55"/>
+
+      <!-- Inner fill + checkmark -->
+      <g class="success-check">
+        <circle cx="65" cy="65" r="28"
+                fill="rgba(201,169,110,0.10)"
+                stroke="rgba(201,169,110,0.4)" stroke-width="1"/>
+        <polyline points="54,65 62,74 78,56"
+                  fill="none" stroke="url(#ringGold)"
+                  stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      </g>
+    </svg>
+  </div>
+  <!-- ── END NEW ILLUSTRATION ── -->
+
+  <p class="success-tag">Order Confirmed</p>
+  <h1 class="success-title">Thank You,<br/><em>Connoisseur</em></h1>
+  <p class="success-sub">Your timepiece has been reserved and will be dispatched within 24 hours. Our curator will reach out to coordinate the white-glove delivery experience.</p>
+
+  <div class="order-ref">
+    <span class="order-ref-label">Order Reference</span>
+    <span class="order-ref-sep"></span>
+    <span class="order-ref-val"><%= order.orderNumber %></span>
+  </div>
+
+  <div class="live-badge normal" id="liveBadge">
+    <span class="live-dot"></span>
+    <span class="live-badge-text" id="liveBadgeText">Live Tracking Active</span>
+  </div>
+
+  <div class="delivery-trail-wrap">
+    <div class="delivery-trail" id="deliveryTrail">
+
+      <div class="del-step" data-stage="confirmed" id="stage-confirmed">
+        <div class="del-dot">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </div>
+        <span class="del-label">Confirmed</span>
+      </div>
+
+      <div class="del-line pending" id="line-confirmed"></div>
+
+      <div class="del-step" data-stage="processing" id="stage-processing">
+        <div class="del-dot">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+        </div>
+        <span class="del-label">Processing</span>
+      </div>
+
+      <div class="del-line pending" id="line-processing"></div>
+
+      <div class="del-step" data-stage="dispatched" id="stage-dispatched">
+        <div class="del-dot">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="1" y="3" width="15" height="13"/>
+            <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/>
+            <circle cx="5.5" cy="18.5" r="2.5"/>
+            <circle cx="18.5" cy="18.5" r="2.5"/>
+          </svg>
+        </div>
+        <span class="del-label">Dispatched</span>
+      </div>
+
+      <div class="del-line pending" id="line-dispatched"></div>
+
+      <div class="del-step" data-stage="delivered" id="stage-delivered">
+        <div class="del-dot">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+        </div>
+        <span class="del-label">Delivered</span>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="order-card">
+    <div class="order-card-title">Order Details</div>
+    <div class="order-row">
+      <span class="order-key">Payment Method</span>
+      <span class="order-val">Cash on Delivery</span>
+    </div>
+    <div class="order-row">
+      <span class="order-key">Order Status</span>
+      <span class="order-val gold" id="liveOrderStatus" style="text-transform:capitalize"><%= order.orderStatus %></span>
+    </div>
+    <div class="order-row">
+      <span class="order-key">Placed On</span>
+      <span class="order-val">
+        <%= new Date(order.createdAt).toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' }) %>
+      </span>
+    </div>
+
+    <% if (order.pricing) { %>
+    <div class="order-divider"></div>
+    <% if (order.pricing.itemDiscount > 0) { %>
+    <div class="order-row">
+      <span class="order-key">Item Discount</span>
+      <span class="order-val" style="color:rgba(74,222,128,.7)">− ₹<%= order.pricing.itemDiscount.toLocaleString('en-IN') %></span>
+    </div>
+    <% } %>
+    <div class="order-row">
+      <span class="order-key">GST (18%)</span>
+      <span class="order-val">₹<%= order.pricing.tax.toLocaleString('en-IN') %></span>
+    </div>
+    <div class="order-row">
+      <span class="order-key">Shipping</span>
+      <span class="order-val gold"><%= order.pricing.shipping === 0 ? 'Complimentary' : '₹' + order.pricing.shipping %></span>
+    </div>
+    <div class="order-divider"></div>
+    <div class="order-total-row">
+      <span class="order-total-key">Total Paid</span>
+      <span class="order-total-val">₹<%= order.pricing.grandTotal.toLocaleString('en-IN') %></span>
+    </div>
+    <% } %>
+  </div>
+
+  <div class="success-btns">
+    <a href="/orders/<%= order._id %>" class="btn-outline">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      View Order Details
+    </a>
+    <a href="/products" class="btn-gold">
+      Continue Shopping
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </a>
+  </div>
+
+</div>
+
+<div class="status-toast" id="statusToast">
+  <div class="toast-icon" id="toastIcon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#c9a96e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" id="toastSvg">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>
+  </div>
+  <div class="toast-text">
+    <div class="toast-title" id="toastTitle">Status Updated</div>
+    <div class="toast-sub"  id="toastSub">Your order status has changed</div>
+  </div>
+</div>
+
+<div class="rule"></div>
+<footer class="footer">
+  <div style="max-width:1200px;margin:0 auto">
+    <div class="footer-bottom">
+      <span class="footer-copy">&copy; <%= new Date().getFullYear() %> Velmora Chroné. All rights reserved.</span>
+      <div class="footer-legal">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Accessibility</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const navbar     = document.getElementById('navbar');
+  const hamburger  = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobileMenu');
+  window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', scrollY > 30), { passive: true });
+  hamburger.addEventListener('click', () => {
+    hamburger.classList.toggle('open');
+    mobileMenu.classList.toggle('open');
+  });
+  history.pushState(null, null, window.location.href);
+  window.addEventListener('popstate', () => history.pushState(null, null, window.location.href));
+
+  const LINEAR_STAGES = ['confirmed', 'processing', 'dispatched', 'delivered'];
+  const STAGE_LABELS  = {
+    confirmed:  'Order Confirmed',
+    processing: 'Processing Order',
+    dispatched: 'Out for Delivery',
+    delivered:  'Delivered',
+    cancelled:  'Order Cancelled',
+    returned:   'Return Initiated',
+  };
+  const STAGE_SUBS = {
+    confirmed:  'Your order has been confirmed.',
+    processing: 'Your order is being prepared.',
+    dispatched: 'Your order is on the way!',
+    delivered:  'Your order has been delivered.',
+    cancelled:  'Your order has been cancelled.',
+    returned:   'Return process has started.',
+  };
+
+  function applyStatus(status) {
+    status = status.toLowerCase();
+
+    const isCancelled = status === 'cancelled';
+    const isReturned  = status === 'returned';
+    const isTerminal  = isCancelled || isReturned;
+    const activeIdx   = LINEAR_STAGES.indexOf(status);
+
+    LINEAR_STAGES.forEach((stage, idx) => {
+      const stepEl = document.getElementById('stage-' + stage);
+      const lineEl = document.getElementById('line-' + stage);
+      if (!stepEl) return;
+
+      stepEl.classList.remove('done', 'active', 'cancelled', 'returned');
+      if (lineEl) lineEl.classList.remove('done', 'pending', 'cancelled-line');
+
+      if (isTerminal) {
+        if (lineEl) lineEl.classList.add('pending');
+      } else {
+        if (idx < activeIdx) {
+          stepEl.classList.add('done');
+          if (lineEl) lineEl.classList.add('done');
+        } else if (idx === activeIdx) {
+          stepEl.classList.add('active');
+          if (lineEl) lineEl.classList.add('pending');
+        } else {
+          if (lineEl) lineEl.classList.add('pending');
+        }
+      }
+    });
+
+    const cancelEl   = document.getElementById('stage-cancelled');
+    const cancelLine = document.getElementById('line-cancelled');
+    if (cancelEl) {
+      cancelEl.classList.remove('done', 'active', 'cancelled', 'returned');
+      if (isCancelled) cancelEl.classList.add('cancelled', 'active');
+    }
+    if (cancelLine) {
+      cancelLine.classList.remove('done', 'pending', 'cancelled-line');
+      if (isCancelled) cancelLine.classList.add('cancelled-line');
+      else cancelLine.classList.add('pending');
+    }
+
+    const returnEl = document.getElementById('stage-returned');
+    if (returnEl) {
+      returnEl.classList.remove('done', 'active', 'cancelled', 'returned');
+      if (isReturned) returnEl.classList.add('returned', 'active');
+    }
+
+    const statusEl = document.getElementById('liveOrderStatus');
+    if (statusEl) {
+      statusEl.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+      statusEl.style.color = isCancelled ? 'rgba(239,68,68,.8)'
+                           : isReturned  ? 'rgba(251,146,60,.8)'
+                           : '#c9a96e';
+    }
+
+    const badge     = document.getElementById('liveBadge');
+    const badgeText = document.getElementById('liveBadgeText');
+    badge.className = 'live-badge';
+    if (isCancelled)     badge.classList.add('cancelled');
+    else if (isReturned) badge.classList.add('returned');
+    else                 badge.classList.add('normal');
+    badgeText.textContent = isTerminal
+      ? 'Status: ' + status.charAt(0).toUpperCase() + status.slice(1)
+      : 'Live Tracking Active';
+  }
+
+  let toastTimer;
+  function showToast(status) {
+    const toast     = document.getElementById('statusToast');
+    const toastIcon = document.getElementById('toastIcon');
+    const toastSvg  = document.getElementById('toastSvg');
+    const title     = document.getElementById('toastTitle');
+    const sub       = document.getElementById('toastSub');
+
+    title.textContent = STAGE_LABELS[status] || 'Status Updated';
+    sub.textContent   = STAGE_SUBS[status]   || 'Your order status has changed.';
+
+    const isCancelled = status === 'cancelled';
+    const isReturned  = status === 'returned';
+
+    toastIcon.style.background = isCancelled ? 'rgba(239,68,68,.12)'
+                               : isReturned  ? 'rgba(251,146,60,.12)'
+                               : 'rgba(201,169,110,.12)';
+    toastSvg.setAttribute('stroke', isCancelled ? 'rgba(239,68,68,.85)'
+                                  : isReturned  ? 'rgba(251,146,60,.85)'
+                                  : '#c9a96e');
+
+    if (isCancelled) {
+      toastSvg.innerHTML = '<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>';
+    } else if (isReturned) {
+      toastSvg.innerHTML = '<polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/>';
+    } else {
+      toastSvg.innerHTML = '<polyline points="20 6 9 17 4 12"/>';
+    }
+
+    clearTimeout(toastTimer);
+    toast.classList.add('show');
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 4500);
+  }
+
+  const ORDER_ID = '<%= order._id %>';
+  let   sse, reconnectDelay = 3000;
+
+  function connectSSE() {
+    sse = new EventSource('/orders/' + ORDER_ID + '/status-stream');
+
+    sse.onopen = () => { reconnectDelay = 3000; };
+
+    sse.addEventListener('orderStatus', (e) => {
+      try {
+        const data = JSON.parse(e.data);
+        if (data.orderStatus) {
+          const prev = document.getElementById('liveOrderStatus').textContent.toLowerCase().trim();
+          const next = data.orderStatus.toLowerCase();
+          applyStatus(next);
+          if (prev !== next) showToast(next);
+        }
+      } catch (_) {}
+    });
+
+    sse.onerror = () => {
+      sse.close();
+      setTimeout(connectSSE, reconnectDelay);
+      reconnectDelay = Math.min(reconnectDelay * 1.5, 30000);
+    };
+  }
+
+  applyStatus('<%= order.orderStatus %>');
+  connectSSE();
+</script>
+</body>
+</html>

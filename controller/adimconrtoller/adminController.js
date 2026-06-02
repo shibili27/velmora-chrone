@@ -139,7 +139,6 @@ export const deleteCategory = async (req, res) => {
 
 // product                                                     ---
 
-
 export const getProducts = async (req, res) => {
   try {
     const search = req.query.search?.trim() || '';
@@ -319,8 +318,7 @@ export const editProduct = async (req, res) => {
       { new: true, runValidators: true }
     );
 
-
-    // SSE 
+    // SSE
     broadcast('productUpdate', {
       productId:     req.params.id,
       stock:         totalStock,
@@ -329,7 +327,7 @@ export const editProduct = async (req, res) => {
       isDeleted:     updated.isDeleted,
       colorVariants: colorVariants.map(v => ({ name: v.name, hex: v.hex, stock: v.stock })),
     });
-    
+
     req.flash('success', 'Product updated successfully.');
     res.redirect('/admin/products');
   } catch (err) {
@@ -338,9 +336,6 @@ export const editProduct = async (req, res) => {
     res.redirect('/admin/products');
   }
 };
-
-
-// delete
 
 export const deleteProduct = async (req, res) => {
   try {
@@ -365,7 +360,6 @@ export const deleteProduct = async (req, res) => {
 };
 
 // brand                                                     ------
-
 
 export const getBrands = async (req, res) => {
   try {

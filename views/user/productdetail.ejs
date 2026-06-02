@@ -67,7 +67,6 @@
     /* ═══ GALLERY ═══ */
     .gallery { display: flex; flex-direction: column; gap: 0.75rem; }
 
-    /* Main image wrapper */
     .main-img-wrap {
       width: 100%; aspect-ratio: 4/3; overflow: hidden;
       background: #1a1a18; position: relative; cursor: zoom-in;
@@ -76,7 +75,6 @@
     .main-img-wrap.zoomed { cursor: zoom-out; }
     .main-img-wrap::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent); z-index: 2; pointer-events: none; border-radius: 16px 16px 0 0; }
 
-    /* Crossfade overlay for slide transition */
     .slide-overlay {
       position: absolute; inset: 0; z-index: 1;
       background-size: cover; background-position: center;
@@ -88,9 +86,6 @@
     .main-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.45s cubic-bezier(0.25,0.46,0.45,0.94); transform-origin: center; pointer-events: none; user-select: none; filter: brightness(.92) contrast(1.04) saturate(.85); display: block; }
     .main-img.zoomed { transform: scale(2.4); filter: brightness(1) contrast(1.04) saturate(.85); }
 
-    /* progress bar removed */
-
-    /* Slide counter */
     .slide-counter {
       position: absolute; bottom: 12px; left: 14px; z-index: 4;
       font-family: 'Jost', sans-serif; font-size: 0.42rem; letter-spacing: 0.15em;
@@ -99,7 +94,6 @@
       pointer-events: none;
     }
 
-    /* Prev / Next arrows */
     .slide-arrow {
       position: absolute; top: 50%; z-index: 4; transform: translateY(-50%);
       width: 32px; height: 32px; background: rgba(17,17,16,0.6);
@@ -114,7 +108,6 @@
     .slide-arrow.prev { left: 10px; }
     .slide-arrow.next { right: 10px; }
 
-    /* Slide dots */
     .slide-dots {
       position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%);
       display: flex; gap: 5px; z-index: 4; pointer-events: none;
@@ -129,13 +122,11 @@
     .zoom-hint { position: absolute; bottom: 12px; right: 14px; font-family: 'Jost', sans-serif; font-size: 0.4rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(245,242,235,0.18); display: flex; align-items: center; gap: 4px; pointer-events: none; transition: opacity 0.3s; z-index: 4; }
     .main-img-wrap.zoomed .zoom-hint { opacity: 0; }
 
-    /* Image badge */
     .img-badge { position: absolute; top: 12px; left: 12px; z-index: 5; font-family: 'Jost', sans-serif; font-size: 0.4rem; letter-spacing: 0.18em; text-transform: uppercase; padding: 3px 10px; border-radius: 100px; }
     .badge-oos { background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.28); color: #f87171; }
     .badge-low { background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.28); color: #fbbf24; }
     .badge-discount { background: rgba(201,169,110,0.1); border: 1px solid rgba(201,169,110,0.28); color: #c9a96e; }
 
-    /* Thumbnails */
     .thumb-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
     .thumb-row::-webkit-scrollbar { height: 2px; }
     .thumb-row::-webkit-scrollbar-thumb { background: rgba(201,169,110,0.3); }
@@ -328,6 +319,7 @@
     <div class="hidden md:flex items-center gap-8">
       <a href="/home"     class="nav-link">Home</a>
       <a href="/products" class="nav-link active">Collection</a>
+      <a href="/orders"   class="nav-link">Orders</a>
       <a href="/home"     class="nav-link">About</a>
       <a href="/home"     class="nav-link">Contact</a>
     </div>
@@ -354,6 +346,7 @@
   <div class="mobile-menu" id="mobileMenu">
     <a href="/home"     class="nav-link">Home</a>
     <a href="/products" class="nav-link active">Collection</a>
+    <a href="/orders"   class="nav-link">Orders</a>
     <% if (isLoggedIn) { %>
       <a href="/profile"  class="nav-link">My Profile</a>
       <a href="/wishlist" class="nav-link">Wishlist</a>
@@ -383,22 +376,18 @@
     <div class="gallery reveal">
       <div class="main-img-wrap gallery-fade visible" id="mainImgWrap" onclick="handleImgClick(event)">
 
-        <!-- Status badge -->
         <% if (isOOS) { %><span class="img-badge badge-oos">Out of Stock</span>
         <% } else if (isLow) { %><span class="img-badge badge-low" id="lowBadge">Only <%= initialStock %> Left</span>
         <% } else if (hasDiscount) { %><span class="img-badge badge-discount">−<%= discPct %>%</span><% } %>
 
-        <!-- Crossfade overlay (used during slide transition) -->
         <div class="slide-overlay" id="slideOverlay"></div>
 
-        <!-- Main image -->
         <% if (initialImages.length > 0) { %>
           <img class="main-img" id="mainImg" src="<%= initialImages[0] %>" alt="<%= product.name %>"/>
         <% } else { %>
           <div class="watch-ph"><svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="rgba(245,242,235,0.05)" stroke-width="0.5"><circle cx="12" cy="12" r="10"/></svg></div>
         <% } %>
 
-        <!-- Prev / Next arrows -->
         <button class="slide-arrow prev" id="arrowPrev" onclick="manualSlide(-1, event)" aria-label="Previous">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
         </button>
@@ -406,13 +395,9 @@
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
 
-        <!-- Dots -->
         <div class="slide-dots" id="slideDots"></div>
-
-        <!-- Counter (shown only if >1 image) -->
         <div class="slide-counter" id="slideCounter" style="display:none">1 / 1</div>
 
-        <!-- Zoom hint -->
         <div class="zoom-hint">
           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="M21 21l-4.35-4.35"/></svg>
           Click to zoom
@@ -636,17 +621,15 @@
 
 <div class="toast" id="toast"><span class="toast-dot"></span><span id="toastMsg"></span></div>
 
+
 <script>
   const PRODUCT_ID     = '<%= product._id %>';
   const MAX_QTY        = 5;
-  const IS_LOGGED_IN   = <%= isLoggedIn %>;
-  const COLOR_VARIANTS = <%- JSON.stringify(variants) %>;
+  const IS_LOGGED_IN   = <%= !!currentUser %>;
+  const COLOR_VARIANTS = JSON.parse('<%- JSON.stringify(variants).replace(/\\/g,"\\\\").replace(/'/g,"\\'") %>');
   let activeVariantIndex = 0;
 
-  /* ══════════════════════════════════════════
-     AUTO SLIDESHOW ENGINE
-  ══════════════════════════════════════════ */
-  const SLIDE_INTERVAL = 3500; // ms between slides
+  const SLIDE_INTERVAL = 3500;
   let slideImages   = <%- JSON.stringify(initialImages) %>;
   let slideIndex    = 0;
   let slideTimer    = null;
@@ -685,13 +668,11 @@
     document.querySelectorAll('.thumb').forEach((t, i) => t.classList.toggle('active', i === slideIndex));
   }
 
-  /* Crossfade to a new src */
   function crossfadeTo(src, onDone) {
     if (!mainImg) { if (onDone) onDone(); return; }
     overlay.style.backgroundImage = `url('${src}')`;
     overlay.style.backgroundSize  = 'cover';
     overlay.style.backgroundPosition = 'center';
-    // force reflow then fade in overlay
     overlay.offsetHeight;
     overlay.classList.add('fading');
     setTimeout(() => {
@@ -722,22 +703,12 @@
     }, SLIDE_INTERVAL);
   }
 
-  function stopSlideshow() {
-    clearInterval(slideTimer);
-  }
+  function stopSlideshow() { clearInterval(slideTimer); }
+  function restartSlideshow() { stopSlideshow(); startSlideshow(); }
 
-  function restartSlideshow() {
-    stopSlideshow();
-    startSlideshow();
-  }
-
-  /* Pause on hover */
   mainWrap.addEventListener('mouseenter', () => { isPaused = true; });
-  mainWrap.addEventListener('mouseleave', () => {
-    if (!isZoomed) { isPaused = false; restartSlideshow(); }
-  });
+  mainWrap.addEventListener('mouseleave', () => { if (!isZoomed) { isPaused = false; restartSlideshow(); } });
 
-  /* Swipe support (touch) */
   let touchStartX = 0;
   mainWrap.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
   mainWrap.addEventListener('touchend', e => {
@@ -750,7 +721,6 @@
     goToSlide(slideIndex + dir, true);
   }
 
-  /* Thumb clicked — jump to that image & restart */
   function thumbClick(thumb, src, idx) {
     if (isZoomed) return;
     slideIndex = idx;
@@ -762,7 +732,6 @@
     restartSlideshow();
   }
 
-  /* Set new image set (called by variant change) */
   function loadImageSet(images) {
     slideImages = images;
     slideIndex  = 0;
@@ -776,28 +745,17 @@
     }
   }
 
-  /* Init */
   buildDots();
   updateCounter();
   startSlideshow();
 
-  /* ══════════════════════════════════════════
-     ZOOM
-  ══════════════════════════════════════════ */
   function handleImgClick(e) {
-    // Don't zoom if arrow button clicked
     if (e.target.closest('.slide-arrow') || e.target.closest('.slide-dot')) return;
     isZoomed = !isZoomed;
     mainWrap.classList.toggle('zoomed', isZoomed);
     if (mainImg) mainImg.classList.toggle('zoomed', isZoomed);
-    if (isZoomed) {
-      isPaused = true;
-      updateZoomOrigin(e);
-      stopSlideshow();
-    } else {
-      isPaused = false;
-      startSlideshow();
-    }
+    if (isZoomed) { isPaused = true; updateZoomOrigin(e); stopSlideshow(); }
+    else { isPaused = false; startSlideshow(); }
   }
   mainWrap.addEventListener('mousemove', e => { if (isZoomed && mainImg) updateZoomOrigin(e); });
   function updateZoomOrigin(e) {
@@ -805,9 +763,6 @@
     if (mainImg) mainImg.style.transformOrigin = `${((e.clientX-r.left)/r.width)*100}% ${((e.clientY-r.top)/r.height)*100}%`;
   }
 
-  /* ══════════════════════════════════════════
-     VARIANTS
-  ══════════════════════════════════════════ */
   function selectVariant(idx) {
     const v = COLOR_VARIANTS[idx];
     if (!v) return;
@@ -829,10 +784,12 @@
     if (nameEl) nameEl.textContent = name;
   }
 
-  /* ══════════════════════════════════════════
-     STOCK UI
-  ══════════════════════════════════════════ */
+  // Mutable flat stock — overwritten immediately by the live stock fetch on load
+  let currentFlatStock = <%= initialStock %>;
+
   function updateStockUI(stock) {
+    if (COLOR_VARIANTS.length === 0) currentFlatStock = stock;
+
     const badge    = document.getElementById('stockBadge');
     const dot      = document.getElementById('stockDot');
     const text     = document.getElementById('stockText');
@@ -842,26 +799,61 @@
     const addBtn   = document.getElementById('addCartBtn');
     const specsStk = document.getElementById('specsStock');
     const isOOS = stock === 0, isLow = stock > 0 && stock <= 5;
+
     if (badge)   badge.className = 'stock-badge ' + (isOOS ? 'out' : isLow ? 'low' : 'in');
     if (dot)     dot.className   = 'stock-dot '   + (isOOS ? 'out' : isLow ? 'low' : 'in');
     if (text) {
-      if (isOOS)     text.textContent = 'Out of Stock';
+      if (isOOS)      text.textContent = 'Out of Stock';
       else if (isLow) text.textContent = `Low Stock — Only ${stock} left`;
       else            text.textContent = `In Stock · ${stock} available`;
     }
-    if (qtyInput) { qtyInput.max = stock; qtyInput.value = Math.min(parseInt(qtyInput.value)||1, Math.min(stock, MAX_QTY)); qtyInput.disabled = isOOS; }
-    if (qtyMinus) qtyMinus.disabled = isOOS;
-    if (qtyPlus)  qtyPlus.disabled  = isOOS;
+
+    const mainImgWrap = document.getElementById('mainImgWrap');
+    let imgBadge = mainImgWrap ? mainImgWrap.querySelector('.img-badge') : null;
+    if (isOOS || isLow) {
+      if (!imgBadge && mainImgWrap) {
+        imgBadge = document.createElement('span');
+        mainImgWrap.prepend(imgBadge);
+      }
+      if (imgBadge) {
+        imgBadge.className   = 'img-badge ' + (isOOS ? 'badge-oos' : 'badge-low');
+        imgBadge.textContent = isOOS ? 'Out of Stock' : `Only ${stock} Left`;
+      }
+    } else {
+      if (imgBadge && (imgBadge.classList.contains('badge-oos') || imgBadge.classList.contains('badge-low'))) {
+        imgBadge.remove();
+      }
+    }
+
+    if (qtyInput) {
+      qtyInput.max      = stock;
+      qtyInput.value    = Math.min(parseInt(qtyInput.value) || 1, Math.min(stock, MAX_QTY));
+      qtyInput.disabled = isOOS;
+    }
+    const qtyVal = parseInt(qtyInput ? qtyInput.value : 1);
+    if (qtyMinus) qtyMinus.disabled = isOOS || qtyVal <= 1;
+    if (qtyPlus)  qtyPlus.disabled  = isOOS || qtyVal >= Math.min(stock, MAX_QTY);
     if (addBtn)   { addBtn.disabled = isOOS; addBtn.textContent = isOOS ? 'Out of Stock' : 'Add to Cart'; }
     if (specsStk) specsStk.textContent = isOOS ? 'Sold Out' : stock + ' units';
+
+    if (COLOR_VARIANTS.length > 0) {
+      document.querySelectorAll('.color-swatch').forEach((sw, i) => {
+        const v = COLOR_VARIANTS[i];
+        if (!v) return;
+        sw.dataset.oos = v.stock === 0 ? 'true' : 'false';
+        sw.title = v.name + (v.stock === 0 ? ' — Out of Stock' : '');
+      });
+    }
   }
 
-  /* ══════════════════════════════════════════
-     QTY
-  ══════════════════════════════════════════ */
+  function getCurrentStock() {
+    if (COLOR_VARIANTS.length > 0) return COLOR_VARIANTS[activeVariantIndex].stock;
+    return currentFlatStock;
+  }
+
   function changeQty(delta) {
     const input = document.getElementById('qtyInput');
-    const stock = COLOR_VARIANTS.length > 0 ? COLOR_VARIANTS[activeVariantIndex].stock : <%= initialStock %>;
+    const stock = getCurrentStock();
     const cap   = Math.min(stock, MAX_QTY);
     const val   = Math.min(cap, Math.max(1, parseInt(input.value || 1) + delta));
     input.value = val;
@@ -869,30 +861,101 @@
     document.getElementById('qtyPlus').disabled  = val >= cap;
   }
 
-  /* ══════════════════════════════════════════
-     ADD TO CART
-  ══════════════════════════════════════════ */
-  async function handleAddToCart(productId) {
-    if (!IS_LOGGED_IN) { window.location.href = '/login'; return; }
-    const qty = parseInt(document.getElementById('qtyInput').value) || 1;
-    const btn = document.getElementById('addCartBtn');
-    btn.disabled = true; btn.textContent = 'Adding…';
+  // ✅ KEY FIX: fetch live stock from DB on every page load.
+  // The EJS bakes initialStock into the HTML at render time, but if another
+  // user purchased between renders, that value is stale. This call overwrites
+  // the UI with the actual current DB value immediately after the page loads,
+  // so the user always sees the correct stock before they can click anything.
+  async function syncStockFromDB() {
     try {
-      const body = { productId, quantity: qty };
-      if (COLOR_VARIANTS.length > 0) { body.variantIndex = activeVariantIndex; body.variantName = COLOR_VARIANTS[activeVariantIndex].name; }
-      const res  = await fetch('/cart/add', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify(body) });
+      const res  = await fetch(`/products/${PRODUCT_ID}/stock`);
+      if (!res.ok) return;
       const data = await res.json();
-      if (res.status === 401) { window.location.href = data.redirectUrl || '/login'; return; }
-      if (!res.ok) { showToast(data.message || 'Could not add to cart', true); return; }
-      showToast('Added to cart ✓');
-      if (data.cartCount !== undefined) document.getElementById('cartCount').textContent = data.cartCount;
-    } catch { showToast('Something went wrong', true); }
-    finally { btn.disabled = false; btn.textContent = COLOR_VARIANTS.length > 0 && COLOR_VARIANTS[activeVariantIndex].stock === 0 ? 'Out of Stock' : 'Add to Cart'; }
+      if (!data.success) return;
+
+      if (COLOR_VARIANTS.length > 0 && data.colorVariants?.length > 0) {
+        // Patch each variant's stock from the live DB response
+        data.colorVariants.forEach(updated => {
+          const match = COLOR_VARIANTS.find(v => v.name === updated.name);
+          if (match) match.stock = updated.stock;
+        });
+        // Update UI for the currently selected variant
+        updateStockUI(COLOR_VARIANTS[activeVariantIndex].stock);
+      } else {
+        // Flat-stock product
+        currentFlatStock = data.stock;
+        updateStockUI(data.stock);
+      }
+    } catch (err) {
+      console.warn('[syncStockFromDB] failed silently:', err);
+      // Non-fatal — page still works, SSE will pick up changes
+    }
   }
 
-  /* ══════════════════════════════════════════
-     WISHLIST
-  ══════════════════════════════════════════ */
+  // Run immediately on page load — before user can interact
+  syncStockFromDB();
+
+  async function handleAddToCart(productId) {
+    if (!IS_LOGGED_IN) { window.location.href = '/login'; return; }
+
+    const currentStock = getCurrentStock();
+    if (currentStock === 0) {
+      showToast('This item is currently out of stock', true);
+      return;
+    }
+
+    const qty = parseInt(document.getElementById('qtyInput').value) || 1;
+    const btn = document.getElementById('addCartBtn');
+    btn.disabled = true;
+    btn.textContent = 'Adding…';
+
+    try {
+      const body = { productId, quantity: qty };
+      if (COLOR_VARIANTS.length > 0) {
+        body.variantIndex = activeVariantIndex;
+        body.variantName  = COLOR_VARIANTS[activeVariantIndex].name;
+      }
+
+      const res  = await fetch('/cart/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(body)
+      });
+
+      let data = {};
+      const contentType = res.headers.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        data = await res.json();
+      }
+
+      if (res.status === 401) {
+        window.location.href = data.redirectUrl || '/login';
+        return;
+      }
+
+      if (!res.ok) {
+        showToast(data.message || 'Could not add to cart', true);
+        // ✅ If server says out of stock, sync UI immediately
+        if (res.status === 400) await syncStockFromDB();
+        return;
+      }
+
+      showToast('Added to cart ✓');
+      if (data.cartCount !== undefined) {
+        document.getElementById('cartCount').textContent = data.cartCount;
+      }
+
+    } catch (err) {
+      console.error('Cart error:', err);
+      showToast('Something went wrong', true);
+    } finally {
+      const stockNow = getCurrentStock();
+      const isNowOOS = stockNow === 0;
+      btn.disabled    = isNowOOS;
+      btn.textContent = isNowOOS ? 'Out of Stock' : 'Add to Cart';
+    }
+  }
+
   let wishlisted = false;
   function applyWishlistUI(state) {
     const btn = document.getElementById('wishlistBtn'), heartSvg = document.getElementById('heartSvg');
@@ -904,14 +967,24 @@
   }
   async function checkWishlistStatus() {
     if (!IS_LOGGED_IN) return;
-    try { const res = await fetch(`/wishlist/status/${PRODUCT_ID}`, { headers: { 'Accept': 'application/json' } }); if (!res.ok) return; const data = await res.json(); wishlisted = !!data.wishlisted; applyWishlistUI(wishlisted); } catch {}
+    try {
+      const res = await fetch(`/wishlist/status/${PRODUCT_ID}`, { headers: { 'Accept': 'application/json' } });
+      if (!res.ok) return;
+      const data = await res.json();
+      wishlisted = !!data.wishlisted;
+      applyWishlistUI(wishlisted);
+    } catch {}
   }
   async function handleWishlistToggle() {
     if (!IS_LOGGED_IN) { window.location.href = '/login'; return; }
     const btn = document.getElementById('wishlistBtn');
     if (btn) btn.disabled = true;
     try {
-      const res  = await fetch('/wishlist/toggle', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify({ productId: PRODUCT_ID }) });
+      const res  = await fetch('/wishlist/toggle', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ productId: PRODUCT_ID })
+      });
       const data = await res.json();
       if (res.status === 401) { window.location.href = data.redirectUrl || '/login'; return; }
       if (!res.ok) { showToast(data.message || 'Could not update wishlist', true); return; }
@@ -923,21 +996,28 @@
   }
   checkWishlistStatus();
 
-  /* ══════════════════════════════════════════
-     NAV / MISC
-  ══════════════════════════════════════════ */
   const navbar = document.getElementById('navbar');
   window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', scrollY > 20), { passive: true });
-  document.getElementById('hamburger').addEventListener('click', function () { this.classList.toggle('open'); document.getElementById('mobileMenu').classList.toggle('open'); });
+  document.getElementById('hamburger').addEventListener('click', function () {
+    this.classList.toggle('open');
+    document.getElementById('mobileMenu').classList.toggle('open');
+  });
 
   if (IS_LOGGED_IN) {
     fetch('/api/cart/count', { headers: { 'Accept': 'application/json' } })
-      .then(r => r.json()).then(d => { if (d.count !== undefined) document.getElementById('cartCount').textContent = d.count; }).catch(() => {});
+      .then(r => r.json())
+      .then(d => { if (d.count !== undefined) document.getElementById('cartCount').textContent = d.count; })
+      .catch(() => {});
   }
 
   const revealEls = document.querySelectorAll('.reveal');
   const revealObs = new IntersectionObserver(entries => {
-    entries.forEach((e, i) => { if (e.isIntersecting) { setTimeout(() => e.target.classList.add('visible'), i * 80); revealObs.unobserve(e.target); } });
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 80);
+        revealObs.unobserve(e.target);
+      }
+    });
   }, { threshold: 0.06 });
   revealEls.forEach(el => revealObs.observe(el));
 
@@ -958,20 +1038,54 @@
     toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
   }
 
-  /* SSE */
+  // ── SSE: live stock/price updates with auto-reconnect ──
   (function () {
-    const es = new EventSource('/sse/products');
-    es.addEventListener('productUpdate', function (e) {
-      const data = JSON.parse(e.data);
-      if (data.productId !== PRODUCT_ID) return;
-      if (data.colorVariants && COLOR_VARIANTS.length > 0) {
-        data.colorVariants.forEach(updated => { const match = COLOR_VARIANTS.find(v => v.name === updated.name); if (match) match.stock = updated.stock; });
-        updateStockUI(COLOR_VARIANTS[activeVariantIndex].stock);
-      } else { updateStockUI(data.stock); }
-      if (data.price !== undefined) { const el = document.querySelector('.prod-price'); if (el) el.textContent = '₹' + Number(data.price).toLocaleString('en-IN'); }
-      if (data.isDeleted || data.isListed === false) { const btn = document.getElementById('addCartBtn'); if (btn) { btn.disabled = true; btn.textContent = 'No Longer Available'; } }
-    });
-    es.onerror = function () {};
+    let es = null;
+    let reconnectDelay = 3000;
+
+    function connectSSE() {
+      if (es) { try { es.close(); } catch(e) {} }
+      es = new EventSource('/sse/products');
+
+      es.addEventListener('productUpdate', function (e) {
+        let data;
+        try { data = JSON.parse(e.data); } catch { return; }
+        if (data.productId !== PRODUCT_ID) return;
+
+        reconnectDelay = 3000;
+
+        if (data.colorVariants && COLOR_VARIANTS.length > 0) {
+          data.colorVariants.forEach(updated => {
+            const match = COLOR_VARIANTS.find(v => v.name === updated.name);
+            if (match) match.stock = updated.stock;
+          });
+          updateStockUI(COLOR_VARIANTS[activeVariantIndex].stock);
+        } else if (data.stock !== undefined) {
+          currentFlatStock = data.stock;
+          updateStockUI(data.stock);
+        }
+
+        if (data.price !== undefined) {
+          const el = document.querySelector('.prod-price');
+          if (el) el.textContent = '₹' + Number(data.price).toLocaleString('en-IN');
+        }
+
+        if (data.isDeleted || data.isListed === false) {
+          const btn = document.getElementById('addCartBtn');
+          if (btn) { btn.disabled = true; btn.textContent = 'No Longer Available'; }
+        }
+      });
+
+      es.onerror = function () {
+        try { es.close(); } catch(e) {}
+        setTimeout(() => {
+          reconnectDelay = Math.min(reconnectDelay * 1.5, 30000);
+          connectSSE();
+        }, reconnectDelay);
+      };
+    }
+
+    connectSSE();
   })();
 </script>
 </body>

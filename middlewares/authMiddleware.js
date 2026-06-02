@@ -54,6 +54,7 @@ function clearUserSession(req) {
 
 export const isAuth = async (req, res, next) => {
 
+
   if (req.session && req.session.adminId && !req.session.user) {
     if (isAjax(req)) {
       return res.status(401).json({
@@ -66,7 +67,10 @@ export const isAuth = async (req, res, next) => {
     return res.redirect('/login');
   }
 
-  if (!req.session || !req.session.user) {
+  const userId = req.session?.user || (req.user ? req.user._id : null);
+
+  if (!userId) {
+    console.log('  ❌ No userId — sending to login (isAjax:', isAjax(req), ')');
     if (isAjax(req)) {
       return res.status(401).json({
         success:     false,
@@ -79,9 +83,10 @@ export const isAuth = async (req, res, next) => {
   }
 
   try {
-    const user = await User.findById(req.session.user);
+    const user = req.user || await User.findById(userId);
 
     if (!user) {
+      console.log('  ❌ User not found in DB');
       await clearUserSession(req);
       if (isAjax(req)) {
         return res.status(401).json({
@@ -95,6 +100,7 @@ export const isAuth = async (req, res, next) => {
     }
 
     if (user.isBlocked) {
+      console.log('  ❌ User is blocked');
       await clearUserSession(req);
       if (isAjax(req)) {
         return res.status(403).json({
@@ -107,6 +113,14 @@ export const isAuth = async (req, res, next) => {
       return res.redirect('/login');
     }
 
+    if (!req.session.user) {
+      req.session.user = user._id;
+      req.session.save((err) => {
+        if (err) console.error('isAuth session save error:', err);
+      });
+    }
+
+    console.log('  ✅ Auth passed for user:', user._id);
     req.user = user;
     next();
   } catch (error) {
@@ -120,18 +134,28 @@ export const isAuth = async (req, res, next) => {
 
 
 export const isOptionalAuth = async (req, res, next) => {
-  if (!req.session || !req.session.user) {
+  const userId = req.session?.user || (req.user ? req.user._id : null);
+
+  if (!userId) {
     req.user = null;
     return next();
   }
 
   try {
-    const user = await User.findById(req.session.user);
+    // Reuse passport's req.user if already loaded
+    const user = req.user || await User.findById(userId);
 
     if (!user || user.isBlocked) {
       await clearUserSession(req);
       req.user = null;
       return next();
+    }
+
+    if (!req.session.user) {
+      req.session.user = user._id;
+      req.session.save((err) => {
+        if (err) console.error('isOptionalAuth session save error:', err);
+      });
     }
 
     req.user = user;
@@ -145,7 +169,8 @@ export const isOptionalAuth = async (req, res, next) => {
 
 
 export const isGuest = (req, res, next) => {
-  if (req.session && req.session.user) {
+  const isLoggedIn = (req.session && req.session.user) || !!req.user;
+  if (isLoggedIn) {
     return res.redirect('/');
   }
   next();
@@ -153,9 +178,10 @@ export const isGuest = (req, res, next) => {
 
 
 export const isNotBlocked = async (req, res, next) => {
-  if (req.session && req.session.user) {
+  const userId = req.session?.user || (req.user ? req.user._id : null);
+  if (userId) {
     try {
-      const user = await User.findById(req.session.user);
+      const user = req.user || await User.findById(userId);
       if (user && user.isBlocked) {
         await clearUserSession(req);
         req.flash('authError', 'Your account has been blocked');

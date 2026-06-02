@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate"/>
+  <meta http-equiv="Pragma" content="no-cache"/>
+  <meta http-equiv="Expires" content="0"/>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Orders — Velmora Chroné Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --teal:       #2d8c84;
+      --teal-dark:  #1f6e67;
+      --teal-light: #e8f4f3;
+      --sidebar-w:  220px;
+      --bg:         #f2f4f3;
+      --white:      #ffffff;
+      --border:     #e2e6e4;
+      --text:       #1a1f1e;
+      --text-mid:   #5a6461;
+      --text-light: #9aa8a5;
+      --green:      #16a34a;
+      --green-bg:   #dcfce7;
+      --blue:       #2563eb;
+      --blue-bg:    #dbeafe;
+      --red:        #dc2626;
+      --red-bg:     #fee2e2;
+      --amber:      #d97706;
+      --amber-bg:   #fef3c7;
+      --purple:     #7c3aed;
+      --purple-bg:  #ede9fe;
+    }
+    html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--bg); color: var(--text); }
+    .layout { display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: var(--sidebar-w); background: var(--white); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; }
+    .sidebar__brand { padding: 24px 20px 18px; border-bottom: 1px solid var(--border); }
+    .sidebar__brand-name { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 600; letter-spacing: 0.06em; color: var(--text); line-height: 1.2; }
+    .sidebar__brand-sub  { font-size: 9px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-light); margin-top: 3px; }
+    .sidebar__nav { flex: 1; padding: 14px 0; overflow-y: auto; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 20px; font-size: 13px; font-weight: 500; color: var(--text-mid); text-decoration: none; transition: background 0.15s, color 0.15s; cursor: pointer; }
+    .nav-item:hover  { background: var(--teal-light); color: var(--teal); }
+    .nav-item.active { background: var(--teal-light); color: var(--teal); border-right: 3px solid var(--teal); }
+    .nav-item svg    { width: 16px; height: 16px; flex-shrink: 0; }
+    .sidebar__footer { padding: 16px 20px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+    .avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--teal); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 13px; font-weight: 600; flex-shrink: 0; }
+    .sidebar__footer-info { overflow: hidden; flex: 1; }
+    .sidebar__footer-name { font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sidebar__footer-role { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); }
+    .btn-logout { display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 6px; border: 1px solid #fecaca; background: var(--red-bg); color: var(--red); cursor: pointer; flex-shrink: 0; transition: background 0.15s, border-color 0.15s; text-decoration: none; }
+    .btn-logout:hover { background: var(--red); color: #fff; border-color: var(--red); }
+    .btn-logout svg { width: 14px; height: 14px; }
+
+    /* Main */
+    .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+    .topbar { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 32px; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+    .topbar__title { font-size: 13px; font-weight: 500; color: var(--text-mid); letter-spacing: 0.04em; }
+    .topbar__right { display: flex; align-items: center; gap: 10px; }
+    .topbar__date { font-size: 11px; color: var(--text-light); letter-spacing: 0.04em; }
+    .content { padding: 32px; flex: 1; }
+
+    /* Page header */
+    .page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px; }
+    .page-header__left { }
+    .page-header__title { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 600; color: var(--text); }
+    .page-header__sub { font-size: 12px; color: var(--text-light); margin-top: 3px; }
+
+    /* Flash messages */
+    .flash { padding: 11px 16px; border-radius: 6px; font-size: 12.5px; font-weight: 500; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+    .flash--success { background: var(--green-bg); color: var(--green); border: 1px solid #bbf7d0; }
+    .flash--error   { background: var(--red-bg);   color: var(--red);   border: 1px solid #fecaca; }
+
+    /* Stat strip */
+    .stat-strip { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 24px; }
+    .stat-pill { background: var(--white); border: 1px solid var(--border); border-radius: 6px; padding: 14px 18px; display: flex; flex-direction: column; gap: 4px; cursor: pointer; transition: box-shadow 0.15s, border-color 0.15s; text-decoration: none; }
+    .stat-pill:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.06); border-color: var(--teal); }
+    .stat-pill.active { border-color: var(--teal); background: var(--teal-light); }
+    .stat-pill__label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); }
+    .stat-pill__val   { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; color: var(--text); }
+    .stat-pill.active .stat-pill__label { color: var(--teal-dark); }
+    .stat-pill.active .stat-pill__val   { color: var(--teal); }
+
+    /* Toolbar */
+    .toolbar { background: var(--white); border: 1px solid var(--border); border-radius: 6px; padding: 16px 20px; margin-bottom: 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .search-wrap { position: relative; flex: 1; min-width: 200px; }
+    .search-wrap svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: var(--text-light); pointer-events: none; }
+    .search-input { width: 100%; padding: 8px 12px 8px 32px; border: 1px solid var(--border); border-radius: 5px; font-family: 'Jost', sans-serif; font-size: 12.5px; color: var(--text); background: var(--bg); outline: none; transition: border-color 0.15s; }
+    .search-input:focus { border-color: var(--teal); background: var(--white); }
+    .search-input::placeholder { color: var(--text-light); }
+    select.filter-select { padding: 8px 12px; border: 1px solid var(--border); border-radius: 5px; font-family: 'Jost', sans-serif; font-size: 12.5px; color: var(--text); background: var(--bg); outline: none; cursor: pointer; transition: border-color 0.15s; min-width: 130px; }
+    select.filter-select:focus { border-color: var(--teal); background: var(--white); }
+    input[type="date"].filter-select { padding: 7px 12px; }
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 5px; font-family: 'Jost', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; border: none; transition: background 0.15s, color 0.15s; text-decoration: none; white-space: nowrap; }
+    .btn--teal   { background: var(--teal); color: #fff; }
+    .btn--teal:hover { background: var(--teal-dark); }
+    .btn--outline { background: var(--white); color: var(--text-mid); border: 1px solid var(--border); }
+    .btn--outline:hover { background: var(--bg); color: var(--text); }
+    .btn svg { width: 13px; height: 13px; }
+
+    /* Table */
+    .section-card { background: var(--white); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+    .section-card__header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .section-card__title  { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text); }
+    .section-card__meta   { font-size: 11px; color: var(--text-light); }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { background: #f8faf9; }
+    th { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); padding: 11px 16px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; cursor: pointer; user-select: none; }
+    th:hover { color: var(--teal); }
+    th .sort-icon { display: inline-block; margin-left: 4px; opacity: 0.4; font-size: 9px; }
+    th.sorted .sort-icon { opacity: 1; color: var(--teal); }
+    td { padding: 13px 16px; font-size: 12.5px; color: var(--text); border-bottom: 1px solid var(--border); vertical-align: middle; }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: #fafcfb; }
+    .empty-row td { text-align: center; padding: 48px; color: var(--text-light); font-size: 13px; }
+
+    /* Badges */
+    .badge { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 20px; white-space: nowrap; letter-spacing: 0.04em; }
+    .badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+    .badge--confirmed    { color: var(--teal);   background: var(--teal-light); }
+    .badge--processing   { color: var(--blue);   background: var(--blue-bg);   }
+    .badge--dispatched   { color: var(--purple); background: var(--purple-bg); }
+    .badge--delivered    { color: var(--green);  background: var(--green-bg);  }
+    .badge--cancelled    { color: var(--red);    background: var(--red-bg);    }
+    .badge--returned     { color: var(--amber);  background: var(--amber-bg);  }
+
+    /* Status inline select */
+    .status-select { font-family: 'Jost', sans-serif; font-size: 11px; font-weight: 600; padding: 4px 8px; border-radius: 20px; border: none; cursor: pointer; outline: none; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%235a6461' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 6px center; padding-right: 22px; }
+    .status-select.s-confirmed  { color: var(--teal);   background-color: var(--teal-light); }
+    .status-select.s-processing { color: var(--blue);   background-color: var(--blue-bg); }
+    .status-select.s-dispatched { color: var(--purple); background-color: var(--purple-bg); }
+    .status-select.s-delivered  { color: var(--green);  background-color: var(--green-bg); }
+    .status-select.s-cancelled  { color: var(--red);    background-color: var(--red-bg); }
+    .status-select.s-returned   { color: var(--amber);  background-color: var(--amber-bg); }
+
+    /* User cell */
+    .user-cell { display: flex; align-items: center; gap: 9px; }
+    .user-avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--teal); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 11px; font-weight: 600; flex-shrink: 0; }
+    .user-name  { font-size: 12.5px; font-weight: 500; color: var(--text); white-space: nowrap; }
+    .user-email { font-size: 10px; color: var(--text-light); margin-top: 1px; }
+
+    /* Pagination */
+    .pagination { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-top: 1px solid var(--border); }
+    .pagination__info { font-size: 11px; color: var(--text-light); }
+    .pagination__pages { display: flex; align-items: center; gap: 4px; }
+    .page-btn { width: 30px; height: 30px; border-radius: 5px; border: 1px solid var(--border); background: var(--white); font-family: 'Jost', sans-serif; font-size: 12px; font-weight: 500; color: var(--text-mid); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; text-decoration: none; }
+    .page-btn:hover { background: var(--teal-light); color: var(--teal); border-color: var(--teal); }
+    .page-btn.active { background: var(--teal); color: #fff; border-color: var(--teal); }
+    .page-btn:disabled, .page-btn.disabled { opacity: 0.4; cursor: default; pointer-events: none; }
+    .page-btn svg { width: 12px; height: 12px; }
+
+    /* Footer */
+    .page-footer { text-align: center; padding: 20px 32px; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); border-top: 1px solid var(--border); }
+
+    /* Toast */
+    .toast { position: fixed; bottom: 24px; right: 24px; background: var(--text); color: #fff; padding: 12px 18px; border-radius: 6px; font-size: 12.5px; font-weight: 500; z-index: 9999; transform: translateY(80px); opacity: 0; transition: transform 0.25s, opacity 0.25s; pointer-events: none; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.success { background: var(--green); }
+    .toast.error   { background: var(--red); }
+  </style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar__brand">
+      <div class="sidebar__brand-name">Velmora<br>Chroné</div>
+      <div class="sidebar__brand-sub">Admin Dashboard</div>
+    </div>
+    <nav class="sidebar__nav">
+      <a href="/admin/dashboard" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Dashboard
+      </a>
+      <a href="/admin/orders" class="nav-item active">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+        Orders
+      </a>
+      <a href="/admin/products" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"/></svg>
+        Products
+      </a>
+      <a href="/admin/reviews" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+        Rating/Review
+      </a>
+      <a href="/admin/customers" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        Customers
+      </a>
+      <a href="/admin/coupons" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+        Coupons
+      </a>
+      <a href="/admin/categories" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+        Categories
+      </a>
+      <a href="/admin/brands" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 4H7a2 2 0 01-2-2V6a2 2 0 012-2h5l2 2h3a2 2 0 012 2v12a2 2 0 01-2 2z"/></svg>
+        Brands
+      </a>
+      <a href="/admin/refunds" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
+        Refund/Return
+      </a>
+      <a href="/admin/banners" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+        Banner
+      </a>
+      <a href="/admin/referrals" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+        Referral
+      </a>
+    </nav>
+    <div class="sidebar__footer">
+      <div class="avatar"><%= adminName ? adminName.charAt(0).toUpperCase() : 'A' %></div>
+      <div class="sidebar__footer-info">
+        <div class="sidebar__footer-name"><%= adminName || 'Admin' %></div>
+        <div class="sidebar__footer-role"><%= adminRole || 'Administrator' %></div>
+      </div>
+      <a href="/admin/logout" class="btn-logout" title="Logout">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main">
+    <header class="topbar">
+      <span class="topbar__title">Order Management</span>
+      <div class="topbar__right">
+        <span class="topbar__date" id="topbarDate"></span>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- Flash messages -->
+      <% if (locals.success && success.length > 0) { %>
+        <div class="flash flash--success">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+          <%= success[0] %>
+        </div>
+      <% } %>
+      <% if (locals.error && error.length > 0) { %>
+        <div class="flash flash--error">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+          <%= error[0] %>
+        </div>
+      <% } %>
+
+      <!-- Page header -->
+      <div class="page-header">
+        <div class="page-header__left">
+          <div class="page-header__title">Orders</div>
+          <div class="page-header__sub">Manage and track all customer orders</div>
+        </div>
+      </div>
+
+      <!-- Stat strip (clickable filters) -->
+      <div class="stat-strip">
+        <a href="/admin/orders?status=all&page=1" class="stat-pill <%= (currentStatus === 'all' || !currentStatus) ? 'active' : '' %>">
+          <div class="stat-pill__label">All Orders</div>
+          <div class="stat-pill__val"><%= counts.all || 0 %></div>
+        </a>
+        <a href="/admin/orders?status=confirmed&page=1" class="stat-pill <%= currentStatus === 'confirmed' ? 'active' : '' %>">
+          <div class="stat-pill__label">Confirmed</div>
+          <div class="stat-pill__val"><%= counts.confirmed || 0 %></div>
+        </a>
+        <a href="/admin/orders?status=processing&page=1" class="stat-pill <%= currentStatus === 'processing' ? 'active' : '' %>">
+          <div class="stat-pill__label">Processing</div>
+          <div class="stat-pill__val"><%= counts.processing || 0 %></div>
+        </a>
+        <a href="/admin/orders?status=dispatched&page=1" class="stat-pill <%= currentStatus === 'dispatched' ? 'active' : '' %>">
+          <div class="stat-pill__label">Dispatched</div>
+          <div class="stat-pill__val"><%= counts.dispatched || 0 %></div>
+        </a>
+        <a href="/admin/orders?status=delivered&page=1" class="stat-pill <%= currentStatus === 'delivered' ? 'active' : '' %>">
+          <div class="stat-pill__label">Delivered</div>
+          <div class="stat-pill__val"><%= counts.delivered || 0 %></div>
+        </a>
+      </div>
+
+      <!-- Toolbar -->
+      <form method="GET" action="/admin/orders" id="filterForm">
+        <input type="hidden" name="page" value="1"/>
+        <% if (currentStatus && currentStatus !== 'all') { %>
+          <input type="hidden" name="status" value="<%= currentStatus %>"/>
+        <% } %>
+        <div class="toolbar">
+          <div class="search-wrap">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35"/></svg>
+            <input
+              type="text"
+              name="search"
+              class="search-input"
+              placeholder="Search by order ID or customer name…"
+              value="<%= currentSearch || '' %>"
+            />
+          </div>
+
+          <select name="status" class="filter-select" onchange="document.getElementById('filterForm').submit()">
+            <option value="all"        <%= (currentStatus === 'all' || !currentStatus) ? 'selected' : '' %>>All Statuses</option>
+            <option value="confirmed"  <%= currentStatus === 'confirmed'  ? 'selected' : '' %>>Confirmed</option>
+            <option value="processing" <%= currentStatus === 'processing' ? 'selected' : '' %>>Processing</option>
+            <option value="dispatched" <%= currentStatus === 'dispatched' ? 'selected' : '' %>>Dispatched</option>
+            <option value="delivered"  <%= currentStatus === 'delivered'  ? 'selected' : '' %>>Delivered</option>
+            <option value="cancelled"  <%= currentStatus === 'cancelled'  ? 'selected' : '' %>>Cancelled</option>
+            <option value="returned"   <%= currentStatus === 'returned'   ? 'selected' : '' %>>Returned</option>
+          </select>
+
+          <select name="sort" class="filter-select" onchange="document.getElementById('filterForm').submit()">
+            <option value="date_desc" <%= currentSort === 'date_desc' ? 'selected' : '' %>>Newest First</option>
+            <option value="date_asc"  <%= currentSort === 'date_asc'  ? 'selected' : '' %>>Oldest First</option>
+            <option value="amount_desc" <%= currentSort === 'amount_desc' ? 'selected' : '' %>>Amount: High–Low</option>
+            <option value="amount_asc"  <%= currentSort === 'amount_asc'  ? 'selected' : '' %>>Amount: Low–High</option>
+          </select>
+
+          <input type="date" name="from" class="filter-select" value="<%= currentFrom || '' %>" title="From date"/>
+          <input type="date" name="to"   class="filter-select" value="<%= currentTo   || '' %>" title="To date"/>
+
+          <button type="submit" class="btn btn--teal">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            Search
+          </button>
+          <a href="/admin/orders" class="btn btn--outline">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+            Clear
+          </a>
+        </div>
+      </form>
+
+      <!-- Orders table -->
+      <div class="section-card">
+        <div class="section-card__header">
+          <span class="section-card__title">Orders</span>
+          <span class="section-card__meta"><%= totalOrders %> total</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Date</th>
+                <th>Customer</th>
+                <th>Items</th>
+                <th>Amount</th>
+                <th>Payment</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (orders && orders.length > 0) { %>
+                <% orders.forEach(function(order) { %>
+                <tr>
+                  <!-- Order ID -->
+                  <td>
+                    <span style="font-family:'Cormorant Garamond',serif;font-size:13px;font-weight:600;color:var(--teal)">
+                      <%= order.orderNumber || '#' + order._id.toString().slice(-6).toUpperCase() %>
+                    </span>
+                  </td>
+
+                  <!-- Date -->
+                  <td style="color:var(--text-mid);font-size:12px;white-space:nowrap">
+                    <%= new Date(order.createdAt).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' }) %>
+                    <div style="font-size:10px;color:var(--text-light)">
+                      <%= new Date(order.createdAt).toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' }) %>
+                    </div>
+                  </td>
+
+                  <!-- Customer -->
+                  <td>
+                    <div class="user-cell">
+                      <div class="user-avatar">
+                        <%= order.user && order.user.name ? order.user.name.charAt(0).toUpperCase() : '?' %>
+                      </div>
+                      <div>
+                        <div class="user-name"><%= order.user ? order.user.name : 'Deleted User' %></div>
+                        <div class="user-email"><%= order.user ? order.user.email : '' %></div>
+                      </div>
+                    </div>
+                  </td>
+
+                  <!-- Items count -->
+                  <td style="color:var(--text-mid);font-size:12px">
+                    <%= order.items ? order.items.length : 0 %> item<%= (order.items && order.items.length !== 1) ? 's' : '' %>
+                  </td>
+
+                  <!-- Amount -->
+                  <td style="font-weight:600">
+                    ₹<%= order.pricing ? order.pricing.grandTotal.toLocaleString('en-IN') : '0' %>
+                  </td>
+
+                  <!-- Payment -->
+                  <td>
+                    <span style="font-size:11px;background:var(--bg);padding:3px 8px;border-radius:4px;color:var(--text-mid);font-weight:500">
+                      <%= order.paymentMethod || 'COD' %>
+                    </span>
+                  </td>
+
+                  <!-- Status (inline change) -->
+                  <td>
+                    <select
+                      class="status-select s-<%= order.orderStatus %>"
+                      data-order-id="<%= order._id %>"
+                      onchange="updateStatus(this)"
+                    >
+                      <option value="confirmed"  <%= order.orderStatus === 'confirmed'  ? 'selected' : '' %>>Confirmed</option>
+                      <option value="processing" <%= order.orderStatus === 'processing' ? 'selected' : '' %>>Processing</option>
+                      <option value="dispatched" <%= order.orderStatus === 'dispatched' ? 'selected' : '' %>>Dispatched</option>
+                      <option value="delivered"  <%= order.orderStatus === 'delivered'  ? 'selected' : '' %>>Delivered</option>
+                      <option value="cancelled"  <%= order.orderStatus === 'cancelled'  ? 'selected' : '' %>>Cancelled</option>
+                      <option value="returned"   <%= order.orderStatus === 'returned'   ? 'selected' : '' %>>Returned</option>
+                    </select>
+                  </td>
+
+                  <!-- Actions -->
+                  <td>
+                    <a href="/admin/orders/<%= order._id %>" class="btn btn--outline" style="padding:6px 12px;font-size:11px">
+                      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                      View
+                    </a>
+                  </td>
+                </tr>
+                <% }) %>
+              <% } else { %>
+                <tr class="empty-row">
+                  <td colspan="8">
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
+                      <svg width="36" height="36" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.2" style="color:var(--border)"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                      <span>No orders found</span>
+                    </div>
+                  </td>
+                </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <% if (totalPages > 1) { %>
+        <div class="pagination">
+          <div class="pagination__info">
+            Showing <%= (currentPage - 1) * limit + 1 %>–<%= Math.min(currentPage * limit, totalOrders) %> of <%= totalOrders %> orders
+          </div>
+          <div class="pagination__pages">
+            <!-- Prev -->
+            <% if (currentPage > 1) { %>
+              <a href="/admin/orders?page=<%= currentPage - 1 %>&status=<%= currentStatus || 'all' %>&search=<%= currentSearch || '' %>&sort=<%= currentSort || 'date_desc' %>&from=<%= currentFrom || '' %>&to=<%= currentTo || '' %>" class="page-btn">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+              </a>
+            <% } else { %>
+              <span class="page-btn disabled"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg></span>
+            <% } %>
+
+            <!-- Page numbers -->
+            <% for (let p = Math.max(1, currentPage - 2); p <= Math.min(totalPages, currentPage + 2); p++) { %>
+              <a href="/admin/orders?page=<%= p %>&status=<%= currentStatus || 'all' %>&search=<%= currentSearch || '' %>&sort=<%= currentSort || 'date_desc' %>&from=<%= currentFrom || '' %>&to=<%= currentTo || '' %>" class="page-btn <%= p === currentPage ? 'active' : '' %>"><%= p %></a>
+            <% } %>
+
+            <!-- Next -->
+            <% if (currentPage < totalPages) { %>
+              <a href="/admin/orders?page=<%= currentPage + 1 %>&status=<%= currentStatus || 'all' %>&search=<%= currentSearch || '' %>&sort=<%= currentSort || 'date_desc' %>&from=<%= currentFrom || '' %>&to=<%= currentTo || '' %>" class="page-btn">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+              </a>
+            <% } else { %>
+              <span class="page-btn disabled"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg></span>
+            <% } %>
+          </div>
+        </div>
+        <% } %>
+      </div>
+
+    </div><!-- /.content -->
+    <footer class="page-footer">© 2026 Velmora Chroné. All Rights Reserved. Admin Panel.</footer>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+  // Topbar date
+  (function() {
+    const el = document.getElementById('topbarDate');
+    if (el) el.textContent = new Date().toLocaleDateString('en-IN', { weekday:'short', day:'numeric', month:'short', year:'numeric' });
+  })();
+
+  // Status colour refresh
+  function refreshSelectColor(sel) {
+    sel.className = 'status-select s-' + sel.value;
+  }
+
+  // Inline status update via AJAX
+  async function updateStatus(sel) {
+    const orderId  = sel.dataset.orderId;
+    const newStatus = sel.value;
+    refreshSelectColor(sel);
+
+    try {
+      const res  = await fetch(`/admin/orders/${orderId}/status`, {
+        method : 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body   : JSON.stringify({ status: newStatus }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast('Order status updated', 'success');
+      } else {
+        showToast(data.message || 'Update failed', 'error');
+      }
+    } catch (e) {
+      showToast('Network error', 'error');
+    }
+  }
+
+  // Toast helper
+  function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className   = `toast ${type} show`;
+    setTimeout(() => { t.className = 'toast'; }, 3000);
+  }
+</script>
+</body>
+</html>

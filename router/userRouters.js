@@ -17,7 +17,8 @@ import {
   getHomePage,
   getProducts,
   getProductDetail,
-  getProductStatus,          
+  getProductStatus,
+  getProductStock,
 } from '../controller/usercontroller/productController.js';
 import {
   getCart,
@@ -37,8 +38,23 @@ import {
   getWishlistCount,
   toggleWishlist,
   getWishlistStatus,
+  clearWishlist,
 } from '../controller/usercontroller/wishlistController.js';
-
+import {
+  getCheckout,
+  placeOrder,
+  getOrderSuccess,
+  applyCoupon,
+} from '../controller/usercontroller/checkoutController.js';
+import {
+  getOrders,
+  getOrderDetail,
+  cancelOrder,
+  cancelItem,
+  returnOrder,
+  downloadInvoice,
+  streamOrderStatus,
+} from '../controller/usercontroller/orderController.js';
 
 
 router.get('/login', isGuest, noCache, (req, res) => {
@@ -56,15 +72,14 @@ router.get('/auth/google',
   isGuest,
   passport.authenticate('google', { scope: ['profile', 'email'] })
 );
-
 router.get('/auth/google/callback',
   passport.authenticate('google', { failureRedirect: '/login', failureFlash: false }),
   async (req, res) => {
     try {
       req.session.user = req.user._id;
-      await new Promise((resolve, reject) => {
-        req.session.save(err => err ? reject(err) : resolve());
-      });
+      await new Promise((resolve, reject) =>
+        req.session.save(err => err ? reject(err) : resolve())
+      );
       res.redirect('/');
     } catch (err) {
       console.error('Google callback error:', err);
@@ -88,7 +103,7 @@ router.post('/sendSignupOtp', authController.sendSignupOtp);
 
 router.get('/otp', isGuest, noCache, hasOtpSession, (req, res) => res.render('user/otp'));
 router.post('/verify-otp',  noCache, hasOtpSession, authController.verifySignupOTP);
-router.post('/resend-otp',   hasOtpSession, authController.resendOTP);
+router.post('/resend-otp',  hasOtpSession, authController.resendOTP);
 
 router.get('/forget-password', isGuest, noCache, (req, res) => res.render('user/forgot'));
 router.post('/forget-password', authController.forgotPassword);
@@ -98,60 +113,64 @@ router.get('/reset-password',  isGuest, noCache, hasOtpVerified, (req, res) => r
 router.post('/reset-password', authController.resetPassword);
 
 
-
-router.get('/',  isOptionalAuth, getHomePage);
-router.get('/home',  isOptionalAuth, getHomePage);
+router.get('/', isOptionalAuth, getHomePage);
+router.get('/home', isOptionalAuth, getHomePage);
 router.get('/products', isOptionalAuth, getProducts);
-
 router.get('/products/:id/status', isOptionalAuth, getProductStatus);
-router.get('/products/:id',   isOptionalAuth, getProductDetail);
-
-
+router.get('/products/:id/stock',  isOptionalAuth, getProductStock);
+router.get('/products/:id', isOptionalAuth, getProductDetail);
 
 
 router.get('/cart', isAuth, getCart);
-router.post('/cart/add',isAuth, addToCart);
-router.patch('/cart/update/:itemId',isAuth, updateCartItem);
-router.delete('/cart/remove/:itemId',isAuth, removeFromCart);
-router.delete('/cart/clear',  isAuth, clearCart);
-router.get('/api/cart/count',isAuth, getCartCount);
+router.post('/cart/add', isAuth, addToCart);
+router.patch('/cart/update/:itemId',  isAuth, updateCartItem);
+router.delete('/cart/remove/:itemId', isAuth, removeFromCart);
+router.delete('/cart/clear', isAuth, clearCart);
+router.get('/api/cart/count', isAuth, getCartCount);
 
 
+router.get('/checkout', isAuth, noCache, getCheckout);
+router.post('/checkout/place-order',  isAuth, placeOrder);
+router.get('/checkout/success', isAuth, noCache, getOrderSuccess);
+router.post('/checkout/apply-coupon', isAuth, applyCoupon);
 
 
-router.get('/wishlist',   isAuth, getWishlist);
-router.post('/wishlist/add',isAuth, addToWishlist);
-router.delete('/wishlist/remove/:itemId',isAuth, removeFromWishlist);
+router.get('/orders', isAuth, noCache, getOrders);
+router.get('/orders/:id/status-stream', isAuth, streamOrderStatus);
+router.get('/orders/:id/invoice', isAuth, downloadInvoice);
+router.get('/orders/:id', isAuth, getOrderDetail);
+router.post('/orders/:id/cancel', isAuth, cancelOrder);
+router.post('/orders/:id/cancel-item', isAuth, cancelItem);
+router.post('/orders/:id/return', isAuth, returnOrder);
+
+
+router.get('/wishlist', isAuth, getWishlist);
+router.post('/wishlist/add', isAuth, addToWishlist);
+router.delete('/wishlist/clear', isAuth, clearWishlist);
+router.delete('/wishlist/remove/:itemId', isAuth, removeFromWishlist);
 router.delete('/wishlist/remove-product/:productId', isAuth, removeFromWishlistByProduct);
-router.get('/wishlist/check/:productId',isAuth, checkInWishlist);
-router.post('/wishlist/move-to-cart',isAuth, moveToCart);
+router.get('/wishlist/check/:productId', isAuth, checkInWishlist);
+router.post('/wishlist/move-to-cart', isAuth, moveToCart);
 router.get('/api/wishlist/count', isAuth, getWishlistCount);
 router.get('/wishlist/status/:productId', isAuth, getWishlistStatus);
-router.post('/wishlist/toggle',  isAuth, toggleWishlist);
+router.post('/wishlist/toggle', isAuth, toggleWishlist);
 
 
-
-
-router.get('/profile',  isAuth, profileController.getProfile);
+router.get('/profile',   isAuth, profileController.getProfile);
 router.post('/profile/update',  isAuth, profileController.updateProfile);
 router.post('/change-password', isAuth, profileController.changePassword);
-
 router.post(
   '/profile/upload-image',
   isAuth,
   upload.single('profileImage'),
   profileController.uploadProfileImage
 );
-
 router.post('/profile/request-email-change', isAuth, profileController.requestEmailChange);
 router.post('/profile/verify-email-change',  isAuth, profileController.verifyEmailChange);
-
 router.post('/profile/address', isAuth, profileController.addAddress);
 router.put('/profile/address/:id', isAuth, profileController.updateAddress);
 router.delete('/profile/address/:id', isAuth, profileController.deleteAddress);
 router.patch('/profile/address/:id/default', isAuth, profileController.setDefaultAddress);
-
-
 
 
 router.get('/logout', (req, res) => {

@@ -27,7 +27,7 @@
     }
 
     /* ═══════════════════════════════════════
-       NAV (exact from home.ejs)
+       NAV
     ═══════════════════════════════════════ */
     .nav-root {
       position: fixed; top: 0; left: 0; right: 0; z-index: 200;
@@ -79,7 +79,7 @@
     .mobile-menu .nav-link { font-size: 0.68rem; padding: 0.45rem 0; border-bottom: 1px solid rgba(245,242,235,0.04); color: rgba(245,242,235,0.5); }
 
     /* ═══════════════════════════════════════
-       PAGE HERO BAND — centered
+       PAGE HERO BAND
     ═══════════════════════════════════════ */
     .page-hero {
       padding: 5.5rem 2rem 2.5rem;
@@ -95,7 +95,6 @@
     @keyframes heroScan { 0% { left: -60%; } 100% { left: 140%; } }
     .page-hero-inner { max-width: 900px; margin: 0 auto; position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; }
 
-    /* Tag with flanking lines both sides */
     .page-hero-tag {
       font-family: 'Jost', sans-serif; font-size: 0.42rem; letter-spacing: 0.38em; text-transform: uppercase;
       color: rgba(201,169,110,0.55); margin-bottom: 0.7rem;
@@ -104,7 +103,6 @@
     .page-hero-tag::before { content: ''; width: 24px; height: 1px; background: #c9a96e; opacity: 0.45; }
     .page-hero-tag::after  { content: ''; width: 24px; height: 1px; background: #c9a96e; opacity: 0.45; }
 
-    /* Playfair Display for the collection heading */
     .page-hero-title {
       font-family: 'Playfair Display', serif; font-weight: 400;
       font-size: clamp(1.6rem, 3.5vw, 2.6rem); line-height: 1;
@@ -116,7 +114,6 @@
       -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
       position: relative;
     }
-    /* Signature underline that draws itself */
     .page-hero-title em::after {
       content: '';
       position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%);
@@ -159,7 +156,6 @@
     .price-row { display: flex; gap: 8px; }
     .price-row .vc-input { font-size: 0.7rem; }
 
-    /* Brand radio list */
     .brand-list { display: flex; flex-direction: column; gap: 6px; max-height: 155px; overflow-y: auto; }
     .brand-list::-webkit-scrollbar { width: 2px; }
     .brand-list::-webkit-scrollbar-thumb { background: rgba(201,169,110,0.3); }
@@ -167,7 +163,6 @@
     .brand-item:hover { color: rgba(245,242,235,0.8); }
     .brand-item input[type=radio] { accent-color: #c9a96e; flex-shrink: 0; }
 
-    /* Apply / clear */
     .btn-apply {
       width: 100%; padding: 0.78rem; border: none; border-radius: 100px; cursor: pointer;
       font-family: 'Jost', sans-serif; font-size: 0.5rem; letter-spacing: 0.22em; text-transform: uppercase;
@@ -191,7 +186,6 @@
     ═══════════════════════════════════════ */
     .products-area { flex: 1; min-width: 0; }
 
-    /* Top bar */
     .products-topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.75rem; padding-bottom: 1.25rem; border-bottom: 1px solid rgba(245,242,235,0.06); flex-wrap: wrap; gap: 0.75rem; }
     .products-count { font-family: 'Jost', sans-serif; font-size: 0.5rem; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(245,242,235,0.25); }
     .products-count strong { color: rgba(201,169,110,0.7); font-weight: 400; }
@@ -208,14 +202,13 @@
     .sort-select:focus { border-color: rgba(201,169,110,0.35); }
     .sort-select option { background: #1a1a18; color: #f5f2eb; }
 
-    /* Active filter tags */
     .active-filters { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 1.25rem; }
     .filter-tag { display: inline-flex; align-items: center; gap: 5px; font-family: 'Jost', sans-serif; font-size: 0.44rem; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(201,169,110,0.75); border: 1px solid rgba(201,169,110,0.2); padding: 4px 10px; border-radius: 100px; background: rgba(201,169,110,0.04); text-decoration: none; transition: border-color 0.2s, background 0.2s; }
     .filter-tag:hover { border-color: rgba(201,169,110,0.45); background: rgba(201,169,110,0.08); }
     .filter-tag svg { width: 8px; height: 8px; }
 
     /* ═══════════════════════════════════════
-       PRODUCT GRID + CARDS (from home.ejs)
+       PRODUCT GRID + CARDS
     ═══════════════════════════════════════ */
     .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 14px; }
     @media(max-width:640px) { .product-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; } }
@@ -244,7 +237,6 @@
     .prod-name { font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; font-weight: 300; color: #f5f2eb; line-height: 1.2; margin-bottom: 5px; flex: 1; }
     .prod-price { font-family: 'Jost', sans-serif; font-size: 0.62rem; color: rgba(201,169,110,0.65); letter-spacing: 0.05em; margin-top: auto; padding-top: 8px; }
 
-    /* ── Empty state ── */
     .empty-state { padding: 5rem 2rem; text-align: center; }
     .empty-state-icon { width: 48px; height: 48px; margin: 0 auto 1.25rem; opacity: 0.1; display: block; }
     .empty-state h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 300; color: rgba(245,242,235,0.25); margin-bottom: 8px; }
@@ -261,10 +253,9 @@
     .page-btn.active { background: linear-gradient(135deg, #c9a96e, #b8913d); border-color: #c9a96e; color: #0d0b08; font-weight: 500; }
     .page-btn.disabled { opacity: 0.2; pointer-events: none; }
 
-    /* ── ACCENT RULE ── */
     .rule { height: 1px; background: linear-gradient(90deg, transparent, rgba(201,169,110,0.18), transparent); }
 
-    /* ── FOOTER (exact from home.ejs) ── */
+    /* ── FOOTER ── */
     .footer { background: #0a0a09; padding: 4rem 2rem 1.5rem; border-top: 1px solid rgba(245,242,235,0.05); position: relative; z-index: 1; }
     @media(min-width:768px) { .footer { padding: 4rem 3rem 1.5rem; } }
     .footer-top { display: grid; grid-template-columns: 1fr; gap: 2.5rem; padding-bottom: 2.5rem; border-bottom: 1px solid rgba(245,242,235,0.05); }
@@ -284,7 +275,6 @@
     .footer-legal a { font-family: 'Jost', sans-serif; font-size: 0.44rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(245,242,235,0.18); text-decoration: none; transition: color 0.2s; }
     .footer-legal a:hover { color: rgba(245,242,235,0.5); }
 
-    /* ── REVEAL ── */
     @keyframes fadeUp { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
     .fade-up { animation: fadeUp .75s ease both; }
     .d1 { animation-delay: .1s; } .d2 { animation-delay: .22s; } .d3 { animation-delay: .35s; }
@@ -294,12 +284,13 @@
 </head>
 <body>
 
-<!-- ══ NAV (exact from home.ejs) ══ -->
+<!-- ══ NAV ══ -->
 <nav class="nav-root" id="navbar">
   <div class="nav-inner">
     <div class="hidden md:flex items-center gap-8">
       <a href="/home"     class="nav-link">Home</a>
       <a href="/products" class="nav-link active">Collection</a>
+      <a href="/orders"   class="nav-link">Orders</a>
       <a href="/home"     class="nav-link">About</a>
       <a href="/home"     class="nav-link">Contact</a>
     </div>
@@ -307,6 +298,9 @@
     <div class="flex items-center gap-2 md:gap-3 ml-auto md:ml-0">
       <a href="/profile" class="nav-icon-btn" aria-label="Profile">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </a>
+      <a href="/wishlist" class="nav-icon-btn wish-active" aria-label="Wishlist">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
       </a>
       <a href="/cart" class="nav-icon-btn" aria-label="Cart" style="position:relative">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
@@ -319,6 +313,7 @@
   <div class="mobile-menu" id="mobileMenu">
     <a href="/home"     class="nav-link">Home</a>
     <a href="/products" class="nav-link active">Collection</a>
+    <a href="/orders"   class="nav-link">Orders</a>
     <a href="/home"     class="nav-link">About</a>
     <a href="/home"     class="nav-link">Contact</a>
     <a href="/profile"  class="nav-link">My Profile</a>
@@ -510,7 +505,7 @@
 
 <div class="rule"></div>
 
-<!-- ══ FOOTER (exact from home.ejs) ══ -->
+<!-- ══ FOOTER ══ -->
 <footer class="footer">
   <div style="max-width:1200px;margin:0 auto;">
     <div class="footer-top">
@@ -564,11 +559,9 @@
 </footer>
 
 <script>
-  /* ── NAV SCROLL ── */
   const navbar = document.getElementById('navbar');
   window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', scrollY > 30), { passive: true });
 
-  /* ── HAMBURGER ── */
   const hamburger  = document.getElementById('hamburger');
   const mobileMenu = document.getElementById('mobileMenu');
   hamburger.addEventListener('click', () => {
@@ -580,7 +573,6 @@
     mobileMenu.classList.remove('open');
   }));
 
-  /* ── REVEAL ON SCROLL ── */
   const revealEls = document.querySelectorAll('.reveal');
   const observer  = new IntersectionObserver(entries => {
     entries.forEach((entry, i) => {
@@ -592,19 +584,16 @@
   }, { threshold: 0.06 });
   revealEls.forEach(el => observer.observe(el));
 
-  /* ── CART COUNT ── */
   fetch('/api/cart/count', { headers: { 'Accept': 'application/json' } })
     .then(r => r.json())
     .then(d => { if (d.count !== undefined) document.getElementById('cartCount').textContent = d.count; })
     .catch(() => {});
 
-  /* ── SORT ── */
   function applySort(val) {
     document.getElementById('sortInput').value = val;
     document.getElementById('filterForm').submit();
   }
 
-  /* ── SSE: live stock/availability updates ── */
   (function () {
     const es = new EventSource('/sse/products');
     es.addEventListener('productUpdate', function (e) {
@@ -624,7 +613,6 @@
     es.onerror = function () {};
   })();
 
-  /* ── BACK BUTTON LOCK ── */
   history.pushState(null, null, window.location.href);
   window.addEventListener('popstate', () => history.pushState(null, null, window.location.href));
 </script>

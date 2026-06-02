@@ -120,9 +120,9 @@ export const getProductDetail = async (req, res) => {
       isDeleted: false,
     })
     .populate('category')
-    .populate('brand');
+    .populate('brand')
+    .lean();
 
-    
     if (!product) {
       return res.status(404).render('user/productUnavailable', {
         title:  'Product Not Found — Velmora Chroné',
@@ -130,12 +130,11 @@ export const getProductDetail = async (req, res) => {
       });
     }
 
-   
     if (product.isListed === false) {
       return res.status(410).render('user/productUnavailable', {
         title:   'Product Unavailable — Velmora Chroné',
         reason:  'blocked',
-        product, 
+        product,
       });
     }
 
@@ -143,7 +142,7 @@ export const getProductDetail = async (req, res) => {
       return res.status(410).render('user/productUnavailable', {
         title:   'Product Unavailable — Velmora Chroné',
         reason:  'category',
-        product, 
+        product,
       });
     }
 
@@ -155,12 +154,17 @@ export const getProductDetail = async (req, res) => {
     })
       .populate('category')
       .populate('brand')
-      .limit(4);
+      .limit(4)
+      .lean();
+
+    // ✅ FIX: check BOTH session auth (local login) and Passport (Google OAuth)
+    const currentUser = req.user || req.session?.user || null;
 
     res.render('user/productDetail', {
-      title:   product.name + ' — Velmora Chroné',
+      title:       product.name + ' — Velmora Chroné',
       product,
       related,
+      currentUser,
     });
   } catch (err) {
     console.error('Get product detail error:', err);
@@ -178,22 +182,45 @@ export const getProductStatus = async (req, res) => {
     .populate('category')
     .lean();
 
-    if (!product) {
-      return res.json({ status: 'notfound' });
-    }
-
-    if (product.isListed === false) {
-      return res.json({ status: 'blocked' });
-    }
-
+    if (!product) return res.json({ status: 'notfound' });
+    if (product.isListed === false) return res.json({ status: 'blocked' });
     if (!product.category || product.category.isDeleted || product.category.isListed === false) {
       return res.json({ status: 'category' });
     }
-
     return res.json({ status: 'available' });
 
   } catch (err) {
     console.error('[getProductStatus]', err);
     return res.status(500).json({ status: 'error' });
+  }
+};
+
+
+export const getProductStock = async (req, res) => {
+  try {
+    const product = await Product.findOne({
+      _id:       req.params.id,
+      isDeleted: false,
+    })
+    .select('stock colorVariants isListed price')
+    .lean();
+
+    if (!product) {
+      return res.status(404).json({ success: false, message: 'Product not found' });
+    }
+
+    return res.json({
+      success:       true,
+      stock:         product.stock,
+      isListed:      product.isListed !== false,
+      price:         product.price,
+      colorVariants: (product.colorVariants || []).map(v => ({
+        name:  v.name,
+        stock: v.stock,
+      })),
+    });
+  } catch (err) {
+    console.error('[getProductStock]', err);
+    return res.status(500).json({ success: false, message: 'Failed to fetch stock' });
   }
 };

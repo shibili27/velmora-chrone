@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate"/>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Order Detail — Velmora Chroné Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --teal:       #2d8c84;
+      --teal-dark:  #1f6e67;
+      --teal-light: #e8f4f3;
+      --sidebar-w:  220px;
+      --bg:         #f2f4f3;
+      --white:      #ffffff;
+      --border:     #e2e6e4;
+      --text:       #1a1f1e;
+      --text-mid:   #5a6461;
+      --text-light: #9aa8a5;
+      --green:      #16a34a;
+      --green-bg:   #dcfce7;
+      --blue:       #2563eb;
+      --blue-bg:    #dbeafe;
+      --red:        #dc2626;
+      --red-bg:     #fee2e2;
+      --amber:      #d97706;
+      --amber-bg:   #fef3c7;
+      --purple:     #7c3aed;
+      --purple-bg:  #ede9fe;
+    }
+    html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--bg); color: var(--text); }
+    .layout { display: flex; min-height: 100vh; }
+
+    /* ── Sidebar ── */
+    .sidebar { width: var(--sidebar-w); background: var(--white); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; }
+    .sidebar__brand { padding: 24px 20px 18px; border-bottom: 1px solid var(--border); }
+    .sidebar__brand-name { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 600; letter-spacing: 0.06em; color: var(--text); line-height: 1.2; }
+    .sidebar__brand-sub  { font-size: 9px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-light); margin-top: 3px; }
+    .sidebar__nav { flex: 1; padding: 14px 0; overflow-y: auto; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 20px; font-size: 13px; font-weight: 500; color: var(--text-mid); text-decoration: none; transition: background 0.15s, color 0.15s; }
+    .nav-item:hover  { background: var(--teal-light); color: var(--teal); }
+    .nav-item.active { background: var(--teal-light); color: var(--teal); border-right: 3px solid var(--teal); }
+    .nav-item svg    { width: 16px; height: 16px; flex-shrink: 0; }
+    .sidebar__footer { padding: 16px 20px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+    .avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--teal); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 13px; font-weight: 600; flex-shrink: 0; }
+    .sidebar__footer-info { overflow: hidden; flex: 1; }
+    .sidebar__footer-name { font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sidebar__footer-role { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); }
+    .btn-logout { display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 6px; border: 1px solid #fecaca; background: var(--red-bg); color: var(--red); cursor: pointer; flex-shrink: 0; transition: background 0.15s; text-decoration: none; }
+    .btn-logout:hover { background: var(--red); color: #fff; border-color: var(--red); }
+    .btn-logout svg { width: 14px; height: 14px; }
+
+    /* ── Main ── */
+    .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+    .topbar { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 32px; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+    .topbar__left { display: flex; align-items: center; gap: 12px; }
+    .topbar__back { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; color: var(--text-mid); text-decoration: none; padding: 6px 10px; border-radius: 5px; transition: background 0.15s; }
+    .topbar__back:hover { background: var(--teal-light); color: var(--teal); }
+    .topbar__back svg { width: 14px; height: 14px; }
+    .topbar__title { font-size: 13px; font-weight: 500; color: var(--text-light); letter-spacing: 0.04em; }
+    .content { padding: 32px; flex: 1; }
+
+    /* ── Grid ── */
+    .detail-grid { display: grid; grid-template-columns: 1fr 320px; gap: 20px; align-items: start; }
+
+    /* ── Cards ── */
+    .card { background: var(--white); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; margin-bottom: 20px; }
+    .card__header { padding: 16px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .card__title  { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-mid); }
+    .card__body   { padding: 20px 22px; }
+
+    /* ── Order banner ── */
+    .order-banner { background: linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%); border-radius: 6px; padding: 22px 28px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
+    .order-banner__id { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 600; color: #fff; }
+    .order-banner__date { font-size: 11px; color: rgba(255,255,255,0.65); margin-top: 4px; }
+    .order-banner__right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+    .order-banner__amount { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; color: #fff; }
+    .order-banner__payment { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.6); }
+
+    /* ── Return alert banner ── */
+    .return-alert {
+      display: flex; align-items: flex-start; gap: 16px;
+      background: #fffbeb; border: 1.5px solid #fcd34d;
+      border-left: 4px solid var(--amber); border-radius: 6px;
+      padding: 18px 20px; margin-bottom: 20px;
+      animation: slideIn 0.35s ease;
+      position: relative;
+    }
+    @keyframes slideIn { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
+    .return-alert__icon { width:38px; height:38px; border-radius:50%; background:var(--amber-bg); display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
+    .return-alert__icon svg { width:18px; height:18px; color:var(--amber); }
+    .return-alert__body { flex:1; }
+    .return-alert__title { font-size:13px; font-weight:600; color:#92400e; margin-bottom:4px; display:flex; align-items:center; gap:8px; }
+    .return-alert__pulse { width:8px; height:8px; border-radius:50%; background:var(--amber); animation:pulse 1.5s ease-in-out infinite; }
+    @keyframes pulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.4; transform:scale(0.7); } }
+    .return-alert__reason { font-size:12px; color:#78350f; margin-bottom:14px; line-height:1.5; }
+    .return-alert__reason span { font-weight:600; }
+    .return-alert__actions { display:flex; gap:10px; flex-wrap:wrap; position:relative; }
+
+    .btn-return-accept { display:inline-flex; align-items:center; gap:6px; padding:8px 18px; border-radius:5px; font-family:'Jost',sans-serif; font-size:12.5px; font-weight:600; cursor:pointer; border:none; background:var(--green); color:#fff; transition:background 0.15s,transform 0.1s; position:relative; }
+    .btn-return-accept:hover { background:#15803d; transform:translateY(-1px); }
+    .btn-return-accept svg { width:13px; height:13px; }
+    .btn-return-reject { display:inline-flex; align-items:center; gap:6px; padding:8px 18px; border-radius:5px; font-family:'Jost',sans-serif; font-size:12.5px; font-weight:600; cursor:pointer; background:var(--white); color:var(--red); border:1.5px solid #fca5a5; transition:background 0.15s,border-color 0.15s,transform 0.1s; position:relative; }
+    .btn-return-reject:hover { background:var(--red-bg); border-color:var(--red); transform:translateY(-1px); }
+    .btn-return-reject svg { width:13px; height:13px; }
+
+    /* ── Return resolved banners ── */
+    .return-resolved { display:flex; align-items:center; gap:12px; padding:14px 20px; border-radius:6px; margin-bottom:20px; font-size:12.5px; font-weight:500; }
+    .return-resolved--accepted { background:var(--green-bg); border:1px solid #86efac; color:#14532d; }
+    .return-resolved--rejected { background:var(--red-bg);   border:1px solid #fca5a5; color:#7f1d1d; }
+    .return-resolved svg { width:16px; height:16px; flex-shrink:0; }
+
+    /* ═══════════════════════════════════════════
+       FLOATING CONFIRM CARDS
+    ═══════════════════════════════════════════ */
+    .float-card {
+      position: absolute;
+      top: calc(100% + 10px);
+      left: 0;
+      z-index: 400;
+      width: 340px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.08);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-6px) scale(0.97);
+      transition: opacity 0.18s ease, transform 0.18s ease;
+    }
+    .float-card.open {
+      opacity: 1;
+      pointer-events: all;
+      transform: translateY(0) scale(1);
+    }
+    /* Arrow pointing up */
+    .float-card::before {
+      content: '';
+      position: absolute;
+      top: -7px;
+      left: 20px;
+      width: 12px;
+      height: 12px;
+      background: var(--white);
+      border-left: 1px solid var(--border);
+      border-top: 1px solid var(--border);
+      transform: rotate(45deg);
+      border-radius: 2px 0 0 0;
+    }
+    .float-card--reject::before { left: 130px; border-color: var(--border); }
+
+    .float-card__header {
+      padding: 14px 16px 12px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .float-card__icon {
+      width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .float-card__icon--green { background: var(--green-bg); color: var(--green); }
+    .float-card__icon--red   { background: var(--red-bg);   color: var(--red);   }
+    .float-card__icon svg { width: 15px; height: 15px; }
+    .float-card__title   { font-size: 13px; font-weight: 700; color: var(--text); }
+    .float-card__sub     { font-size: 11px; color: var(--text-mid); margin-top: 2px; }
+
+    .float-card__body { padding: 12px 16px; }
+
+    /* Summary rows inside float card */
+    .fcs-row {
+      display: flex; justify-content: space-between; align-items: baseline;
+      padding: 5px 0; border-bottom: 1px solid var(--border);
+      font-size: 12px;
+    }
+    .fcs-row:last-child { border-bottom: none; }
+    .fcs-row__label { color: var(--text-mid); }
+    .fcs-row__val   { color: var(--text); font-weight: 500; max-width: 180px; text-align: right; }
+    .fcs-row__val--green  { color: var(--green); font-weight: 700; font-size: 13px; }
+    .fcs-row__val--amber  { color: var(--amber); font-style: italic; }
+
+    .float-card__reason-box {
+      background: #fffbeb; border: 1px solid #fde68a; border-radius: 5px;
+      padding: 8px 10px; font-size: 11.5px; color: #78350f;
+      line-height: 1.5; margin-bottom: 4px; font-style: italic;
+    }
+
+    /* Reject textarea */
+    .float-card__textarea {
+      width: 100%; padding: 8px 10px;
+      border: 1px solid var(--border); border-radius: 5px;
+      font-family: 'Jost', sans-serif; font-size: 12px; color: var(--text);
+      background: var(--bg); outline: none; resize: vertical; min-height: 68px;
+      transition: border-color 0.15s; margin-top: 8px;
+    }
+    .float-card__textarea:focus { border-color: var(--red); background: var(--white); }
+    .float-card__textarea::placeholder { color: var(--text-light); }
+    .float-card__textarea-label {
+      font-size: 10px; font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--text-mid); display: block; margin-top: 10px;
+    }
+
+    .float-card__footer {
+      padding: 10px 16px 14px;
+      display: flex; gap: 8px; justify-content: flex-end;
+    }
+    .fc-btn {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 7px 14px; border-radius: 5px; font-family: 'Jost', sans-serif;
+      font-size: 12px; font-weight: 600; cursor: pointer; border: none;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .fc-btn:active { transform: scale(0.97); }
+    .fc-btn svg { width: 11px; height: 11px; }
+    .fc-btn--cancel  { background: var(--bg); color: var(--text-mid); border: 1px solid var(--border); }
+    .fc-btn--cancel:hover { background: var(--border); }
+    .fc-btn--accept  { background: var(--green); color: #fff; }
+    .fc-btn--accept:hover { background: #15803d; }
+    .fc-btn--reject  { background: var(--red); color: #fff; }
+    .fc-btn--reject:hover { background: #b91c1c; }
+    .fc-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    /* ── Table ── */
+    table { width:100%; border-collapse:collapse; }
+    th { font-size:10px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-light); padding:10px 16px; text-align:left; border-bottom:1px solid var(--border); background:#f8faf9; }
+    td { padding:13px 16px; font-size:12.5px; color:var(--text); border-bottom:1px solid var(--border); vertical-align:middle; }
+    tbody tr:last-child td { border-bottom:none; }
+
+    /* ── Product cell ── */
+    .product-cell { display:flex; align-items:center; gap:10px; }
+    .product-thumb { width:40px; height:40px; border-radius:4px; background:var(--teal-light); object-fit:cover; flex-shrink:0; }
+    .product-thumb-placeholder { width:40px; height:40px; border-radius:4px; background:var(--teal-light); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .product-thumb-placeholder svg { width:16px; height:16px; color:var(--teal); }
+    .product-name { font-size:12.5px; font-weight:500; color:var(--text); }
+    .product-brand { font-size:10px; color:var(--text-light); margin-top:2px; }
+
+    /* ── Badges ── */
+    .badge { display:inline-flex; align-items:center; gap:5px; font-size:10px; font-weight:600; padding:3px 9px; border-radius:20px; white-space:nowrap; }
+    .badge::before { content:''; width:5px; height:5px; border-radius:50%; background:currentColor; flex-shrink:0; }
+    .badge--confirmed  { color:var(--teal);   background:var(--teal-light); }
+    .badge--processing { color:var(--blue);   background:var(--blue-bg);   }
+    .badge--dispatched { color:var(--purple); background:var(--purple-bg); }
+    .badge--delivered  { color:var(--green);  background:var(--green-bg);  }
+    .badge--cancelled  { color:var(--red);    background:var(--red-bg);    }
+    .badge--returned   { color:var(--amber);  background:var(--amber-bg);  }
+    .badge--active     { color:var(--green);  background:var(--green-bg);  }
+    .badge--item-cancelled { color:var(--red); background:var(--red-bg);   }
+
+    /* ── Pricing ── */
+    .price-row { display:flex; align-items:center; justify-content:space-between; padding:9px 0; border-bottom:1px solid var(--border); font-size:12.5px; }
+    .price-row:last-child { border-bottom:none; }
+    .price-row.total { font-weight:600; font-size:14px; padding-top:12px; }
+    .price-row__label { color:var(--text-mid); }
+    .price-row__val { color:var(--text); }
+    .price-row__val--green { color:var(--green); }
+    .price-row__val--teal  { color:var(--teal); font-family:'Cormorant Garamond',serif; font-size:18px; }
+
+    /* ── Info rows ── */
+    .info-row { display:flex; align-items:flex-start; gap:8px; padding:8px 0; border-bottom:1px solid var(--border); font-size:12.5px; }
+    .info-row:last-child { border-bottom:none; }
+    .info-row__label { width:110px; flex-shrink:0; color:var(--text-light); font-size:11px; font-weight:500; letter-spacing:0.04em; text-transform:uppercase; padding-top:1px; }
+    .info-row__val { flex:1; color:var(--text); line-height:1.5; }
+
+    /* ── Status form ── */
+    .status-form { display:flex; flex-direction:column; gap:12px; }
+    .status-form label { font-size:11px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color:var(--text-mid); display:block; margin-bottom:5px; }
+    .status-form select, .status-form textarea { width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:5px; font-family:'Jost',sans-serif; font-size:12.5px; color:var(--text); background:var(--bg); outline:none; transition:border-color 0.15s; }
+    .status-form select:focus, .status-form textarea:focus { border-color:var(--teal); background:var(--white); }
+    .status-form textarea { resize:vertical; min-height:70px; }
+    .btn { display:inline-flex; align-items:center; gap:6px; padding:9px 16px; border-radius:5px; font-family:'Jost',sans-serif; font-size:12.5px; font-weight:600; cursor:pointer; border:none; transition:background 0.15s; text-decoration:none; }
+    .btn--teal    { background:var(--teal); color:#fff; width:100%; justify-content:center; }
+    .btn--teal:hover { background:var(--teal-dark); }
+    .btn--outline { background:var(--white); color:var(--text-mid); border:1px solid var(--border); }
+    .btn--outline:hover { background:var(--bg); }
+    .btn svg { width:13px; height:13px; }
+
+    /* ── Timeline ── */
+    .timeline { padding:6px 0; }
+    .timeline-item { display:flex; gap:12px; padding:10px 0; position:relative; }
+    .timeline-item:not(:last-child)::before { content:''; position:absolute; left:7px; top:28px; bottom:-4px; width:1px; background:var(--border); }
+    .timeline-dot { width:16px; height:16px; border-radius:50%; flex-shrink:0; margin-top:2px; border:2px solid var(--white); box-shadow:0 0 0 1px var(--border); }
+    .timeline-dot--teal   { background:var(--teal);   box-shadow:0 0 0 1px var(--teal);   }
+    .timeline-dot--green  { background:var(--green);  box-shadow:0 0 0 1px var(--green);  }
+    .timeline-dot--blue   { background:var(--blue);   box-shadow:0 0 0 1px var(--blue);   }
+    .timeline-dot--amber  { background:var(--amber);  box-shadow:0 0 0 1px var(--amber);  }
+    .timeline-dot--red    { background:var(--red);    box-shadow:0 0 0 1px var(--red);    }
+    .timeline-dot--purple { background:var(--purple); box-shadow:0 0 0 1px var(--purple); }
+    .timeline-dot--gray   { background:var(--border); }
+    .timeline-text { font-size:12px; color:var(--text-mid); line-height:1.4; }
+    .timeline-text strong { color:var(--text); font-weight:600; }
+    .timeline-time { font-size:10px; color:var(--text-light); margin-top:3px; }
+
+    /* ── Toast ── */
+    .toast { position:fixed; bottom:24px; right:24px; background:var(--text); color:#fff; padding:12px 18px; border-radius:6px; font-size:12.5px; font-weight:500; z-index:9999; transform:translateY(80px); opacity:0; transition:transform 0.25s,opacity 0.25s; pointer-events:none; }
+    .toast.show { transform:translateY(0); opacity:1; }
+    .toast--success { background:var(--green); }
+    .toast--error   { background:var(--red); }
+
+    /* dim backdrop when a float-card is open */
+    .fc-backdrop {
+      position: fixed; inset: 0; z-index: 300;
+      background: transparent;
+      display: none;
+    }
+    .fc-backdrop.active { display: block; }
+
+    .page-footer { text-align:center; padding:20px 32px; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-light); border-top:1px solid var(--border); }
+  </style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar">
+    <div class="sidebar__brand">
+      <div class="sidebar__brand-name">Velmora<br>Chroné</div>
+      <div class="sidebar__brand-sub">Admin Dashboard</div>
+    </div>
+    <nav class="sidebar__nav">
+      <a href="/admin/dashboard" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Dashboard
+      </a>
+      <a href="/admin/orders" class="nav-item active">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+        Orders
+      </a>
+      <a href="/admin/products" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"/></svg>
+        Products
+      </a>
+      <a href="/admin/reviews" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+        Rating/Review
+      </a>
+      <a href="/admin/customers" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        Customers
+      </a>
+      <a href="/admin/coupons" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+        Coupons
+      </a>
+      <a href="/admin/categories" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+        Categories
+      </a>
+      <a href="/admin/brands" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 4H7a2 2 0 01-2-2V6a2 2 0 012-2h5l2 2h3a2 2 0 012 2v12a2 2 0 01-2 2z"/></svg>
+        Brands
+      </a>
+      <a href="/admin/refunds" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
+        Refund/Return
+      </a>
+      <a href="/admin/banners" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+        Banner
+      </a>
+      <a href="/admin/referrals" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+        Referral
+      </a>
+    </nav>
+    <div class="sidebar__footer">
+      <div class="avatar"><%= adminName ? adminName.charAt(0).toUpperCase() : 'A' %></div>
+      <div class="sidebar__footer-info">
+        <div class="sidebar__footer-name"><%= adminName || 'Admin' %></div>
+        <div class="sidebar__footer-role"><%= adminRole || 'Administrator' %></div>
+      </div>
+      <a href="/admin/logout" class="btn-logout" title="Logout">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+      </a>
+    </div>
+  </aside>
+
+  <!-- ── Main ── -->
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar__left">
+        <a href="/admin/orders" class="topbar__back">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+          Orders
+        </a>
+        <span style="color:var(--border)">/</span>
+        <span class="topbar__title"><%= order.orderNumber || order._id %></span>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- Order banner -->
+      <div class="order-banner">
+        <div>
+          <div class="order-banner__id"><%= order.orderNumber || '#' + order._id.toString().slice(-6).toUpperCase() %></div>
+          <div class="order-banner__date">
+            Placed on <%= new Date(order.createdAt).toLocaleDateString('en-IN', { day:'2-digit', month:'long', year:'numeric' }) %>
+            at <%= new Date(order.createdAt).toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' }) %>
+          </div>
+        </div>
+        <div class="order-banner__right">
+          <div class="order-banner__amount">₹<%= order.pricing.grandTotal.toLocaleString('en-IN') %></div>
+          <div class="order-banner__payment"><%= order.paymentMethod %></div>
+        </div>
+      </div>
+
+      <%
+        const rStatus = order.returnStatus || 'none';
+      %>
+
+      <!-- ── RETURN REQUEST ALERT ── -->
+      <% if (rStatus === 'pending') { %>
+      <div class="return-alert" id="returnAlert">
+        <div class="return-alert__icon">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
+        </div>
+        <div class="return-alert__body">
+          <div class="return-alert__title">
+            <div class="return-alert__pulse"></div>
+            Return Request Pending — Action Required
+          </div>
+          <div class="return-alert__reason">
+            Customer reason:&nbsp;<span>"<%= order.returnReason || 'No reason provided' %>"</span>
+            <% if (order.returnRequestedAt) { %>
+              &nbsp;·&nbsp;Requested on <%= new Date(order.returnRequestedAt).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' }) %>
+            <% } %>
+          </div>
+
+          <!-- Action buttons + floating cards anchored here -->
+          <div class="return-alert__actions" id="returnActions">
+
+            <!-- ACCEPT button -->
+            <button class="btn-return-accept" id="btnAccept" onclick="toggleAcceptCard(event)">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+              Accept Return
+            </button>
+
+            <!-- REJECT button -->
+            <button class="btn-return-reject" id="btnReject" onclick="toggleRejectCard(event)">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+              Reject Return
+            </button>
+
+            <!-- ═══ FLOATING CARD: ACCEPT ═══ -->
+            <div class="float-card" id="acceptCard">
+              <div class="float-card__header">
+                <div class="float-card__icon float-card__icon--green">
+                  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                </div>
+                <div>
+                  <div class="float-card__title">Confirm Accept Return</div>
+                  <div class="float-card__sub">Review the details below before proceeding</div>
+                </div>
+              </div>
+              <div class="float-card__body">
+                <div class="fcs-row">
+                  <span class="fcs-row__label">Order</span>
+                  <span class="fcs-row__val"><%= order.orderNumber || order._id %></span>
+                </div>
+                <div class="fcs-row">
+                  <span class="fcs-row__label">Customer</span>
+                  <span class="fcs-row__val"><%= order.user ? order.user.name : 'Unknown' %></span>
+                </div>
+                <div class="fcs-row">
+                  <span class="fcs-row__label">Items</span>
+                  <span class="fcs-row__val"><%= order.items.filter(i => i.status === 'active').length %> item(s)</span>
+                </div>
+                <div class="fcs-row">
+                  <span class="fcs-row__label">Payment method</span>
+                  <span class="fcs-row__val"><%= order.paymentMethod %></span>
+                </div>
+                <div class="fcs-row">
+                  <span class="fcs-row__label">Refund amount</span>
+                  <span class="fcs-row__val fcs-row__val--green">₹<%= order.pricing.grandTotal.toLocaleString('en-IN') %></span>
+                </div>
+                <% if (order.returnReason) { %>
+                <div style="margin-top:10px">
+                  <div style="font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-mid);margin-bottom:5px;">Return Reason</div>
+                  <div class="float-card__reason-box">"<%= order.returnReason %>"</div>
+                </div>
+                <% } %>
+              </div>
+              <div class="float-card__footer">
+                <button class="fc-btn fc-btn--cancel" onclick="closeAllCards()">Cancel</button>
+                <button class="fc-btn fc-btn--accept" id="acceptOkBtn" onclick="confirmAccept()">
+                  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                  Yes, Accept
+                </button>
+              </div>
+            </div>
+
+            <!-- ═══ FLOATING CARD: REJECT ═══ -->
+            <div class="float-card float-card--reject" id="rejectCard">
+              <div class="float-card__header">
+                <div class="float-card__icon float-card__icon--red">
+                  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                </div>
+                <div>
+                  <div class="float-card__title">Confirm Reject Return</div>
+                  <div class="float-card__sub">Customer will be notified of your decision</div>
+                </div>
+              </div>
+              <div class="float-card__body">
+                <div class="fcs-row">
+                  <span class="fcs-row__label">Order</span>
+                  <span class="fcs-row__val"><%= order.orderNumber || order._id %></span>
+                </div>
+                <div class="fcs-row">
+                  <span class="fcs-row__label">Customer</span>
+                  <span class="fcs-row__val"><%= order.user ? order.user.name : 'Unknown' %></span>
+                </div>
+                <div class="fcs-row">
+                  <span class="fcs-row__label">Refund amount</span>
+                  <span class="fcs-row__val" style="color:var(--red);">₹<%= order.pricing.grandTotal.toLocaleString('en-IN') %> — Not refunded</span>
+                </div>
+                <% if (order.returnReason) { %>
+                <div class="fcs-row">
+                  <span class="fcs-row__label">Customer reason</span>
+                  <span class="fcs-row__val fcs-row__val--amber">"<%= order.returnReason %>"</span>
+                </div>
+                <% } %>
+                <label class="float-card__textarea-label">Rejection Reason <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-light)">(optional)</span></label>
+                <textarea class="float-card__textarea" id="rejectReasonInput" placeholder="e.g. Item shows signs of use / not covered by return policy…"></textarea>
+              </div>
+              <div class="float-card__footer">
+                <button class="fc-btn fc-btn--cancel" onclick="closeAllCards()">Cancel</button>
+                <button class="fc-btn fc-btn--reject" id="rejectOkBtn" onclick="confirmReject()">
+                  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                  Reject
+                </button>
+              </div>
+            </div>
+
+          </div><!-- /return-alert__actions -->
+        </div>
+      </div>
+
+      <% } else if (rStatus === 'accepted') { %>
+      <div class="return-resolved return-resolved--accepted">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        Return request was <strong>&nbsp;accepted&nbsp;</strong> — refund has been initiated.
+      </div>
+
+      <% } else if (rStatus === 'rejected') { %>
+      <div class="return-resolved return-resolved--rejected">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        Return request was <strong>&nbsp;rejected.</strong>
+        <% if (order.returnRejectionReason) { %>&nbsp;Reason: <%= order.returnRejectionReason %><% } %>
+      </div>
+      <% } %>
+
+      <!-- transparent backdrop to close cards on outside click -->
+      <div class="fc-backdrop" id="fcBackdrop" onclick="closeAllCards()"></div>
+
+      <!-- ── Detail grid ── -->
+      <div class="detail-grid">
+
+        <!-- Left column -->
+        <div>
+
+          <!-- Items -->
+          <div class="card">
+            <div class="card__header">
+              <span class="card__title">Order Items (<%= order.items.length %>)</span>
+              <span class="badge badge--<%= order.orderStatus %>"><%= order.orderStatus.charAt(0).toUpperCase() + order.orderStatus.slice(1) %></span>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Product</th><th>Price</th><th>Qty</th><th>Total</th><th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% order.items.forEach(function(item) { %>
+                <tr>
+                  <td>
+                    <div class="product-cell">
+                      <% if (item.image) { %>
+                        <img src="<%= item.image %>" alt="<%= item.name %>" class="product-thumb"/>
+                      <% } else { %>
+                        <div class="product-thumb-placeholder">
+                          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"/></svg>
+                        </div>
+                      <% } %>
+                      <div>
+                        <div class="product-name"><%= item.name %></div>
+                        <% if (item.brand) { %><div class="product-brand"><%= item.brand %></div><% } %>
+                      </div>
+                    </div>
+                  </td>
+                  <td>₹<%= item.price.toLocaleString('en-IN') %></td>
+                  <td><%= item.quantity %></td>
+                  <td style="font-weight:600">₹<%= item.totalPrice.toLocaleString('en-IN') %></td>
+                  <td>
+                    <span class="badge badge--<%= item.status === 'active' ? 'active' : 'item-cancelled' %>">
+                      <%= item.status === 'active' ? 'Active' : 'Cancelled' %>
+                    </span>
+                  </td>
+                </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pricing summary -->
+          <div class="card">
+            <div class="card__header"><span class="card__title">Pricing Breakdown</span></div>
+            <div class="card__body">
+              <div class="price-row">
+                <span class="price-row__label">Subtotal</span>
+                <span class="price-row__val">₹<%= order.pricing.subtotal.toLocaleString('en-IN') %></span>
+              </div>
+              <% if (order.pricing.itemDiscount > 0) { %>
+              <div class="price-row">
+                <span class="price-row__label">Item Discount</span>
+                <span class="price-row__val price-row__val--green">− ₹<%= order.pricing.itemDiscount.toLocaleString('en-IN') %></span>
+              </div>
+              <% } %>
+              <% if (order.pricing.couponDiscount > 0) { %>
+              <div class="price-row">
+                <span class="price-row__label">Coupon Discount</span>
+                <span class="price-row__val price-row__val--green">− ₹<%= order.pricing.couponDiscount.toLocaleString('en-IN') %></span>
+              </div>
+              <% } %>
+              <% if (order.pricing.tax > 0) { %>
+              <div class="price-row">
+                <span class="price-row__label">Tax</span>
+                <span class="price-row__val">₹<%= order.pricing.tax.toLocaleString('en-IN') %></span>
+              </div>
+              <% } %>
+              <div class="price-row">
+                <span class="price-row__label">Shipping</span>
+                <span class="price-row__val"><%= order.pricing.shipping > 0 ? '₹' + order.pricing.shipping.toLocaleString('en-IN') : 'Free' %></span>
+              </div>
+              <div class="price-row total">
+                <span class="price-row__label" style="color:var(--text)">Grand Total</span>
+                <span class="price-row__val price-row__val--teal">₹<%= order.pricing.grandTotal.toLocaleString('en-IN') %></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Shipping address -->
+          <div class="card">
+            <div class="card__header"><span class="card__title">Shipping Address</span></div>
+            <div class="card__body">
+              <div class="info-row">
+                <span class="info-row__label">Name</span>
+                <span class="info-row__val" style="font-weight:500"><%= order.shippingAddress.fullName %></span>
+              </div>
+              <div class="info-row">
+                <span class="info-row__label">Phone</span>
+                <span class="info-row__val"><%= order.shippingAddress.phone %></span>
+              </div>
+              <div class="info-row">
+                <span class="info-row__label">Address</span>
+                <span class="info-row__val"><%= order.shippingAddress.line1 %></span>
+              </div>
+              <div class="info-row">
+                <span class="info-row__label">City</span>
+                <span class="info-row__val"><%= order.shippingAddress.city %></span>
+              </div>
+              <% if (order.shippingAddress.state) { %>
+              <div class="info-row">
+                <span class="info-row__label">State</span>
+                <span class="info-row__val"><%= order.shippingAddress.state %></span>
+              </div>
+              <% } %>
+              <div class="info-row">
+                <span class="info-row__label">Pincode</span>
+                <span class="info-row__val"><%= order.shippingAddress.pincode %></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Notes -->
+          <% if (order.cancellationNote || order.returnReason) { %>
+          <div class="card">
+            <div class="card__header"><span class="card__title">Notes</span></div>
+            <div class="card__body">
+              <% if (order.cancellationNote) { %>
+              <div class="info-row">
+                <span class="info-row__label">Cancellation</span>
+                <span class="info-row__val"><%= order.cancellationNote %></span>
+              </div>
+              <% } %>
+              <% if (order.returnReason) { %>
+              <div class="info-row">
+                <span class="info-row__label">Return Reason</span>
+                <span class="info-row__val"><%= order.returnReason %></span>
+              </div>
+              <% } %>
+            </div>
+          </div>
+          <% } %>
+
+        </div><!-- /left -->
+
+        <!-- Right column -->
+        <div>
+
+          <!-- Customer -->
+          <div class="card">
+            <div class="card__header"><span class="card__title">Customer</span></div>
+            <div class="card__body">
+              <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+                <div style="width:42px;height:42px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;font-weight:600;flex-shrink:0">
+                  <%= order.user && order.user.name ? order.user.name.charAt(0).toUpperCase() : '?' %>
+                </div>
+                <div>
+                  <div style="font-size:13px;font-weight:600;color:var(--text)"><%= order.user ? order.user.name : 'Deleted User' %></div>
+                  <div style="font-size:11px;color:var(--text-light);margin-top:2px"><%= order.user ? order.user.email : '' %></div>
+                </div>
+              </div>
+              <% if (order.user) { %>
+              <div class="info-row">
+                <span class="info-row__label">Member since</span>
+                <span class="info-row__val"><%= new Date(order.user.createdAt).toLocaleDateString('en-IN', { month:'short', year:'numeric' }) %></span>
+              </div>
+              <div class="info-row">
+                <span class="info-row__label">Status</span>
+                <span class="info-row__val">
+                  <% if (order.user.isBlocked) { %>
+                    <span class="badge badge--cancelled">Blocked</span>
+                  <% } else { %>
+                    <span class="badge badge--delivered">Active</span>
+                  <% } %>
+                </span>
+              </div>
+              <% } %>
+            </div>
+          </div>
+
+          <!-- Update status -->
+          <div class="card">
+            <div class="card__header"><span class="card__title">Update Status</span></div>
+            <div class="card__body">
+              <div class="status-form">
+                <div>
+                  <label>Order Status</label>
+                  <select id="statusSelect">
+                    <option value="confirmed"  <%= order.orderStatus === 'confirmed'  ? 'selected' : '' %>>Confirmed</option>
+                    <option value="processing" <%= order.orderStatus === 'processing' ? 'selected' : '' %>>Processing</option>
+                    <option value="dispatched" <%= order.orderStatus === 'dispatched' ? 'selected' : '' %>>Dispatched</option>
+                    <option value="delivered"  <%= order.orderStatus === 'delivered'  ? 'selected' : '' %>>Delivered</option>
+                    <option value="cancelled"  <%= order.orderStatus === 'cancelled'  ? 'selected' : '' %>>Cancelled</option>
+                    <option value="returned"   <%= order.orderStatus === 'returned'   ? 'selected' : '' %>>Returned</option>
+                  </select>
+                </div>
+                <div>
+                  <label>Note (optional)</label>
+                  <textarea id="statusNote" placeholder="Add a note for this status change…"><%= order.cancellationNote || '' %></textarea>
+                </div>
+                <button class="btn btn--teal" onclick="saveStatus()">
+                  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                  Update Status
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Timeline -->
+          <div class="card">
+            <div class="card__header"><span class="card__title">Order Timeline</span></div>
+            <div class="card__body">
+              <div class="timeline">
+                <%
+                  const statusFlow   = ['confirmed','processing','dispatched','delivered'];
+                  const currentIdx   = statusFlow.indexOf(order.orderStatus);
+                  const dotColors    = { confirmed:'teal', processing:'blue', dispatched:'purple', delivered:'green', cancelled:'red', returned:'amber' };
+                  const statusLabels = { confirmed:'Order Confirmed', processing:'Processing', dispatched:'Out for Delivery', delivered:'Delivered', cancelled:'Cancelled', returned:'Returned' };
+                %>
+                <% if (order.orderStatus === 'cancelled' || order.orderStatus === 'returned') { %>
+                  <div class="timeline-item">
+                    <div class="timeline-dot timeline-dot--teal"></div>
+                    <div>
+                      <div class="timeline-text"><strong>Order Placed</strong></div>
+                      <div class="timeline-time"><%= new Date(order.createdAt).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' }) %></div>
+                    </div>
+                  </div>
+                  <div class="timeline-item">
+                    <div class="timeline-dot timeline-dot--<%= dotColors[order.orderStatus] %>"></div>
+                    <div>
+                      <div class="timeline-text"><strong><%= statusLabels[order.orderStatus] %></strong></div>
+                      <div class="timeline-time"><%= new Date(order.updatedAt).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' }) %></div>
+                    </div>
+                  </div>
+                  <% if (rStatus === 'pending') { %>
+                  <div class="timeline-item">
+                    <div class="timeline-dot timeline-dot--amber"></div>
+                    <div>
+                      <div class="timeline-text"><strong>Return Requested</strong> — awaiting admin review</div>
+                      <div class="timeline-time"><%= order.returnRequestedAt ? new Date(order.returnRequestedAt).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' }) : '' %></div>
+                    </div>
+                  </div>
+                  <% } else if (rStatus === 'accepted') { %>
+                  <div class="timeline-item">
+                    <div class="timeline-dot timeline-dot--green"></div>
+                    <div>
+                      <div class="timeline-text"><strong>Return Accepted</strong> — refund initiated</div>
+                    </div>
+                  </div>
+                  <% } else if (rStatus === 'rejected') { %>
+                  <div class="timeline-item">
+                    <div class="timeline-dot timeline-dot--red"></div>
+                    <div>
+                      <div class="timeline-text"><strong>Return Rejected</strong></div>
+                    </div>
+                  </div>
+                  <% } %>
+                <% } else { %>
+                  <% statusFlow.forEach(function(s, i) { %>
+                    <div class="timeline-item">
+                      <div class="timeline-dot timeline-dot--<%= i <= currentIdx ? dotColors[s] : 'gray' %>"></div>
+                      <div>
+                        <div class="timeline-text" style="<%= i > currentIdx ? 'opacity:0.4' : '' %>">
+                          <strong><%= statusLabels[s] %></strong>
+                        </div>
+                        <% if (i === 0) { %>
+                          <div class="timeline-time"><%= new Date(order.createdAt).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' }) %></div>
+                        <% } else if (i === currentIdx) { %>
+                          <div class="timeline-time"><%= new Date(order.updatedAt).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' }) %></div>
+                        <% } else if (i < currentIdx) { %>
+                          <div class="timeline-time">Completed</div>
+                        <% } else { %>
+                          <div class="timeline-time" style="opacity:0.4">Pending</div>
+                        <% } %>
+                      </div>
+                    </div>
+                  <% }) %>
+                <% } %>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /right -->
+      </div><!-- /detail-grid -->
+
+    </div><!-- /.content -->
+    <footer class="page-footer">© 2026 Velmora Chroné. All Rights Reserved. Admin Panel.</footer>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const ORDER_ID = '<%= order._id %>';
+
+  /* ─────────────────────────────────────────
+     FLOAT CARD OPEN / CLOSE
+  ───────────────────────────────────────── */
+  function closeAllCards() {
+    document.getElementById('acceptCard').classList.remove('open');
+    document.getElementById('rejectCard').classList.remove('open');
+    document.getElementById('fcBackdrop').classList.remove('active');
+  }
+
+  function toggleAcceptCard(e) {
+    e.stopPropagation();
+    const ac = document.getElementById('acceptCard');
+    const rc = document.getElementById('rejectCard');
+    const bd = document.getElementById('fcBackdrop');
+    const isOpen = ac.classList.contains('open');
+    rc.classList.remove('open');
+    if (isOpen) {
+      ac.classList.remove('open');
+      bd.classList.remove('active');
+    } else {
+      ac.classList.add('open');
+      bd.classList.add('active');
+    }
+  }
+
+  function toggleRejectCard(e) {
+    e.stopPropagation();
+    const ac = document.getElementById('acceptCard');
+    const rc = document.getElementById('rejectCard');
+    const bd = document.getElementById('fcBackdrop');
+    const isOpen = rc.classList.contains('open');
+    ac.classList.remove('open');
+    if (isOpen) {
+      rc.classList.remove('open');
+      bd.classList.remove('active');
+    } else {
+      rc.classList.add('open');
+      bd.classList.add('active');
+      setTimeout(() => document.getElementById('rejectReasonInput').focus(), 160);
+    }
+  }
+
+  /* Stop clicks inside cards from bubbling to backdrop */
+  ['acceptCard','rejectCard'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('click', e => e.stopPropagation());
+  });
+
+  /* Escape key closes */
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeAllCards();
+  });
+
+  /* ─────────────────────────────────────────
+     CONFIRM ACCEPT
+  ───────────────────────────────────────── */
+  async function confirmAccept() {
+    const btn = document.getElementById('acceptOkBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:11px;height:11px;animation:spin .6s linear infinite"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Processing…';
+    closeAllCards();
+    await sendReturnDecision('accepted', '');
+    btn.disabled = false;
+    btn.innerHTML = '✓ Yes, Accept';
+  }
+
+  /* ─────────────────────────────────────────
+     CONFIRM REJECT
+  ───────────────────────────────────────── */
+  async function confirmReject() {
+    const reason = document.getElementById('rejectReasonInput').value.trim();
+    const btn    = document.getElementById('rejectOkBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:11px;height:11px;animation:spin .6s linear infinite"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Processing…';
+    closeAllCards();
+    await sendReturnDecision('rejected', reason);
+    btn.disabled = false;
+    btn.innerHTML = '✕ Reject';
+  }
+
+  /* ─────────────────────────────────────────
+     SHARED PATCH
+  ───────────────────────────────────────── */
+  async function sendReturnDecision(decision, rejectionReason) {
+    try {
+      const res  = await fetch(`/admin/orders/${ORDER_ID}/return`, {
+        method : 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body   : JSON.stringify({ decision, rejectionReason }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast(
+          decision === 'accepted' ? '✓ Return accepted — refund initiated' : '✕ Return rejected',
+          decision === 'accepted' ? 'success' : 'error'
+        );
+        setTimeout(() => location.reload(), 1500);
+      } else {
+        showToast(data.message || 'Action failed', 'error');
+      }
+    } catch {
+      showToast('Network error — please try again', 'error');
+    }
+  }
+
+  /* ─────────────────────────────────────────
+     STATUS UPDATE
+  ───────────────────────────────────────── */
+  async function saveStatus() {
+    const status = document.getElementById('statusSelect').value;
+    const note   = document.getElementById('statusNote').value;
+    try {
+      const res  = await fetch(`/admin/orders/${ORDER_ID}/status`, {
+        method : 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body   : JSON.stringify({ status, note }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast('Status updated successfully', 'success');
+        setTimeout(() => location.reload(), 1200);
+      } else {
+        showToast(data.message || 'Update failed', 'error');
+      }
+    } catch {
+      showToast('Network error', 'error');
+    }
+  }
+
+  /* ─────────────────────────────────────────
+     TOAST
+  ───────────────────────────────────────── */
+  function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className   = `toast toast--${type} show`;
+    setTimeout(() => { t.className = 'toast'; }, 3200);
+  }
+
+  /* spinner keyframe */
+  const style = document.createElement('style');
+  style.textContent = '@keyframes spin { to { transform: rotate(360deg); } }';
+  document.head.appendChild(style);
+</script>
+</body>
+</html>

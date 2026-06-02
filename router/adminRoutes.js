@@ -11,10 +11,15 @@ import {
   blockProduct,  unblockProduct,
   getBrands,     addBrand,    editBrand,    deleteBrand,
 } from '../controller/adimconrtoller/adminController.js';
+import {
+  listOrders,
+  getOrderDetail,
+  updateOrderStatus,
+  handleReturnRequest,          
+} from '../controller/adimconrtoller/orderController.js';
 
 const router = express.Router();
 
-//login get
 router.get('/login', isGuest, (req, res) => {
   res.render('admin/login', {
     title:      'Admin Sign In — Velmora Chroné',
@@ -25,7 +30,6 @@ router.get('/login', isGuest, (req, res) => {
   });
 });
 
-//login POST
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
@@ -83,7 +87,6 @@ router.post('/login', async (req, res) => {
   }
 });
 
-//logout
 router.get('/logout', isAuthenticated, (req, res) => {
   req.session.destroy((err) => {
     if (err) console.error('Logout error:', err);
@@ -92,10 +95,8 @@ router.get('/logout', isAuthenticated, (req, res) => {
   });
 });
 
-//dashboard
 router.get('/dashboard', isAuthenticated, getDashboard);
 
-//customers
 router.get('/customers', isAuthenticated, async (req, res) => {
   try {
     const page   = parseInt(req.query.page) || 1;
@@ -167,24 +168,25 @@ router.post('/customers/:id/unblock', isAuthenticated, async (req, res) => {
   }
 });
 
-//categories
-router.get('/categories', isAuthenticated, getCategories);
+router.get('/categories',isAuthenticated, getCategories);
 router.post('/categories/add',isAuthenticated, addCategory);
 router.post('/categories/:id/edit',isAuthenticated, editCategory);
-router.post('/categories/:id/delete',isAuthenticated, deleteCategory);
+router.post('/categories/:id/delete', isAuthenticated, deleteCategory);
 
-//products 
-router.get('/products',  isAuthenticated, getProducts);
-router.post('/products/add',  isAuthenticated, addProduct);
+router.get('/products',isAuthenticated, getProducts);
+router.post('/products/add',isAuthenticated, addProduct);
 router.post('/products/:id/edit',isAuthenticated, editProduct);
-router.post('/products/:id/delete',isAuthenticated, deleteProduct);
-router.post('/products/:id/block', isAuthenticated, blockProduct);
+router.post('/products/:id/delete',  isAuthenticated, deleteProduct);
+router.post('/products/:id/block',isAuthenticated, blockProduct);
 router.post('/products/:id/unblock', isAuthenticated, unblockProduct);
 
-//brands
-router.get('/brands',  isAuthenticated, getBrands);
-router.post('/brands/add', isAuthenticated, addBrand);
+router.get('/brands',isAuthenticated, getBrands);
+router.post('/brands/add',isAuthenticated, addBrand);
 router.post('/brands/:id/edit',isAuthenticated, editBrand);
-router.post('/brands/:id/delete',isAuthenticated, deleteBrand);
+router.post('/brands/:id/delete', isAuthenticated, deleteBrand);
 
+router.get('/orders',isAuthenticated, listOrders);
+router.get('/orders/:id',isAuthenticated, getOrderDetail);
+router.patch('/orders/:id/status',isAuthenticated, updateOrderStatus);
+router.patch('/orders/:id/return',isAuthenticated, handleReturnRequest);  
 export default router;

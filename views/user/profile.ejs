@@ -19,16 +19,12 @@
     ::-webkit-scrollbar-track { background: #111110; }
     ::-webkit-scrollbar-thumb { background: #c9a96e; }
 
-    /* ── GRAIN OVERLAY ── */
     body::before {
       content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
       opacity: .016;
     }
 
-    /* ═══════════════════════════════════════
-       NAV
-    ═══════════════════════════════════════ */
     .nav-root {
       position: fixed; top: 0; left: 0; right: 0; z-index: 200;
       background: rgba(17,17,16,0.92);
@@ -50,46 +46,23 @@
       color: rgba(245,242,235,0.45); text-decoration: none;
       transition: color 0.2s; position: relative; padding-bottom: 2px;
     }
-    .nav-link::after {
-      content: ''; position: absolute; bottom: -2px; left: 0; width: 0; height: 1px;
-      background: #c9a96e; transition: width 0.3s;
-    }
+    .nav-link::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 0; height: 1px; background: #c9a96e; transition: width 0.3s; }
     .nav-link:hover { color: rgba(245,242,235,0.9); }
     .nav-link:hover::after { width: 100%; }
     .nav-link.active { color: #c9a96e; }
     .nav-link.active::after { width: 100%; }
-
     .nav-icon-btn {
       position: relative; width: 36px; height: 36px;
       display: flex; align-items: center; justify-content: center;
-      color: rgba(245,242,235,0.5);
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(201,169,110,0.12);
-      border-radius: 10px; cursor: pointer; text-decoration: none;
-      transition: color 0.22s, background 0.22s, border-color 0.22s,
-        transform 0.18s cubic-bezier(.34,1.56,.64,1), box-shadow 0.22s;
-      transform-style: preserve-3d;
-      box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 2px 6px rgba(0,0,0,0.35), 0 0 0 0 rgba(201,169,110,0);
+      color: rgba(245,242,235,0.5); background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(201,169,110,0.12); border-radius: 10px; cursor: pointer; text-decoration: none;
+      transition: color 0.22s, background 0.22s, border-color 0.22s, transform 0.18s cubic-bezier(.34,1.56,.64,1), box-shadow 0.22s;
+      box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 2px 6px rgba(0,0,0,0.35);
     }
-    .nav-icon-btn::before {
-      content: ''; position: absolute; inset: 0; border-radius: 10px;
-      background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 55%);
-      pointer-events: none;
-    }
-    .nav-icon-btn:hover {
-      color: #c9a96e; background: rgba(201,169,110,0.08); border-color: rgba(201,169,110,0.35);
-      transform: translateY(-2px) scale(1.06);
-      box-shadow: 0 1px 0 rgba(255,255,255,0.06) inset, 0 6px 20px rgba(0,0,0,0.5), 0 0 14px rgba(201,169,110,0.15);
-    }
-    .nav-icon-btn:active { transform: translateY(0px) scale(0.97); box-shadow: 0 1px 4px rgba(0,0,0,0.4); }
+    .nav-icon-btn::before { content: ''; position: absolute; inset: 0; border-radius: 10px; background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 55%); pointer-events: none; }
+    .nav-icon-btn:hover { color: #c9a96e; background: rgba(201,169,110,0.08); border-color: rgba(201,169,110,0.35); transform: translateY(-2px) scale(1.06); box-shadow: 0 1px 0 rgba(255,255,255,0.06) inset, 0 6px 20px rgba(0,0,0,0.5), 0 0 14px rgba(201,169,110,0.15); }
     .nav-icon-btn.active-icon { color: #c9a96e; border-color: rgba(201,169,110,0.3); background: rgba(201,169,110,0.06); }
-    .cart-badge {
-      position: absolute; top: -5px; right: -5px; width: 14px; height: 14px; border-radius: 50%;
-      background: linear-gradient(135deg, #d4b97e, #c9a96e);
-      font-size: 0.38rem; font-weight: 600; color: #111110;
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 2px 6px rgba(201,169,110,0.4);
-    }
+    .cart-badge { position: absolute; top: -5px; right: -5px; width: 14px; height: 14px; border-radius: 50%; background: linear-gradient(135deg, #d4b97e, #c9a96e); font-size: 0.38rem; font-weight: 600; color: #111110; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(201,169,110,0.4); }
     .hamburger { display: flex; flex-direction: column; gap: 5px; background: none; border: none; cursor: pointer; padding: 3px; }
     .hamburger span { display: block; width: 20px; height: 1px; background: rgba(245,242,235,0.6); transition: transform 0.3s, opacity 0.3s; }
     .hamburger.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
@@ -99,420 +72,165 @@
     .mobile-menu.open { display: flex; }
     .mobile-menu .nav-link { font-size: 0.68rem; padding: 0.45rem 0; border-bottom: 1px solid rgba(245,242,235,0.04); color: rgba(245,242,235,0.5); }
 
-    /* ═══════════════════════════════════════
-       PAGE HERO — CENTERED
-    ═══════════════════════════════════════ */
     .page-hero {
       padding: 5.5rem 2rem 2.5rem;
       background: linear-gradient(180deg, #080807 0%, #111110 100%);
       border-bottom: 1px solid rgba(201,169,110,0.08);
-      position: relative; overflow: hidden;
-      text-align: center;
+      position: relative; overflow: hidden; text-align: center;
     }
     @media(min-width:768px) { .page-hero { padding: 5.5rem 3rem 2.5rem; } }
-
-    /* Radial glow — centered now */
-    .page-hero::before {
-      content: ''; position: absolute; top: -60px; left: 50%; transform: translateX(-50%);
-      width: 600px; height: 400px; border-radius: 50%;
-      background: radial-gradient(ellipse, rgba(201,169,110,0.07) 0%, transparent 70%);
-      pointer-events: none;
-    }
-    .page-hero::after {
-      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(201,169,110,0.25), transparent);
-    }
-
-    .page-hero-inner {
-      max-width: 900px; margin: 0 auto; position: relative; z-index: 1;
-      display: flex; flex-direction: column; align-items: center;
-    }
-
-    .page-hero-tag {
-      font-family: 'Jost', sans-serif; font-size: 0.42rem;
-      letter-spacing: 0.38em; text-transform: uppercase;
-      color: rgba(201,169,110,0.55); margin-bottom: 0.65rem;
-      display: flex; align-items: center; gap: 0.65rem;
-    }
-    .page-hero-tag::before { content: ''; width: 24px; height: 1px; background: #c9a96e; opacity: 0.45; }
-    .page-hero-tag::after  { content: ''; width: 24px; height: 1px; background: #c9a96e; opacity: 0.45; }
-
-    /* NEW: Playfair Display for the hero title */
-    .page-hero-title {
-      font-family: 'Playfair Display', serif; font-weight: 400;
-      font-size: clamp(1.6rem, 3.5vw, 2.6rem); line-height: 1;
-      color: #f5f2eb; letter-spacing: -0.01em;
-    }
-    .page-hero-title em {
-      font-style: italic; display: block;
-      background: linear-gradient(125deg, #edd99e 0%, #c9a96e 45%, #a8873d 100%);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-      position: relative;
-    }
-
-    /* ── SIGNATURE DRAW UNDERLINE ── */
-    .page-hero-title em::after {
-      content: '';
-      position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%);
-      width: 0; height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(201,169,110,0.6), transparent);
-      animation: drawUnderline 1.4s cubic-bezier(.22,1,.36,1) 0.7s forwards;
-    }
+    .page-hero::before { content: ''; position: absolute; top: -60px; left: 50%; transform: translateX(-50%); width: 600px; height: 400px; border-radius: 50%; background: radial-gradient(ellipse, rgba(201,169,110,0.07) 0%, transparent 70%); pointer-events: none; }
+    .page-hero::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(201,169,110,0.25), transparent); }
+    .page-hero-inner { max-width: 900px; margin: 0 auto; position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; }
+    .page-hero-tag { font-family: 'Jost', sans-serif; font-size: 0.42rem; letter-spacing: 0.38em; text-transform: uppercase; color: rgba(201,169,110,0.55); margin-bottom: 0.65rem; display: flex; align-items: center; gap: 0.65rem; }
+    .page-hero-tag::before, .page-hero-tag::after { content: ''; width: 24px; height: 1px; background: #c9a96e; opacity: 0.45; }
+    .page-hero-title { font-family: 'Playfair Display', serif; font-weight: 400; font-size: clamp(1.6rem, 3.5vw, 2.6rem); line-height: 1; color: #f5f2eb; letter-spacing: -0.01em; }
+    .page-hero-title em { font-style: italic; display: block; background: linear-gradient(125deg, #edd99e 0%, #c9a96e 45%, #a8873d 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; position: relative; }
+    .page-hero-title em::after { content: ''; position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%); width: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(201,169,110,0.6), transparent); animation: drawUnderline 1.4s cubic-bezier(.22,1,.36,1) 0.7s forwards; }
     @keyframes drawUnderline { to { width: 80%; } }
-
-    /* Live clock under heading — centered */
-    .hero-clock-row {
-      display: flex; align-items: center; justify-content: center;
-      gap: 0.75rem; margin-top: 0.9rem; height: 16px;
-    }
-    .hero-clock-row .clock-line {
-      width: 36px; height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(201,169,110,0.4));
-    }
-    .hero-clock-row .clock-line.right {
-      background: linear-gradient(270deg, transparent, rgba(201,169,110,0.4));
-    }
-
-    /* ── FLOATING DUST PARTICLES ── */
-    .hero-particles {
-      position: absolute; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
-    }
-    .particle {
-      position: absolute; border-radius: 50%;
-      background: rgba(201,169,110,0.55);
-      animation: particleDrift linear infinite;
-    }
-
-    @keyframes particleDrift {
-      0%   { transform: translateY(0px) translateX(0px); opacity: 0; }
-      10%  { opacity: 1; }
-      90%  { opacity: 0.6; }
-      100% { transform: translateY(-120px) translateX(var(--drift-x)); opacity: 0; }
-    }
-
-    /* ambient orbs (kept from original, repositioned for center) */
-    .hero-orb {
-      position: absolute; border-radius: 50%;
-      background: radial-gradient(circle, rgba(201,169,110,0.06) 0%, transparent 65%);
-      animation: orbFloat 8s ease-in-out infinite; pointer-events: none;
-    }
-    .hero-orb.orb1 { width: 380px; height: 380px; top: -100px; left: 50%; transform: translateX(-50%); animation-delay: 0s; }
+    .hero-clock-row { display: flex; align-items: center; justify-content: center; gap: 0.75rem; margin-top: 0.9rem; height: 16px; }
+    .hero-clock-row .clock-line { width: 36px; height: 1px; background: linear-gradient(90deg, transparent, rgba(201,169,110,0.4)); }
+    .hero-clock-row .clock-line.right { background: linear-gradient(270deg, transparent, rgba(201,169,110,0.4)); }
+    .hero-particles { position: absolute; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+    .particle { position: absolute; border-radius: 50%; background: rgba(201,169,110,0.55); animation: particleDrift linear infinite; }
+    @keyframes particleDrift { 0% { transform: translateY(0px) translateX(0px); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 0.6; } 100% { transform: translateY(-120px) translateX(var(--drift-x)); opacity: 0; } }
+    .hero-orb { position: absolute; border-radius: 50%; background: radial-gradient(circle, rgba(201,169,110,0.06) 0%, transparent 65%); animation: orbFloat 8s ease-in-out infinite; pointer-events: none; }
+    .hero-orb.orb1 { width: 380px; height: 380px; top: -100px; left: 50%; transform: translateX(-50%); }
     .hero-orb.orb2 { width: 200px; height: 200px; bottom: -20px; left: 30%; animation-delay: 3.5s; animation-duration: 11s; }
-    @keyframes orbFloat {
-      0%, 100% { transform: translateY(0) scale(1); }
-      50%       { transform: translateY(-20px) scale(1.05); }
-    }
-
-    /* Gold scan line */
-    .page-hero-scan {
-      position: absolute; top: 0; left: -100%; width: 60%; height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(201,169,110,0.025), transparent);
-      animation: heroScan 6s ease-in-out infinite; pointer-events: none; z-index: 0;
-    }
+    @keyframes orbFloat { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-20px) scale(1.05); } }
+    .page-hero-scan { position: absolute; top: 0; left: -100%; width: 60%; height: 100%; background: linear-gradient(90deg, transparent, rgba(201,169,110,0.025), transparent); animation: heroScan 6s ease-in-out infinite; pointer-events: none; z-index: 0; }
     @keyframes heroScan { 0% { left: -60%; } 100% { left: 140%; } }
-
-    /* ── ACCENT RULE ── */
     .rule { height: 1px; background: linear-gradient(90deg, transparent, rgba(201,169,110,0.2), transparent); }
-
-    /* ── WATCH-FACE DIVIDER ── */
-    .watch-divider {
-      background: #0a0a09;
-      border-top: 1px solid rgba(201,169,110,0.07);
-      border-bottom: 1px solid rgba(201,169,110,0.07);
-      padding: 1.1rem 2rem;
-      display: flex; align-items: center; justify-content: center; gap: 2.5rem;
-      position: relative; overflow: hidden;
-    }
-    .watch-divider::before {
-      content: ''; position: absolute; inset: 0;
-      background: radial-gradient(ellipse at center, rgba(201,169,110,0.04) 0%, transparent 65%);
-      pointer-events: none;
-    }
+    .watch-divider { background: #0a0a09; border-top: 1px solid rgba(201,169,110,0.07); border-bottom: 1px solid rgba(201,169,110,0.07); padding: 1.1rem 2rem; display: flex; align-items: center; justify-content: center; gap: 2.5rem; position: relative; overflow: hidden; }
+    .watch-divider::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(201,169,110,0.04) 0%, transparent 65%); pointer-events: none; }
     .wd-line { flex: 1; max-width: 200px; height: 1px; background: linear-gradient(90deg, transparent, rgba(201,169,110,0.2), transparent); }
     .wd-line.right { background: linear-gradient(270deg, transparent, rgba(201,169,110,0.2), transparent); }
     .wd-items { display: flex; align-items: center; gap: 2rem; flex-shrink: 0; }
-    .wd-item {
-      display: flex; align-items: center; gap: 0.65rem;
-      font-family: 'Jost', sans-serif; font-size: 0.42rem;
-      letter-spacing: 0.28em; text-transform: uppercase; color: rgba(201,169,110,0.38);
-      opacity: 0; animation: wdFadeIn 0.6s ease forwards;
-    }
-    .wd-item:nth-child(1) { animation-delay: 0.15s; }
-    .wd-item:nth-child(2) { animation-delay: 0.3s; }
-    .wd-item:nth-child(3) { animation-delay: 0.45s; }
+    .wd-item { display: flex; align-items: center; gap: 0.65rem; font-family: 'Jost', sans-serif; font-size: 0.42rem; letter-spacing: 0.28em; text-transform: uppercase; color: rgba(201,169,110,0.38); opacity: 0; animation: wdFadeIn 0.6s ease forwards; }
+    .wd-item:nth-child(1) { animation-delay: 0.15s; } .wd-item:nth-child(2) { animation-delay: 0.3s; } .wd-item:nth-child(3) { animation-delay: 0.45s; }
     @keyframes wdFadeIn { to { opacity: 1; } }
     .wd-sep { width: 3px; height: 3px; border-radius: 50%; background: rgba(201,169,110,0.2); flex-shrink: 0; }
     .wd-clock { position: relative; width: 28px; height: 28px; flex-shrink: 0; }
-    .wd-clock-face { width: 28px; height: 28px; border-radius: 50%; border: 1px solid rgba(201,169,110,0.3); background: rgba(201,169,110,0.04); position: relative; overflow: visible; }
+    .wd-clock-face { width: 28px; height: 28px; border-radius: 50%; border: 1px solid rgba(201,169,110,0.3); background: rgba(201,169,110,0.04); }
     .wd-hand-seconds { transform-origin: 50% 80%; animation: sweepSeconds 60s linear infinite; }
     .wd-hand-minutes { transform-origin: 50% 75%; animation: sweepMinutes 3600s linear infinite; }
     @keyframes sweepSeconds { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     @keyframes sweepMinutes { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-    /* ═══════════════════════════════════════
-       LAYOUT — fix dark shading on right
-    ═══════════════════════════════════════ */
-    .profile-wrap {
-      max-width: 1200px; margin: 0 auto;
-      padding: 3rem 2rem 5rem;
-      display: flex; gap: 0; position: relative; z-index: 1;
-      background: transparent; /* was causing shade on right */
-    }
+    .profile-wrap { max-width: 1200px; margin: 0 auto; padding: 3rem 2rem 5rem; display: flex; gap: 0; position: relative; z-index: 1; background: transparent; }
     @media(min-width:768px) { .profile-wrap { padding: 3rem 3rem 5rem; } }
     @media(max-width:767px) { .profile-wrap { flex-direction: column; padding: 2rem 1.25rem 4rem; } }
 
-    /* ── SIDEBAR ── */
     .profile-sidebar { width: 210px; flex-shrink: 0; border-right: 1px solid rgba(201,169,110,0.1); padding-top: 0.5rem; }
     @media(max-width:767px) { .profile-sidebar { width: 100%; border-right: none; border-bottom: 1px solid rgba(201,169,110,0.1); padding-bottom: 1rem; margin-bottom: 2rem; } }
     .sidebar-inner { display: flex; flex-direction: column; gap: 2px; }
     @media(max-width:767px) { .sidebar-inner { flex-direction: row; overflow-x: auto; gap: 0; } }
-
-    /* NEW: DM Serif Display font on sidebar tabs */
-    .sidebar-tab {
-      display: flex; align-items: center; gap: 10px;
-      padding: 0.75rem 1.1rem;
-      font-family: 'Jost', sans-serif; font-size: 0.52rem; letter-spacing: 0.18em; text-transform: uppercase;
-      color: rgba(245,242,235,0.35);
-      cursor: pointer; background: none; width: 100%; text-align: left;
-      border-left: 2px solid transparent;
-      border-top: none; border-right: none; border-bottom: none;
-      transition: color 0.22s, border-color 0.22s, background 0.22s, transform 0.15s;
-      white-space: nowrap; border-radius: 0 6px 6px 0;
-      opacity: 0; animation: sidebarSlide 0.5s cubic-bezier(.25,.46,.45,.94) forwards;
-    }
+    .sidebar-tab { display: flex; align-items: center; gap: 10px; padding: 0.75rem 1.1rem; font-family: 'Jost', sans-serif; font-size: 0.52rem; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(245,242,235,0.35); cursor: pointer; background: none; width: 100%; text-align: left; border-left: 2px solid transparent; border-top: none; border-right: none; border-bottom: none; transition: color 0.22s, border-color 0.22s, background 0.22s; white-space: nowrap; border-radius: 0 6px 6px 0; opacity: 0; animation: sidebarSlide 0.5s cubic-bezier(.25,.46,.45,.94) forwards; }
     @media(max-width:767px) { .sidebar-tab { border-left: none; border-bottom: 2px solid transparent; padding: 0.6rem 0.9rem; border-radius: 0; } }
-    .sidebar-tab:nth-child(1) { animation-delay: 0.1s; }
-    .sidebar-tab:nth-child(2) { animation-delay: 0.18s; }
-    .sidebar-tab:nth-child(3) { animation-delay: 0.26s; }
-    .sidebar-tab:nth-child(4) { animation-delay: 0.34s; }
-    .sidebar-tab:nth-child(5) { animation-delay: 0.42s; }
+    .sidebar-tab:nth-child(1) { animation-delay: 0.1s; } .sidebar-tab:nth-child(2) { animation-delay: 0.18s; } .sidebar-tab:nth-child(3) { animation-delay: 0.26s; } .sidebar-tab:nth-child(4) { animation-delay: 0.34s; } .sidebar-tab:nth-child(5) { animation-delay: 0.42s; }
     @keyframes sidebarSlide { from { opacity:0; transform:translateX(-12px); } to { opacity:1; transform:translateX(0); } }
-    .sidebar-tab svg { width: 13px; height: 13px; flex-shrink: 0; transition: color 0.2s; }
+    .sidebar-tab svg { width: 13px; height: 13px; flex-shrink: 0; }
     .sidebar-tab:hover { color: rgba(245,242,235,0.8); border-left-color: rgba(201,169,110,0.35); background: rgba(201,169,110,0.04); }
-    @media(max-width:767px) { .sidebar-tab:hover { border-left-color: transparent; border-bottom-color: rgba(201,169,110,0.35); } }
     .sidebar-tab.active { color: #c9a96e; border-left-color: #c9a96e; background: rgba(201,169,110,0.06); }
-    @media(max-width:767px) { .sidebar-tab.active { border-left-color: transparent; border-bottom-color: #c9a96e; } }
-
-    .sidebar-logout {
-      display: flex; align-items: center; gap: 8px;
-      font-family: 'Jost', sans-serif; font-size: 0.5rem; letter-spacing: 0.18em; text-transform: uppercase;
-      color: rgba(201,169,110,0.3); text-decoration: none;
-      padding: 0.7rem 1.1rem; margin-top: 1.5rem;
-      transition: color 0.2s; border-radius: 0 6px 6px 0;
-      opacity: 0; animation: sidebarSlide 0.5s cubic-bezier(.25,.46,.45,.94) 0.52s forwards;
-    }
+    .sidebar-logout { display: flex; align-items: center; gap: 8px; font-family: 'Jost', sans-serif; font-size: 0.5rem; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(201,169,110,0.3); text-decoration: none; padding: 0.7rem 1.1rem; margin-top: 1.5rem; transition: color 0.2s; border-radius: 0 6px 6px 0; opacity: 0; animation: sidebarSlide 0.5s cubic-bezier(.25,.46,.45,.94) 0.52s forwards; }
     .sidebar-logout:hover { color: rgba(201,169,110,0.65); }
     .sidebar-logout svg { width: 12px; height: 12px; }
     @media(max-width:767px) { .sidebar-logout { display: none; } }
 
-    /* ── MAIN PANEL ── */
     .profile-main { flex: 1; padding: 0.5rem 0 0 2.5rem; min-width: 0; }
     @media(max-width:767px) { .profile-main { padding: 0; } }
-
-    /* ── PANEL TRANSITIONS ── */
     .panel { display: none; }
-    .panel.active {
-      display: block;
-      animation: panelReveal 0.55s cubic-bezier(.22,1,.36,1) both;
-    }
-    @keyframes panelReveal {
-      from { opacity: 0; transform: translateY(18px) scale(0.995); filter: blur(2px); }
-      to   { opacity: 1; transform: translateY(0)    scale(1);     filter: blur(0); }
-    }
-
-    /* NEW: panel title uses DM Serif Display */
-    .panel-title {
-      font-family: 'DM Serif Display', serif; font-size: 1.1rem; font-style: italic;
-      letter-spacing: 0.01em; color: rgba(201,169,110,0.7);
-      margin-bottom: 1.75rem;
-      display: flex; align-items: center; gap: 0.65rem;
-    }
+    .panel.active { display: block; animation: panelReveal 0.55s cubic-bezier(.22,1,.36,1) both; }
+    @keyframes panelReveal { from { opacity: 0; transform: translateY(18px) scale(0.995); filter: blur(2px); } to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); } }
+    .panel-title { font-family: 'DM Serif Display', serif; font-size: 1.1rem; font-style: italic; letter-spacing: 0.01em; color: rgba(201,169,110,0.7); margin-bottom: 1.75rem; display: flex; align-items: center; gap: 0.65rem; }
     .panel-title::before { content: ''; width: 18px; height: 1px; background: rgba(201,169,110,0.35); flex-shrink: 0; }
 
-    /* ── INPUTS ── */
     .vc-label { display: block; font-family: 'Jost', sans-serif; font-size: 0.48rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(245,242,235,0.3); margin-bottom: 7px; }
-    .vc-input {
-      width: 100%; background: rgba(245,242,235,0.03);
-      border: 1px solid rgba(245,242,235,0.08);
-      padding: 0.8rem 1rem;
-      font-family: 'Jost', sans-serif; font-size: 0.82rem; font-weight: 300;
-      color: #f5f2eb; outline: none;
-      transition: border-color 0.25s, background 0.25s, box-shadow 0.25s;
-      border-radius: 6px;
-    }
+    .vc-input { width: 100%; background: rgba(245,242,235,0.03); border: 1px solid rgba(245,242,235,0.08); padding: 0.8rem 1rem; font-family: 'Jost', sans-serif; font-size: 0.82rem; font-weight: 300; color: #f5f2eb; outline: none; transition: border-color 0.25s, background 0.25s, box-shadow 0.25s; border-radius: 6px; appearance: none; -webkit-appearance: none; }
     .vc-input::placeholder { color: rgba(245,242,235,0.18); }
     .vc-input:focus { border-color: rgba(201,169,110,0.4); background: rgba(201,169,110,0.03); box-shadow: 0 0 0 3px rgba(201,169,110,0.06); }
     .vc-input:disabled { opacity: 0.3; cursor: not-allowed; }
+    select.vc-input { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='rgba(201,169,110,0.45)' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-color: rgba(245,242,235,0.03); padding-right: 2.2rem; }
+    select.vc-input option { background: #1a1a18; color: #f5f2eb; }
 
-    /* ── BUTTONS ── */
-    .btn-gold {
-      font-family: 'Jost', sans-serif; font-size: 0.5rem;
-      letter-spacing: 0.24em; text-transform: uppercase; color: #0d0b08;
-      display: inline-flex; align-items: center; gap: 0.6rem;
-      padding: 0.85rem 2rem; border-radius: 100px; text-decoration: none; cursor: pointer;
-      position: relative; overflow: hidden;
-      background: linear-gradient(135deg, #e0c47e 0%, #c9a96e 50%, #b8913d 100%);
-      border: none;
-      transition: transform 0.2s cubic-bezier(.34,1.56,.64,1), box-shadow 0.22s;
-      box-shadow: 0 1px 0 rgba(255,255,255,0.35) inset, 0 4px 18px rgba(185,140,55,0.35), 0 1px 4px rgba(0,0,0,0.4);
-    }
-    .btn-gold::after {
-      content: ''; position: absolute; top: 0; left: -75%; width: 50%; height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent);
-      transform: skewX(-18deg); transition: left 0.55s ease;
-    }
+    .btn-gold { font-family: 'Jost', sans-serif; font-size: 0.5rem; letter-spacing: 0.24em; text-transform: uppercase; color: #0d0b08; display: inline-flex; align-items: center; gap: 0.6rem; padding: 0.85rem 2rem; border-radius: 100px; text-decoration: none; cursor: pointer; position: relative; overflow: hidden; background: linear-gradient(135deg, #e0c47e 0%, #c9a96e 50%, #b8913d 100%); border: none; transition: transform 0.2s cubic-bezier(.34,1.56,.64,1), box-shadow 0.22s; box-shadow: 0 1px 0 rgba(255,255,255,0.35) inset, 0 4px 18px rgba(185,140,55,0.35), 0 1px 4px rgba(0,0,0,0.4); }
+    .btn-gold::after { content: ''; position: absolute; top: 0; left: -75%; width: 50%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent); transform: skewX(-18deg); transition: left 0.55s ease; }
     .btn-gold:hover::after { left: 130%; }
     .btn-gold:hover { transform: translateY(-2px) scale(1.04); box-shadow: 0 1px 0 rgba(255,255,255,0.4) inset, 0 8px 28px rgba(185,140,55,0.45), 0 2px 8px rgba(0,0,0,0.45); }
     .btn-gold:active { transform: translateY(1px) scale(0.98); }
     .btn-gold:disabled { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
     .btn-gold .btn-arrow { width: 16px; height: 16px; border-radius: 50%; background: rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: transform 0.2s; }
     .btn-gold:hover .btn-arrow { transform: translateX(3px); }
-
-    .btn-dark {
-      font-family: 'Jost', sans-serif; font-size: 0.5rem;
-      letter-spacing: 0.24em; text-transform: uppercase; color: rgba(245,242,235,0.6);
-      display: inline-flex; align-items: center; gap: 0.55rem;
-      padding: 0.83rem 1.8rem; border-radius: 100px; text-decoration: none; cursor: pointer;
-      background: transparent;
-      border: 1px solid rgba(201,169,110,0.25);
-      transition: transform 0.2s cubic-bezier(.34,1.56,.64,1), box-shadow 0.22s, border-color 0.22s, color 0.22s;
-      box-shadow: none;
-    }
+    .btn-dark { font-family: 'Jost', sans-serif; font-size: 0.5rem; letter-spacing: 0.24em; text-transform: uppercase; color: rgba(245,242,235,0.6); display: inline-flex; align-items: center; gap: 0.55rem; padding: 0.83rem 1.8rem; border-radius: 100px; text-decoration: none; cursor: pointer; background: transparent; border: 1px solid rgba(201,169,110,0.25); transition: transform 0.2s cubic-bezier(.34,1.56,.64,1), box-shadow 0.22s, border-color 0.22s, color 0.22s; }
     .btn-dark:hover { color: #f5f2eb; border-color: rgba(201,169,110,0.5); transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,0,0,0.3), 0 0 14px rgba(201,169,110,0.08); }
-    .btn-dark:active { transform: translateY(1px); box-shadow: none; }
     .btn-dark:disabled { opacity: 0.4; cursor: not-allowed; }
-
-    .btn-danger-sm {
-      display: inline-flex; align-items: center; gap: 5px;
-      font-family: 'Jost', sans-serif; font-size: 0.48rem; letter-spacing: 0.18em; text-transform: uppercase;
-      color: rgba(248,113,113,0.65); background: transparent;
-      border: 1px solid rgba(248,113,113,0.18); border-radius: 100px;
-      padding: 0.55rem 1.1rem; cursor: pointer;
-      transition: color 0.22s, border-color 0.22s, background 0.22s, transform 0.18s;
-    }
+    .btn-danger-sm { display: inline-flex; align-items: center; gap: 5px; font-family: 'Jost', sans-serif; font-size: 0.48rem; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(248,113,113,0.65); background: transparent; border: 1px solid rgba(248,113,113,0.18); border-radius: 100px; padding: 0.55rem 1.1rem; cursor: pointer; transition: color 0.22s, border-color 0.22s, background 0.22s, transform 0.18s; }
     .btn-danger-sm:hover { color: #f87171; border-color: rgba(248,113,113,0.45); background: rgba(248,113,113,0.06); transform: translateY(-1px); }
-    .btn-danger-sm:active { transform: translateY(0); }
 
-    /* ── AVATAR ── */
     .avatar-wrap { position: relative; width: 90px; height: 90px; cursor: pointer; flex-shrink: 0; }
     .avatar-img { width: 90px; height: 90px; object-fit: cover; border: 1px solid rgba(201,169,110,0.2); display: block; border-radius: 12px; }
     .avatar-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.55); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; border-radius: 12px; }
     .avatar-wrap:hover .avatar-overlay { opacity: 1; }
-    .avatar-wrap::after { content: ''; position: absolute; inset: -4px; border-radius: 16px; border: 1px solid rgba(201,169,110,0); transition: border-color 0.3s, box-shadow 0.3s; }
-    .avatar-wrap:hover::after { border-color: rgba(201,169,110,0.35); box-shadow: 0 0 16px rgba(201,169,110,0.15); }
 
-    /* ── STAT PILLS ── */
-    .stat-pill {
-      display: flex; flex-direction: column; align-items: center; gap: 3px;
-      padding: 0.9rem 1.4rem; border: 1px solid rgba(201,169,110,0.12);
-      background: rgba(201,169,110,0.03); border-radius: 10px; position: relative; overflow: hidden;
-      transition: border-color 0.25s, background 0.25s, box-shadow 0.25s, transform 0.18s cubic-bezier(.34,1.56,.64,1);
-    }
-    .stat-pill:hover { border-color: rgba(201,169,110,0.3); background: rgba(201,169,110,0.06); transform: translateY(-2px); box-shadow: 0 4px 18px rgba(0,0,0,0.3), 0 0 12px rgba(201,169,110,0.08); }
-    .stat-num {
-      font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 300; line-height: 1;
-      background: linear-gradient(135deg, #d4b97e, #c9a96e);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-    }
+    .stat-pill { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 0.9rem 1.4rem; border: 1px solid rgba(201,169,110,0.12); background: rgba(201,169,110,0.03); border-radius: 10px; transition: border-color 0.25s, background 0.25s, transform 0.18s; }
+    .stat-pill:hover { border-color: rgba(201,169,110,0.3); background: rgba(201,169,110,0.06); transform: translateY(-2px); }
+    .stat-num { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 300; line-height: 1; background: linear-gradient(135deg, #d4b97e, #c9a96e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
     .stat-label { font-family: 'Jost', sans-serif; font-size: 0.42rem; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(245,242,235,0.25); }
 
-    /* ── INFO GRID ── */
     .info-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1.5rem 2rem; }
-    .info-item { padding: 1rem 1.1rem; border: 1px solid rgba(245,242,235,0.06); border-radius: 8px; background: rgba(245,242,235,0.02); transition: border-color 0.25s, box-shadow 0.25s; position: relative; overflow: hidden; }
-    .info-item:hover { border-color: rgba(201,169,110,0.2); box-shadow: 0 2px 16px rgba(0,0,0,0.25); }
+    .info-item { padding: 1rem 1.1rem; border: 1px solid rgba(245,242,235,0.06); border-radius: 8px; background: rgba(245,242,235,0.02); transition: border-color 0.25s; position: relative; overflow: hidden; }
+    .info-item:hover { border-color: rgba(201,169,110,0.2); }
     .info-item::after { content: ''; position: absolute; bottom: 0; left: 0; width: 0; height: 1px; background: linear-gradient(90deg, rgba(201,169,110,0.45), transparent); transition: width 0.4s ease; }
     .info-item:hover::after { width: 100%; }
     .info-item-label { font-family: 'Jost', sans-serif; font-size: 0.44rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(245,242,235,0.25); margin-bottom: 6px; }
     .info-item-value { font-family: 'Jost', sans-serif; font-size: 0.82rem; font-weight: 300; color: rgba(245,242,235,0.7); }
 
-    /* ── OTP CELLS ── */
     .otp-row { display: flex; gap: 8px; }
     .otp-cell { width: 44px; height: 52px; text-align: center; background: rgba(245,242,235,0.03); border: 1px solid rgba(245,242,235,0.1); border-radius: 8px; font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 300; color: #c9a96e; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
     .otp-cell:focus { border-color: rgba(201,169,110,0.5); box-shadow: 0 0 0 3px rgba(201,169,110,0.08); }
 
-    /* ── PASSWORD STRENGTH ── */
     .pw-bar-wrap { display: flex; gap: 3px; margin-top: 8px; }
     .pw-bar { flex: 1; height: 2px; background: rgba(245,242,235,0.07); border-radius: 2px; transition: background 0.3s; }
-    .pw-bar.weak   { background: #f87171; }
-    .pw-bar.medium { background: #fbbf24; }
-    .pw-bar.strong { background: #4ade80; }
+    .pw-bar.weak { background: #f87171; } .pw-bar.medium { background: #fbbf24; } .pw-bar.strong { background: #4ade80; }
 
-    /* ── ADDRESS CARD ── */
-    .addr-card { border: 1px solid rgba(245,242,235,0.06); border-radius: 12px; padding: 1.25rem 1.25rem 1.1rem; position: relative; background: rgba(245,242,235,0.02); transition: border-color 0.25s, background 0.25s, box-shadow 0.25s, transform 0.18s; }
-    .addr-card:hover { border-color: rgba(201,169,110,0.22); background: rgba(201,169,110,0.03); box-shadow: 0 4px 20px rgba(0,0,0,0.3); transform: translateY(-2px); }
+    .addr-card { border: 1px solid rgba(245,242,235,0.06); border-radius: 12px; padding: 1.25rem 1.25rem 1.1rem; position: relative; background: rgba(245,242,235,0.02); transition: border-color 0.25s, background 0.25s, transform 0.18s; }
+    .addr-card:hover { border-color: rgba(201,169,110,0.22); background: rgba(201,169,110,0.03); transform: translateY(-2px); }
     .addr-card.default-addr { border-color: rgba(201,169,110,0.3); }
 
-    /* ── FLASH ── */
-    .flash-error   { background: rgba(248,113,113,0.06); border: 1px solid rgba(248,113,113,0.2); padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.72rem; font-weight: 300; color: rgba(248,113,113,0.85); margin-bottom: 1.25rem; }
+    .flash-error { background: rgba(248,113,113,0.06); border: 1px solid rgba(248,113,113,0.2); padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.72rem; font-weight: 300; color: rgba(248,113,113,0.85); margin-bottom: 1.25rem; }
     .flash-success { background: rgba(74,222,128,0.05); border: 1px solid rgba(74,222,128,0.2); padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.72rem; font-weight: 300; color: rgba(74,222,128,0.75); margin-bottom: 1.25rem; }
 
-    /* ── MODAL ── */
     .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.78); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); z-index: 300; display: flex; align-items: center; justify-content: center; padding: 1rem; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
     .modal-backdrop.open { opacity: 1; pointer-events: all; }
-    .modal-box { background: #1a1a18; border: 1px solid rgba(201,169,110,0.15); border-radius: 16px; padding: 2rem; width: 100%; max-width: 440px; transform: translateY(16px); transition: transform 0.3s; max-height: 90vh; overflow-y: auto; box-shadow: 0 24px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.03); }
+    .modal-box { background: #1a1a18; border: 1px solid rgba(201,169,110,0.15); border-radius: 16px; padding: 2rem; width: 100%; max-width: 480px; transform: translateY(16px); transition: transform 0.3s; max-height: 90vh; overflow-y: auto; box-shadow: 0 24px 60px rgba(0,0,0,0.7); }
+    .modal-box::-webkit-scrollbar { width: 2px; } .modal-box::-webkit-scrollbar-thumb { background: rgba(201,169,110,0.3); }
     .modal-backdrop.open .modal-box { transform: translateY(0); }
     .modal-title { font-family: 'DM Serif Display', serif; font-size: 1rem; font-style: italic; letter-spacing: 0.01em; color: rgba(201,169,110,0.65); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; }
     .modal-title::before { content: ''; width: 14px; height: 1px; background: rgba(201,169,110,0.3); }
 
-    /* ── TOAST ── */
+    /* ── FORM GRID FOR MODAL ── */
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem; }
+    .form-row.full { grid-template-columns: 1fr; }
+    .form-group { display: flex; flex-direction: column; gap: 4px; }
+
     .toast { position: fixed; bottom: 2rem; right: 2rem; z-index: 999; background: #1a1a18; border: 1px solid rgba(201,169,110,0.25); border-radius: 10px; color: #f5f2eb; font-family: 'Jost', sans-serif; font-size: 0.58rem; letter-spacing: 0.08em; padding: 0.8rem 1.25rem; display: flex; align-items: center; gap: 10px; transform: translateY(80px); opacity: 0; transition: transform 0.35s, opacity 0.35s; pointer-events: none; min-width: 200px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
     .toast.show { transform: translateY(0); opacity: 1; }
     .toast.err { border-color: rgba(248,113,113,0.3); }
     .toast-dot { width: 5px; height: 5px; border-radius: 50%; background: #c9a96e; flex-shrink: 0; }
-    .toast.err .toast-dot { background: #f87171; }
-    .toast.ok  .toast-dot { background: #4ade80; }
-
-    /* ── GOOGLE BADGE ── */
+    .toast.err .toast-dot { background: #f87171; } .toast.ok .toast-dot { background: #4ade80; }
     .google-badge { font-size: 0.48rem; letter-spacing: 0.15em; text-transform: uppercase; color: #4ade80; border: 1px solid rgba(74,222,128,0.25); padding: 3px 10px; display: inline-block; border-radius: 100px; background: rgba(74,222,128,0.05); }
 
-    /* ═══════════════════════════════════════
-       UNIQUE ANIMATION: GOLD INK REVEAL
-       on overview profile card
-    ═══════════════════════════════════════ */
-    .ink-reveal {
-      position: relative; overflow: hidden;
-    }
-    .ink-reveal::before {
-      content: '';
-      position: absolute; inset: 0; z-index: 2; pointer-events: none;
-      background: radial-gradient(ellipse at 30% 50%,
-        #111110 0%,
-        rgba(17,17,16,0.92) 30%,
-        rgba(17,17,16,0.6) 55%,
-        transparent 75%
-      );
-      animation: inkWipe 1.1s cubic-bezier(.77,0,.18,1) 0.2s forwards;
-    }
-    @keyframes inkWipe {
-      0%   { clip-path: inset(0 0 0 0); opacity: 1; }
-      100% { clip-path: inset(0 100% 0 0); opacity: 0; }
-    }
-
-    /* ═══════════════════════════════════════
-       UNIQUE ANIMATION: ANIMATED GOLD LINE
-       under the profile name
-    ═══════════════════════════════════════ */
+    .ink-reveal { position: relative; overflow: hidden; }
+    .ink-reveal::before { content: ''; position: absolute; inset: 0; z-index: 2; pointer-events: none; background: radial-gradient(ellipse at 30% 50%, #111110 0%, rgba(17,17,16,0.92) 30%, rgba(17,17,16,0.6) 55%, transparent 75%); animation: inkWipe 1.1s cubic-bezier(.77,0,.18,1) 0.2s forwards; }
+    @keyframes inkWipe { 0% { clip-path: inset(0 0 0 0); opacity: 1; } 100% { clip-path: inset(0 100% 0 0); opacity: 0; } }
     .profile-name-wrap { position: relative; display: inline-block; }
-    .profile-name-wrap::after {
-      content: '';
-      position: absolute; bottom: -3px; left: 0; width: 0; height: 1px;
-      background: linear-gradient(90deg, #c9a96e, rgba(201,169,110,0.3));
-      animation: nameUnderline 0.9s cubic-bezier(.22,1,.36,1) 0.6s forwards;
-    }
+    .profile-name-wrap::after { content: ''; position: absolute; bottom: -3px; left: 0; width: 0; height: 1px; background: linear-gradient(90deg, #c9a96e, rgba(201,169,110,0.3)); animation: nameUnderline 0.9s cubic-bezier(.22,1,.36,1) 0.6s forwards; }
     @keyframes nameUnderline { to { width: 100%; } }
 
-    /* ═══════════════════════════════════════
-       UNIQUE ANIMATION: GOLD COUNTER
-       stat pills count up on load
-    ═══════════════════════════════════════ */
-    .stat-num[data-count] { transition: none; }
-
-    /* ── REVEAL ── */
     @keyframes fadeUp { from { opacity: 0; transform: translateY(26px); } to { opacity: 1; transform: translateY(0); } }
     .fade-up { animation: fadeUp .75s ease both; }
     .d1 { animation-delay: .1s; } .d2 { animation-delay: .22s; } .d3 { animation-delay: .38s; }
 
-    /* ── FOOTER ── */
     .footer { background: #0a0a09; padding: 4rem 2rem 1.5rem; border-top: 1px solid rgba(245,242,235,0.05); position: relative; z-index: 1; }
     @media(min-width:768px) { .footer { padding: 4rem 3rem 1.5rem; } }
     .footer-top { display: grid; grid-template-columns: 1fr; gap: 2.5rem; padding-bottom: 2.5rem; border-bottom: 1px solid rgba(245,242,235,0.05); }
@@ -549,6 +267,9 @@
       <a href="/profile" class="nav-icon-btn active-icon" aria-label="Profile">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       </a>
+      <a href="/wishlist" class="nav-icon-btn" aria-label="Wishlist">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      </a>
       <a href="/cart" class="nav-icon-btn" aria-label="Cart" style="position:relative">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
         <span class="cart-badge" id="cartCount">0</span>
@@ -560,33 +281,21 @@
   <div class="mobile-menu" id="mobileMenu">
     <a href="/products" class="nav-link">Collection</a>
     <a href="/home"     class="nav-link">Watches</a>
-    <a href="/home"     class="nav-link">About</a>
-    <a href="/home"     class="nav-link">Contact</a>
     <a href="/profile"  class="nav-link active">My Profile</a>
     <a href="/cart"     class="nav-link">Cart</a>
     <a href="/logout"   class="nav-link" style="color:rgba(201,169,110,0.55)">Logout</a>
   </div>
 </nav>
 
-<!-- ══ PAGE HERO — CENTERED ══ -->
+<!-- ══ PAGE HERO ══ -->
 <div class="page-hero">
-  <!-- Floating gold dust particles (JS-generated) -->
   <div class="hero-particles" id="heroParticles"></div>
-  <!-- Ambient orbs -->
   <div class="hero-orb orb1"></div>
   <div class="hero-orb orb2"></div>
-  <!-- Gold scan line -->
   <div class="page-hero-scan"></div>
-
   <div class="page-hero-inner">
     <p class="page-hero-tag fade-up d1">My Account</p>
-
-    <h1 class="page-hero-title fade-up d2">
-      My
-      <em>Profile</em>
-    </h1>
-
-    <!-- Live clock — centered below title -->
+    <h1 class="page-hero-title fade-up d2">My<em>Profile</em></h1>
     <div class="hero-clock-row fade-up d3">
       <div class="clock-line"></div>
       <span id="liveTime" style="font-family:'Jost',sans-serif;font-size:0.42rem;letter-spacing:0.32em;text-transform:uppercase;color:rgba(201,169,110,0.45);font-variant-numeric:tabular-nums;min-width:92px;display:inline-block;text-align:center;"></span>
@@ -595,7 +304,7 @@
   </div>
 </div>
 
-<!-- ══ WATCH-FACE HERITAGE DIVIDER ══ -->
+<!-- ══ WATCH DIVIDER ══ -->
 <div class="watch-divider">
   <div class="wd-line"></div>
   <div class="wd-items">
@@ -604,9 +313,9 @@
     <div class="wd-clock">
       <svg class="wd-clock-face" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
         <circle cx="14" cy="14" r="13" stroke="rgba(201,169,110,0.28)" stroke-width="0.8"/>
-        <line x1="14" y1="2.5" x2="14" y2="4.5"   stroke="rgba(201,169,110,0.5)" stroke-width="0.7"/>
+        <line x1="14" y1="2.5" x2="14" y2="4.5" stroke="rgba(201,169,110,0.5)" stroke-width="0.7"/>
         <line x1="14" y1="23.5" x2="14" y2="25.5" stroke="rgba(201,169,110,0.5)" stroke-width="0.7"/>
-        <line x1="2.5" y1="14" x2="4.5" y2="14"   stroke="rgba(201,169,110,0.5)" stroke-width="0.7"/>
+        <line x1="2.5" y1="14" x2="4.5" y2="14" stroke="rgba(201,169,110,0.5)" stroke-width="0.7"/>
         <line x1="23.5" y1="14" x2="25.5" y2="14" stroke="rgba(201,169,110,0.5)" stroke-width="0.7"/>
         <g class="wd-hand-minutes" style="transform-origin:14px 14px">
           <line x1="14" y1="14" x2="14" y2="6" stroke="rgba(201,169,110,0.7)" stroke-width="1" stroke-linecap="round"/>
@@ -618,7 +327,7 @@
       </svg>
     </div>
     <div class="wd-sep"></div>
-    <div class="wd-item" style="animation-delay:0.3s">Est. 1882</div>
+    <div class="wd-item">Est. 1882</div>
   </div>
   <div class="wd-line right"></div>
 </div>
@@ -664,13 +373,12 @@
     <!-- ── OVERVIEW PANEL ── -->
     <div class="panel active ink-reveal" id="panel-details">
       <p class="panel-title">Profile Overview</p>
-
       <div style="display:flex;align-items:flex-start;gap:1.5rem;flex-wrap:wrap;margin-bottom:2.5rem;">
         <div>
           <div class="avatar-wrap" onclick="document.getElementById('avatarInput').click()">
             <img id="avatarPreview"
               src="<%= user.profileImage && user.profileImage !== '/images/default-avatar.png' ? user.profileImage : 'https://res.cloudinary.com/dwb0hd0m6/image/upload/v1774530220/velmora_chrone_logo_bgyhmw.svg' %>"
-              onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 96 96%22%3E%3Crect fill=%22%231a1a18%22 width=%2296%22 height=%2296%22/%3E%3Ccircle cx=%2248%22 cy=%2238%22 r=%2216%22 fill=%22rgba(201,169,110,0.15)%22/%3E%3C/svg%3E'"
+              onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 96 96%22%3E%3Crect fill=%22%231a1a18%22 width=%2296%22 height=%2296%22/%3E%3C/svg%3E'"
               alt="Profile" class="avatar-img"/>
             <div class="avatar-overlay">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c9a96e" stroke-width="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
@@ -680,14 +388,11 @@
           <p id="avatarStatus" style="font-size:0.44rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(245,242,235,0.18);margin-top:6px;text-align:center;">Click to change</p>
         </div>
         <div style="flex:1;min-width:160px;padding-top:4px;">
-          <!-- Profile name with unique animated underline -->
           <div class="profile-name-wrap">
             <h2 style="font-family:'Playfair Display',serif;font-size:1.9rem;font-weight:400;color:#f5f2eb;line-height:1.1;margin-bottom:4px;"><%= user.name %></h2>
           </div>
           <p id="displayEmail" style="font-size:0.72rem;font-weight:300;color:rgba(245,242,235,0.35);margin-bottom:12px;letter-spacing:0.04em;margin-top:8px;"><%= user.email %></p>
-          <% if (user.googleId && !user.password) { %>
-            <span class="google-badge">Google Account</span>
-          <% } %>
+          <% if (user.googleId && !user.password) { %><span class="google-badge">Google Account</span><% } %>
           <div style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:1.1rem;">
             <div class="stat-pill">
               <span class="stat-num" id="statAddresses"><%= user.addresses ? user.addresses.length : 0 %></span>
@@ -704,43 +409,17 @@
           </div>
         </div>
       </div>
-
       <div class="rule" style="margin-bottom:2rem;"></div>
-
       <div class="info-grid">
-        <div class="info-item">
-          <p class="info-item-label">Full Name</p>
-          <p class="info-item-value"><%= user.name %></p>
-        </div>
-        <div class="info-item">
-          <p class="info-item-label">Email Address</p>
-          <p class="info-item-value"><%= user.email %></p>
-        </div>
-        <div class="info-item">
-          <p class="info-item-label">Account Type</p>
-          <p class="info-item-value"><%= user.googleId ? 'Google OAuth' : 'Email & Password' %></p>
-        </div>
-        <div class="info-item">
-          <p class="info-item-label">Member Since</p>
-          <p class="info-item-value"><%= new Date(user.createdAt).toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' }) %></p>
-        </div>
-        <div class="info-item">
-          <p class="info-item-label">Last Login</p>
-          <p class="info-item-value"><%= user.lastLogin ? new Date(user.lastLogin).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) : '—' %></p>
-        </div>
-        <div class="info-item">
-          <p class="info-item-label">Role</p>
-          <p class="info-item-value" style="text-transform:capitalize;"><%= user.role %></p>
-        </div>
+        <div class="info-item"><p class="info-item-label">Full Name</p><p class="info-item-value"><%= user.name %></p></div>
+        <div class="info-item"><p class="info-item-label">Email Address</p><p class="info-item-value"><%= user.email %></p></div>
+        <div class="info-item"><p class="info-item-label">Account Type</p><p class="info-item-value"><%= user.googleId ? 'Google OAuth' : 'Email & Password' %></p></div>
+        <div class="info-item"><p class="info-item-label">Member Since</p><p class="info-item-value"><%= new Date(user.createdAt).toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' }) %></p></div>
+        <div class="info-item"><p class="info-item-label">Last Login</p><p class="info-item-value"><%= user.lastLogin ? new Date(user.lastLogin).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) : '—' %></p></div>
+        <div class="info-item"><p class="info-item-label">Role</p><p class="info-item-value" style="text-transform:capitalize;"><%= user.role %></p></div>
       </div>
-
       <div style="margin-top:2rem;display:flex;gap:0.75rem;flex-wrap:wrap;align-items:center;">
-        <button class="btn-gold" onclick="switchTab('edit')">
-          Edit Profile
-          <span class="btn-arrow">
-            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-          </span>
-        </button>
+        <button class="btn-gold" onclick="switchTab('edit')">Edit Profile<span class="btn-arrow"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span></button>
         <button class="btn-dark" onclick="switchTab('addresses')">Manage Addresses</button>
       </div>
     </div>
@@ -763,12 +442,7 @@
           </div>
         </div>
         <div style="margin-top:1.75rem;display:flex;gap:0.75rem;flex-wrap:wrap;">
-          <button type="submit" class="btn-gold">
-            Save Changes
-            <span class="btn-arrow">
-              <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-            </span>
-          </button>
+          <button type="submit" class="btn-gold">Save Changes<span class="btn-arrow"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span></button>
           <button type="button" class="btn-dark" onclick="switchTab('details')">Cancel</button>
         </div>
       </form>
@@ -779,30 +453,18 @@
       <p class="panel-title">Change Email Address</p>
       <div id="email-step1" style="max-width:420px;">
         <p style="font-size:0.75rem;font-weight:300;color:rgba(245,242,235,0.35);line-height:1.85;margin-bottom:1.5rem;">Enter your new email. We'll send a 6-digit code to confirm the change.</p>
-        <div style="margin-bottom:1.25rem;">
-          <label class="vc-label">Current Email</label>
-          <input class="vc-input" value="<%= user.email %>" disabled/>
-        </div>
+        <div style="margin-bottom:1.25rem;"><label class="vc-label">Current Email</label><input class="vc-input" value="<%= user.email %>" disabled/></div>
         <div style="margin-bottom:1.5rem;">
           <label class="vc-label" for="new-email">New Email Address</label>
           <input class="vc-input" id="new-email" type="email" placeholder="new@email.com"/>
           <p id="emailInputError" style="display:none;font-size:0.6rem;color:#f87171;margin-top:6px;"></p>
         </div>
-        <button class="btn-gold" id="sendOtpBtn" onclick="sendEmailOTP()">
-          Send Verification Code
-          <span class="btn-arrow">
-            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-          </span>
-        </button>
+        <button class="btn-gold" id="sendOtpBtn" onclick="sendEmailOTP()">Send Verification Code<span class="btn-arrow"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span></button>
       </div>
-
       <div id="email-step2" style="display:none;max-width:420px;">
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:1.5rem;padding:1rem;border:1px solid rgba(74,222,128,0.15);background:rgba(74,222,128,0.04);border-radius:10px;">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="1.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-          <div>
-            <p style="font-size:0.7rem;color:rgba(245,242,235,0.75);">Verification code sent</p>
-            <p style="font-size:0.6rem;color:rgba(245,242,235,0.3);" id="otp-sent-to">Check your inbox</p>
-          </div>
+          <div><p style="font-size:0.7rem;color:rgba(245,242,235,0.75);">Verification code sent</p><p style="font-size:0.6rem;color:rgba(245,242,235,0.3);" id="otp-sent-to">Check your inbox</p></div>
         </div>
         <p style="font-size:0.7rem;color:rgba(245,242,235,0.35);margin-bottom:1.25rem;font-weight:300;">Enter the 6-digit code:</p>
         <div class="otp-row" style="margin-bottom:0.75rem;">
@@ -815,12 +477,7 @@
         </div>
         <p id="otpError" style="display:none;font-size:0.6rem;color:#f87171;margin-bottom:1rem;"></p>
         <div style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:1rem;">
-          <button class="btn-gold" id="verifyOtpBtn" onclick="verifyEmailOTP()">
-            Verify &amp; Update
-            <span class="btn-arrow">
-              <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-            </span>
-          </button>
+          <button class="btn-gold" id="verifyOtpBtn" onclick="verifyEmailOTP()">Verify &amp; Update<span class="btn-arrow"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span></button>
           <button class="btn-dark" id="resendOtpBtn" onclick="resendEmailOTP()" disabled style="font-size:0.48rem;">Resend <span id="resendTimer"></span></button>
         </div>
         <button onclick="resetEmailForm()" style="margin-top:1rem;background:none;border:none;font-size:0.48rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(245,242,235,0.2);cursor:pointer;transition:color 0.2s;" onmouseover="this.style.color='rgba(245,242,235,0.5)'" onmouseout="this.style.color='rgba(245,242,235,0.2)'">← Use different email</button>
@@ -836,7 +493,7 @@
           <label class="vc-label" for="pw-current">Current Password</label>
           <div style="position:relative;">
             <input class="vc-input" id="pw-current" name="oldPassword" type="password" placeholder="Current password" style="padding-right:2.75rem;" required/>
-            <button type="button" onclick="togglePw('pw-current')" style="position:absolute;right:0.85rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:rgba(245,242,235,0.25);transition:color 0.2s;" onmouseover="this.style.color='rgba(245,242,235,0.6)'" onmouseout="this.style.color='rgba(245,242,235,0.25)'">
+            <button type="button" onclick="togglePw('pw-current')" style="position:absolute;right:0.85rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:rgba(245,242,235,0.25);transition:color 0.2s;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
             </button>
           </div>
@@ -845,7 +502,7 @@
           <label class="vc-label" for="pw-new">New Password</label>
           <div style="position:relative;">
             <input class="vc-input" id="pw-new" name="newPassword" type="password" placeholder="Min. 8 characters" style="padding-right:2.75rem;" oninput="updateStrength(this.value)" required/>
-            <button type="button" onclick="togglePw('pw-new')" style="position:absolute;right:0.85rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:rgba(245,242,235,0.25);transition:color 0.2s;" onmouseover="this.style.color='rgba(245,242,235,0.6)'" onmouseout="this.style.color='rgba(245,242,235,0.25)'">
+            <button type="button" onclick="togglePw('pw-new')" style="position:absolute;right:0.85rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:rgba(245,242,235,0.25);transition:color 0.2s;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
             </button>
           </div>
@@ -856,12 +513,7 @@
           <label class="vc-label" for="pw-confirm">Confirm New Password</label>
           <input class="vc-input" id="pw-confirm" name="confirmPassword" type="password" placeholder="Re-enter new password" required/>
         </div>
-        <button type="button" class="btn-gold" onclick="submitPassword()">
-          Update Password
-          <span class="btn-arrow">
-            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-          </span>
-        </button>
+        <button type="button" class="btn-gold" onclick="submitPassword()">Update Password<span class="btn-arrow"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span></button>
       </form>
     </div>
     <% } %>
@@ -879,7 +531,7 @@
         const dbAddresses = <%- JSON.stringify(user.addresses || []) %>;
         let addresses = dbAddresses.map(a => ({ ...a, id: a._id ? a._id.toString() : String(Math.random()) }));
       </script>
-      <div id="addressList" style="display:flex;flex-direction:column;gap:0.75rem;max-width:600px;"></div>
+      <div id="addressList" style="display:flex;flex-direction:column;gap:0.75rem;max-width:620px;"></div>
       <p id="noAddresses" style="font-size:0.75rem;font-weight:300;color:rgba(245,242,235,0.22);display:none;">No saved addresses. Add one above.</p>
     </div>
 
@@ -894,34 +546,30 @@
         <p class="footer-logo">Velmora<br/>Chroné</p>
         <p class="footer-desc">Geneva-made timepieces for those who understand that true luxury is measured not in price, but in permanence.</p>
         <div class="footer-socials">
-          <a href="#" class="footer-social-btn" aria-label="Instagram">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/></svg>
-          </a>
-          <a href="#" class="footer-social-btn" aria-label="Facebook">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
-          </a>
+          <a href="#" class="footer-social-btn" aria-label="Instagram"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/></svg></a>
+          <a href="#" class="footer-social-btn" aria-label="Facebook"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
         </div>
       </div>
       <div>
         <span class="footer-col-title">Customer Service</span>
-        <a href="#" class="footer-col-link">Our Story</a>
         <a href="#" class="footer-col-link">Shipping &amp; Returns</a>
         <a href="#" class="footer-col-link">Watch Care Guide</a>
-        <a href="#" class="footer-col-link">Contact Us</a>
+        <a href="#" class="footer-col-link">Warranty Registration</a>
+        <a href="#" class="footer-col-link">Track Order</a>
       </div>
       <div>
         <span class="footer-col-title">About Us</span>
+        <a href="#" class="footer-col-link">Our Story</a>
         <a href="#" class="footer-col-link">Craftsmanship</a>
         <a href="#" class="footer-col-link">Sustainability</a>
-        <a href="#" class="footer-col-link">Store Blog</a>
-        <a href="#" class="footer-col-link">Warranty</a>
+        <a href="#" class="footer-col-link">Retail Partners</a>
       </div>
       <div>
         <span class="footer-col-title">Newsletter</span>
         <p style="font-family:'Jost',sans-serif;font-size:.6rem;color:rgba(245,242,235,.2);line-height:1.75;margin-bottom:.75rem;font-weight:300">Subscribe for exclusive deals &amp; new arrivals.</p>
         <div style="display:flex;align-items:center;border-bottom:1px solid rgba(201,169,110,0.2);padding-bottom:.3rem">
           <input type="email" placeholder="Enter your email address" style="flex:1;background:transparent;border:none;outline:none;font-family:'Jost',sans-serif;font-size:.63rem;color:#f5f2eb;min-width:0"/>
-          <button style="background:none;border:none;cursor:pointer;color:rgba(201,169,110,0.45);transition:color .2s" onmouseover="this.style.color='#c9a96e'" onmouseout="this.style.color='rgba(201,169,110,0.45)'">
+          <button style="background:none;border:none;cursor:pointer;color:rgba(201,169,110,0.45);">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
           </button>
         </div>
@@ -929,41 +577,97 @@
     </div>
     <div class="footer-bottom">
       <span class="footer-copy">&copy; <%= new Date().getFullYear() %> Velmora Chroné. All rights reserved.</span>
-      <div class="footer-legal">
-        <a href="#">Privacy Policy</a>
-        <a href="#">Terms of Service</a>
-        <a href="#">Accessibility</a>
-      </div>
+      <div class="footer-legal"><a href="#">Privacy Policy</a><a href="#">Terms of Service</a><a href="#">Accessibility</a></div>
     </div>
   </div>
 </footer>
 
-<!-- ══ ADDRESS MODAL ══ -->
+<!-- ══ ADDRESS MODAL — UPDATED WITH ALL FIELDS ══ -->
 <div class="modal-backdrop" id="addrModal">
   <div class="modal-box">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
       <p class="modal-title" id="addrModalTitle">Add New Address</p>
-      <button onclick="closeAddressModal()" style="background:none;border:none;cursor:pointer;color:rgba(245,242,235,0.25);transition:color 0.2s;border-radius:8px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;" onmouseover="this.style.color='rgba(245,242,235,0.7)'" onmouseout="this.style.color='rgba(245,242,235,0.25)'">
+      <button onclick="closeAddressModal()" style="background:none;border:none;cursor:pointer;color:rgba(245,242,235,0.25);transition:color 0.2s;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:8px;" onmouseover="this.style.color='rgba(245,242,235,0.7)'" onmouseout="this.style.color='rgba(245,242,235,0.25)'">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
-    <div style="display:grid;gap:1rem;">
-      <div><label class="vc-label">Street / House No.</label><input class="vc-input" id="addr-street" placeholder="House No., Street, Area"/></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
-        <div><label class="vc-label">City</label><input class="vc-input" id="addr-city" placeholder="City"/></div>
-        <div><label class="vc-label">PIN Code</label><input class="vc-input" id="addr-pincode" placeholder="6-digit PIN" maxlength="6"/></div>
+
+    <!-- Row 1: Full Name + Phone -->
+    <div class="form-row">
+      <div class="form-group">
+        <label class="vc-label">Full Name *</label>
+        <input class="vc-input" id="addr-fullName" type="text" placeholder="Your full name"/>
       </div>
-      <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
-        <input type="checkbox" id="addr-default" style="accent-color:#c9a96e;width:13px;height:13px;"/>
-        <label for="addr-default" style="font-size:0.5rem;letter-spacing:0.12em;text-transform:uppercase;color:rgba(245,242,235,0.3);cursor:pointer;">Set as default address</label>
+      <div class="form-group">
+        <label class="vc-label">Phone *</label>
+        <input class="vc-input" id="addr-phone" type="tel" placeholder="10-digit number" maxlength="10"/>
       </div>
     </div>
+
+    <!-- Row 2: Address Line 1 -->
+    <div class="form-row full">
+      <div class="form-group">
+        <label class="vc-label">Address Line 1 *</label>
+        <input class="vc-input" id="addr-line1" type="text" placeholder="House / Flat, Street, Area"/>
+      </div>
+    </div>
+
+    <!-- Row 3: Address Line 2 -->
+    <div class="form-row full">
+      <div class="form-group">
+        <label class="vc-label">Address Line 2</label>
+        <input class="vc-input" id="addr-line2" type="text" placeholder="Landmark (optional)"/>
+      </div>
+    </div>
+
+    <!-- Row 4: City + State -->
+    <div class="form-row">
+      <div class="form-group">
+        <label class="vc-label">City *</label>
+        <input class="vc-input" id="addr-city" type="text" placeholder="City"/>
+      </div>
+      <div class="form-group">
+        <label class="vc-label">State *</label>
+        <select class="vc-input" id="addr-state">
+          <option value="">Select State</option>
+          <option>Andhra Pradesh</option><option>Arunachal Pradesh</option>
+          <option>Assam</option><option>Bihar</option><option>Chhattisgarh</option>
+          <option>Delhi</option><option>Goa</option><option>Gujarat</option>
+          <option>Haryana</option><option>Himachal Pradesh</option>
+          <option>Jharkhand</option><option>Karnataka</option><option>Kerala</option>
+          <option>Madhya Pradesh</option><option>Maharashtra</option>
+          <option>Manipur</option><option>Meghalaya</option><option>Mizoram</option>
+          <option>Nagaland</option><option>Odisha</option><option>Punjab</option>
+          <option>Rajasthan</option><option>Sikkim</option><option>Tamil Nadu</option>
+          <option>Telangana</option><option>Tripura</option><option>Uttar Pradesh</option>
+          <option>Uttarakhand</option><option>West Bengal</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Row 5: PIN Code + Address Type -->
+    <div class="form-row">
+      <div class="form-group">
+        <label class="vc-label">PIN Code *</label>
+        <input class="vc-input" id="addr-pincode" type="text" placeholder="6-digit PIN" maxlength="6"/>
+      </div>
+      <div class="form-group">
+        <label class="vc-label">Address Type</label>
+        <select class="vc-input" id="addr-type">
+          <option value="Home">Home</option>
+          <option value="Office">Office</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Error message -->
+    <p id="addrModalError" style="display:none;font-family:'Jost',sans-serif;font-size:0.5rem;color:rgba(248,113,113,0.8);margin-top:0.5rem;letter-spacing:0.05em;"></p>
+
     <div style="margin-top:1.5rem;display:flex;gap:0.75rem;flex-wrap:wrap;">
       <button class="btn-gold" onclick="saveAddress()" id="saveAddrBtn">
         Save Address
-        <span class="btn-arrow">
-          <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-        </span>
+        <span class="btn-arrow"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
       </button>
       <button class="btn-dark" onclick="closeAddressModal()">Cancel</button>
     </div>
@@ -989,32 +693,23 @@
 <div class="toast" id="toast"><span class="toast-dot"></span><span id="toastMsg"></span></div>
 
 <script>
-  /* ── NAV SCROLL ── */
+  /* ── NAV ── */
   const navbar = document.getElementById('navbar');
   window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', scrollY > 30), { passive: true });
+  document.getElementById('hamburger').addEventListener('click', function() {
+    this.classList.toggle('open');
+    document.getElementById('mobileMenu').classList.toggle('open');
+  });
 
-  /* ── FLOATING GOLD DUST PARTICLES ── */
+  /* ── PARTICLES ── */
   (function() {
     const container = document.getElementById('heroParticles');
     if (!container) return;
-    const count = 18;
-    for (let i = 0; i < count; i++) {
+    for (let i = 0; i < 18; i++) {
       const p = document.createElement('div');
       p.className = 'particle';
       const size = Math.random() * 2.5 + 1;
-      const left = Math.random() * 100;
-      const duration = Math.random() * 12 + 8;
-      const delay = Math.random() * 10;
-      const driftX = (Math.random() - 0.5) * 60;
-      const startY = Math.random() * 100 + 20;
-      p.style.cssText = `
-        width:${size}px; height:${size}px;
-        left:${left}%; top:${startY}%;
-        --drift-x: ${driftX}px;
-        animation-duration:${duration}s;
-        animation-delay:-${delay}s;
-        opacity: ${Math.random() * 0.5 + 0.2};
-      `;
+      p.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}%;top:${Math.random()*100+20}%;--drift-x:${(Math.random()-0.5)*60}px;animation-duration:${Math.random()*12+8}s;animation-delay:-${Math.random()*10}s;opacity:${Math.random()*0.5+0.2};`;
       container.appendChild(p);
     }
   })();
@@ -1022,43 +717,23 @@
   /* ── LIVE CLOCK ── */
   (function() {
     const el = document.getElementById('liveTime');
-    if (!el) return;
     function tick() {
       const now = new Date();
-      const hh = String(now.getHours()).padStart(2,'0');
-      const mm = String(now.getMinutes()).padStart(2,'0');
-      const ss = String(now.getSeconds()).padStart(2,'0');
-      el.textContent = hh + ' : ' + mm + ' : ' + ss;
+      el.textContent = String(now.getHours()).padStart(2,'0') + ' : ' + String(now.getMinutes()).padStart(2,'0') + ' : ' + String(now.getSeconds()).padStart(2,'0');
     }
     tick(); setInterval(tick, 1000);
   })();
 
-  /* ── SYNC WATCH HANDS ── */
+  /* ── WATCH HANDS ── */
   (function() {
-    const now = new Date();
-    const sec = now.getSeconds();
-    const min = now.getMinutes() + sec / 60;
-    document.querySelectorAll('.wd-hand-seconds').forEach(el => {
-      el.style.transform = `rotate(${sec * 6}deg)`;
-      el.style.animationDelay = `-${sec}s`;
-    });
-    document.querySelectorAll('.wd-hand-minutes').forEach(el => {
-      el.style.transform = `rotate(${min * 6}deg)`;
-      el.style.animationDelay = `-${min * 60}s`;
-    });
+    const now = new Date(), sec = now.getSeconds(), min = now.getMinutes() + sec/60;
+    document.querySelectorAll('.wd-hand-seconds').forEach(el => { el.style.transform = `rotate(${sec*6}deg)`; el.style.animationDelay = `-${sec}s`; });
+    document.querySelectorAll('.wd-hand-minutes').forEach(el => { el.style.transform = `rotate(${min*6}deg)`; el.style.animationDelay = `-${min*60}s`; });
   })();
-
-  /* ── HAMBURGER ── */
-  document.getElementById('hamburger').addEventListener('click', function() {
-    this.classList.toggle('open');
-    document.getElementById('mobileMenu').classList.toggle('open');
-  });
 
   /* ── CART COUNT ── */
   fetch('/api/cart/count', { headers: { 'Accept': 'application/json' } })
-    .then(r => r.json())
-    .then(d => { if (d.count !== undefined) document.getElementById('cartCount').textContent = d.count; })
-    .catch(() => {});
+    .then(r => r.json()).then(d => { if (d.count !== undefined) document.getElementById('cartCount').textContent = d.count; }).catch(() => {});
 
   /* ── TAB SWITCHER ── */
   function switchTab(tab) {
@@ -1083,8 +758,7 @@
 
   /* ── AVATAR UPLOAD ── */
   async function uploadAvatar(e) {
-    const file = e.target.files[0];
-    if (!file) return;
+    const file = e.target.files[0]; if (!file) return;
     const reader = new FileReader();
     reader.onload = ev => document.getElementById('avatarPreview').src = ev.target.result;
     reader.readAsDataURL(file);
@@ -1093,118 +767,65 @@
     const formData = new FormData();
     formData.append('profileImage', file);
     try {
-      const res  = await fetch('/profile/upload-image', { method: 'POST', body: formData });
+      const res = await fetch('/profile/upload-image', { method: 'POST', body: formData });
       const data = await res.json();
-      if (data.success) {
-        document.getElementById('avatarPreview').src = data.imageUrl;
-        statusEl.textContent = 'Click to change';
-        showToast('Profile photo updated!', 'success');
-      } else {
-        statusEl.textContent = 'Upload failed';
-        showToast(data.message || 'Upload failed', 'error');
-      }
-    } catch {
-      statusEl.textContent = 'Click to change';
-      showToast('Network error. Try again.', 'error');
-    }
+      if (data.success) { document.getElementById('avatarPreview').src = data.imageUrl; statusEl.textContent = 'Click to change'; showToast('Profile photo updated!', 'success'); }
+      else { statusEl.textContent = 'Upload failed'; showToast(data.message || 'Upload failed', 'error'); }
+    } catch { statusEl.textContent = 'Click to change'; showToast('Network error. Try again.', 'error'); }
   }
 
   /* ── EMAIL OTP ── */
   let resendInterval = null;
-
   async function sendEmailOTP() {
     const email = document.getElementById('new-email').value.trim();
-    const errEl = document.getElementById('emailInputError');
-    const btn   = document.getElementById('sendOtpBtn');
+    const errEl = document.getElementById('emailInputError'), btn = document.getElementById('sendOtpBtn');
     errEl.style.display = 'none';
-    if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
-      errEl.textContent = 'Please enter a valid email address.';
-      errEl.style.display = 'block'; return;
-    }
+    if (!email || !/^\S+@\S+\.\S+$/.test(email)) { errEl.textContent = 'Please enter a valid email address.'; errEl.style.display = 'block'; return; }
     btn.disabled = true; btn.textContent = 'Sending…';
     try {
-      const res  = await fetch('/profile/request-email-change', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ newEmail: email }) });
+      const res = await fetch('/profile/request-email-change', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ newEmail: email }) });
       const data = await res.json();
-      if (data.success) {
-        document.getElementById('otp-sent-to').textContent = 'Sent to ' + email;
-        document.getElementById('email-step1').style.display = 'none';
-        document.getElementById('email-step2').style.display = 'block';
-        document.querySelectorAll('.otp-cell')[0].focus();
-        startResendTimer();
-        showToast('OTP sent! Check your inbox.', 'success');
-      } else {
-        errEl.textContent = data.message || 'Failed to send OTP.';
-        errEl.style.display = 'block';
-      }
+      if (data.success) { document.getElementById('otp-sent-to').textContent = 'Sent to ' + email; document.getElementById('email-step1').style.display = 'none'; document.getElementById('email-step2').style.display = 'block'; document.querySelectorAll('.otp-cell')[0].focus(); startResendTimer(); showToast('OTP sent! Check your inbox.', 'success'); }
+      else { errEl.textContent = data.message || 'Failed to send OTP.'; errEl.style.display = 'block'; }
     } catch { errEl.textContent = 'Network error. Please try again.'; errEl.style.display = 'block'; }
     btn.disabled = false; btn.textContent = 'Send Verification Code';
   }
-
   async function verifyEmailOTP() {
     const cells = document.querySelectorAll('.otp-cell');
-    const otp   = Array.from(cells).map(c => c.value).join('');
-    const errEl = document.getElementById('otpError');
-    const btn   = document.getElementById('verifyOtpBtn');
+    const otp = Array.from(cells).map(c => c.value).join('');
+    const errEl = document.getElementById('otpError'), btn = document.getElementById('verifyOtpBtn');
     errEl.style.display = 'none';
     if (otp.length < 6) { errEl.textContent = 'Enter the complete 6-digit code.'; errEl.style.display = 'block'; return; }
     btn.disabled = true; btn.textContent = 'Verifying…';
     try {
-      const res  = await fetch('/profile/verify-email-change', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ otp }) });
+      const res = await fetch('/profile/verify-email-change', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ otp }) });
       const data = await res.json();
-      if (data.success) {
-        showToast('Email updated successfully!', 'success');
-        clearInterval(resendInterval);
-        const newEmail = document.getElementById('new-email').value.trim();
-        const el = document.getElementById('displayEmail');
-        if (el) el.textContent = newEmail;
-        resetEmailForm();
-      } else {
-        errEl.textContent = data.message || 'Invalid OTP. Try again.';
-        errEl.style.display = 'block';
-        cells.forEach(c => { c.style.borderColor = 'rgba(248,113,113,0.5)'; });
-        setTimeout(() => cells.forEach(c => { c.style.borderColor = ''; }), 1400);
-      }
+      if (data.success) { showToast('Email updated successfully!', 'success'); clearInterval(resendInterval); const newEmail = document.getElementById('new-email').value.trim(); const el = document.getElementById('displayEmail'); if (el) el.textContent = newEmail; resetEmailForm(); }
+      else { errEl.textContent = data.message || 'Invalid OTP. Try again.'; errEl.style.display = 'block'; cells.forEach(c => { c.style.borderColor = 'rgba(248,113,113,0.5)'; }); setTimeout(() => cells.forEach(c => { c.style.borderColor = ''; }), 1400); }
     } catch { errEl.textContent = 'Network error.'; errEl.style.display = 'block'; }
     btn.disabled = false; btn.textContent = 'Verify & Update';
   }
-
   async function resendEmailOTP() {
-    const btn = document.getElementById('resendOtpBtn');
-    const errEl = document.getElementById('otpError');
+    const btn = document.getElementById('resendOtpBtn'), errEl = document.getElementById('otpError');
     errEl.style.display = 'none'; btn.disabled = true;
     try {
       const email = document.getElementById('new-email').value.trim();
-      const res   = await fetch('/profile/request-email-change', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ newEmail: email }) });
-      const data  = await res.json();
-      if (data.success) {
-        document.querySelectorAll('.otp-cell').forEach(c => c.value = '');
-        document.querySelectorAll('.otp-cell')[0].focus();
-        startResendTimer();
-        showToast('New OTP sent!', 'success');
-      } else { errEl.textContent = data.message || 'Failed to resend.'; errEl.style.display = 'block'; btn.disabled = false; }
+      const res = await fetch('/profile/request-email-change', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ newEmail: email }) });
+      const data = await res.json();
+      if (data.success) { document.querySelectorAll('.otp-cell').forEach(c => c.value = ''); document.querySelectorAll('.otp-cell')[0].focus(); startResendTimer(); showToast('New OTP sent!', 'success'); }
+      else { errEl.textContent = data.message || 'Failed to resend.'; errEl.style.display = 'block'; btn.disabled = false; }
     } catch { errEl.textContent = 'Network error.'; errEl.style.display = 'block'; btn.disabled = false; }
   }
-
-  function otpNext(input, idx) {
-    input.value = input.value.replace(/[^0-9]/g, '');
-    const cells = document.querySelectorAll('.otp-cell');
-    if (input.value.length === 1 && idx < 5) cells[idx + 1].focus();
-    if (idx === 5 && input.value.length === 1) {
-      const otp = Array.from(cells).map(c => c.value).join('');
-      if (otp.length === 6) verifyEmailOTP();
-    }
-  }
-  function otpBack(e, input, idx) {
-    if (e.key === 'Backspace' && !input.value && idx > 0) document.querySelectorAll('.otp-cell')[idx - 1].focus();
-  }
+  function otpNext(input, idx) { input.value = input.value.replace(/[^0-9]/g, ''); const cells = document.querySelectorAll('.otp-cell'); if (input.value.length === 1 && idx < 5) cells[idx+1].focus(); if (idx === 5 && input.value.length === 1) { const otp = Array.from(cells).map(c => c.value).join(''); if (otp.length === 6) verifyEmailOTP(); } }
+  function otpBack(e, input, idx) { if (e.key === 'Backspace' && !input.value && idx > 0) document.querySelectorAll('.otp-cell')[idx-1].focus(); }
   document.querySelectorAll('.otp-cell').forEach(cell => {
     cell.addEventListener('paste', e => {
       e.preventDefault();
-      const pasted = e.clipboardData.getData('text').replace(/[^0-9]/g, '').slice(0, 6);
+      const pasted = e.clipboardData.getData('text').replace(/[^0-9]/g,'').slice(0,6);
       if (!pasted) return;
       const cells = document.querySelectorAll('.otp-cell');
       pasted.split('').forEach((char, i) => { if (cells[i]) cells[i].value = char; });
-      cells[Math.min(pasted.length - 1, 5)].focus();
+      cells[Math.min(pasted.length-1, 5)].focus();
       if (pasted.length === 6) verifyEmailOTP();
     });
   });
@@ -1212,20 +833,9 @@
     const btn = document.getElementById('resendOtpBtn'), timerEl = document.getElementById('resendTimer');
     btn.disabled = true; let secs = 30; timerEl.textContent = '(' + secs + 's)';
     clearInterval(resendInterval);
-    resendInterval = setInterval(() => {
-      secs--; timerEl.textContent = '(' + secs + 's)';
-      if (secs <= 0) { clearInterval(resendInterval); btn.disabled = false; timerEl.textContent = ''; }
-    }, 1000);
+    resendInterval = setInterval(() => { secs--; timerEl.textContent = '(' + secs + 's)'; if (secs <= 0) { clearInterval(resendInterval); btn.disabled = false; timerEl.textContent = ''; } }, 1000);
   }
-  function resetEmailForm() {
-    document.getElementById('email-step1').style.display = 'block';
-    document.getElementById('email-step2').style.display = 'none';
-    document.getElementById('new-email').value = '';
-    document.getElementById('emailInputError').style.display = 'none';
-    document.getElementById('otpError').style.display = 'none';
-    document.querySelectorAll('.otp-cell').forEach(c => c.value = '');
-    clearInterval(resendInterval);
-  }
+  function resetEmailForm() { document.getElementById('email-step1').style.display = 'block'; document.getElementById('email-step2').style.display = 'none'; document.getElementById('new-email').value = ''; document.getElementById('emailInputError').style.display = 'none'; document.getElementById('otpError').style.display = 'none'; document.querySelectorAll('.otp-cell').forEach(c => c.value = ''); clearInterval(resendInterval); }
 
   /* ── PASSWORD ── */
   function togglePw(id) { const el = document.getElementById(id); el.type = el.type === 'password' ? 'text' : 'password'; }
@@ -1237,19 +847,21 @@
     const b1 = document.getElementById('bar1'), b2 = document.getElementById('bar2'), b3 = document.getElementById('bar3'), lb = document.getElementById('pwStrengthLabel');
     if (!b1) return;
     b1.className = b2.className = b3.className = 'pw-bar';
-    if      (score === 1) { b1.classList.add('weak');   lb.textContent = 'Weak';   lb.style.color = '#f87171'; }
+    if (score === 1) { b1.classList.add('weak'); lb.textContent = 'Weak'; lb.style.color = '#f87171'; }
     else if (score === 2) { b1.classList.add('medium'); b2.classList.add('medium'); lb.textContent = 'Good'; lb.style.color = '#fbbf24'; }
     else if (score === 3) { b1.classList.add('strong'); b2.classList.add('strong'); b3.classList.add('strong'); lb.textContent = 'Strong'; lb.style.color = '#4ade80'; }
     else { lb.textContent = ''; }
   }
   function submitPassword() {
     const nw = document.getElementById('pw-new').value, conf = document.getElementById('pw-confirm').value;
-    if (nw.length < 8)  { showToast('Password must be at least 8 characters', 'error'); return; }
-    if (nw !== conf)    { showToast('Passwords do not match', 'error'); return; }
+    if (nw.length < 8) { showToast('Password must be at least 8 characters', 'error'); return; }
+    if (nw !== conf) { showToast('Passwords do not match', 'error'); return; }
     document.getElementById('pwForm').submit();
   }
 
-  /* ── ADDRESSES ── */
+  /* ══════════════════════════════════════════
+     ADDRESSES — UPDATED TO MATCH NEW FIELDS
+  ══════════════════════════════════════════ */
   let editingAddrId = null, deleteAddrId = null;
 
   function renderAddresses() {
@@ -1260,15 +872,27 @@
     addresses.forEach(addr => {
       const card = document.createElement('div');
       card.className = 'addr-card' + (addr.isDefault ? ' default-addr' : '');
+      // Build address display lines using new fields
+      const nameLine  = addr.fullName || '—';
+      const phoneLine = addr.phone    ? `📞 ${addr.phone}` : '';
+      const line1     = addr.line1    || addr.street || '';
+      const line2     = addr.line2    ? `, ${addr.line2}` : '';
+      const cityLine  = [addr.city, addr.state].filter(Boolean).join(', ');
+      const pinLine   = addr.pincode  ? ` — ${addr.pincode}` : '';
+      const typeBadge = addr.addressType ? `<span style="font-size:0.38rem;letter-spacing:0.14em;text-transform:uppercase;color:rgba(201,169,110,0.55);border:1px solid rgba(201,169,110,0.2);padding:2px 8px;border-radius:100px;margin-left:8px;">${addr.addressType}</span>` : '';
+
       card.innerHTML = `
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
-          <div style="flex:1;min-width:140px;">
+          <div style="flex:1;min-width:160px;">
             ${addr.isDefault ? '<span style="font-size:0.44rem;letter-spacing:0.15em;text-transform:uppercase;color:#4ade80;border:1px solid rgba(74,222,128,0.22);padding:2px 10px;display:inline-block;margin-bottom:8px;border-radius:100px;background:rgba(74,222,128,0.05);">Default</span>' : ''}
-            <p style="font-size:0.82rem;font-weight:300;line-height:1.8;color:rgba(245,242,235,0.6);">
-              ${addr.street || '—'}<br/>${addr.city || ''}${addr.pincode ? ' — ' + addr.pincode : ''}
+            <p style="font-family:\'Cormorant Garamond\',serif;font-size:1rem;font-weight:400;color:#f5f2eb;margin-bottom:4px;">${nameLine}${typeBadge}</p>
+            <p style="font-size:0.72rem;font-weight:300;line-height:1.85;color:rgba(245,242,235,0.45);">
+              ${line1}${line2}<br/>
+              ${cityLine}${pinLine}<br/>
+              ${phoneLine}
             </p>
           </div>
-          <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;">
+          <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;flex-shrink:0;">
             <button class="btn-dark" style="font-size:0.46rem;padding:0.5rem 1.1rem;" onclick="editAddress('${addr.id}')">Edit</button>
             ${!addr.isDefault ? `<button class="btn-dark" style="font-size:0.46rem;padding:0.5rem 1.1rem;" onclick="setDefaultAddr('${addr.id}')">Set Default</button>` : ''}
             <button class="btn-danger-sm" style="font-size:0.46rem;padding:0.5rem 1.1rem;" onclick="promptDelete('${addr.id}')">Delete</button>
@@ -1276,53 +900,105 @@
         </div>`;
       list.appendChild(card);
     });
+
+    // Update the address count stat pill
+    const statEl = document.getElementById('statAddresses');
+    if (statEl) statEl.textContent = addresses.length;
   }
 
   function openAddressModal(id = null) {
     editingAddrId = id;
-    document.getElementById('addr-street').value  = '';
-    document.getElementById('addr-city').value    = '';
-    document.getElementById('addr-pincode').value = '';
-    document.getElementById('addr-default').checked = false;
+    // Clear all fields
+    ['addr-fullName','addr-phone','addr-line1','addr-line2','addr-city','addr-pincode'].forEach(fid => {
+      document.getElementById(fid).value = '';
+    });
+    document.getElementById('addr-state').value = '';
+    document.getElementById('addr-type').value  = 'Home';
+    document.getElementById('addrModalError').style.display = 'none';
     document.getElementById('addrModalTitle').textContent = id ? 'Edit Address' : 'Add New Address';
+
+    // Pre-fill if editing
     if (id) {
       const a = addresses.find(x => x.id === id);
       if (a) {
-        document.getElementById('addr-street').value  = a.street  || '';
-        document.getElementById('addr-city').value    = a.city    || '';
-        document.getElementById('addr-pincode').value = a.pincode || '';
-        document.getElementById('addr-default').checked = !!a.isDefault;
+        document.getElementById('addr-fullName').value = a.fullName || '';
+        document.getElementById('addr-phone').value    = a.phone    || '';
+        document.getElementById('addr-line1').value    = a.line1    || a.street || '';
+        document.getElementById('addr-line2').value    = a.line2    || '';
+        document.getElementById('addr-city').value     = a.city     || '';
+        document.getElementById('addr-pincode').value  = a.pincode  || '';
+        document.getElementById('addr-type').value     = a.addressType || 'Home';
+        // Set state dropdown
+        const sel = document.getElementById('addr-state');
+        for (const opt of sel.options) {
+          if (opt.value === a.state || opt.text === a.state) { sel.value = opt.value; break; }
+        }
       }
     }
     document.getElementById('addrModal').classList.add('open');
+    setTimeout(() => document.getElementById('addr-fullName').focus(), 300);
   }
-  function closeAddressModal() { document.getElementById('addrModal').classList.remove('open'); editingAddrId = null; }
 
-  function saveAddress() {
-    const street   = document.getElementById('addr-street').value.trim();
-    const city     = document.getElementById('addr-city').value.trim();
-    const pincode  = document.getElementById('addr-pincode').value.trim();
-    const isDefault = document.getElementById('addr-default').checked;
-    if (!street || !city || !pincode) { showToast('Please fill all address fields', 'error'); return; }
-    if (!/^\d{6}$/.test(pincode))     { showToast('PIN code must be 6 digits', 'error'); return; }
-    const payload = { street, city, pincode, isDefault };
+  function closeAddressModal() {
+    document.getElementById('addrModal').classList.remove('open');
+    editingAddrId = null;
+  }
+
+  async function saveAddress() {
+    const fullName    = document.getElementById('addr-fullName').value.trim();
+    const phone       = document.getElementById('addr-phone').value.trim();
+    const line1       = document.getElementById('addr-line1').value.trim();
+    const line2       = document.getElementById('addr-line2').value.trim();
+    const city        = document.getElementById('addr-city').value.trim();
+    const state       = document.getElementById('addr-state').value;
+    const pincode     = document.getElementById('addr-pincode').value.trim();
+    const addressType = document.getElementById('addr-type').value;
+    const errEl       = document.getElementById('addrModalError');
+
+    // Client-side validation
+    if (!fullName)                        { errEl.textContent = 'Full name is required.';             errEl.style.display = 'block'; return; }
+    if (!phone || !/^\d{10}$/.test(phone)) { errEl.textContent = 'Enter a valid 10-digit phone number.'; errEl.style.display = 'block'; return; }
+    if (!line1)                           { errEl.textContent = 'Address line 1 is required.';        errEl.style.display = 'block'; return; }
+    if (!city)                            { errEl.textContent = 'City is required.';                   errEl.style.display = 'block'; return; }
+    if (!state)                           { errEl.textContent = 'Please select a state.';              errEl.style.display = 'block'; return; }
+    if (!pincode || !/^\d{6}$/.test(pincode)) { errEl.textContent = 'Enter a valid 6-digit PIN code.'; errEl.style.display = 'block'; return; }
+
+    errEl.style.display = 'none';
+    const btn = document.getElementById('saveAddrBtn');
+    btn.disabled = true; btn.textContent = 'Saving…';
+
+    const payload = { fullName, phone, line1, line2, city, state, pincode, addressType };
     const url    = editingAddrId ? `/profile/address/${editingAddrId}` : '/profile/address';
     const method = editingAddrId ? 'PUT' : 'POST';
-    fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
-      .then(r => r.json()).then(data => {
-        if (data.success) {
-          addresses = data.addresses.map(a => ({ ...a, id: a._id.toString() }));
-          closeAddressModal(); renderAddresses();
-          showToast(editingAddrId ? 'Address updated' : 'Address added', 'success');
-        } else showToast(data.message || 'Failed', 'error');
-      }).catch(() => showToast('Network error', 'error'));
+
+    try {
+      const res  = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      const data = await res.json();
+      if (data.success) {
+        addresses = data.addresses.map(a => ({ ...a, id: a._id.toString() }));
+        closeAddressModal();
+        renderAddresses();
+        showToast(editingAddrId ? 'Address updated.' : 'Address saved.', 'success');
+      } else {
+        errEl.textContent = data.message || 'Failed to save address.';
+        errEl.style.display = 'block';
+      }
+    } catch {
+      errEl.textContent = 'Network error. Please try again.';
+      errEl.style.display = 'block';
+    } finally {
+      btn.disabled = false; btn.textContent = 'Save Address';
+    }
   }
+
   function setDefaultAddr(id) {
     fetch(`/profile/address/${id}/default`, { method: 'PATCH' })
       .then(r => r.json()).then(data => {
-        if (data.success) { addresses = data.addresses.map(a => ({ ...a, id: a._id.toString() })); renderAddresses(); showToast('Default address updated', 'success'); }
-      }).catch(() => showToast('Network error', 'error'));
+        if (data.success) { addresses = data.addresses.map(a => ({ ...a, id: a._id.toString() })); renderAddresses(); showToast('Default address updated.', 'success'); }
+        else showToast(data.message || 'Failed.', 'error');
+      }).catch(() => showToast('Network error.', 'error'));
   }
+
   function editAddress(id) { openAddressModal(id); }
   function promptDelete(id) { deleteAddrId = id; document.getElementById('deleteModal').classList.add('open'); }
   function closeDeleteModal() { document.getElementById('deleteModal').classList.remove('open'); deleteAddrId = null; }
@@ -1330,9 +1006,9 @@
     if (!deleteAddrId) return;
     fetch(`/profile/address/${deleteAddrId}`, { method: 'DELETE' })
       .then(r => r.json()).then(data => {
-        if (data.success) { addresses = data.addresses.map(a => ({ ...a, id: a._id.toString() })); closeDeleteModal(); renderAddresses(); showToast('Address removed', 'info'); }
-        else showToast(data.message || 'Delete failed', 'error');
-      }).catch(() => showToast('Network error', 'error'));
+        if (data.success) { addresses = data.addresses.map(a => ({ ...a, id: a._id.toString() })); closeDeleteModal(); renderAddresses(); showToast('Address removed.', 'info'); }
+        else showToast(data.message || 'Delete failed.', 'error');
+      }).catch(() => showToast('Network error.', 'error'));
   }
 
   /* ── MODAL BACKDROP DISMISS ── */
@@ -1343,37 +1019,8 @@
   renderAddresses();
   const hash = window.location.hash.replace('#', '');
   if (['details','edit','email','password','addresses'].includes(hash)) switchTab(hash);
-
   history.pushState(null, null, window.location.href);
   window.addEventListener('popstate', () => history.pushState(null, null, window.location.href));
-</script>
-
-<!-- SSE for live product updates -->
-<script>
-  (function () {
-    if (typeof PRODUCT_ID === 'undefined') return;
-    const es = new EventSource('/sse/products');
-    es.addEventListener('productUpdate', function (e) {
-      const data = JSON.parse(e.data);
-      if (data.productId !== PRODUCT_ID) return;
-      if (data.colorVariants && COLOR_VARIANTS.length > 0) {
-        data.colorVariants.forEach(updated => {
-          const match = COLOR_VARIANTS.find(v => v.name === updated.name);
-          if (match) match.stock = updated.stock;
-        });
-        updateStockUI(COLOR_VARIANTS[activeVariantIndex].stock);
-      } else { updateStockUI(data.stock); }
-      if (data.price !== undefined) {
-        const priceEl = document.querySelector('.prod-price');
-        if (priceEl) priceEl.textContent = '₹' + Number(data.price).toLocaleString('en-IN');
-      }
-      if (data.isDeleted || data.isListed === false) {
-        const addBtn = document.getElementById('addCartBtn');
-        if (addBtn) { addBtn.disabled = true; addBtn.textContent = 'No Longer Available'; }
-      }
-    });
-    es.onerror = function () {};
-  })();
 </script>
 </body>
 </html>

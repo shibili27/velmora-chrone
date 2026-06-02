@@ -17,7 +17,7 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: false,   
+    required: false,
     default: null,
     minlength: [8, 'Password must be at least 8 characters']
   },
@@ -39,10 +39,15 @@ const userSchema = new mongoose.Schema({
     default: '/images/default-avatar.png'
   },
   addresses: [{
-    street:    { type: String, trim: true },
-    city:      { type: String, trim: true },
-    pincode:   { type: String, trim: true },
-    isDefault: { type: Boolean, default: false }
+    fullName:    { type: String, trim: true, default: '' },
+    phone:       { type: String, trim: true, default: '' },
+    line1:       { type: String, trim: true, default: '' },  // replaces 'street'
+    line2:       { type: String, trim: true, default: '' },
+    city:        { type: String, trim: true, default: '' },
+    state:       { type: String, trim: true, default: '' },
+    pincode:     { type: String, trim: true, default: '' },
+    addressType: { type: String, default: 'Home' },
+    isDefault:   { type: Boolean, default: false }
   }],
   lastLogin: {
     type: Date

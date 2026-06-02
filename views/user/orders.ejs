@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Orders — Velmora Chroné</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Jost:wght@200;300;400;500&family=Playfair+Display:ital,wght@0,400;1,400&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Jost', sans-serif; background: #111110; color: #f5f2eb; overflow-x: hidden; min-height: 100vh; }
+    ::-webkit-scrollbar { width: 2px; }
+    ::-webkit-scrollbar-track { background: #111110; }
+    ::-webkit-scrollbar-thumb { background: #c9a96e; }
+
+    body::before {
+      content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity: .016;
+    }
+
+    /* ═══ NAV ═══ */
+    .nav-root { position: fixed; top: 0; left: 0; right: 0; z-index: 200; background: rgba(17,17,16,0.92); backdrop-filter: blur(18px) saturate(1.4); -webkit-backdrop-filter: blur(18px) saturate(1.4); border-bottom: 1px solid rgba(245,242,235,0.06); transition: box-shadow 0.3s; }
+    .nav-root.scrolled { box-shadow: 0 2px 24px rgba(0,0,0,0.5); }
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 1rem 2rem; }
+    @media(min-width:768px) { .nav-inner { padding: 1rem 3rem; } }
+    .nav-logo { font-family: 'Cormorant Garamond', serif; font-size: 0.85rem; font-weight: 300; letter-spacing: 0.25em; text-transform: uppercase; color: #f5f2eb; text-decoration: none; }
+    .nav-link { font-family: 'Jost', sans-serif; font-size: 0.53rem; font-weight: 400; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(245,242,235,0.45); text-decoration: none; transition: color 0.2s; position: relative; padding-bottom: 2px; }
+    .nav-link::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 0; height: 1px; background: #c9a96e; transition: width 0.3s; }
+    .nav-link:hover { color: rgba(245,242,235,0.9); }
+    .nav-link:hover::after { width: 100%; }
+    .nav-link.active { color: #c9a96e; }
+    .nav-link.active::after { width: 100%; }
+    .nav-icon-btn { position: relative; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; color: rgba(245,242,235,0.5); background: rgba(255,255,255,0.03); border: 1px solid rgba(201,169,110,0.12); border-radius: 10px; cursor: pointer; text-decoration: none; transition: color 0.22s, background 0.22s, border-color 0.22s, transform 0.18s cubic-bezier(.34,1.56,.64,1), box-shadow 0.22s; box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 2px 6px rgba(0,0,0,0.35); }
+    .nav-icon-btn::before { content: ''; position: absolute; inset: 0; border-radius: 10px; background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 55%); pointer-events: none; }
+    .nav-icon-btn:hover { color: #c9a96e; background: rgba(201,169,110,0.08); border-color: rgba(201,169,110,0.35); transform: translateY(-2px) scale(1.06); box-shadow: 0 1px 0 rgba(255,255,255,0.06) inset, 0 6px 20px rgba(0,0,0,0.5), 0 0 14px rgba(201,169,110,0.15); }
+    .nav-icon-btn:active { transform: translateY(0px) scale(0.97); }
+    .cart-badge { position: absolute; top: -5px; right: -5px; width: 14px; height: 14px; border-radius: 50%; background: linear-gradient(135deg, #d4b97e, #c9a96e); font-size: 0.38rem; font-weight: 600; color: #111110; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(201,169,110,0.4); }
+    .hamburger { display: flex; flex-direction: column; gap: 5px; background: none; border: none; cursor: pointer; padding: 3px; }
+    .hamburger span { display: block; width: 20px; height: 1px; background: rgba(245,242,235,0.6); transition: transform 0.3s, opacity 0.3s; }
+    .hamburger.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+    .mobile-menu { display: none; flex-direction: column; background: #0d0d0c; padding: 1.5rem 2rem; gap: 1rem; border-top: 1px solid rgba(245,242,235,0.05); }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu .nav-link { font-size: 0.68rem; padding: 0.45rem 0; border-bottom: 1px solid rgba(245,242,235,0.04); color: rgba(245,242,235,0.5); }
+
+    /* ═══ PAGE HERO ═══ */
+    .page-hero { padding: 5.5rem 2rem 2.8rem; background: linear-gradient(180deg, #080807 0%, #111110 100%); border-bottom: 1px solid rgba(201,169,110,0.08); position: relative; overflow: hidden; text-align: center; }
+    @media(min-width:768px) { .page-hero { padding: 5.5rem 3rem 2.8rem; } }
+    .page-hero::before { content: ''; position: absolute; top: -60px; left: 50%; transform: translateX(-50%); width: 600px; height: 400px; border-radius: 50%; background: radial-gradient(ellipse, rgba(201,169,110,0.055) 0%, transparent 70%); pointer-events: none; }
+    .page-hero::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(201,169,110,0.25), transparent); }
+    .hero-scan { position: absolute; top: 0; left: -100%; width: 60%; height: 100%; background: linear-gradient(90deg, transparent, rgba(201,169,110,0.022), transparent); animation: heroScan 7s ease-in-out infinite; pointer-events: none; z-index: 0; }
+    @keyframes heroScan { 0% { left: -60%; } 100% { left: 140%; } }
+    .page-hero-inner { max-width: 900px; margin: 0 auto; position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; }
+    .hero-tag { font-family: 'Jost', sans-serif; font-size: 0.42rem; letter-spacing: 0.38em; text-transform: uppercase; color: rgba(201,169,110,0.55); margin-bottom: 0.7rem; display: flex; align-items: center; gap: 0.65rem; }
+    .hero-tag::before { content: ''; width: 24px; height: 1px; background: #c9a96e; opacity: 0.45; }
+    .hero-tag::after  { content: ''; width: 24px; height: 1px; background: #c9a96e; opacity: 0.45; }
+    .hero-title { font-family: 'Playfair Display', serif; font-weight: 400; font-size: clamp(1.6rem, 3.5vw, 2.6rem); line-height: 1; color: #f5f2eb; letter-spacing: -0.01em; }
+    .hero-title em { font-style: italic; display: block; background: linear-gradient(125deg, #edd99e 0%, #c9a96e 45%, #a8873d 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; position: relative; }
+    .hero-title em::after { content: ''; position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%); width: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(201,169,110,0.6), transparent); animation: drawLine 1.4s cubic-bezier(.22,1,.36,1) 0.7s forwards; }
+    @keyframes drawLine { to { width: 75%; } }
+    .hero-meta { display: flex; align-items: center; gap: 0.75rem; margin-top: 1.4rem; }
+    .hero-meta-line { width: 36px; height: 1px; background: linear-gradient(90deg, transparent, rgba(201,169,110,0.4)); flex-shrink: 0; }
+    .hero-meta-line.r { background: linear-gradient(270deg, transparent, rgba(201,169,110,0.4)); }
+    .hero-meta-text { font-family: 'Jost', sans-serif; font-size: 0.42rem; letter-spacing: 0.32em; text-transform: uppercase; color: rgba(201,169,110,0.38); }
+
+    /* ═══ MAIN WRAP ═══ */
+    .orders-wrap { max-width: 1000px; margin: 0 auto; padding: 3rem 2rem 6rem; position: relative; z-index: 1; }
+    @media(min-width:768px) { .orders-wrap { padding: 3rem 3rem 6rem; } }
+
+    /* ═══ TOOLBAR ═══ */
+    .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.6rem; flex-wrap: wrap; }
+    .orders-count { font-family: 'Jost', sans-serif; font-size: 0.48rem; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(245,242,235,0.22); }
+    .orders-count strong { color: rgba(201,169,110,0.65); font-weight: 400; }
+    .search-form { display: flex; align-items: center; height: 38px; background: rgba(245,242,235,0.02); border: 1px solid rgba(245,242,235,0.08); border-radius: 8px; overflow: hidden; transition: border-color 0.25s, box-shadow 0.25s; }
+    .search-form:focus-within { border-color: rgba(201,169,110,0.38); box-shadow: 0 0 0 3px rgba(201,169,110,0.06); }
+    .search-icon { padding: 0 11px; color: rgba(245,242,235,0.2); display: flex; align-items: center; flex-shrink: 0; }
+    .search-input { background: transparent; border: none; outline: none; font-family: 'Jost', sans-serif; font-size: 0.7rem; font-weight: 300; color: #f5f2eb; width: 230px; padding: 0; }
+    .search-input::placeholder { color: rgba(245,242,235,0.18); }
+    .search-clear { padding: 0 10px; background: none; border: none; cursor: pointer; color: rgba(245,242,235,0.18); display: flex; align-items: center; transition: color 0.2s; flex-shrink: 0; }
+    .search-clear:hover { color: #f87171; }
+    .search-btn { padding: 0 16px; height: 100%; align-self: stretch; background: none; border: none; border-left: 1px solid rgba(245,242,235,0.06); color: rgba(201,169,110,0.45); font-family: 'Jost', sans-serif; font-size: 0.42rem; letter-spacing: 0.2em; text-transform: uppercase; cursor: pointer; transition: color 0.2s, background 0.2s; white-space: nowrap; display: flex; align-items: center; }
+    .search-btn:hover { color: #c9a96e; background: rgba(201,169,110,0.05); }
+
+    /* ═══ FILTER TABS ═══ */
+    .filter-row { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 2rem; }
+    .f-tab { padding: 6px 18px; border: 1px solid rgba(245,242,235,0.08); background: rgba(245,242,235,0.02); color: rgba(245,242,235,0.32); font-family: 'Jost', sans-serif; font-size: 0.44rem; letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; border-radius: 100px; transition: all 0.2s; }
+    .f-tab:hover { border-color: rgba(201,169,110,0.28); color: rgba(245,242,235,0.7); background: rgba(201,169,110,0.03); }
+    .f-tab.active { border-color: rgba(201,169,110,0.45); color: #c9a96e; background: rgba(201,169,110,0.08); }
+
+    /* ═══ ORDER CARD ═══ */
+    .order-card { background: #1c1c1a; border: 1px solid rgba(245,242,235,0.06); border-radius: 16px; margin-bottom: 14px; position: relative; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.35); transition: transform 0.3s cubic-bezier(.34,1.56,.64,1), box-shadow 0.3s, border-color 0.25s; animation: fadeUp 0.45s ease both; }
+    .order-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent); z-index: 2; border-radius: 16px 16px 0 0; pointer-events: none; }
+    .order-card::after { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: linear-gradient(180deg, #e0c47e, #c9a96e, #b8913d); opacity: 0; transition: opacity 0.25s; border-radius: 16px 0 0 16px; }
+    .order-card:hover { transform: translateY(-4px) scale(1.005); box-shadow: 0 16px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(201,169,110,0.15), 0 0 28px rgba(201,169,110,0.05); border-color: rgba(201,169,110,0.14); }
+    .order-card:hover::after { opacity: 1; }
+    .order-card.hidden { display: none; }
+    .order-card:nth-child(1) { animation-delay: 0.00s; }
+    .order-card:nth-child(2) { animation-delay: 0.07s; }
+    .order-card:nth-child(3) { animation-delay: 0.14s; }
+    .order-card:nth-child(4) { animation-delay: 0.21s; }
+    .order-card:nth-child(5) { animation-delay: 0.28s; }
+    .order-card:nth-child(6) { animation-delay: 0.35s; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Card Head */
+    .card-head { display: flex; align-items: center; justify-content: space-between; padding: 18px 24px 14px; border-bottom: 1px solid rgba(245,242,235,0.05); gap: 14px; flex-wrap: wrap; }
+    .order-num { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; font-weight: 400; letter-spacing: 0.06em; color: #f5f2eb; margin-bottom: 3px; }
+    .order-date { font-family: 'Jost', sans-serif; font-size: 0.5rem; color: rgba(245,242,235,0.25); letter-spacing: 0.07em; }
+
+    /* Badges */
+    .badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 13px; font-family: 'Jost', sans-serif; font-size: 0.4rem; letter-spacing: 0.16em; text-transform: uppercase; font-weight: 400; border-radius: 100px; white-space: nowrap; transition: background 0.4s, color 0.4s, border-color 0.4s; }
+    .badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+    .badge-confirmed  { background: rgba(96,165,250,0.08);  color: #60a5fa; border: 1px solid rgba(96,165,250,0.2);  }
+    .badge-processing { background: rgba(251,191,36,0.08);  color: #fbbf24; border: 1px solid rgba(251,191,36,0.2);  }
+    .badge-dispatched { background: rgba(201,169,110,0.08); color: #c9a96e; border: 1px solid rgba(201,169,110,0.22); }
+    .badge-delivered  { background: rgba(74,222,128,0.08);  color: #4ade80; border: 1px solid rgba(74,222,128,0.2);  }
+    .badge-cancelled  { background: rgba(248,113,113,0.08); color: #f87171; border: 1px solid rgba(248,113,113,0.2); }
+    .badge-returned   { background: rgba(136,136,128,0.08); color: rgba(245,242,235,0.3); border: 1px solid rgba(245,242,235,0.07); }
+
+    /* Live dot on badge */
+    .badge-live-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; flex-shrink: 0; animation: livePulse 1.8s ease-in-out infinite; }
+    @keyframes livePulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.35; transform: scale(0.65); } }
+
+    /* Card Items */
+    .card-items { padding: 10px 24px; }
+    .item-row { display: flex; align-items: center; gap: 14px; padding: 10px 0; border-bottom: 1px solid rgba(245,242,235,0.04); }
+    .item-row:last-child { border-bottom: none; }
+    .item-thumb { width: 52px; height: 52px; object-fit: cover; border: 1px solid rgba(245,242,235,0.07); flex-shrink: 0; background: #1a1a18; border-radius: 10px; filter: brightness(.9) saturate(.8); }
+    .item-no-img { width: 52px; height: 52px; border: 1px solid rgba(245,242,235,0.06); background: #1a1a18; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; color: rgba(245,242,235,0.08); border-radius: 10px; }
+    .item-info { flex: 1; min-width: 0; }
+    .item-name { font-family: 'Jost', sans-serif; font-size: 0.72rem; font-weight: 300; color: #f5f2eb; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
+    .item-brand { font-family: 'Jost', sans-serif; font-size: 0.42rem; color: rgba(201,169,110,0.5); letter-spacing: 0.14em; text-transform: uppercase; }
+    .item-cancelled-tag { font-family: 'Jost', sans-serif; font-size: 0.4rem; color: #f87171; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 2px; }
+    .item-qty { font-family: 'Jost', sans-serif; font-size: 0.55rem; color: rgba(245,242,235,0.22); white-space: nowrap; flex-shrink: 0; }
+    .item-price { font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; color: rgba(201,169,110,0.75); white-space: nowrap; flex-shrink: 0; }
+    .more-items { font-family: 'Jost', sans-serif; font-size: 0.42rem; color: rgba(245,242,235,0.15); letter-spacing: 0.12em; text-transform: uppercase; text-align: center; padding: 7px 0 2px; }
+
+    /* Card Footer */
+    .card-foot { display: flex; align-items: center; justify-content: space-between; padding: 13px 24px; border-top: 1px solid rgba(245,242,235,0.05); gap: 14px; flex-wrap: wrap; }
+    .order-total-label { font-family: 'Jost', sans-serif; font-size: 0.4rem; color: rgba(245,242,235,0.18); letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 3px; }
+    .order-total-amt { font-family: 'Cormorant Garamond', serif; font-size: 1.45rem; color: #f5f2eb; letter-spacing: 0.04em; }
+    .card-actions { display: flex; gap: 9px; align-items: center; }
+
+    .btn-view { padding: 0.62rem 1.5rem; border: none; border-radius: 100px; cursor: pointer; font-family: 'Jost', sans-serif; font-size: 0.44rem; letter-spacing: 0.2em; text-transform: uppercase; color: #0d0b08; display: inline-block; text-align: center; text-decoration: none; position: relative; overflow: hidden; background: linear-gradient(135deg, #e0c47e 0%, #c9a96e 50%, #b8913d 100%); transition: transform 0.2s cubic-bezier(.34,1.56,.64,1), box-shadow 0.22s; box-shadow: 0 1px 0 rgba(255,255,255,0.35) inset, 0 4px 18px rgba(185,140,55,0.22), 0 1px 4px rgba(0,0,0,0.4); }
+    .btn-view::after { content: ''; position: absolute; top: 0; left: -75%; width: 50%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent); transform: skewX(-18deg); transition: left 0.55s ease; }
+    .btn-view:hover::after { left: 130%; }
+    .btn-view:hover { transform: translateY(-2px); box-shadow: 0 1px 0 rgba(255,255,255,0.4) inset, 0 8px 24px rgba(185,140,55,0.38); }
+    .btn-view:active { transform: translateY(1px); }
+
+    .btn-invoice { display: inline-flex; align-items: center; gap: 6px; padding: 0.6rem 1.2rem; border: 1px solid rgba(201,169,110,0.25); border-radius: 100px; background: rgba(201,169,110,0.04); color: rgba(201,169,110,0.6); font-family: 'Jost', sans-serif; font-size: 0.42rem; letter-spacing: 0.16em; text-transform: uppercase; cursor: pointer; transition: all 0.22s; white-space: nowrap; text-decoration: none; }
+    .btn-invoice:hover { border-color: rgba(201,169,110,0.55); color: #c9a96e; background: rgba(201,169,110,0.08); transform: translateY(-1px); }
+
+    /* ═══ TOAST ═══ */
+    .status-toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(120%); z-index: 500; background: #1a1916; border: 1px solid rgba(201,169,110,0.3); border-radius: 12px; padding: 0.85rem 1.5rem; display: flex; align-items: center; gap: 0.75rem; box-shadow: 0 8px 32px rgba(0,0,0,0.5); transition: transform 0.5s cubic-bezier(.34,1.56,.64,1), opacity 0.4s; opacity: 0; min-width: 280px; max-width: 90vw; }
+    .status-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    .toast-icon { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(201,169,110,0.12); flex-shrink: 0; }
+    .toast-icon svg { width: 14px; height: 14px; }
+    .toast-text { flex: 1; }
+    .toast-title { font-family: 'Jost', sans-serif; font-size: 0.55rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #f5f2eb; margin-bottom: 0.2rem; }
+    .toast-sub { font-family: 'Jost', sans-serif; font-size: 0.48rem; color: rgba(245,242,235,0.35); letter-spacing: 0.04em; }
+
+    /* ═══ PAGINATION ═══ */
+    .pagination { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 3.5rem; padding-top: 2rem; border-top: 1px solid rgba(245,242,235,0.05); }
+    .page-btn { display: inline-flex; align-items: center; justify-content: center; min-width: 36px; height: 36px; padding: 0 6px; border: 1px solid rgba(245,242,235,0.08); border-radius: 8px; font-family: 'Jost', sans-serif; font-size: 0.55rem; font-weight: 300; color: rgba(245,242,235,0.35); text-decoration: none; transition: all 0.2s; background: rgba(245,242,235,0.02); }
+    .page-btn:hover { border-color: rgba(201,169,110,0.35); color: #c9a96e; background: rgba(201,169,110,0.04); }
+    .page-btn.active { background: linear-gradient(135deg, #c9a96e, #b8913d); border-color: #c9a96e; color: #0d0b08; font-weight: 500; }
+    .page-btn.disabled { opacity: 0.2; pointer-events: none; }
+
+    /* ═══ EMPTY / NO RESULTS ═══ */
+    .empty-state { padding: 5rem 2rem; text-align: center; }
+    .empty-state h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 300; color: rgba(245,242,235,0.2); margin-bottom: 10px; }
+    .empty-state p { font-family: 'Jost', sans-serif; font-size: 0.58rem; letter-spacing: 0.1em; color: rgba(245,242,235,0.15); margin-bottom: 2rem; line-height: 1.8; }
+    .btn-explore { display: inline-block; padding: 0.78rem 2.5rem; border: none; border-radius: 100px; cursor: pointer; font-family: 'Jost', sans-serif; font-size: 0.46rem; letter-spacing: 0.22em; text-transform: uppercase; color: #0d0b08; text-decoration: none; position: relative; overflow: hidden; background: linear-gradient(135deg, #e0c47e 0%, #c9a96e 50%, #b8913d 100%); transition: transform 0.2s cubic-bezier(.34,1.56,.64,1), box-shadow 0.22s; box-shadow: 0 1px 0 rgba(255,255,255,0.35) inset, 0 4px 18px rgba(185,140,55,0.3); }
+    .btn-explore:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(185,140,55,0.4); }
+    .no-results { padding: 4rem 2rem; text-align: center; border: 1px dashed rgba(245,242,235,0.05); border-radius: 16px; background: rgba(245,242,235,0.01); }
+    .no-results p { font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; font-weight: 300; color: rgba(245,242,235,0.18); margin-bottom: 6px; }
+    .no-results span { font-family: 'Jost', sans-serif; font-size: 0.5rem; color: rgba(245,242,235,0.1); letter-spacing: 0.08em; }
+
+    /* ═══ FOOTER ═══ */
+    .footer { background: #0a0a09; padding: 4rem 2rem 1.5rem; border-top: 1px solid rgba(245,242,235,0.05); position: relative; z-index: 1; }
+    @media(min-width:768px) { .footer { padding: 4rem 3rem 1.5rem; } }
+    .footer-top { display: grid; grid-template-columns: 1fr; gap: 2.5rem; padding-bottom: 2.5rem; border-bottom: 1px solid rgba(245,242,235,0.05); max-width: 1200px; margin: 0 auto; }
+    @media(min-width:768px) { .footer-top { grid-template-columns: 1.2fr 1fr 1fr 1.2fr; gap: 3rem; } }
+    .footer-bottom { display: flex; flex-direction: column; gap: 0.75rem; padding-top: 1.5rem; align-items: center; text-align: center; max-width: 1200px; margin: 0 auto; }
+    @media(min-width:768px) { .footer-bottom { flex-direction: row; justify-content: space-between; } }
+    .footer-logo { font-family: 'Cormorant Garamond', serif; font-size: 1rem; font-weight: 300; letter-spacing: 0.2em; text-transform: uppercase; color: #f5f2eb; margin-bottom: 0.75rem; }
+    .footer-desc { font-family: 'Jost', sans-serif; font-size: 0.6rem; font-weight: 300; color: rgba(245,242,235,0.22); line-height: 1.85; }
+    .footer-socials { display: flex; gap: 0.9rem; margin-top: 1.25rem; }
+    .footer-social-btn { width: 32px; height: 32px; border: 1px solid rgba(201,169,110,0.15); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: rgba(245,242,235,0.3); text-decoration: none; transition: border-color 0.25s, color 0.25s, transform 0.18s; }
+    .footer-social-btn:hover { border-color: rgba(201,169,110,0.4); color: #c9a96e; transform: scale(1.1); }
+    .footer-col-title { font-family: 'Jost', sans-serif; font-size: 0.44rem; letter-spacing: 0.28em; text-transform: uppercase; color: rgba(201,169,110,0.35); margin-bottom: 1rem; display: block; }
+    .footer-col-link { display: block; font-family: 'Jost', sans-serif; font-size: 0.58rem; letter-spacing: 0.08em; color: rgba(245,242,235,0.25); text-decoration: none; transition: color 0.2s; margin-bottom: 0.5rem; }
+    .footer-col-link:hover { color: rgba(245,242,235,0.6); }
+    .footer-copy { font-family: 'Jost', sans-serif; font-size: 0.44rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(245,242,235,0.12); }
+    .footer-legal { display: flex; gap: 1.25rem; }
+    .footer-legal a { font-family: 'Jost', sans-serif; font-size: 0.44rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(245,242,235,0.18); text-decoration: none; transition: color 0.2s; }
+    .footer-legal a:hover { color: rgba(245,242,235,0.5); }
+
+    /* ═══ UTIL ═══ */
+    .rule { height: 1px; background: linear-gradient(90deg, transparent, rgba(201,169,110,0.18), transparent); }
+    .fade-up { animation: fadeUp .75s ease both; }
+    .d1 { animation-delay: .1s; } .d2 { animation-delay: .22s; } .d3 { animation-delay: .35s; }
+    .reveal { opacity: 0; transform: translateY(20px); transition: opacity .6s ease, transform .6s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    @media(max-width:640px) {
+      .card-head { flex-direction: column; align-items: flex-start; }
+      .card-foot { flex-direction: column; align-items: flex-start; }
+      .card-actions { width: 100%; }
+      .btn-view, .btn-invoice { flex: 1; text-align: center; justify-content: center; }
+      .search-input { width: 140px; }
+      .toolbar { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav class="nav-root" id="navbar">
+  <div class="nav-inner">
+    <div class="hidden md:flex items-center gap-8">
+      <a href="/home"     class="nav-link">Home</a>
+      <a href="/products" class="nav-link">Collection</a>
+      <a href="/orders"   class="nav-link active">Orders</a>
+      <a href="/profile"  class="nav-link">Profile</a>
+    </div>
+    <a href="/home" class="nav-logo md:absolute md:left-1/2 md:-translate-x-1/2">Velmora Chroné</a>
+    <div class="flex items-center gap-2 md:gap-3 ml-auto md:ml-0">
+      <a href="/wishlist" class="nav-icon-btn" aria-label="Wishlist">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      </a>
+      <a href="/cart" class="nav-icon-btn" aria-label="Cart" style="position:relative">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <span class="cart-badge" id="cartCount">0</span>
+      </a>
+      <a href="/logout" class="nav-link hidden md:inline" style="margin-left:4px;">Logout</a>
+      <button class="hamburger md:hidden" id="hamburger"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="/home"     class="nav-link">Home</a>
+    <a href="/products" class="nav-link">Collection</a>
+    <a href="/orders"   class="nav-link active">Orders</a>
+    <a href="/profile"  class="nav-link">Profile</a>
+    <a href="/logout"   class="nav-link" style="color:rgba(201,169,110,0.55)">Logout</a>
+  </div>
+</nav>
+
+<!-- ══ HERO ══ -->
+<div class="page-hero">
+  <div class="hero-scan"></div>
+  <div class="page-hero-inner">
+    <p class="hero-tag fade-up d1">Account</p>
+    <h1 class="hero-title fade-up d2">My <em>Orders</em></h1>
+    <div class="hero-meta fade-up d3">
+      <div class="hero-meta-line"></div>
+      <span class="hero-meta-text">
+        <% if (total > 0) { %><%= total %> Order<%= total !== 1 ? 's' : '' %><% if (search) { %> · "<%= search %>"<% } %><% } else { %>Order History<% } %>
+      </span>
+      <div class="hero-meta-line r"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MAIN ══ -->
+<div class="orders-wrap">
+
+  <% if (total > 0 || search) { %>
+
+  <!-- Toolbar -->
+  <div class="toolbar reveal">
+    <span class="orders-count"><strong><%= total %></strong> order<%= total !== 1 ? 's' : '' %> found</span>
+    <form class="search-form" action="/orders" method="GET">
+      <span class="search-icon">
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="M21 21l-4.35-4.35"/></svg>
+      </span>
+      <input class="search-input" type="text" name="search" value="<%= search %>" placeholder="Search orders…" autocomplete="off"/>
+      <% if (search) { %>
+        <a href="/orders" class="search-clear" title="Clear">
+          <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </a>
+      <% } %>
+      <button type="submit" class="search-btn">Search</button>
+    </form>
+  </div>
+
+  <!-- Filter tabs -->
+  <% if (!search && orders.length > 0) { %>
+  <div class="filter-row reveal" id="filterRow">
+    <button class="f-tab active" data-filter="all">All</button>
+    <button class="f-tab" data-filter="confirmed">Confirmed</button>
+    <button class="f-tab" data-filter="processing">Processing</button>
+    <button class="f-tab" data-filter="dispatched">Dispatched</button>
+    <button class="f-tab" data-filter="delivered">Delivered</button>
+    <button class="f-tab" data-filter="cancelled">Cancelled</button>
+    <button class="f-tab" data-filter="returned">Returned</button>
+  </div>
+  <% } %>
+
+  <% if (orders.length > 0) { %>
+
+  <!-- Cards -->
+  <div id="cardsContainer">
+  <% orders.forEach(function(order) { %>
+    <%
+      const statusVal = order.orderStatus;
+      const isTerminal = statusVal === 'delivered' || statusVal === 'cancelled' || statusVal === 'returned';
+    %>
+    <div class="order-card" data-status="<%= statusVal %>" data-order-id="<%= order._id %>">
+
+      <!-- Head -->
+      <div class="card-head">
+        <div>
+          <div class="order-num"><%= order.orderNumber %></div>
+          <div class="order-date">Placed on <%= new Date(order.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' }) %></div>
+        </div>
+        <!-- Badge — the live-dot class replaces the static ::before dot -->
+        <span class="badge badge-<%= statusVal %>" id="badge-<%= order._id %>">
+          <span class="badge-live-dot <%= isTerminal ? '' : '' %>"></span>
+          <span id="badge-text-<%= order._id %>"><%= statusVal.charAt(0).toUpperCase() + statusVal.slice(1) %></span>
+        </span>
+      </div>
+
+      <!-- Items -->
+      <div class="card-items">
+        <% order.items.slice(0, 2).forEach(function(item) { %>
+          <div class="item-row">
+            <% if (item.image) { %>
+              <img class="item-thumb" src="<%= item.image %>" alt="<%= item.name %>" loading="lazy"/>
+            <% } else { %>
+              <div class="item-no-img">⌚</div>
+            <% } %>
+            <div class="item-info">
+              <div class="item-name"><%= item.name %></div>
+              <% if (item.brand) { %><div class="item-brand"><%= item.brand %></div><% } %>
+              <% if (item.status === 'cancelled') { %><div class="item-cancelled-tag">Cancelled</div><% } %>
+            </div>
+            <div class="item-qty">× <%= item.quantity %></div>
+            <div class="item-price">₹<%= item.totalPrice.toLocaleString('en-IN') %></div>
+          </div>
+        <% }); %>
+        <% if (order.items.length > 2) { %>
+          <div class="more-items">+ <%= order.items.length - 2 %> more item<%= order.items.length - 2 !== 1 ? 's' : '' %></div>
+        <% } %>
+      </div>
+
+      <!-- Footer -->
+      <div class="card-foot">
+        <div>
+          <div class="order-total-label">Order Total</div>
+          <div class="order-total-amt">₹<%= order.pricing.grandTotal.toLocaleString('en-IN') %></div>
+        </div>
+        <div class="card-actions" id="actions-<%= order._id %>">
+          <% if (order.orderStatus === 'delivered') { %>
+            <a href="/orders/<%= order._id %>/invoice" class="btn-invoice">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Invoice
+            </a>
+          <% } %>
+          <a href="/orders/<%= order._id %>" class="btn-view">View Details</a>
+        </div>
+      </div>
+
+    </div>
+  <% }); %>
+  </div>
+
+  <!-- Pagination -->
+  <% if (totalPages > 1) { %>
+  <div class="pagination reveal">
+    <a href="/orders?search=<%= encodeURIComponent(search) %>&page=<%= page - 1 %>" class="page-btn <%= page <= 1 ? 'disabled' : '' %>">
+      <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+    </a>
+    <% for (let p = 1; p <= totalPages; p++) { %>
+      <% if (p === 1 || p === totalPages || (p >= page - 1 && p <= page + 1)) { %>
+        <a href="/orders?search=<%= encodeURIComponent(search) %>&page=<%= p %>" class="page-btn <%= p === page ? 'active' : '' %>"><%= p %></a>
+      <% } else if (p === page - 2 || p === page + 2) { %>
+        <span style="color:rgba(245,242,235,0.15);font-size:0.6rem;padding:0 4px;">…</span>
+      <% } %>
+    <% } %>
+    <a href="/orders?search=<%= encodeURIComponent(search) %>&page=<%= page + 1 %>" class="page-btn <%= page >= totalPages ? 'disabled' : '' %>">
+      <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+    </a>
+  </div>
+  <% } %>
+
+  <% } else { %>
+  <div class="no-results reveal">
+    <p>No orders found</p>
+    <span>No results for "<%= search %>". Try searching by order ID, product name, or status.</span>
+  </div>
+  <% } %>
+
+  <% } else { %>
+  <!-- Empty State -->
+  <div class="empty-state reveal">
+    <svg width="52" height="52" fill="none" stroke="rgba(201,169,110,0.1)" stroke-width="0.6" viewBox="0 0 24 24" style="margin:0 auto 1.5rem;display:block"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    <h3>No Orders Yet</h3>
+    <p>Your timepiece collection awaits.<br/>Begin your journey with Velmora Chroné.</p>
+    <a href="/products" class="btn-explore">Explore Collection</a>
+  </div>
+  <% } %>
+
+</div>
+
+<!-- ══ TOAST ══ -->
+<div class="status-toast" id="statusToast">
+  <div class="toast-icon" id="toastIcon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#c9a96e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" id="toastSvg">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>
+  </div>
+  <div class="toast-text">
+    <div class="toast-title" id="toastTitle">Status Updated</div>
+    <div class="toast-sub"  id="toastSub">Your order status has changed</div>
+  </div>
+</div>
+
+<div class="rule"></div>
+
+<!-- ══ FOOTER ══ -->
+<footer class="footer">
+  <div style="max-width:1200px;margin:0 auto;">
+    <div class="footer-top">
+      <div>
+        <p class="footer-logo">Velmora<br/>Chroné</p>
+        <p class="footer-desc">Geneva-made timepieces for those who understand that true luxury is measured not in price, but in permanence.</p>
+        <div class="footer-socials">
+          <a href="#" class="footer-social-btn" aria-label="Instagram"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/></svg></a>
+          <a href="#" class="footer-social-btn" aria-label="Facebook"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
+        </div>
+      </div>
+      <div>
+        <span class="footer-col-title">Customer Service</span>
+        <a href="#" class="footer-col-link">Our Story</a>
+        <a href="#" class="footer-col-link">Shipping &amp; Returns</a>
+        <a href="#" class="footer-col-link">Watch Care Guide</a>
+        <a href="#" class="footer-col-link">Contact Us</a>
+      </div>
+      <div>
+        <span class="footer-col-title">About Us</span>
+        <a href="#" class="footer-col-link">Craftsmanship</a>
+        <a href="#" class="footer-col-link">Sustainability</a>
+        <a href="#" class="footer-col-link">Store Blog</a>
+        <a href="#" class="footer-col-link">Warranty</a>
+      </div>
+      <div>
+        <span class="footer-col-title">Newsletter</span>
+        <p style="font-family:'Jost',sans-serif;font-size:.6rem;color:rgba(245,242,235,.2);line-height:1.75;margin-bottom:.75rem;font-weight:300">Subscribe for exclusive deals &amp; new arrivals.</p>
+        <div style="display:flex;align-items:center;border-bottom:1px solid rgba(201,169,110,0.2);padding-bottom:.3rem">
+          <input type="email" placeholder="Enter your email address" style="flex:1;background:transparent;border:none;outline:none;font-family:'Jost',sans-serif;font-size:.63rem;color:#f5f2eb;min-width:0"/>
+          <button style="background:none;border:none;cursor:pointer;color:rgba(201,169,110,0.45)" onmouseover="this.style.color='#c9a96e'" onmouseout="this.style.color='rgba(201,169,110,0.45)'"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span class="footer-copy">&copy; <%= new Date().getFullYear() %> Velmora Chroné. All rights reserved.</span>
+      <div class="footer-legal"><a href="#">Privacy Policy</a><a href="#">Terms of Service</a><a href="#">Accessibility</a></div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  /* ── Nav ── */
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', scrollY > 30), { passive: true });
+  const hamburger = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobileMenu');
+  hamburger.addEventListener('click', () => { hamburger.classList.toggle('open'); mobileMenu.classList.toggle('open'); });
+  mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => { hamburger.classList.remove('open'); mobileMenu.classList.remove('open'); }));
+
+  /* ── Reveal ── */
+  const revealEls = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach((e, i) => { if (e.isIntersecting) { setTimeout(() => e.target.classList.add('visible'), i * 60); observer.unobserve(e.target); } });
+  }, { threshold: 0.06 });
+  revealEls.forEach(el => observer.observe(el));
+
+  /* ── Cart count ── */
+  fetch('/api/cart/count', { headers: { 'Accept': 'application/json' } })
+    .then(r => r.json()).then(d => { if (d.count !== undefined) document.getElementById('cartCount').textContent = d.count; }).catch(() => {});
+
+  /* ── Filter tabs ── */
+  const tabs  = document.querySelectorAll('.f-tab');
+  const cards = document.querySelectorAll('.order-card');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const filter = tab.dataset.filter;
+      cards.forEach(card => card.classList.toggle('hidden', filter !== 'all' && card.dataset.status !== filter));
+      const container = document.getElementById('cardsContainer');
+      const visible   = [...cards].filter(c => !c.classList.contains('hidden'));
+      let noRes = container.querySelector('.no-filter-inline');
+      if (visible.length === 0) {
+        if (!noRes) {
+          noRes = document.createElement('div');
+          noRes.className = 'no-results no-filter-inline';
+          noRes.innerHTML = `<p>No ${filter} orders</p><span>You have no orders with this status right now.</span>`;
+          container.appendChild(noRes);
+        }
+      } else if (noRes) { noRes.remove(); }
+    });
+  });
+
+  /* ── Esc clears search ── */
+  const searchInput = document.querySelector('.search-input');
+  if (searchInput) searchInput.addEventListener('keydown', e => { if (e.key === 'Escape') window.location.href = '/orders'; });
+
+  /* ══════════════════════════════════════════
+     LIVE TRACKING — SSE per order card
+  ══════════════════════════════════════════ */
+
+  const BADGE_CLASSES = ['badge-confirmed','badge-processing','badge-dispatched','badge-delivered','badge-cancelled','badge-returned'];
+
+  const STAGE_LABELS = {
+    confirmed:  'Order Confirmed',
+    processing: 'Processing Order',
+    dispatched: 'Out for Delivery',
+    delivered:  'Delivered',
+    cancelled:  'Order Cancelled',
+    returned:   'Return Initiated',
+  };
+  const STAGE_SUBS = {
+    confirmed:  'Your order has been confirmed.',
+    processing: 'Your order is being prepared.',
+    dispatched: 'Your order is on the way!',
+    delivered:  'Your order has been delivered.',
+    cancelled:  'Your order has been cancelled.',
+    returned:   'Return process has started.',
+  };
+
+  /* Toast */
+  let toastTimer;
+  function showToast(status, orderNum) {
+    const toast     = document.getElementById('statusToast');
+    const toastIcon = document.getElementById('toastIcon');
+    const toastSvg  = document.getElementById('toastSvg');
+    const title     = document.getElementById('toastTitle');
+    const sub       = document.getElementById('toastSub');
+
+    const isCancelled = status === 'cancelled';
+    const isReturned  = status === 'returned';
+
+    title.textContent = (orderNum ? orderNum + ' — ' : '') + (STAGE_LABELS[status] || 'Status Updated');
+    sub.textContent   = STAGE_SUBS[status] || 'Your order status has changed.';
+
+    toastIcon.style.background = isCancelled ? 'rgba(239,68,68,.12)'
+                               : isReturned  ? 'rgba(251,146,60,.12)'
+                               : 'rgba(201,169,110,.12)';
+    toastSvg.setAttribute('stroke', isCancelled ? 'rgba(239,68,68,.85)'
+                                  : isReturned  ? 'rgba(251,146,60,.85)'
+                                  : '#c9a96e');
+    if (isCancelled) {
+      toastSvg.innerHTML = '<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>';
+    } else if (isReturned) {
+      toastSvg.innerHTML = '<polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/>';
+    } else {
+      toastSvg.innerHTML = '<polyline points="20 6 9 17 4 12"/>';
+    }
+
+    clearTimeout(toastTimer);
+    toast.classList.add('show');
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 4500);
+  }
+
+  /* Apply status update to a card */
+  function applyCardStatus(orderId, newStatus, orderNum) {
+    const card      = document.querySelector(`.order-card[data-order-id="${orderId}"]`);
+    const badgeEl   = document.getElementById('badge-' + orderId);
+    const badgeText = document.getElementById('badge-text-' + orderId);
+    const actionsEl = document.getElementById('actions-' + orderId);
+    if (!card || !badgeEl) return;
+
+    const prev = card.dataset.status;
+    if (prev === newStatus) return;               // no change, skip
+
+    /* Update data-status for filter tabs */
+    card.dataset.status = newStatus;
+
+    /* Re-apply active filter so card hides/shows correctly */
+    const activeTab = document.querySelector('.f-tab.active');
+    if (activeTab && activeTab.dataset.filter !== 'all') {
+      card.classList.toggle('hidden', card.dataset.status !== activeTab.dataset.filter);
+    }
+
+    /* Swap badge class */
+    BADGE_CLASSES.forEach(c => badgeEl.classList.remove(c));
+    badgeEl.classList.add('badge-' + newStatus);
+
+    /* Update badge text */
+    badgeText.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
+
+    /* Stop pulsing dot for terminal statuses */
+    const dot = badgeEl.querySelector('.badge-live-dot');
+    const isTerminal = newStatus === 'delivered' || newStatus === 'cancelled' || newStatus === 'returned';
+    if (dot) dot.style.animationPlayState = isTerminal ? 'paused' : 'running';
+
+    /* Inject Invoice button if newly delivered */
+    if (newStatus === 'delivered' && actionsEl) {
+      const existingInvoice = actionsEl.querySelector('.btn-invoice');
+      if (!existingInvoice) {
+        const invoiceBtn = document.createElement('a');
+        invoiceBtn.href      = `/orders/${orderId}/invoice`;
+        invoiceBtn.className = 'btn-invoice';
+        invoiceBtn.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Invoice`;
+        actionsEl.insertBefore(invoiceBtn, actionsEl.firstChild);
+      }
+    }
+
+    /* Show toast */
+    showToast(newStatus, orderNum);
+  }
+
+  /* Collect all order IDs + numbers from the rendered cards */
+  const orderCards = document.querySelectorAll('.order-card[data-order-id]');
+  const sseConnections = {};
+
+  orderCards.forEach(card => {
+    const orderId  = card.dataset.orderId;
+    const orderNum = card.querySelector('.order-num')?.textContent?.trim() || '';
+
+    /* Skip terminal statuses — no need to stream */
+    const initialStatus = card.dataset.status;
+    if (initialStatus === 'delivered' || initialStatus === 'cancelled' || initialStatus === 'returned') {
+      /* Pause the pulsing dot */
+      const dot = card.querySelector('.badge-live-dot');
+      if (dot) dot.style.animationPlayState = 'paused';
+      return;
+    }
+
+    let reconnectDelay = 3000;
+
+    function connect() {
+      const sse = new EventSource('/orders/' + orderId + '/status-stream');
+      sseConnections[orderId] = sse;
+
+      sse.onopen = () => { reconnectDelay = 3000; };
+
+      sse.addEventListener('orderStatus', (e) => {
+        try {
+          const data = JSON.parse(e.data);
+          if (data.orderStatus) {
+            applyCardStatus(orderId, data.orderStatus.toLowerCase(), orderNum);
+          }
+        } catch (_) {}
+      });
+
+      sse.onerror = () => {
+        sse.close();
+        setTimeout(connect, reconnectDelay);
+        reconnectDelay = Math.min(reconnectDelay * 1.5, 30000);
+      };
+    }
+
+    connect();
+  });
+
+  /* Clean up SSE connections when page unloads */
+  window.addEventListener('beforeunload', () => {
+    Object.values(sseConnections).forEach(sse => sse.close());
+  });
+</script>
+</body>
+</html>

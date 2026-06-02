@@ -220,10 +220,7 @@ const verifyResetOTP = async (req, res) => {
   try {
     const otp = req.body.otp ? req.body.otp.toString().trim() : '';
 
-    console.log('=== verifyResetOTP ===');
-    console.log('body otp:', otp);
-    console.log('session resetOTP:', req.session.resetOTP);
-    console.log('session resetEmail:', req.session.resetEmail);
+   
 
     if (!req.session.resetOTP || !req.session.resetEmail) {
       return res.json({ success: false, message: "Session expired. Please try again." });
