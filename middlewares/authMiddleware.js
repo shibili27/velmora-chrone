@@ -70,7 +70,7 @@ export const isAuth = async (req, res, next) => {
   const userId = req.session?.user || (req.user ? req.user._id : null);
 
   if (!userId) {
-    console.log('  ❌ No userId — sending to login (isAjax:', isAjax(req), ')');
+   
     if (isAjax(req)) {
       return res.status(401).json({
         success:     false,
@@ -120,7 +120,7 @@ export const isAuth = async (req, res, next) => {
       });
     }
 
-    console.log('  ✅ Auth passed for user:', user._id);
+    
     req.user = user;
     next();
   } catch (error) {

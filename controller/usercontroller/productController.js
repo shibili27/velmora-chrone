@@ -1,26 +1,8 @@
-import Product  from '../../models/product.js';
-import Category from '../../models/category.js';
-
+import * as productService from '../../services/productService.js';
 
 export const getHomePage = async (req, res) => {
   try {
-    const products = await Product.find({
-      isDeleted: false,
-      isListed:  { $ne: false },
-      stock:     { $gt: 0 },
-    })
-      .populate({
-        path:  'category',
-        match: { isDeleted: false, isListed: { $ne: false } },
-      })
-      .populate('brand')
-      .sort({ createdAt: -1 })
-      .limit(12)
-      .skip(1)
-      .lean();
-
-    const featuredProducts = products.filter(p => p.category !== null);
-
+    const featuredProducts = await productService.getFeaturedProducts();
     res.render('user/home', { featuredProducts });
   } catch (err) {
     console.error('[getHomePage]', err);
@@ -28,83 +10,27 @@ export const getHomePage = async (req, res) => {
   }
 };
 
-
 export const getProducts = async (req, res) => {
   try {
-    const search   = req.query.search?.trim()       || '';
-    const sort     = req.query.sort                 || 'newest';
-    const category = req.query.category             || '';
-    const brand    = req.query.brand?.trim()        || '';
-    const minPrice = parseFloat(req.query.minPrice) || 0;
-    const maxPrice = parseFloat(req.query.maxPrice) || 999999999;
-    const page     = Math.max(1, parseInt(req.query.page) || 1);
-    const limit    = 12;
-    const skip     = (page - 1) * limit;
-
-    const query = {
-      isDeleted: false,
-      isListed:  { $ne: false },
-      price:     { $gte: minPrice, $lte: maxPrice },
+    const filters = {
+      search  : req.query.search?.trim()       || '',
+      sort    : req.query.sort                 || 'newest',
+      category: req.query.category             || '',
+      brand   : req.query.brand?.trim()        || '',
+      minPrice: req.query.minPrice,
+      maxPrice: req.query.maxPrice,
+      page    : req.query.page,
     };
 
-    if (search)   query.name     = { $regex: search, $options: 'i' };
-    if (category) query.category = category;
-
-    const sortMap = {
-      newest:    { createdAt: -1 },
-      oldest:    { createdAt:  1 },
-      priceLow:  { price:      1 },
-      priceHigh: { price:     -1 },
-      nameAZ:    { name:       1 },
-      nameZA:    { name:      -1 },
-    };
-    const sortOption = sortMap[sort] || sortMap.newest;
-
-    const [allProducts, categories] = await Promise.all([
-      Product.find(query)
-        .populate({
-          path:  'category',
-          match: { isDeleted: false, isListed: { $ne: false } },
-        })
-        .populate('brand')
-        .sort(sortOption),
-      Category.find({ isDeleted: false, isListed: { $ne: false } }).sort({ name: 1 }),
-    ]);
-
-    let visibleProducts = allProducts.filter(p => p.category !== null);
-
-    const brandNames = [
-      ...new Set(
-        visibleProducts
-          .map(p => p.brand?.name)
-          .filter(Boolean)
-      ),
-    ].sort();
-
-    if (brand) {
-      visibleProducts = visibleProducts.filter(
-        p => p.brand?.name?.toLowerCase() === brand.toLowerCase()
-      );
-    }
-
-    const total             = visibleProducts.length;
-    const totalPages        = Math.ceil(total / limit);
-    const paginatedProducts = visibleProducts.slice(skip, skip + limit);
+    const data = await productService.getFilteredProducts(filters);
 
     res.render('user/products', {
-      title:     'Collection — Velmora Chroné',
-      products:   paginatedProducts,
-      categories,
-      brands:     brandNames,
-      search,
-      sort,
-      category,
-      brand,
-      minPrice:  minPrice === 0         ? '' : minPrice,
-      maxPrice:  maxPrice === 999999999 ? '' : maxPrice,
-      page,
-      totalPages,
-      total,
+      title: 'Collection — Velmora Chroné',
+      ...data,
+      search  : filters.search,
+      sort    : filters.sort,
+      category: filters.category,
+      brand   : filters.brand,
     });
   } catch (err) {
     console.error('Get products error:', err);
@@ -112,115 +38,40 @@ export const getProducts = async (req, res) => {
   }
 };
 
-
 export const getProductDetail = async (req, res) => {
   try {
-    const product = await Product.findOne({
-      _id:       req.params.id,
-      isDeleted: false,
-    })
-    .populate('category')
-    .populate('brand')
-    .lean();
-
-    if (!product) {
-      return res.status(404).render('user/productUnavailable', {
-        title:  'Product Not Found — Velmora Chroné',
-        reason: 'notfound',
-      });
-    }
-
-    if (product.isListed === false) {
-      return res.status(410).render('user/productUnavailable', {
-        title:   'Product Unavailable — Velmora Chroné',
-        reason:  'blocked',
-        product,
-      });
-    }
-
-    if (!product.category || product.category.isDeleted || product.category.isListed === false) {
-      return res.status(410).render('user/productUnavailable', {
-        title:   'Product Unavailable — Velmora Chroné',
-        reason:  'category',
-        product,
-      });
-    }
-
-    const related = await Product.find({
-      _id:       { $ne: product._id },
-      category:  product.category._id,
-      isDeleted: false,
-      isListed:  { $ne: false },
-    })
-      .populate('category')
-      .populate('brand')
-      .limit(4)
-      .lean();
-
-    // ✅ FIX: check BOTH session auth (local login) and Passport (Google OAuth)
-    const currentUser = req.user || req.session?.user || null;
-
+    const { product, related } = await productService.getProductById(req.params.id);
     res.render('user/productDetail', {
-      title:       product.name + ' — Velmora Chroné',
+      title      : product.name + ' — Velmora Chroné',
       product,
       related,
-      currentUser,
+      currentUser: req.user || req.session?.user || null,
     });
   } catch (err) {
+    const reason = err.message; 
+    const status = err.status || 500;
+    if (status === 404) return res.status(404).render('user/productUnavailable', { title: 'Product Not Found — Velmora Chroné', reason });
+    if (status === 410) return res.status(410).render('user/productUnavailable', { title: 'Product Unavailable — Velmora Chroné', reason, product: err.product });
     console.error('Get product detail error:', err);
     res.status(500).render('user/error', { message: 'Failed to load product.' });
   }
 };
 
-
 export const getProductStatus = async (req, res) => {
   try {
-    const product = await Product.findOne({
-      _id:       req.params.id,
-      isDeleted: false,
-    })
-    .populate('category')
-    .lean();
-
-    if (!product) return res.json({ status: 'notfound' });
-    if (product.isListed === false) return res.json({ status: 'blocked' });
-    if (!product.category || product.category.isDeleted || product.category.isListed === false) {
-      return res.json({ status: 'category' });
-    }
-    return res.json({ status: 'available' });
-
+    const status = await productService.getProductStatus(req.params.id);
+    res.json({ status });
   } catch (err) {
     console.error('[getProductStatus]', err);
-    return res.status(500).json({ status: 'error' });
+    res.status(500).json({ status: 'error' });
   }
 };
 
-
 export const getProductStock = async (req, res) => {
   try {
-    const product = await Product.findOne({
-      _id:       req.params.id,
-      isDeleted: false,
-    })
-    .select('stock colorVariants isListed price')
-    .lean();
-
-    if (!product) {
-      return res.status(404).json({ success: false, message: 'Product not found' });
-    }
-
-    return res.json({
-      success:       true,
-      stock:         product.stock,
-      isListed:      product.isListed !== false,
-      price:         product.price,
-      colorVariants: (product.colorVariants || []).map(v => ({
-        name:  v.name,
-        stock: v.stock,
-      })),
-    });
+    const data = await productService.getProductStock(req.params.id);
+    res.json({ success: true, ...data });
   } catch (err) {
-    console.error('[getProductStock]', err);
-    return res.status(500).json({ success: false, message: 'Failed to fetch stock' });
+    res.status(err.status || 500).json({ success: false, message: err.message });
   }
 };

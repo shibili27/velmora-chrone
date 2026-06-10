@@ -1,15 +1,16 @@
 import mongoose from 'mongoose';
+import { getIO } from '../utils/socket.js';
 
 const orderItemSchema = new mongoose.Schema({
-  product         : { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
-  name            : { type: String, required: true },
-  brand           : { type: String, default: '' },
-  image           : { type: String, default: '' },
-  quantity        : { type: Number, required: true, min: 1 },
-  price           : { type: Number, required: true },
-  totalPrice      : { type: Number, required: true },
-  status          : { type: String, enum: ['active', 'cancelled'], default: 'active' },
-  cancellationNote: { type: String, default: '' },
+  product          : { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
+  name             : { type: String, required: true },
+  brand            : { type: String, default: '' },
+  image            : { type: String, default: '' },
+  quantity         : { type: Number, required: true, min: 1 },
+  price            : { type: Number, required: true },
+  totalPrice       : { type: Number, required: true },
+  status           : { type: String, enum: ['active', 'cancelled'], default: 'active' },
+  cancellationNote : { type: String, default: '' },
 }, { _id: true });
 
 const addressSchema = new mongoose.Schema({
@@ -35,34 +36,49 @@ const orderSchema = new mongoose.Schema({
   orderNumber     : { type: String, unique: true },
   items           : { type: [orderItemSchema], required: true },
   shippingAddress : { type: addressSchema, required: true },
-  pricing         : { type: pricingSchema,  required: true },
+  pricing         : { type: pricingSchema, required: true },
   paymentMethod   : { type: String, enum: ['COD', 'Razorpay', 'Wallet'], default: 'COD' },
   orderStatus     : {
     type    : String,
     enum    : ['confirmed', 'processing', 'dispatched', 'delivered', 'cancelled', 'returned'],
     default : 'confirmed',
   },
-  cancellationNote    : { type: String, default: '' },
-  returnReason        : { type: String, default: '' },
-
-  
-  returnStatus        : {
+  cancellationNote      : { type: String, default: '' },
+  returnReason          : { type: String, default: '' },
+  returnStatus          : {
     type    : String,
     enum    : ['none', 'pending', 'accepted', 'rejected'],
     default : 'none',
   },
   returnRejectionReason : { type: String, default: '' },
   returnRequestedAt     : { type: Date, default: null },
-
 }, { timestamps: true });
 
+
 orderSchema.pre('save', async function () {
+  this._wasNew = this.isNew;
   if (this.isNew) {
     const datePart = new Date().toISOString().slice(0, 10).replace(/-/g, '');
     const count    = await mongoose.model('Order').countDocuments();
     const seq      = String(count + 1).padStart(5, '0');
     this.orderNumber = `VC-${datePart}-${seq}`;
   }
+});
+
+
+orderSchema.post('save', function (doc) {
+  if (!this._wasNew) return;
+  const io = getIO();
+  if (!io) return;
+
+  io.to('admin-room').emit('new-order', {
+    _id          : doc._id,
+    orderNumber  : doc.orderNumber,
+    grandTotal   : doc.pricing.grandTotal,
+    itemCount    : doc.items.length,
+    paymentMethod: doc.paymentMethod,
+    createdAt    : doc.createdAt,
+  });
 });
 
 const Order = mongoose.models.Order || mongoose.model('Order', orderSchema);

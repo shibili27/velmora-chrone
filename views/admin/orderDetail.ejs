@@ -60,6 +60,10 @@
     .topbar__back:hover { background: var(--teal-light); color: var(--teal); }
     .topbar__back svg { width: 14px; height: 14px; }
     .topbar__title { font-size: 13px; font-weight: 500; color: var(--text-light); letter-spacing: 0.04em; }
+    /* Live badge in topbar */
+    .live-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 600; color: var(--green); letter-spacing: 0.06em; padding: 4px 8px; border-radius: 10px; background: var(--green-bg); border: 1px solid #86efac; }
+    .live-badge__dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: livePulse 1.8s ease-in-out infinite; }
+    @keyframes livePulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.65)} }
     .content { padding: 32px; flex: 1; }
 
     /* ── Grid ── */
@@ -80,14 +84,7 @@
     .order-banner__payment { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.6); }
 
     /* ── Return alert banner ── */
-    .return-alert {
-      display: flex; align-items: flex-start; gap: 16px;
-      background: #fffbeb; border: 1.5px solid #fcd34d;
-      border-left: 4px solid var(--amber); border-radius: 6px;
-      padding: 18px 20px; margin-bottom: 20px;
-      animation: slideIn 0.35s ease;
-      position: relative;
-    }
+    .return-alert { display: flex; align-items: flex-start; gap: 16px; background: #fffbeb; border: 1.5px solid #fcd34d; border-left: 4px solid var(--amber); border-radius: 6px; padding: 18px 20px; margin-bottom: 20px; animation: slideIn 0.35s ease; position: relative; }
     @keyframes slideIn { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
     .return-alert__icon { width:38px; height:38px; border-radius:50%; background:var(--amber-bg); display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
     .return-alert__icon svg { width:18px; height:18px; color:var(--amber); }
@@ -112,114 +109,45 @@
     .return-resolved--rejected { background:var(--red-bg);   border:1px solid #fca5a5; color:#7f1d1d; }
     .return-resolved svg { width:16px; height:16px; flex-shrink:0; }
 
-    /* ═══════════════════════════════════════════
-       FLOATING CONFIRM CARDS
-    ═══════════════════════════════════════════ */
-    .float-card {
-      position: absolute;
-      top: calc(100% + 10px);
-      left: 0;
-      z-index: 400;
-      width: 340px;
-      background: var(--white);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.08);
-      opacity: 0;
-      pointer-events: none;
-      transform: translateY(-6px) scale(0.97);
-      transition: opacity 0.18s ease, transform 0.18s ease;
-    }
-    .float-card.open {
-      opacity: 1;
-      pointer-events: all;
-      transform: translateY(0) scale(1);
-    }
-    /* Arrow pointing up */
-    .float-card::before {
-      content: '';
-      position: absolute;
-      top: -7px;
-      left: 20px;
-      width: 12px;
-      height: 12px;
-      background: var(--white);
-      border-left: 1px solid var(--border);
-      border-top: 1px solid var(--border);
-      transform: rotate(45deg);
-      border-radius: 2px 0 0 0;
-    }
+    /* ── Floating confirm cards ── */
+    .float-card { position: absolute; top: calc(100% + 10px); left: 0; z-index: 400; width: 340px; background: var(--white); border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 8px 32px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.08); opacity: 0; pointer-events: none; transform: translateY(-6px) scale(0.97); transition: opacity 0.18s ease, transform 0.18s ease; }
+    .float-card.open { opacity: 1; pointer-events: all; transform: translateY(0) scale(1); }
+    .float-card::before { content: ''; position: absolute; top: -7px; left: 20px; width: 12px; height: 12px; background: var(--white); border-left: 1px solid var(--border); border-top: 1px solid var(--border); transform: rotate(45deg); border-radius: 2px 0 0 0; }
     .float-card--reject::before { left: 130px; border-color: var(--border); }
-
-    .float-card__header {
-      padding: 14px 16px 12px;
-      border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; gap: 10px;
-    }
-    .float-card__icon {
-      width: 32px; height: 32px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-    }
+    .float-card__header { padding: 14px 16px 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+    .float-card__icon { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .float-card__icon--green { background: var(--green-bg); color: var(--green); }
     .float-card__icon--red   { background: var(--red-bg);   color: var(--red);   }
     .float-card__icon svg { width: 15px; height: 15px; }
-    .float-card__title   { font-size: 13px; font-weight: 700; color: var(--text); }
-    .float-card__sub     { font-size: 11px; color: var(--text-mid); margin-top: 2px; }
-
+    .float-card__title { font-size: 13px; font-weight: 700; color: var(--text); }
+    .float-card__sub   { font-size: 11px; color: var(--text-mid); margin-top: 2px; }
     .float-card__body { padding: 12px 16px; }
-
-    /* Summary rows inside float card */
-    .fcs-row {
-      display: flex; justify-content: space-between; align-items: baseline;
-      padding: 5px 0; border-bottom: 1px solid var(--border);
-      font-size: 12px;
-    }
+    .fcs-row { display: flex; justify-content: space-between; align-items: baseline; padding: 5px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
     .fcs-row:last-child { border-bottom: none; }
     .fcs-row__label { color: var(--text-mid); }
     .fcs-row__val   { color: var(--text); font-weight: 500; max-width: 180px; text-align: right; }
-    .fcs-row__val--green  { color: var(--green); font-weight: 700; font-size: 13px; }
-    .fcs-row__val--amber  { color: var(--amber); font-style: italic; }
-
-    .float-card__reason-box {
-      background: #fffbeb; border: 1px solid #fde68a; border-radius: 5px;
-      padding: 8px 10px; font-size: 11.5px; color: #78350f;
-      line-height: 1.5; margin-bottom: 4px; font-style: italic;
-    }
-
-    /* Reject textarea */
-    .float-card__textarea {
-      width: 100%; padding: 8px 10px;
-      border: 1px solid var(--border); border-radius: 5px;
-      font-family: 'Jost', sans-serif; font-size: 12px; color: var(--text);
-      background: var(--bg); outline: none; resize: vertical; min-height: 68px;
-      transition: border-color 0.15s; margin-top: 8px;
-    }
+    .fcs-row__val--green { color: var(--green); font-weight: 700; font-size: 13px; }
+    .fcs-row__val--amber { color: var(--amber); font-style: italic; }
+    .float-card__reason-box { background: #fffbeb; border: 1px solid #fde68a; border-radius: 5px; padding: 8px 10px; font-size: 11.5px; color: #78350f; line-height: 1.5; margin-bottom: 4px; font-style: italic; }
+    .float-card__textarea { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 5px; font-family: 'Jost', sans-serif; font-size: 12px; color: var(--text); background: var(--bg); outline: none; resize: vertical; min-height: 68px; transition: border-color 0.15s; margin-top: 8px; }
     .float-card__textarea:focus { border-color: var(--red); background: var(--white); }
     .float-card__textarea::placeholder { color: var(--text-light); }
-    .float-card__textarea-label {
-      font-size: 10px; font-weight: 600; letter-spacing: 0.08em;
-      text-transform: uppercase; color: var(--text-mid); display: block; margin-top: 10px;
-    }
-
-    .float-card__footer {
-      padding: 10px 16px 14px;
-      display: flex; gap: 8px; justify-content: flex-end;
-    }
-    .fc-btn {
-      display: inline-flex; align-items: center; gap: 5px;
-      padding: 7px 14px; border-radius: 5px; font-family: 'Jost', sans-serif;
-      font-size: 12px; font-weight: 600; cursor: pointer; border: none;
-      transition: background 0.15s, transform 0.1s;
-    }
+    .float-card__textarea-label { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-mid); display: block; margin-top: 10px; }
+    .float-card__footer { padding: 10px 16px 14px; display: flex; gap: 8px; justify-content: flex-end; }
+    .fc-btn { display: inline-flex; align-items: center; gap: 5px; padding: 7px 14px; border-radius: 5px; font-family: 'Jost', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; border: none; transition: background 0.15s, transform 0.1s; }
     .fc-btn:active { transform: scale(0.97); }
     .fc-btn svg { width: 11px; height: 11px; }
-    .fc-btn--cancel  { background: var(--bg); color: var(--text-mid); border: 1px solid var(--border); }
+    .fc-btn--cancel { background: var(--bg); color: var(--text-mid); border: 1px solid var(--border); }
     .fc-btn--cancel:hover { background: var(--border); }
-    .fc-btn--accept  { background: var(--green); color: #fff; }
+    .fc-btn--accept { background: var(--green); color: #fff; }
     .fc-btn--accept:hover { background: #15803d; }
-    .fc-btn--reject  { background: var(--red); color: #fff; }
+    .fc-btn--reject { background: var(--red); color: #fff; }
     .fc-btn--reject:hover { background: #b91c1c; }
     .fc-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    /* ── Status locked notice ── */
+    .status-locked-notice { display:flex; align-items:center; gap:8px; background:#f8faf9; border:1px solid var(--border); border-radius:5px; padding:10px 14px; font-size:12px; color:var(--text-mid); margin-top:8px; }
+    .status-locked-notice svg { width:14px; height:14px; flex-shrink:0; color:var(--text-light); }
 
     /* ── Table ── */
     table { width:100%; border-collapse:collapse; }
@@ -267,10 +195,12 @@
     .status-form label { font-size:11px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color:var(--text-mid); display:block; margin-bottom:5px; }
     .status-form select, .status-form textarea { width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:5px; font-family:'Jost',sans-serif; font-size:12.5px; color:var(--text); background:var(--bg); outline:none; transition:border-color 0.15s; }
     .status-form select:focus, .status-form textarea:focus { border-color:var(--teal); background:var(--white); }
+    .status-form select:disabled { opacity:1; cursor:not-allowed; background:#f0f2f1; color:var(--text-mid); }
     .status-form textarea { resize:vertical; min-height:70px; }
     .btn { display:inline-flex; align-items:center; gap:6px; padding:9px 16px; border-radius:5px; font-family:'Jost',sans-serif; font-size:12.5px; font-weight:600; cursor:pointer; border:none; transition:background 0.15s; text-decoration:none; }
-    .btn--teal    { background:var(--teal); color:#fff; width:100%; justify-content:center; }
+    .btn--teal { background:var(--teal); color:#fff; width:100%; justify-content:center; }
     .btn--teal:hover { background:var(--teal-dark); }
+    .btn--teal:disabled { background:#aaa; cursor:not-allowed; }
     .btn--outline { background:var(--white); color:var(--text-mid); border:1px solid var(--border); }
     .btn--outline:hover { background:var(--bg); }
     .btn svg { width:13px; height:13px; }
@@ -297,14 +227,8 @@
     .toast--success { background:var(--green); }
     .toast--error   { background:var(--red); }
 
-    /* dim backdrop when a float-card is open */
-    .fc-backdrop {
-      position: fixed; inset: 0; z-index: 300;
-      background: transparent;
-      display: none;
-    }
+    .fc-backdrop { position: fixed; inset: 0; z-index: 300; background: transparent; display: none; }
     .fc-backdrop.active { display: block; }
-
     .page-footer { text-align:center; padding:20px 32px; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-light); border-top:1px solid var(--border); }
   </style>
 </head>
@@ -386,6 +310,11 @@
         <span style="color:var(--border)">/</span>
         <span class="topbar__title"><%= order.orderNumber || order._id %></span>
       </div>
+      <!-- Live badge -->
+      <div class="live-badge" id="liveBadge">
+        <div class="live-badge__dot"></div>
+        LIVE
+      </div>
     </header>
 
     <div class="content">
@@ -407,6 +336,7 @@
 
       <%
         const rStatus = order.returnStatus || 'none';
+        const isTerminalStatus = ['cancelled', 'returned', 'delivered'].includes(order.orderStatus);
       %>
 
       <!-- ── RETURN REQUEST ALERT ── -->
@@ -427,22 +357,17 @@
             <% } %>
           </div>
 
-          <!-- Action buttons + floating cards anchored here -->
           <div class="return-alert__actions" id="returnActions">
-
-            <!-- ACCEPT button -->
             <button class="btn-return-accept" id="btnAccept" onclick="toggleAcceptCard(event)">
               <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
               Accept Return
             </button>
-
-            <!-- REJECT button -->
             <button class="btn-return-reject" id="btnReject" onclick="toggleRejectCard(event)">
               <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
               Reject Return
             </button>
 
-            <!-- ═══ FLOATING CARD: ACCEPT ═══ -->
+            <!-- FLOATING CARD: ACCEPT -->
             <div class="float-card" id="acceptCard">
               <div class="float-card__header">
                 <div class="float-card__icon float-card__icon--green">
@@ -454,26 +379,11 @@
                 </div>
               </div>
               <div class="float-card__body">
-                <div class="fcs-row">
-                  <span class="fcs-row__label">Order</span>
-                  <span class="fcs-row__val"><%= order.orderNumber || order._id %></span>
-                </div>
-                <div class="fcs-row">
-                  <span class="fcs-row__label">Customer</span>
-                  <span class="fcs-row__val"><%= order.user ? order.user.name : 'Unknown' %></span>
-                </div>
-                <div class="fcs-row">
-                  <span class="fcs-row__label">Items</span>
-                  <span class="fcs-row__val"><%= order.items.filter(i => i.status === 'active').length %> item(s)</span>
-                </div>
-                <div class="fcs-row">
-                  <span class="fcs-row__label">Payment method</span>
-                  <span class="fcs-row__val"><%= order.paymentMethod %></span>
-                </div>
-                <div class="fcs-row">
-                  <span class="fcs-row__label">Refund amount</span>
-                  <span class="fcs-row__val fcs-row__val--green">₹<%= order.pricing.grandTotal.toLocaleString('en-IN') %></span>
-                </div>
+                <div class="fcs-row"><span class="fcs-row__label">Order</span><span class="fcs-row__val"><%= order.orderNumber || order._id %></span></div>
+                <div class="fcs-row"><span class="fcs-row__label">Customer</span><span class="fcs-row__val"><%= order.user ? order.user.name : 'Unknown' %></span></div>
+                <div class="fcs-row"><span class="fcs-row__label">Items</span><span class="fcs-row__val"><%= order.items.filter(i => i.status === 'active').length %> item(s)</span></div>
+                <div class="fcs-row"><span class="fcs-row__label">Payment method</span><span class="fcs-row__val"><%= order.paymentMethod %></span></div>
+                <div class="fcs-row"><span class="fcs-row__label">Refund amount</span><span class="fcs-row__val fcs-row__val--green">₹<%= order.pricing.grandTotal.toLocaleString('en-IN') %></span></div>
                 <% if (order.returnReason) { %>
                 <div style="margin-top:10px">
                   <div style="font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-mid);margin-bottom:5px;">Return Reason</div>
@@ -490,7 +400,7 @@
               </div>
             </div>
 
-            <!-- ═══ FLOATING CARD: REJECT ═══ -->
+            <!-- FLOATING CARD: REJECT -->
             <div class="float-card float-card--reject" id="rejectCard">
               <div class="float-card__header">
                 <div class="float-card__icon float-card__icon--red">
@@ -502,23 +412,11 @@
                 </div>
               </div>
               <div class="float-card__body">
-                <div class="fcs-row">
-                  <span class="fcs-row__label">Order</span>
-                  <span class="fcs-row__val"><%= order.orderNumber || order._id %></span>
-                </div>
-                <div class="fcs-row">
-                  <span class="fcs-row__label">Customer</span>
-                  <span class="fcs-row__val"><%= order.user ? order.user.name : 'Unknown' %></span>
-                </div>
-                <div class="fcs-row">
-                  <span class="fcs-row__label">Refund amount</span>
-                  <span class="fcs-row__val" style="color:var(--red);">₹<%= order.pricing.grandTotal.toLocaleString('en-IN') %> — Not refunded</span>
-                </div>
+                <div class="fcs-row"><span class="fcs-row__label">Order</span><span class="fcs-row__val"><%= order.orderNumber || order._id %></span></div>
+                <div class="fcs-row"><span class="fcs-row__label">Customer</span><span class="fcs-row__val"><%= order.user ? order.user.name : 'Unknown' %></span></div>
+                <div class="fcs-row"><span class="fcs-row__label">Refund amount</span><span class="fcs-row__val" style="color:var(--red);">₹<%= order.pricing.grandTotal.toLocaleString('en-IN') %> — Not refunded</span></div>
                 <% if (order.returnReason) { %>
-                <div class="fcs-row">
-                  <span class="fcs-row__label">Customer reason</span>
-                  <span class="fcs-row__val fcs-row__val--amber">"<%= order.returnReason %>"</span>
-                </div>
+                <div class="fcs-row"><span class="fcs-row__label">Customer reason</span><span class="fcs-row__val fcs-row__val--amber">"<%= order.returnReason %>"</span></div>
                 <% } %>
                 <label class="float-card__textarea-label">Rejection Reason <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-light)">(optional)</span></label>
                 <textarea class="float-card__textarea" id="rejectReasonInput" placeholder="e.g. Item shows signs of use / not covered by return policy…"></textarea>
@@ -531,8 +429,7 @@
                 </button>
               </div>
             </div>
-
-          </div><!-- /return-alert__actions -->
+          </div>
         </div>
       </div>
 
@@ -550,7 +447,6 @@
       </div>
       <% } %>
 
-      <!-- transparent backdrop to close cards on outside click -->
       <div class="fc-backdrop" id="fcBackdrop" onclick="closeAllCards()"></div>
 
       <!-- ── Detail grid ── -->
@@ -558,18 +454,15 @@
 
         <!-- Left column -->
         <div>
-
           <!-- Items -->
           <div class="card">
             <div class="card__header">
               <span class="card__title">Order Items (<%= order.items.length %>)</span>
-              <span class="badge badge--<%= order.orderStatus %>"><%= order.orderStatus.charAt(0).toUpperCase() + order.orderStatus.slice(1) %></span>
+              <span class="badge badge--<%= order.orderStatus %>" id="orderStatusBadge"><%= order.orderStatus.charAt(0).toUpperCase() + order.orderStatus.slice(1) %></span>
             </div>
             <table>
               <thead>
-                <tr>
-                  <th>Product</th><th>Price</th><th>Qty</th><th>Total</th><th>Status</th>
-                </tr>
+                <tr><th>Product</th><th>Price</th><th>Qty</th><th>Total</th><th>Status</th></tr>
               </thead>
               <tbody>
                 <% order.items.forEach(function(item) { %>
@@ -603,36 +496,21 @@
             </table>
           </div>
 
-          <!-- Pricing summary -->
+          <!-- Pricing -->
           <div class="card">
             <div class="card__header"><span class="card__title">Pricing Breakdown</span></div>
             <div class="card__body">
-              <div class="price-row">
-                <span class="price-row__label">Subtotal</span>
-                <span class="price-row__val">₹<%= order.pricing.subtotal.toLocaleString('en-IN') %></span>
-              </div>
+              <div class="price-row"><span class="price-row__label">Subtotal</span><span class="price-row__val">₹<%= order.pricing.subtotal.toLocaleString('en-IN') %></span></div>
               <% if (order.pricing.itemDiscount > 0) { %>
-              <div class="price-row">
-                <span class="price-row__label">Item Discount</span>
-                <span class="price-row__val price-row__val--green">− ₹<%= order.pricing.itemDiscount.toLocaleString('en-IN') %></span>
-              </div>
+              <div class="price-row"><span class="price-row__label">Item Discount</span><span class="price-row__val price-row__val--green">− ₹<%= order.pricing.itemDiscount.toLocaleString('en-IN') %></span></div>
               <% } %>
               <% if (order.pricing.couponDiscount > 0) { %>
-              <div class="price-row">
-                <span class="price-row__label">Coupon Discount</span>
-                <span class="price-row__val price-row__val--green">− ₹<%= order.pricing.couponDiscount.toLocaleString('en-IN') %></span>
-              </div>
+              <div class="price-row"><span class="price-row__label">Coupon Discount</span><span class="price-row__val price-row__val--green">− ₹<%= order.pricing.couponDiscount.toLocaleString('en-IN') %></span></div>
               <% } %>
               <% if (order.pricing.tax > 0) { %>
-              <div class="price-row">
-                <span class="price-row__label">Tax</span>
-                <span class="price-row__val">₹<%= order.pricing.tax.toLocaleString('en-IN') %></span>
-              </div>
+              <div class="price-row"><span class="price-row__label">Tax</span><span class="price-row__val">₹<%= order.pricing.tax.toLocaleString('en-IN') %></span></div>
               <% } %>
-              <div class="price-row">
-                <span class="price-row__label">Shipping</span>
-                <span class="price-row__val"><%= order.pricing.shipping > 0 ? '₹' + order.pricing.shipping.toLocaleString('en-IN') : 'Free' %></span>
-              </div>
+              <div class="price-row"><span class="price-row__label">Shipping</span><span class="price-row__val"><%= order.pricing.shipping > 0 ? '₹' + order.pricing.shipping.toLocaleString('en-IN') : 'Free' %></span></div>
               <div class="price-row total">
                 <span class="price-row__label" style="color:var(--text)">Grand Total</span>
                 <span class="price-row__val price-row__val--teal">₹<%= order.pricing.grandTotal.toLocaleString('en-IN') %></span>
@@ -644,32 +522,14 @@
           <div class="card">
             <div class="card__header"><span class="card__title">Shipping Address</span></div>
             <div class="card__body">
-              <div class="info-row">
-                <span class="info-row__label">Name</span>
-                <span class="info-row__val" style="font-weight:500"><%= order.shippingAddress.fullName %></span>
-              </div>
-              <div class="info-row">
-                <span class="info-row__label">Phone</span>
-                <span class="info-row__val"><%= order.shippingAddress.phone %></span>
-              </div>
-              <div class="info-row">
-                <span class="info-row__label">Address</span>
-                <span class="info-row__val"><%= order.shippingAddress.line1 %></span>
-              </div>
-              <div class="info-row">
-                <span class="info-row__label">City</span>
-                <span class="info-row__val"><%= order.shippingAddress.city %></span>
-              </div>
+              <div class="info-row"><span class="info-row__label">Name</span><span class="info-row__val" style="font-weight:500"><%= order.shippingAddress.fullName %></span></div>
+              <div class="info-row"><span class="info-row__label">Phone</span><span class="info-row__val"><%= order.shippingAddress.phone %></span></div>
+              <div class="info-row"><span class="info-row__label">Address</span><span class="info-row__val"><%= order.shippingAddress.line1 %></span></div>
+              <div class="info-row"><span class="info-row__label">City</span><span class="info-row__val"><%= order.shippingAddress.city %></span></div>
               <% if (order.shippingAddress.state) { %>
-              <div class="info-row">
-                <span class="info-row__label">State</span>
-                <span class="info-row__val"><%= order.shippingAddress.state %></span>
-              </div>
+              <div class="info-row"><span class="info-row__label">State</span><span class="info-row__val"><%= order.shippingAddress.state %></span></div>
               <% } %>
-              <div class="info-row">
-                <span class="info-row__label">Pincode</span>
-                <span class="info-row__val"><%= order.shippingAddress.pincode %></span>
-              </div>
+              <div class="info-row"><span class="info-row__label">Pincode</span><span class="info-row__val"><%= order.shippingAddress.pincode %></span></div>
             </div>
           </div>
 
@@ -679,26 +539,18 @@
             <div class="card__header"><span class="card__title">Notes</span></div>
             <div class="card__body">
               <% if (order.cancellationNote) { %>
-              <div class="info-row">
-                <span class="info-row__label">Cancellation</span>
-                <span class="info-row__val"><%= order.cancellationNote %></span>
-              </div>
+              <div class="info-row"><span class="info-row__label">Cancellation</span><span class="info-row__val"><%= order.cancellationNote %></span></div>
               <% } %>
               <% if (order.returnReason) { %>
-              <div class="info-row">
-                <span class="info-row__label">Return Reason</span>
-                <span class="info-row__val"><%= order.returnReason %></span>
-              </div>
+              <div class="info-row"><span class="info-row__label">Return Reason</span><span class="info-row__val"><%= order.returnReason %></span></div>
               <% } %>
             </div>
           </div>
           <% } %>
-
         </div><!-- /left -->
 
         <!-- Right column -->
         <div>
-
           <!-- Customer -->
           <div class="card">
             <div class="card__header"><span class="card__title">Customer</span></div>
@@ -738,7 +590,7 @@
               <div class="status-form">
                 <div>
                   <label>Order Status</label>
-                  <select id="statusSelect">
+                  <select id="statusSelect" <%= isTerminalStatus ? 'disabled' : '' %>>
                     <option value="confirmed"  <%= order.orderStatus === 'confirmed'  ? 'selected' : '' %>>Confirmed</option>
                     <option value="processing" <%= order.orderStatus === 'processing' ? 'selected' : '' %>>Processing</option>
                     <option value="dispatched" <%= order.orderStatus === 'dispatched' ? 'selected' : '' %>>Dispatched</option>
@@ -749,12 +601,19 @@
                 </div>
                 <div>
                   <label>Note (optional)</label>
-                  <textarea id="statusNote" placeholder="Add a note for this status change…"><%= order.cancellationNote || '' %></textarea>
+                  <textarea id="statusNote" placeholder="Add a note for this status change…" <%= isTerminalStatus ? 'disabled' : '' %>><%= order.cancellationNote || '' %></textarea>
                 </div>
-                <button class="btn btn--teal" onclick="saveStatus()">
-                  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-                  Update Status
-                </button>
+                <% if (isTerminalStatus) { %>
+                  <div class="status-locked-notice">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                    Order is <strong>&nbsp;<%= order.orderStatus %>&nbsp;</strong> — no further status changes allowed.
+                  </div>
+                <% } else { %>
+                  <button class="btn btn--teal" onclick="saveStatus()">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                    Update Status
+                  </button>
+                <% } %>
               </div>
             </div>
           </div>
@@ -763,7 +622,7 @@
           <div class="card">
             <div class="card__header"><span class="card__title">Order Timeline</span></div>
             <div class="card__body">
-              <div class="timeline">
+              <div class="timeline" id="orderTimeline">
                 <%
                   const statusFlow   = ['confirmed','processing','dispatched','delivered'];
                   const currentIdx   = statusFlow.indexOf(order.orderStatus);
@@ -796,16 +655,12 @@
                   <% } else if (rStatus === 'accepted') { %>
                   <div class="timeline-item">
                     <div class="timeline-dot timeline-dot--green"></div>
-                    <div>
-                      <div class="timeline-text"><strong>Return Accepted</strong> — refund initiated</div>
-                    </div>
+                    <div><div class="timeline-text"><strong>Return Accepted</strong> — refund initiated</div></div>
                   </div>
                   <% } else if (rStatus === 'rejected') { %>
                   <div class="timeline-item">
                     <div class="timeline-dot timeline-dot--red"></div>
-                    <div>
-                      <div class="timeline-text"><strong>Return Rejected</strong></div>
-                    </div>
+                    <div><div class="timeline-text"><strong>Return Rejected</strong></div></div>
                   </div>
                   <% } %>
                 <% } else { %>
@@ -832,7 +687,6 @@
               </div>
             </div>
           </div>
-
         </div><!-- /right -->
       </div><!-- /detail-grid -->
 
@@ -843,141 +697,136 @@
 
 <div class="toast" id="toast"></div>
 
+<script src="/socket.io/socket.io.js"></script>
 <script>
-  const ORDER_ID = '<%= order._id %>';
+  const ORDER_ID       = '<%= order._id %>';
+  const CURRENT_STATUS = '<%= order.orderStatus %>';
 
-  /* ─────────────────────────────────────────
-     FLOAT CARD OPEN / CLOSE
-  ───────────────────────────────────────── */
-  function closeAllCards() {
-    document.getElementById('acceptCard').classList.remove('open');
-    document.getElementById('rejectCard').classList.remove('open');
-    document.getElementById('fcBackdrop').classList.remove('active');
+  const STATUS_ORDER = ['confirmed', 'processing', 'dispatched', 'delivered'];
+  const TERMINAL     = ['cancelled', 'returned', 'delivered'];
+
+  const STATUS_LABELS = {
+    confirmed : 'Order Confirmed',
+    processing: 'Processing',
+    dispatched: 'Out for Delivery',
+    delivered : 'Delivered',
+    cancelled : 'Cancelled',
+    returned  : 'Returned'
+  };
+  const DOT_COLORS = {
+    confirmed:'teal', processing:'blue', dispatched:'purple',
+    delivered:'green', cancelled:'red', returned:'amber'
+  };
+
+  function allowedNext(current) {
+    if (TERMINAL.includes(current)) return [];
+    const idx = STATUS_ORDER.indexOf(current);
+    if (idx === -1) return STATUS_ORDER;
+    return STATUS_ORDER.slice(idx + 1);
   }
 
+  // Lock invalid options in detail select on load
+  (function lockDetailSelect() {
+    const sel = document.getElementById('statusSelect');
+    if (!sel || sel.disabled) return;
+    const allowed = allowedNext(CURRENT_STATUS);
+    Array.from(sel.options).forEach(opt => {
+      const ok = opt.value === CURRENT_STATUS || allowed.includes(opt.value);
+      opt.disabled    = !ok;
+      opt.style.color = !ok ? '#bbb' : '';
+    });
+  })();
+
+  /* ── Float card helpers ─────────────────────────────────────────────────── */
+  function closeAllCards() {
+    document.getElementById('acceptCard')?.classList.remove('open');
+    document.getElementById('rejectCard')?.classList.remove('open');
+    document.getElementById('fcBackdrop')?.classList.remove('active');
+  }
   function toggleAcceptCard(e) {
     e.stopPropagation();
     const ac = document.getElementById('acceptCard');
     const rc = document.getElementById('rejectCard');
     const bd = document.getElementById('fcBackdrop');
-    const isOpen = ac.classList.contains('open');
+    const open = ac.classList.contains('open');
     rc.classList.remove('open');
-    if (isOpen) {
-      ac.classList.remove('open');
-      bd.classList.remove('active');
-    } else {
-      ac.classList.add('open');
-      bd.classList.add('active');
-    }
+    open ? (ac.classList.remove('open'), bd.classList.remove('active'))
+         : (ac.classList.add('open'),    bd.classList.add('active'));
   }
-
   function toggleRejectCard(e) {
     e.stopPropagation();
     const ac = document.getElementById('acceptCard');
     const rc = document.getElementById('rejectCard');
     const bd = document.getElementById('fcBackdrop');
-    const isOpen = rc.classList.contains('open');
+    const open = rc.classList.contains('open');
     ac.classList.remove('open');
-    if (isOpen) {
-      rc.classList.remove('open');
-      bd.classList.remove('active');
-    } else {
-      rc.classList.add('open');
-      bd.classList.add('active');
-      setTimeout(() => document.getElementById('rejectReasonInput').focus(), 160);
-    }
+    open ? (rc.classList.remove('open'), bd.classList.remove('active'))
+         : (rc.classList.add('open'),    bd.classList.add('active'),
+            setTimeout(() => document.getElementById('rejectReasonInput').focus(), 160));
   }
-
-  /* Stop clicks inside cards from bubbling to backdrop */
   ['acceptCard','rejectCard'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.addEventListener('click', e => e.stopPropagation());
   });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAllCards(); });
 
-  /* Escape key closes */
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') closeAllCards();
-  });
-
-  /* ─────────────────────────────────────────
-     CONFIRM ACCEPT
-  ───────────────────────────────────────── */
+  /* ── Return decision ────────────────────────────────────────────────────── */
   async function confirmAccept() {
     const btn = document.getElementById('acceptOkBtn');
-    btn.disabled = true;
-    btn.innerHTML = '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:11px;height:11px;animation:spin .6s linear infinite"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Processing…';
+    btn.disabled = true; btn.innerHTML = '… Processing';
     closeAllCards();
     await sendReturnDecision('accepted', '');
-    btn.disabled = false;
-    btn.innerHTML = '✓ Yes, Accept';
+    btn.disabled = false; btn.innerHTML = '✓ Yes, Accept';
   }
-
-  /* ─────────────────────────────────────────
-     CONFIRM REJECT
-  ───────────────────────────────────────── */
   async function confirmReject() {
     const reason = document.getElementById('rejectReasonInput').value.trim();
-    const btn    = document.getElementById('rejectOkBtn');
-    btn.disabled = true;
-    btn.innerHTML = '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:11px;height:11px;animation:spin .6s linear infinite"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Processing…';
+    const btn = document.getElementById('rejectOkBtn');
+    btn.disabled = true; btn.innerHTML = '… Processing';
     closeAllCards();
     await sendReturnDecision('rejected', reason);
-    btn.disabled = false;
-    btn.innerHTML = '✕ Reject';
+    btn.disabled = false; btn.innerHTML = '✕ Reject';
   }
-
-  /* ─────────────────────────────────────────
-     SHARED PATCH
-  ───────────────────────────────────────── */
   async function sendReturnDecision(decision, rejectionReason) {
     try {
       const res  = await fetch(`/admin/orders/${ORDER_ID}/return`, {
-        method : 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body   : JSON.stringify({ decision, rejectionReason }),
+        method:'PATCH', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ decision, rejectionReason }),
       });
       const data = await res.json();
       if (data.success) {
-        showToast(
-          decision === 'accepted' ? '✓ Return accepted — refund initiated' : '✕ Return rejected',
-          decision === 'accepted' ? 'success' : 'error'
-        );
+        showToast(decision === 'accepted' ? '✓ Return accepted — refund initiated' : '✕ Return rejected',
+                  decision === 'accepted' ? 'success' : 'error');
         setTimeout(() => location.reload(), 1500);
-      } else {
-        showToast(data.message || 'Action failed', 'error');
-      }
-    } catch {
-      showToast('Network error — please try again', 'error');
-    }
+      } else { showToast(data.message || 'Action failed', 'error'); }
+    } catch { showToast('Network error — please try again', 'error'); }
   }
 
-  /* ─────────────────────────────────────────
-     STATUS UPDATE
-  ───────────────────────────────────────── */
+  /* ── Status update ──────────────────────────────────────────────────────── */
   async function saveStatus() {
-    const status = document.getElementById('statusSelect').value;
+    const sel    = document.getElementById('statusSelect');
+    const status = sel.value;
     const note   = document.getElementById('statusNote').value;
+    const allowed = allowedNext(CURRENT_STATUS);
+
+    if (status === CURRENT_STATUS) { showToast('Order is already "' + CURRENT_STATUS + '"', 'error'); return; }
+    if (!allowed.includes(status)) {
+      showToast('Cannot change from "' + CURRENT_STATUS + '" to "' + status + '"', 'error');
+      sel.value = CURRENT_STATUS; return;
+    }
     try {
       const res  = await fetch(`/admin/orders/${ORDER_ID}/status`, {
-        method : 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body   : JSON.stringify({ status, note }),
+        method:'PATCH', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ status, note }),
       });
       const data = await res.json();
       if (data.success) {
-        showToast('Status updated successfully', 'success');
+        showToast('Status updated to "' + status + '"', 'success');
         setTimeout(() => location.reload(), 1200);
-      } else {
-        showToast(data.message || 'Update failed', 'error');
-      }
-    } catch {
-      showToast('Network error', 'error');
-    }
+      } else { showToast(data.message || 'Update failed', 'error'); }
+    } catch { showToast('Network error', 'error'); }
   }
 
-  /* ─────────────────────────────────────────
-     TOAST
-  ───────────────────────────────────────── */
+  /* ── Toast ──────────────────────────────────────────────────────────────── */
   function showToast(msg, type = 'success') {
     const t = document.getElementById('toast');
     t.textContent = msg;
@@ -985,9 +834,73 @@
     setTimeout(() => { t.className = 'toast'; }, 3200);
   }
 
+  /* ── Socket.io — live status push ──────────────────────────────────────── */
+  const socket = io();
+  socket.emit('join-admin');
+
+  // If another admin (or the same session) updates THIS order's status elsewhere,
+  // reflect it live without a page reload
+  socket.on('order-status-updated', (data) => {
+    if (String(data.orderId) !== ORDER_ID) return;
+    const newStatus = data.status;
+
+    // Update the status badge in the items card header
+    const badge = document.getElementById('orderStatusBadge');
+    if (badge) {
+      badge.className = `badge badge--${newStatus}`;
+      badge.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
+    }
+
+    // Update the status select if not already locked
+    const sel = document.getElementById('statusSelect');
+    if (sel && !sel.disabled) {
+      sel.value = newStatus;
+      if (TERMINAL.includes(newStatus)) {
+        sel.disabled = true;
+      } else {
+        Array.from(sel.options).forEach(opt => {
+          const ok = opt.value === newStatus || allowedNext(newStatus).includes(opt.value);
+          opt.disabled    = !ok;
+          opt.style.color = !ok ? '#bbb' : '';
+        });
+      }
+    }
+
+    // Append a new step to the live timeline
+    const timeline = document.getElementById('orderTimeline');
+    if (timeline) {
+      const item = document.createElement('div');
+      item.className = 'timeline-item';
+      item.style.animation = 'slideIn 0.3s ease';
+      item.innerHTML = `
+        <div class="timeline-dot timeline-dot--${DOT_COLORS[newStatus] || 'teal'}"></div>
+        <div>
+          <div class="timeline-text"><strong>${STATUS_LABELS[newStatus] || newStatus}</strong> <span style="font-size:10px;color:var(--teal);font-weight:600;">· Live update</span></div>
+          <div class="timeline-time">${new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})}</div>
+        </div>`;
+      timeline.appendChild(item);
+    }
+
+    showToast('Order status updated to "' + newStatus + '" (live)', 'success');
+  });
+
+  // Live badge connectivity
+  socket.on('disconnect', () => {
+    const b = document.getElementById('liveBadge');
+    if (b) { b.style.background='var(--bg)'; b.style.color='var(--text-light)'; b.style.borderColor='var(--border)'; }
+  });
+  socket.on('connect', () => {
+    const b = document.getElementById('liveBadge');
+    if (b) { b.style.background=''; b.style.color=''; b.style.borderColor=''; }
+    socket.emit('join-admin');
+  });
+
   /* spinner keyframe */
   const style = document.createElement('style');
-  style.textContent = '@keyframes spin { to { transform: rotate(360deg); } }';
+  style.textContent = `
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes slideIn { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
+  `;
   document.head.appendChild(style);
 </script>
 </body>

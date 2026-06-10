@@ -2,45 +2,238 @@ import User      from '../../models/user.js';
 import Category  from '../../models/category.js';
 import Product   from '../../models/product.js';
 import Brand     from '../../models/brand.js';
+import Order     from '../../models/order.js';
 import cloudinary from '../../config/cloudinary.js';
 import { broadcast } from '../../public/utils/ssemanager.js';
 
-       
-// dashh                                                         --
+
+// ── Dashboard ────────────────────────────────────────────────────────────────
+
 export const getDashboard = async (req, res) => {
   try {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const search = req.query.search?.trim() || '';
-    const page   = Math.max(1, parseInt(req.query.page) || 1);
-    const limit  = 10;
-    const skip   = (page - 1) * limit;
-    const customerQuery = { role: 'user' };
-    if (search) customerQuery.name = { $regex: search, $options: 'i' };
-    const [totalUsers, blockedUsers, newUsersToday, totalProducts, totalCategories, customers, total] = await Promise.all([
+    const now            = new Date();
+    const todayStart     = new Date(now); todayStart.setHours(0, 0, 0, 0);
+    const monthStart     = new Date(now.getFullYear(), now.getMonth(), 1);
+    const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const lastMonthEnd   = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
+
+    const [
+      totalOrders,
+      pendingOrders,
+      shippedOrders,
+      deliveredOrders,
+      cancelledOrders,
+      totalCustomers,
+      newCustomers,
+      blockedUsers,
+      totalProducts,
+      outOfStock,
+      totalCategories,
+      totalBrands,
+      recentOrders,
+      revenueAgg,
+      todayRevenueAgg,
+      lastMonthRevenueAgg,
+      monthlySalesAgg,
+      topProductsAgg,
+    ] = await Promise.all([
+
+      Order.countDocuments(),
+      Order.countDocuments({ orderStatus: 'confirmed' }),
+      Order.countDocuments({ orderStatus: { $in: ['processing', 'dispatched'] } }),
+      Order.countDocuments({ orderStatus: 'delivered' }),
+      Order.countDocuments({ orderStatus: 'cancelled' }),
+
       User.countDocuments({ role: 'user' }),
+      User.countDocuments({ role: 'user', createdAt: { $gte: monthStart } }),
       User.countDocuments({ isBlocked: true }),
-      User.countDocuments({ createdAt: { $gte: today } }),
+
       Product.countDocuments({ isDeleted: false }),
+      Product.countDocuments({ isDeleted: false, stock: 0 }),
       Category.countDocuments({ isDeleted: false }),
-      User.find(customerQuery).sort({ createdAt: -1 }).skip(skip).limit(limit),
-      User.countDocuments(customerQuery),
+      Brand.countDocuments({ isDeleted: false }),
+
+      // Recent 6 orders
+      Order.find()
+        .populate('user', 'name email')
+        .sort({ createdAt: -1 })
+        .limit(6)
+        .lean(),
+
+      // All-time revenue (delivered only)
+      Order.aggregate([
+        { $match: { orderStatus: 'delivered' } },
+        { $group: { _id: null, total: { $sum: '$pricing.grandTotal' } } },
+      ]),
+
+      // Today's revenue
+      Order.aggregate([
+        { $match: { orderStatus: 'delivered', createdAt: { $gte: todayStart } } },
+        { $group: { _id: null, total: { $sum: '$pricing.grandTotal' } } },
+      ]),
+
+      // Last month revenue (for growth %)
+      Order.aggregate([
+        { $match: { orderStatus: 'delivered', createdAt: { $gte: lastMonthStart, $lte: lastMonthEnd } } },
+        { $group: { _id: null, total: { $sum: '$pricing.grandTotal' } } },
+      ]),
+
+      // Last 7 months sales
+      Order.aggregate([
+        { $match: { orderStatus: 'delivered' } },
+        {
+          $group: {
+            _id:     { year: { $year: '$createdAt' }, month: { $month: '$createdAt' } },
+            revenue: { $sum: '$pricing.grandTotal' },
+            count:   { $sum: 1 },
+          },
+        },
+        { $sort: { '_id.year': 1, '_id.month': 1 } },
+        { $limit: 7 },
+      ]),
+
+      // Top 5 selling products
+      Order.aggregate([
+        { $match: { orderStatus: 'delivered' } },
+        { $unwind: '$items' },
+        { $match: { 'items.status': 'active' } },
+        {
+          $group: {
+            _id:          '$items.product',
+            name:         { $first: '$items.name' },
+            brand:        { $first: '$items.brand' },
+            image:        { $first: '$items.image' },
+            totalSold:    { $sum: '$items.quantity' },
+            totalRevenue: { $sum: '$items.totalPrice' },
+          },
+        },
+        { $sort: { totalSold: -1 } },
+        { $limit: 5 },
+      ]),
     ]);
+
+    // ── Derived values ────────────────────────────────────────────────────────
+    const totalRevenue     = Math.round(revenueAgg[0]?.total      ?? 0);
+    const todayRevenue     = Math.round(todayRevenueAgg[0]?.total  ?? 0);
+    const lastMonthRevenue = Math.round(lastMonthRevenueAgg[0]?.total ?? 0);
+
+    const thisMonthEntry = monthlySalesAgg.find(
+      m => m._id.year === now.getFullYear() && m._id.month === now.getMonth() + 1
+    );
+    const thisMonthRevenue = Math.round(thisMonthEntry?.revenue ?? 0);
+
+    const revenueGrowth = lastMonthRevenue > 0
+      ? Math.round(((thisMonthRevenue - lastMonthRevenue) / lastMonthRevenue) * 100)
+      : 0;
+
+    const avgOrderValue = deliveredOrders > 0
+      ? Math.round(totalRevenue / deliveredOrders)
+      : 0;
+
+    const highestMonth = monthlySalesAgg.length > 0
+      ? Math.round(Math.max(...monthlySalesAgg.map(m => m.revenue)))
+      : 0;
+
+    // Order status percentages
+    const safeTotal    = totalOrders || 1;
+    const deliveredPct = Math.round((deliveredOrders / safeTotal) * 100);
+    const pendingPct   = Math.round((pendingOrders   / safeTotal) * 100);
+    const shippedPct   = Math.round((shippedOrders   / safeTotal) * 100);
+    const cancelledPct = Math.round((cancelledOrders / safeTotal) * 100);
+
+    // Monthly sales chart
+    const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const monthlySales = monthlySalesAgg.map(m => ({
+      label: MONTH_NAMES[m._id.month - 1],
+      value: Math.round(m.revenue),
+    }));
+
+    // Map recentOrders to EJS shape (template uses o.userId.name / o.totalAmount)
+    const recentOrdersMapped = recentOrders.map(o => ({
+      _id:         o._id,
+      orderId:     o.orderNumber,
+      userId:      { name: o.user?.name ?? 'Unknown' },
+      totalAmount: o.pricing.grandTotal,
+      status:      o.orderStatus,
+    }));
+
+    // Activity feed
+    const colorMap = {
+      confirmed:  'teal',
+      processing: 'blue',
+      dispatched: 'blue',
+      delivered:  'green',
+      cancelled:  'red',
+      returned:   'amber',
+    };
+    const recentActivity = recentOrders.slice(0, 8).map(o => ({
+      color:   colorMap[o.orderStatus] ?? 'teal',
+      message: `Order <strong>${o.orderNumber}</strong> by ${o.user?.name ?? 'a customer'} — ${o.orderStatus}`,
+      time:    new Date(o.createdAt).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }),
+    }));
+
+    // Top products — images array shape for EJS
+    const topProducts = topProductsAgg.map(p => ({
+      ...p,
+      images: p.image ? [p.image] : [],
+    }));
+
     res.render('admin/dashboard', {
-      stats: { totalUsers, blockedUsers, newUsersToday, totalProducts, totalCategories },
       adminName: req.session.adminName,
       adminRole: req.session.adminRole,
-      customers, search, page,
-      pages: Math.ceil(total / limit),
-      total,
+
+      // Stat cards
+      totalRevenue,
+      todayRevenue,
+      revenueGrowth,
+      totalOrders,
+      ordersGrowth:    0,
+      pendingOrders,
+      totalCustomers,
+      customersGrowth: 0,
+      newCustomers,
+      totalProducts,
+      outOfStock,
+      blockedUsers,
+      totalCategories,
+      totalBrands,
+
+      // Chart
+      monthlySales,
+      avgOrderValue,
+      highestMonth,
+      conversionRate: 0,
+
+      // Order status progress bars
+      deliveredOrders,
+      shippedOrders,
+      cancelledOrders,
+      deliveredPct,
+      pendingPct,
+      shippedPct,
+      cancelledPct,
+
+      // Tables / feeds
+      recentOrders:   recentOrdersMapped,
+      recentActivity,
+      topProducts,
+
+      // Quick stats
+      totalReviews:   0,
+      avgRating:      '0.0',
+      activeCoupons:  0,
+      pendingRefunds: 0,
+      activeBanners:  0,
     });
+
   } catch (err) {
     console.error('Dashboard error:', err);
     res.status(500).send('Error loading dashboard');
   }
 };
 
-// cat                                                        ----
+
+// ── Categories ───────────────────────────────────────────────────────────────
 
 export const getCategories = async (req, res) => {
   try {
@@ -137,7 +330,8 @@ export const deleteCategory = async (req, res) => {
   }
 };
 
-// product                                                     ---
+
+// ── Products ─────────────────────────────────────────────────────────────────
 
 export const getProducts = async (req, res) => {
   try {
@@ -317,8 +511,6 @@ export const editProduct = async (req, res) => {
       },
       { new: true, runValidators: true }
     );
-
-    // SSE
     broadcast('productUpdate', {
       productId:     req.params.id,
       stock:         totalStock,
@@ -327,7 +519,6 @@ export const editProduct = async (req, res) => {
       isDeleted:     updated.isDeleted,
       colorVariants: colorVariants.map(v => ({ name: v.name, hex: v.hex, stock: v.stock })),
     });
-
     req.flash('success', 'Product updated successfully.');
     res.redirect('/admin/products');
   } catch (err) {
@@ -359,7 +550,8 @@ export const deleteProduct = async (req, res) => {
   }
 };
 
-// brand                                                     ------
+
+// ── Brands ───────────────────────────────────────────────────────────────────
 
 export const getBrands = async (req, res) => {
   try {

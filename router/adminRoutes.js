@@ -15,7 +15,8 @@ import {
   listOrders,
   getOrderDetail,
   updateOrderStatus,
-  handleReturnRequest,          
+  handleReturnRequest, 
+   getRecentOrders,            
 } from '../controller/adimconrtoller/orderController.js';
 
 const router = express.Router();
@@ -186,6 +187,7 @@ router.post('/brands/:id/edit',isAuthenticated, editBrand);
 router.post('/brands/:id/delete', isAuthenticated, deleteBrand);
 
 router.get('/orders',isAuthenticated, listOrders);
+router.get('/orders/notify/recent',    isAuthenticated, getRecentOrders);
 router.get('/orders/:id',isAuthenticated, getOrderDetail);
 router.patch('/orders/:id/status',isAuthenticated, updateOrderStatus);
 router.patch('/orders/:id/return',isAuthenticated, handleReturnRequest);  

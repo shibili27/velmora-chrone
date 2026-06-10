@@ -35,7 +35,7 @@
     html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--bg); color: var(--text); }
     .layout { display: flex; min-height: 100vh; }
 
-    /* Sidebar */
+    /* ── Sidebar ── */
     .sidebar { width: var(--sidebar-w); background: var(--white); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; }
     .sidebar__brand { padding: 24px 20px 18px; border-bottom: 1px solid var(--border); }
     .sidebar__brand-name { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 600; letter-spacing: 0.06em; color: var(--text); line-height: 1.2; }
@@ -54,26 +54,69 @@
     .btn-logout:hover { background: var(--red); color: #fff; border-color: var(--red); }
     .btn-logout svg { width: 14px; height: 14px; }
 
-    /* Main */
+    /* ── Main ── */
     .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
     .topbar { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 32px; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
     .topbar__title { font-size: 13px; font-weight: 500; color: var(--text-mid); letter-spacing: 0.04em; }
-    .topbar__right { display: flex; align-items: center; gap: 10px; }
-    .topbar__date { font-size: 11px; color: var(--text-light); letter-spacing: 0.04em; }
+    .topbar__right { display: flex; align-items: center; gap: 12px; }
+    .topbar__date  { font-size: 11px; color: var(--text-light); letter-spacing: 0.04em; }
     .content { padding: 32px; flex: 1; }
 
-    /* Page header */
-    .page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px; }
-    .page-header__left { }
-    .page-header__title { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 600; color: var(--text); }
-    .page-header__sub { font-size: 12px; color: var(--text-light); margin-top: 3px; }
+    /* ── Notification bell ── */
+    .notif-wrap { position: relative; }
+    .notif-bell { position: relative; background: none; border: 1px solid var(--border); border-radius: 6px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-mid); transition: background 0.15s, color 0.15s; }
+    .notif-bell:hover { background: var(--teal-light); color: var(--teal); border-color: var(--teal); }
+    .notif-count { position: absolute; top: -5px; right: -5px; background: var(--red); color: #fff; font-size: 9px; font-weight: 700; min-width: 16px; height: 16px; border-radius: 8px; display: flex; align-items: center; justify-content: center; padding: 0 3px; border: 1.5px solid var(--white); }
+    .notif-dropdown { position: absolute; top: calc(100% + 8px); right: 0; width: 320px; background: var(--white); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.10); z-index: 200; display: none; overflow: hidden; }
+    .notif-dropdown.open { display: block; }
+    .notif-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+    .notif-header-left { font-size: 12px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 8px; }
+    .notif-tabs { display: flex; gap: 4px; }
+    .notif-tab { font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg); color: var(--text-mid); cursor: pointer; transition: all 0.15s; }
+    .notif-tab.active { background: var(--teal); color: #fff; border-color: var(--teal); }
+    .notif-clear { background: none; border: none; font-family: 'Jost', sans-serif; font-size: 11px; color: var(--teal); cursor: pointer; font-weight: 500; white-space: nowrap; }
+    .notif-clear:hover { text-decoration: underline; }
+    .notif-list { max-height: 340px; overflow-y: auto; }
+    .notif-empty { padding: 28px; text-align: center; font-size: 12px; color: var(--text-light); }
+    .notif-item { display: flex; align-items: flex-start; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--border); text-decoration: none; transition: background 0.12s; position: relative; background: #f0faf9; }
+    .notif-item:last-child { border-bottom: none; }
+    .notif-item:hover { background: var(--teal-light); }
+    .notif-item.read { background: var(--white); }
+    .notif-item.read:hover { background: var(--bg); }
+    .notif-item__dot { width: 7px; height: 7px; border-radius: 50%; background: var(--teal); flex-shrink: 0; margin-top: 5px; transition: opacity 0.2s; }
+    .notif-item.read .notif-item__dot { background: transparent; border: 1.5px solid var(--border); }
+    .notif-item__body-wrap { flex: 1; min-width: 0; }
+    .notif-item__top  { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px; }
+    .notif-item__id   { font-size: 12px; font-weight: 600; color: var(--teal); font-family: 'Cormorant Garamond', serif; }
+    .notif-item.read .notif-item__id { color: var(--text-mid); }
+    .notif-item__time { font-size: 10px; color: var(--text-light); }
+    .notif-item__info { font-size: 11.5px; color: var(--text-mid); }
+    .notif-item__customer { font-size: 10px; color: var(--text-light); margin-top: 1px; }
+    .notif-item__actions { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
+    .notif-mark-btn { font-size: 9px; font-weight: 600; color: var(--teal); background: none; border: 1px solid var(--teal-light); border-radius: 4px; padding: 2px 6px; cursor: pointer; white-space: nowrap; font-family: 'Jost', sans-serif; transition: background 0.12s; }
+    .notif-mark-btn:hover { background: var(--teal-light); }
+    .notif-item.read .notif-mark-btn { color: var(--text-light); border-color: var(--border); }
+    .notif-view-btn { font-size: 9px; font-weight: 600; color: var(--text-mid); background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: 2px 6px; cursor: pointer; white-space: nowrap; font-family: 'Jost', sans-serif; text-decoration: none; transition: background 0.12s; }
+    .notif-view-btn:hover { background: var(--border); }
+    .notif-footer { padding: 10px 16px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .notif-footer-count { font-size: 10px; color: var(--text-light); }
 
-    /* Flash messages */
+    /* ── Live indicator ── */
+    .live-dot { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 600; color: var(--green); letter-spacing: 0.06em; }
+    .live-dot__pulse { width: 7px; height: 7px; border-radius: 50%; background: var(--green); animation: livePulse 1.8s ease-in-out infinite; }
+    @keyframes livePulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.4; transform:scale(0.65); } }
+
+    /* ── Page header ── */
+    .page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px; }
+    .page-header__title { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 600; color: var(--text); }
+    .page-header__sub   { font-size: 12px; color: var(--text-light); margin-top: 3px; }
+
+    /* ── Flash ── */
     .flash { padding: 11px 16px; border-radius: 6px; font-size: 12.5px; font-weight: 500; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
     .flash--success { background: var(--green-bg); color: var(--green); border: 1px solid #bbf7d0; }
     .flash--error   { background: var(--red-bg);   color: var(--red);   border: 1px solid #fecaca; }
 
-    /* Stat strip */
+    /* ── Stat strip ── */
     .stat-strip { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 24px; }
     .stat-pill { background: var(--white); border: 1px solid var(--border); border-radius: 6px; padding: 14px 18px; display: flex; flex-direction: column; gap: 4px; cursor: pointer; transition: box-shadow 0.15s, border-color 0.15s; text-decoration: none; }
     .stat-pill:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.06); border-color: var(--teal); }
@@ -83,7 +126,7 @@
     .stat-pill.active .stat-pill__label { color: var(--teal-dark); }
     .stat-pill.active .stat-pill__val   { color: var(--teal); }
 
-    /* Toolbar */
+    /* ── Toolbar ── */
     .toolbar { background: var(--white); border: 1px solid var(--border); border-radius: 6px; padding: 16px 20px; margin-bottom: 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
     .search-wrap { position: relative; flex: 1; min-width: 200px; }
     .search-wrap svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: var(--text-light); pointer-events: none; }
@@ -94,13 +137,13 @@
     select.filter-select:focus { border-color: var(--teal); background: var(--white); }
     input[type="date"].filter-select { padding: 7px 12px; }
     .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 5px; font-family: 'Jost', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; border: none; transition: background 0.15s, color 0.15s; text-decoration: none; white-space: nowrap; }
-    .btn--teal   { background: var(--teal); color: #fff; }
+    .btn--teal    { background: var(--teal); color: #fff; }
     .btn--teal:hover { background: var(--teal-dark); }
     .btn--outline { background: var(--white); color: var(--text-mid); border: 1px solid var(--border); }
     .btn--outline:hover { background: var(--bg); color: var(--text); }
     .btn svg { width: 13px; height: 13px; }
 
-    /* Table */
+    /* ── Table ── */
     .section-card { background: var(--white); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
     .section-card__header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
     .section-card__title  { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text); }
@@ -108,26 +151,15 @@
     .table-wrap { overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; }
     thead tr { background: #f8faf9; }
-    th { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); padding: 11px 16px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; cursor: pointer; user-select: none; }
-    th:hover { color: var(--teal); }
-    th .sort-icon { display: inline-block; margin-left: 4px; opacity: 0.4; font-size: 9px; }
-    th.sorted .sort-icon { opacity: 1; color: var(--teal); }
+    th { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); padding: 11px 16px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
     td { padding: 13px 16px; font-size: 12.5px; color: var(--text); border-bottom: 1px solid var(--border); vertical-align: middle; }
     tbody tr:last-child td { border-bottom: none; }
     tbody tr:hover { background: #fafcfb; }
+    tbody tr.new-order-flash { animation: rowFlash 2.5s ease forwards; }
+    @keyframes rowFlash { 0% { background:#e8f4f3; } 60% { background:#e8f4f3; } 100% { background:transparent; } }
     .empty-row td { text-align: center; padding: 48px; color: var(--text-light); font-size: 13px; }
 
-    /* Badges */
-    .badge { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 20px; white-space: nowrap; letter-spacing: 0.04em; }
-    .badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
-    .badge--confirmed    { color: var(--teal);   background: var(--teal-light); }
-    .badge--processing   { color: var(--blue);   background: var(--blue-bg);   }
-    .badge--dispatched   { color: var(--purple); background: var(--purple-bg); }
-    .badge--delivered    { color: var(--green);  background: var(--green-bg);  }
-    .badge--cancelled    { color: var(--red);    background: var(--red-bg);    }
-    .badge--returned     { color: var(--amber);  background: var(--amber-bg);  }
-
-    /* Status inline select */
+    /* ── Status select ── */
     .status-select { font-family: 'Jost', sans-serif; font-size: 11px; font-weight: 600; padding: 4px 8px; border-radius: 20px; border: none; cursor: pointer; outline: none; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%235a6461' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 6px center; padding-right: 22px; }
     .status-select.s-confirmed  { color: var(--teal);   background-color: var(--teal-light); }
     .status-select.s-processing { color: var(--blue);   background-color: var(--blue-bg); }
@@ -135,29 +167,30 @@
     .status-select.s-delivered  { color: var(--green);  background-color: var(--green-bg); }
     .status-select.s-cancelled  { color: var(--red);    background-color: var(--red-bg); }
     .status-select.s-returned   { color: var(--amber);  background-color: var(--amber-bg); }
+    .status-select:disabled { opacity: 1; cursor: not-allowed; }
 
-    /* User cell */
-    .user-cell { display: flex; align-items: center; gap: 9px; }
+    /* ── User cell ── */
+    .user-cell   { display: flex; align-items: center; gap: 9px; }
     .user-avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--teal); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 11px; font-weight: 600; flex-shrink: 0; }
-    .user-name  { font-size: 12.5px; font-weight: 500; color: var(--text); white-space: nowrap; }
-    .user-email { font-size: 10px; color: var(--text-light); margin-top: 1px; }
+    .user-name   { font-size: 12.5px; font-weight: 500; color: var(--text); white-space: nowrap; }
+    .user-email  { font-size: 10px; color: var(--text-light); margin-top: 1px; }
 
-    /* Pagination */
+    /* ── Pagination ── */
     .pagination { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-top: 1px solid var(--border); }
-    .pagination__info { font-size: 11px; color: var(--text-light); }
+    .pagination__info  { font-size: 11px; color: var(--text-light); }
     .pagination__pages { display: flex; align-items: center; gap: 4px; }
     .page-btn { width: 30px; height: 30px; border-radius: 5px; border: 1px solid var(--border); background: var(--white); font-family: 'Jost', sans-serif; font-size: 12px; font-weight: 500; color: var(--text-mid); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; text-decoration: none; }
     .page-btn:hover { background: var(--teal-light); color: var(--teal); border-color: var(--teal); }
-    .page-btn.active { background: var(--teal); color: #fff; border-color: var(--teal); }
+    .page-btn.active   { background: var(--teal); color: #fff; border-color: var(--teal); }
     .page-btn:disabled, .page-btn.disabled { opacity: 0.4; cursor: default; pointer-events: none; }
     .page-btn svg { width: 12px; height: 12px; }
 
-    /* Footer */
+    /* ── Footer ── */
     .page-footer { text-align: center; padding: 20px 32px; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); border-top: 1px solid var(--border); }
 
-    /* Toast */
-    .toast { position: fixed; bottom: 24px; right: 24px; background: var(--text); color: #fff; padding: 12px 18px; border-radius: 6px; font-size: 12.5px; font-weight: 500; z-index: 9999; transform: translateY(80px); opacity: 0; transition: transform 0.25s, opacity 0.25s; pointer-events: none; }
-    .toast.show { transform: translateY(0); opacity: 1; }
+    /* ── Toast ── */
+    .toast { position: fixed; bottom: 24px; right: 24px; background: var(--text); color: #fff; padding: 12px 18px; border-radius: 6px; font-size: 12.5px; font-weight: 500; z-index: 9999; transform: translateY(80px); opacity: 0; transition: transform 0.25s, opacity 0.25s; pointer-events: none; max-width: 320px; }
+    .toast.show    { transform: translateY(0); opacity: 1; }
     .toast.success { background: var(--green); }
     .toast.error   { background: var(--red); }
   </style>
@@ -165,7 +198,7 @@
 <body>
 <div class="layout">
 
-  <!-- Sidebar -->
+  <!-- ── Sidebar ── -->
   <aside class="sidebar">
     <div class="sidebar__brand">
       <div class="sidebar__brand-name">Velmora<br>Chroné</div>
@@ -229,18 +262,49 @@
     </div>
   </aside>
 
-  <!-- Main -->
+  <!-- ── Main ── -->
   <div class="main">
     <header class="topbar">
       <span class="topbar__title">Order Management</span>
       <div class="topbar__right">
         <span class="topbar__date" id="topbarDate"></span>
+        <div class="live-dot" id="liveDot" title="Live updates active">
+          <div class="live-dot__pulse"></div>
+          LIVE
+        </div>
+        <div class="notif-wrap" id="notifWrap">
+          <button class="notif-bell" id="notifBell" onclick="toggleDropdown()">
+            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+            </svg>
+            <span class="notif-count" id="notifCount" style="display:none">0</span>
+          </button>
+          <div class="notif-dropdown" id="notifDropdown">
+            <div class="notif-header">
+              <div class="notif-header-left">
+                <span>Orders</span>
+                <div class="notif-tabs">
+                  <button class="notif-tab active" id="tabAll"    onclick="switchTab('all')">All</button>
+                  <button class="notif-tab"         id="tabUnread" onclick="switchTab('unread')">Unread</button>
+                  <button class="notif-tab"         id="tabRead"   onclick="switchTab('read')">Read</button>
+                </div>
+              </div>
+              <button onclick="markAllRead()" class="notif-clear">Mark all read</button>
+            </div>
+            <div class="notif-list" id="notifList">
+              <div class="notif-empty">No new orders</div>
+            </div>
+            <div class="notif-footer">
+              <span class="notif-footer-count" id="notifFooterCount">0 notifications</span>
+              <button onclick="clearAll()" class="notif-clear">Clear all</button>
+            </div>
+          </div>
+        </div>
       </div>
     </header>
 
     <div class="content">
 
-      <!-- Flash messages -->
       <% if (locals.success && success.length > 0) { %>
         <div class="flash flash--success">
           <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
@@ -254,7 +318,6 @@
         </div>
       <% } %>
 
-      <!-- Page header -->
       <div class="page-header">
         <div class="page-header__left">
           <div class="page-header__title">Orders</div>
@@ -262,7 +325,7 @@
         </div>
       </div>
 
-      <!-- Stat strip (clickable filters) -->
+      <!-- ── Stat Strip — clicking these navigates with status filter ── -->
       <div class="stat-strip">
         <a href="/admin/orders?status=all&page=1" class="stat-pill <%= (currentStatus === 'all' || !currentStatus) ? 'active' : '' %>">
           <div class="stat-pill__label">All Orders</div>
@@ -286,24 +349,14 @@
         </a>
       </div>
 
-      <!-- Toolbar -->
+      <!-- ── FIXED: removed duplicate hidden status input ── -->
       <form method="GET" action="/admin/orders" id="filterForm">
         <input type="hidden" name="page" value="1"/>
-        <% if (currentStatus && currentStatus !== 'all') { %>
-          <input type="hidden" name="status" value="<%= currentStatus %>"/>
-        <% } %>
         <div class="toolbar">
           <div class="search-wrap">
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35"/></svg>
-            <input
-              type="text"
-              name="search"
-              class="search-input"
-              placeholder="Search by order ID or customer name…"
-              value="<%= currentSearch || '' %>"
-            />
+            <input type="text" name="search" class="search-input" placeholder="Search by order ID or customer name…" value="<%= currentSearch || '' %>"/>
           </div>
-
           <select name="status" class="filter-select" onchange="document.getElementById('filterForm').submit()">
             <option value="all"        <%= (currentStatus === 'all' || !currentStatus) ? 'selected' : '' %>>All Statuses</option>
             <option value="confirmed"  <%= currentStatus === 'confirmed'  ? 'selected' : '' %>>Confirmed</option>
@@ -313,17 +366,14 @@
             <option value="cancelled"  <%= currentStatus === 'cancelled'  ? 'selected' : '' %>>Cancelled</option>
             <option value="returned"   <%= currentStatus === 'returned'   ? 'selected' : '' %>>Returned</option>
           </select>
-
           <select name="sort" class="filter-select" onchange="document.getElementById('filterForm').submit()">
-            <option value="date_desc" <%= currentSort === 'date_desc' ? 'selected' : '' %>>Newest First</option>
-            <option value="date_asc"  <%= currentSort === 'date_asc'  ? 'selected' : '' %>>Oldest First</option>
+            <option value="date_desc"   <%= currentSort === 'date_desc'   ? 'selected' : '' %>>Newest First</option>
+            <option value="date_asc"    <%= currentSort === 'date_asc'    ? 'selected' : '' %>>Oldest First</option>
             <option value="amount_desc" <%= currentSort === 'amount_desc' ? 'selected' : '' %>>Amount: High–Low</option>
             <option value="amount_asc"  <%= currentSort === 'amount_asc'  ? 'selected' : '' %>>Amount: Low–High</option>
           </select>
-
           <input type="date" name="from" class="filter-select" value="<%= currentFrom || '' %>" title="From date"/>
           <input type="date" name="to"   class="filter-select" value="<%= currentTo   || '' %>" title="To date"/>
-
           <button type="submit" class="btn btn--teal">
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
             Search
@@ -335,7 +385,6 @@
         </div>
       </form>
 
-      <!-- Orders table -->
       <div class="section-card">
         <div class="section-card__header">
           <span class="section-card__title">Orders</span>
@@ -355,26 +404,24 @@
                 <th>Actions</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="ordersTableBody">
               <% if (orders && orders.length > 0) { %>
                 <% orders.forEach(function(order) { %>
-                <tr>
-                  <!-- Order ID -->
+                <%
+                  const isTerminal = ['cancelled','returned','delivered'].includes(order.orderStatus);
+                %>
+                <tr data-order-id="<%= order._id %>">
                   <td>
                     <span style="font-family:'Cormorant Garamond',serif;font-size:13px;font-weight:600;color:var(--teal)">
                       <%= order.orderNumber || '#' + order._id.toString().slice(-6).toUpperCase() %>
                     </span>
                   </td>
-
-                  <!-- Date -->
                   <td style="color:var(--text-mid);font-size:12px;white-space:nowrap">
                     <%= new Date(order.createdAt).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' }) %>
                     <div style="font-size:10px;color:var(--text-light)">
                       <%= new Date(order.createdAt).toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' }) %>
                     </div>
                   </td>
-
-                  <!-- Customer -->
                   <td>
                     <div class="user-cell">
                       <div class="user-avatar">
@@ -386,30 +433,24 @@
                       </div>
                     </div>
                   </td>
-
-                  <!-- Items count -->
                   <td style="color:var(--text-mid);font-size:12px">
                     <%= order.items ? order.items.length : 0 %> item<%= (order.items && order.items.length !== 1) ? 's' : '' %>
                   </td>
-
-                  <!-- Amount -->
                   <td style="font-weight:600">
                     ₹<%= order.pricing ? order.pricing.grandTotal.toLocaleString('en-IN') : '0' %>
                   </td>
-
-                  <!-- Payment -->
                   <td>
                     <span style="font-size:11px;background:var(--bg);padding:3px 8px;border-radius:4px;color:var(--text-mid);font-weight:500">
                       <%= order.paymentMethod || 'COD' %>
                     </span>
                   </td>
-
-                  <!-- Status (inline change) -->
                   <td>
                     <select
                       class="status-select s-<%= order.orderStatus %>"
                       data-order-id="<%= order._id %>"
+                      data-current-status="<%= order.orderStatus %>"
                       onchange="updateStatus(this)"
+                      <%= isTerminal ? 'disabled title="No further status changes allowed"' : '' %>
                     >
                       <option value="confirmed"  <%= order.orderStatus === 'confirmed'  ? 'selected' : '' %>>Confirmed</option>
                       <option value="processing" <%= order.orderStatus === 'processing' ? 'selected' : '' %>>Processing</option>
@@ -419,8 +460,6 @@
                       <option value="returned"   <%= order.orderStatus === 'returned'   ? 'selected' : '' %>>Returned</option>
                     </select>
                   </td>
-
-                  <!-- Actions -->
                   <td>
                     <a href="/admin/orders/<%= order._id %>" class="btn btn--outline" style="padding:6px 12px;font-size:11px">
                       <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
@@ -430,7 +469,7 @@
                 </tr>
                 <% }) %>
               <% } else { %>
-                <tr class="empty-row">
+                <tr class="empty-row" id="emptyRow">
                   <td colspan="8">
                     <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
                       <svg width="36" height="36" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.2" style="color:var(--border)"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
@@ -443,30 +482,24 @@
           </table>
         </div>
 
-        <!-- Pagination -->
         <% if (totalPages > 1) { %>
         <div class="pagination">
           <div class="pagination__info">
             Showing <%= (currentPage - 1) * limit + 1 %>–<%= Math.min(currentPage * limit, totalOrders) %> of <%= totalOrders %> orders
           </div>
           <div class="pagination__pages">
-            <!-- Prev -->
             <% if (currentPage > 1) { %>
-              <a href="/admin/orders?page=<%= currentPage - 1 %>&status=<%= currentStatus || 'all' %>&search=<%= currentSearch || '' %>&sort=<%= currentSort || 'date_desc' %>&from=<%= currentFrom || '' %>&to=<%= currentTo || '' %>" class="page-btn">
+              <a href="/admin/orders?page=<%= currentPage-1 %>&status=<%= currentStatus||'all' %>&search=<%= currentSearch||'' %>&sort=<%= currentSort||'date_desc' %>&from=<%= currentFrom||'' %>&to=<%= currentTo||'' %>" class="page-btn">
                 <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
               </a>
             <% } else { %>
               <span class="page-btn disabled"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg></span>
             <% } %>
-
-            <!-- Page numbers -->
-            <% for (let p = Math.max(1, currentPage - 2); p <= Math.min(totalPages, currentPage + 2); p++) { %>
-              <a href="/admin/orders?page=<%= p %>&status=<%= currentStatus || 'all' %>&search=<%= currentSearch || '' %>&sort=<%= currentSort || 'date_desc' %>&from=<%= currentFrom || '' %>&to=<%= currentTo || '' %>" class="page-btn <%= p === currentPage ? 'active' : '' %>"><%= p %></a>
+            <% for (let p = Math.max(1, currentPage-2); p <= Math.min(totalPages, currentPage+2); p++) { %>
+              <a href="/admin/orders?page=<%= p %>&status=<%= currentStatus||'all' %>&search=<%= currentSearch||'' %>&sort=<%= currentSort||'date_desc' %>&from=<%= currentFrom||'' %>&to=<%= currentTo||'' %>" class="page-btn <%= p === currentPage ? 'active' : '' %>"><%= p %></a>
             <% } %>
-
-            <!-- Next -->
             <% if (currentPage < totalPages) { %>
-              <a href="/admin/orders?page=<%= currentPage + 1 %>&status=<%= currentStatus || 'all' %>&search=<%= currentSearch || '' %>&sort=<%= currentSort || 'date_desc' %>&from=<%= currentFrom || '' %>&to=<%= currentTo || '' %>" class="page-btn">
+              <a href="/admin/orders?page=<%= currentPage+1 %>&status=<%= currentStatus||'all' %>&search=<%= currentSearch||'' %>&sort=<%= currentSort||'date_desc' %>&from=<%= currentFrom||'' %>&to=<%= currentTo||'' %>" class="page-btn">
                 <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
               </a>
             <% } else { %>
@@ -477,30 +510,62 @@
         <% } %>
       </div>
 
-    </div><!-- /.content -->
+    </div>
     <footer class="page-footer">© 2026 Velmora Chroné. All Rights Reserved. Admin Panel.</footer>
   </div>
 </div>
 
-<!-- Toast -->
 <div class="toast" id="toast"></div>
 
+<script src="/socket.io/socket.io.js"></script>
 <script>
-  // Topbar date
-  (function() {
+  // ── Topbar date ──────────────────────────────────────────────────────────
+  (function () {
     const el = document.getElementById('topbarDate');
-    if (el) el.textContent = new Date().toLocaleDateString('en-IN', { weekday:'short', day:'numeric', month:'short', year:'numeric' });
+    if (el) el.textContent = new Date().toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
   })();
 
-  // Status colour refresh
-  function refreshSelectColor(sel) {
-    sel.className = 'status-select s-' + sel.value;
+  // ── Status progression constants ─────────────────────────────────────────
+  const STATUS_ORDER = ['confirmed', 'processing', 'dispatched', 'delivered'];
+  const TERMINAL     = ['cancelled', 'returned', 'delivered'];
+
+  function allowedNext(current) {
+    if (TERMINAL.includes(current)) return [];
+    const idx = STATUS_ORDER.indexOf(current);
+    if (idx === -1) return STATUS_ORDER;
+    return STATUS_ORDER.slice(idx + 1);
   }
 
-  // Inline status update via AJAX
+  // Lock invalid options on page load
+  document.querySelectorAll('.status-select:not([disabled])').forEach(sel => {
+    const current = sel.dataset.currentStatus || sel.value;
+    sel.dataset.currentStatus = current;
+    const allowed = allowedNext(current);
+    Array.from(sel.options).forEach(opt => {
+      const ok = opt.value === current || allowed.includes(opt.value);
+      opt.disabled    = !ok;
+      opt.style.color = !ok ? '#bbb' : '';
+    });
+  });
+
+  // ── Status colour helper ─────────────────────────────────────────────────
+  function refreshSelectColor(sel) { sel.className = 'status-select s-' + sel.value; }
+
+  // ── Inline status update ─────────────────────────────────────────────────
   async function updateStatus(sel) {
-    const orderId  = sel.dataset.orderId;
+    const orderId   = sel.dataset.orderId;
     const newStatus = sel.value;
+    const current   = sel.dataset.currentStatus;
+    const allowed   = allowedNext(current);
+
+    if (newStatus === current) return;
+    if (!allowed.includes(newStatus)) {
+      showToast('Cannot change from "' + current + '" to "' + newStatus + '"', 'error');
+      sel.value = current;
+      refreshSelectColor(sel);
+      return;
+    }
+
     refreshSelectColor(sel);
 
     try {
@@ -511,22 +576,310 @@
       });
       const data = await res.json();
       if (data.success) {
-        showToast('Order status updated', 'success');
+        sel.dataset.currentStatus = newStatus;
+        if (TERMINAL.includes(newStatus)) {
+          sel.disabled = true;
+          sel.title    = 'Order is ' + newStatus + ' — no further status changes allowed';
+        } else {
+          Array.from(sel.options).forEach(opt => {
+            const ok = opt.value === newStatus || allowedNext(newStatus).includes(opt.value);
+            opt.disabled    = !ok;
+            opt.style.color = !ok ? '#bbb' : '';
+          });
+        }
+        showToast('Status updated to "' + newStatus + '"', 'success');
       } else {
         showToast(data.message || 'Update failed', 'error');
+        sel.value = current;
+        refreshSelectColor(sel);
       }
-    } catch (e) {
+    } catch {
       showToast('Network error', 'error');
+      sel.value = current;
+      refreshSelectColor(sel);
     }
   }
 
-  // Toast helper
+  // ── Notification sound ───────────────────────────────────────────────────
+  function playNotifSound() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const t   = ctx.currentTime;
+      [0, 0.18].forEach((delay, i) => {
+        const osc  = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(i === 0 ? 880 : 660, t + delay);
+        gain.gain.setValueAtTime(0.3, t + delay);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + delay + 0.4);
+        osc.start(t + delay);
+        osc.stop(t + delay + 0.4);
+      });
+    } catch (_) {}
+  }
+
+  // ── Toast ────────────────────────────────────────────────────────────────
   function showToast(msg, type = 'success') {
     const t = document.getElementById('toast');
     t.textContent = msg;
     t.className   = `toast ${type} show`;
-    setTimeout(() => { t.className = 'toast'; }, 3000);
+    setTimeout(() => { t.className = 'toast'; }, 3500);
   }
+
+  // ── localStorage helpers ─────────────────────────────────────────────────
+  const STORAGE_KEY = 'vc_admin_notifs';
+  const SEEN_KEY    = 'vc_seen_order_ids';
+
+  function loadNotifications() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch { return []; }
+  }
+  function saveNotifications() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(notifications)); } catch (_) {}
+  }
+  function loadSeenIds() {
+    try { return new Set(JSON.parse(localStorage.getItem(SEEN_KEY) || '[]')); } catch { return new Set(); }
+  }
+  function saveSeenIds(set) {
+    try {
+      const arr = [...set].slice(-500);
+      localStorage.setItem(SEEN_KEY, JSON.stringify(arr));
+    } catch (_) {}
+  }
+
+  // ── Notification state ───────────────────────────────────────────────────
+  let notifications = loadNotifications();
+  let seenIds       = loadSeenIds();
+  let currentTab    = 'all';
+
+  function getVisible() {
+    if (currentTab === 'unread') return notifications.filter(n => !n.read);
+    if (currentTab === 'read')   return notifications.filter(n =>  n.read);
+    return notifications;
+  }
+  function unreadCount() { return notifications.filter(n => !n.read).length; }
+
+  function updateBadge() {
+    const badge = document.getElementById('notifCount');
+    const count = unreadCount();
+    badge.textContent   = count > 9 ? '9+' : count;
+    badge.style.display = count > 0 ? 'flex' : 'none';
+  }
+
+  function updateFooter() {
+    document.getElementById('notifFooterCount').textContent =
+      `${notifications.length} total · ${unreadCount()} unread`;
+  }
+
+  function timeAgo(date) {
+    const s = Math.floor((Date.now() - new Date(date)) / 1000);
+    if (s < 60)   return 'just now';
+    if (s < 3600) return Math.floor(s / 60) + 'm ago';
+    return Math.floor(s / 3600) + 'h ago';
+  }
+
+  function renderList() {
+    const list    = document.getElementById('notifList');
+    const visible = getVisible();
+    list.innerHTML = '';
+    if (visible.length === 0) {
+      list.innerHTML = `<div class="notif-empty">${
+        currentTab === 'unread' ? 'No unread notifications' :
+        currentTab === 'read'   ? 'No read notifications'   : 'No notifications'
+      }</div>`;
+      return;
+    }
+    visible.forEach(n => {
+      const el = document.createElement('div');
+      el.className  = 'notif-item' + (n.read ? ' read' : '');
+      el.dataset.id = n.id;
+      el.innerHTML  = `
+        <div class="notif-item__dot"></div>
+        <div class="notif-item__body-wrap">
+          <div class="notif-item__top">
+            <span class="notif-item__id">${n.orderNumber}</span>
+            <span class="notif-item__time">${timeAgo(n.createdAt)}</span>
+          </div>
+          <div class="notif-item__info">
+            ₹${Number(n.grandTotal).toLocaleString('en-IN')} &nbsp;·&nbsp; ${n.itemCount} item${n.itemCount !== 1 ? 's' : ''} &nbsp;·&nbsp; ${n.paymentMethod}
+          </div>
+          ${n.customerName ? `<div class="notif-item__customer">${n.customerName}</div>` : ''}
+        </div>
+        <div class="notif-item__actions">
+          <button class="notif-mark-btn" onclick="toggleRead('${n.id}', event)">
+            ${n.read ? 'Mark unread' : 'Mark read'}
+          </button>
+          <a href="/admin/orders/${n.id}" class="notif-view-btn" onclick="markOneRead('${n.id}')">View</a>
+        </div>`;
+      list.appendChild(el);
+    });
+  }
+
+  function toggleRead(id, e) {
+    e.preventDefault(); e.stopPropagation();
+    const n = notifications.find(x => x.id === id);
+    if (!n) return;
+    n.read = !n.read;
+    saveNotifications();
+    updateBadge(); updateFooter(); renderList();
+  }
+  function markOneRead(id) {
+    const n = notifications.find(x => x.id === id);
+    if (n) { n.read = true; saveNotifications(); }
+    updateBadge(); updateFooter();
+  }
+  function markAllRead() {
+    notifications.forEach(n => { n.read = true; });
+    saveNotifications();
+    updateBadge(); updateFooter(); renderList();
+  }
+  function clearAll() {
+    notifications = [];
+    saveNotifications();
+    updateBadge(); updateFooter(); renderList();
+    document.getElementById('notifDropdown').classList.remove('open');
+  }
+  function switchTab(tab) {
+    currentTab = tab;
+    document.querySelectorAll('.notif-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+    renderList();
+  }
+  function toggleDropdown() {
+    document.getElementById('notifDropdown').classList.toggle('open');
+  }
+  document.addEventListener('click', (e) => {
+    if (!document.getElementById('notifWrap').contains(e.target))
+      document.getElementById('notifDropdown').classList.remove('open');
+  });
+
+  // ── Add notification + inject live row ───────────────────────────────────
+  function addNotification(order) {
+    const id = String(order._id);
+    if (seenIds.has(id)) return;
+    seenIds.add(id);
+    saveSeenIds(seenIds);
+
+    if (notifications.find(n => n.id === id)) {
+      updateBadge(); updateFooter(); renderList();
+      return;
+    }
+
+    notifications.unshift({
+      id,
+      orderNumber  : order.orderNumber || ('#' + id.slice(-6).toUpperCase()),
+      grandTotal   : order.grandTotal  ?? order.pricing?.grandTotal ?? 0,
+      itemCount    : order.itemCount   ?? order.items?.length ?? 0,
+      paymentMethod: order.paymentMethod || 'COD',
+      customerName : order.customerName || '',
+      createdAt    : order.createdAt,
+      read         : false,
+    });
+    saveNotifications();
+
+    updateBadge(); updateFooter(); renderList();
+    playNotifSound();
+    showToast(`New order ${notifications[0].orderNumber} — ₹${Number(notifications[0].grandTotal).toLocaleString('en-IN')}`, 'success');
+
+    injectOrderRow(order);
+  }
+
+  function injectOrderRow(order) {
+    const tbody = document.getElementById('ordersTableBody');
+    if (!tbody) return;
+
+    const emptyRow = document.getElementById('emptyRow');
+    if (emptyRow) emptyRow.remove();
+
+    if (tbody.querySelector(`tr[data-order-id="${order._id}"]`)) return;
+
+    const id     = String(order._id);
+    const num    = order.orderNumber || ('#' + id.slice(-6).toUpperCase());
+    const total  = order.grandTotal ?? order.pricing?.grandTotal ?? 0;
+    const items  = order.itemCount  ?? order.items?.length ?? 0;
+    const method = order.paymentMethod || 'COD';
+    const name   = order.customerName || 'Customer';
+    const email  = order.customerEmail || '';
+    const date   = new Date(order.createdAt);
+
+    const tr = document.createElement('tr');
+    tr.dataset.orderId = id;
+    tr.classList.add('new-order-flash');
+    tr.innerHTML = `
+      <td>
+        <span style="font-family:'Cormorant Garamond',serif;font-size:13px;font-weight:600;color:var(--teal)">${num}</span>
+      </td>
+      <td style="color:var(--text-mid);font-size:12px;white-space:nowrap">
+        ${date.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})}
+        <div style="font-size:10px;color:var(--text-light)">${date.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}</div>
+      </td>
+      <td>
+        <div class="user-cell">
+          <div class="user-avatar">${name.charAt(0).toUpperCase()}</div>
+          <div>
+            <div class="user-name">${name}</div>
+            <div class="user-email">${email}</div>
+          </div>
+        </div>
+      </td>
+      <td style="color:var(--text-mid);font-size:12px">${items} item${items !== 1 ? 's' : ''}</td>
+      <td style="font-weight:600">₹${Number(total).toLocaleString('en-IN')}</td>
+      <td>
+        <span style="font-size:11px;background:var(--bg);padding:3px 8px;border-radius:4px;color:var(--text-mid);font-weight:500">${method}</span>
+      </td>
+      <td>
+        <select class="status-select s-confirmed"
+          data-order-id="${id}"
+          data-current-status="confirmed"
+          onchange="updateStatus(this)">
+          <option value="confirmed" selected>Confirmed</option>
+          <option value="processing">Processing</option>
+          <option value="dispatched">Dispatched</option>
+          <option value="delivered">Delivered</option>
+          <option value="cancelled" disabled style="color:#bbb">Cancelled</option>
+          <option value="returned"  disabled style="color:#bbb">Returned</option>
+        </select>
+      </td>
+      <td>
+        <a href="/admin/orders/${id}" class="btn btn--outline" style="padding:6px 12px;font-size:11px">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+          View
+        </a>
+      </td>`;
+    tbody.insertBefore(tr, tbody.firstChild);
+  }
+
+  // ── Socket.io ─────────────────────────────────────────────────────────────
+  const socket = io();
+  socket.emit('join-admin');
+  socket.on('new-order', (order) => addNotification(order));
+
+  socket.on('disconnect', () => {
+    const dot = document.getElementById('liveDot');
+    if (dot) dot.style.color = 'var(--text-light)';
+  });
+  socket.on('connect', () => {
+    const dot = document.getElementById('liveDot');
+    if (dot) dot.style.color = 'var(--green)';
+    socket.emit('join-admin');
+  });
+
+  // ── Polling fallback every 30s ────────────────────────────────────────────
+  async function pollRecent() {
+    try {
+      const res  = await fetch('/admin/orders/notify/recent');
+      const data = await res.json();
+      if (data.success) data.orders.forEach(addNotification);
+    } catch (_) {}
+  }
+  pollRecent();
+  setInterval(pollRecent, 30_000);
+
+  // ── Init UI from persisted state ──────────────────────────────────────────
+  updateBadge();
+  updateFooter();
+  renderList();
 </script>
 </body>
 </html>

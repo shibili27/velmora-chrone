@@ -74,11 +74,55 @@
     /* ── Topbar ── */
     .topbar { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 32px; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
     .topbar__title { font-size: 13px; font-weight: 500; color: var(--text-mid); letter-spacing: 0.04em; }
-    .topbar__right { display: flex; align-items: center; gap: 10px; }
+    .topbar__right { display: flex; align-items: center; gap: 12px; }
     .topbar__date { font-size: 11px; color: var(--text-light); letter-spacing: 0.04em; }
-    .topbar__bell { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-mid); background: none; transition: background 0.15s; }
-    .topbar__bell:hover { background: var(--teal-light); color: var(--teal); }
-    .topbar__bell svg { width: 16px; height: 16px; }
+
+    /* ── Notification bell ── */
+    .notif-wrap { position: relative; }
+    .notif-bell { position: relative; background: none; border: 1px solid var(--border); border-radius: 6px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-mid); transition: background 0.15s, color 0.15s; }
+    .notif-bell:hover { background: var(--teal-light); color: var(--teal); border-color: var(--teal); }
+    .notif-count { position: absolute; top: -5px; right: -5px; background: var(--red); color: #fff; font-size: 9px; font-weight: 700; min-width: 16px; height: 16px; border-radius: 8px; display: flex; align-items: center; justify-content: center; padding: 0 3px; border: 1.5px solid var(--white); }
+
+    .notif-dropdown { position: absolute; top: calc(100% + 8px); right: 0; width: 320px; background: var(--white); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.10); z-index: 200; display: none; overflow: hidden; }
+    .notif-dropdown.open { display: block; }
+
+    .notif-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+    .notif-header-left { font-size: 12px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 8px; }
+    .notif-tabs { display: flex; gap: 4px; }
+    .notif-tab { font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg); color: var(--text-mid); cursor: pointer; transition: all 0.15s; }
+    .notif-tab.active { background: var(--teal); color: #fff; border-color: var(--teal); }
+    .notif-clear { background: none; border: none; font-family: 'Jost', sans-serif; font-size: 11px; color: var(--teal); cursor: pointer; font-weight: 500; white-space: nowrap; }
+    .notif-clear:hover { text-decoration: underline; }
+
+    .notif-list { max-height: 340px; overflow-y: auto; }
+    .notif-empty { padding: 28px; text-align: center; font-size: 12px; color: var(--text-light); }
+
+    .notif-item { display: flex; align-items: flex-start; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--border); text-decoration: none; transition: background 0.12s; position: relative; background: #f0faf9; }
+    .notif-item:last-child { border-bottom: none; }
+    .notif-item:hover { background: var(--teal-light); }
+    .notif-item.read { background: var(--white); }
+    .notif-item.read:hover { background: var(--bg); }
+
+    .notif-item__dot { width: 7px; height: 7px; border-radius: 50%; background: var(--teal); flex-shrink: 0; margin-top: 5px; }
+    .notif-item.read .notif-item__dot { background: transparent; border: 1.5px solid var(--border); }
+
+    .notif-item__body-wrap { flex: 1; min-width: 0; }
+    .notif-item__top  { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px; }
+    .notif-item__id   { font-size: 12px; font-weight: 600; color: var(--teal); font-family: 'Cormorant Garamond', serif; }
+    .notif-item.read .notif-item__id { color: var(--text-mid); }
+    .notif-item__time { font-size: 10px; color: var(--text-light); }
+    .notif-item__info { font-size: 11.5px; color: var(--text-mid); }
+    .notif-item__customer { font-size: 10px; color: var(--text-light); margin-top: 1px; }
+
+    .notif-item__actions { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
+    .notif-mark-btn { font-size: 9px; font-weight: 600; color: var(--teal); background: none; border: 1px solid var(--teal-light); border-radius: 4px; padding: 2px 6px; cursor: pointer; white-space: nowrap; font-family: 'Jost', sans-serif; transition: background 0.12s; }
+    .notif-mark-btn:hover { background: var(--teal-light); }
+    .notif-item.read .notif-mark-btn { color: var(--text-light); border-color: var(--border); }
+    .notif-view-btn { font-size: 9px; font-weight: 600; color: var(--text-mid); background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: 2px 6px; cursor: pointer; white-space: nowrap; font-family: 'Jost', sans-serif; text-decoration: none; transition: background 0.12s; }
+    .notif-view-btn:hover { background: var(--border); }
+
+    .notif-footer { padding: 10px 16px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .notif-footer-count { font-size: 10px; color: var(--text-light); }
 
     /* ── Content ── */
     .content { padding: 32px; flex: 1; }
@@ -86,83 +130,33 @@
     /* ── Welcome banner ── */
     .welcome-banner {
       background: linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%);
-      border-radius: 8px;
-      padding: 28px 32px;
-      margin-bottom: 28px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      overflow: hidden;
-      position: relative;
+      border-radius: 8px; padding: 28px 32px; margin-bottom: 28px;
+      display: flex; align-items: center; justify-content: space-between;
+      overflow: hidden; position: relative;
     }
-    .welcome-banner::before {
-      content: '';
-      position: absolute;
-      right: -40px; top: -40px;
-      width: 200px; height: 200px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.05);
-    }
-    .welcome-banner::after {
-      content: '';
-      position: absolute;
-      right: 60px; bottom: -60px;
-      width: 160px; height: 160px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.04);
-    }
+    .welcome-banner::before { content: ''; position: absolute; right: -40px; top: -40px; width: 200px; height: 200px; border-radius: 50%; background: rgba(255,255,255,0.05); }
+    .welcome-banner::after  { content: ''; position: absolute; right: 60px; bottom: -60px; width: 160px; height: 160px; border-radius: 50%; background: rgba(255,255,255,0.04); }
     .welcome-banner__text { position: relative; z-index: 1; }
     .welcome-banner__greeting { font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.65); margin-bottom: 6px; }
     .welcome-banner__name { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 600; color: #fff; line-height: 1.2; }
     .welcome-banner__sub { font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 6px; }
-    .welcome-banner__badge {
-      position: relative; z-index: 1;
-      background: rgba(255,255,255,0.12);
-      border: 1px solid rgba(255,255,255,0.2);
-      border-radius: 6px;
-      padding: 12px 20px;
-      text-align: center;
-      min-width: 130px;
-    }
+    .welcome-banner__badge { position: relative; z-index: 1; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; padding: 12px 20px; text-align: center; min-width: 130px; }
     .welcome-banner__badge-label { font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 4px; }
     .welcome-banner__badge-val { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; color: #fff; }
     .welcome-banner__badge-val span { font-size: 12px; font-family: 'Jost', sans-serif; }
 
     /* ── Stat cards ── */
-    .stat-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-      margin-bottom: 24px;
-    }
-    .stat-card {
-      background: var(--white);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 20px 22px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      transition: box-shadow 0.2s;
-    }
+    .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+    .stat-card { background: var(--white); border: 1px solid var(--border); border-radius: 6px; padding: 20px 22px; display: flex; flex-direction: column; gap: 12px; transition: box-shadow 0.2s; }
     .stat-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
     .stat-card__top { display: flex; align-items: flex-start; justify-content: space-between; }
-    .stat-card__icon {
-      width: 38px; height: 38px;
-      border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-    }
+    .stat-card__icon { width: 38px; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .stat-card__icon svg { width: 18px; height: 18px; }
-    .stat-card__icon--teal   { background: var(--teal-light); color: var(--teal); }
-    .stat-card__icon--green  { background: var(--green-bg);   color: var(--green); }
-    .stat-card__icon--blue   { background: var(--blue-bg);    color: var(--blue); }
-    .stat-card__icon--amber  { background: var(--amber-bg);   color: var(--amber); }
-    .stat-card__trend {
-      font-size: 10px; font-weight: 600;
-      display: flex; align-items: center; gap: 3px;
-      padding: 3px 7px; border-radius: 20px;
-    }
+    .stat-card__icon--teal  { background: var(--teal-light); color: var(--teal); }
+    .stat-card__icon--green { background: var(--green-bg);   color: var(--green); }
+    .stat-card__icon--blue  { background: var(--blue-bg);    color: var(--blue); }
+    .stat-card__icon--amber { background: var(--amber-bg);   color: var(--amber); }
+    .stat-card__trend { font-size: 10px; font-weight: 600; display: flex; align-items: center; gap: 3px; padding: 3px 7px; border-radius: 20px; }
     .stat-card__trend svg { width: 10px; height: 10px; }
     .stat-card__trend--up   { color: var(--green); background: var(--green-bg); }
     .stat-card__trend--down { color: var(--red);   background: var(--red-bg); }
@@ -170,9 +164,9 @@
     .stat-card__value { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 600; color: var(--text); line-height: 1; }
     .stat-card__sub { font-size: 11px; color: var(--text-light); margin-top: 2px; }
 
-    /* ── Two-col grid ── */
-    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
-    .three-col { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 24px; }
+    /* ── Two/Three col ── */
+    .two-col   { display: grid; grid-template-columns: 1fr 1fr;  gap: 20px; margin-bottom: 24px; }
+    .three-col { display: grid; grid-template-columns: 2fr 1fr;  gap: 20px; margin-bottom: 24px; }
 
     /* ── Section card ── */
     .section-card { background: var(--white); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
@@ -182,29 +176,16 @@
     .section-card__link   { font-size: 11px; font-weight: 600; color: var(--teal); text-decoration: none; letter-spacing: 0.04em; }
     .section-card__link:hover { text-decoration: underline; }
 
-    /* ── Mini chart bars ── */
+    /* ── Chart bars ── */
     .chart-area { padding: 20px 24px; }
-    .chart-bars {
-      display: flex;
-      align-items: flex-end;
-      gap: 6px;
-      height: 100px;
-    }
+    .chart-bars { display: flex; align-items: flex-end; gap: 6px; height: 100px; }
     .chart-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; }
-    .chart-bar {
-      width: 100%;
-      border-radius: 3px 3px 0 0;
-      background: var(--teal-light);
-      transition: background 0.15s;
-      cursor: default;
-      position: relative;
-    }
-    .chart-bar.active { background: var(--teal); }
-    .chart-bar:hover  { background: var(--teal); }
+    .chart-bar { width: 100%; border-radius: 3px 3px 0 0; background: var(--teal-light); transition: background 0.15s; cursor: default; }
+    .chart-bar.active, .chart-bar:hover { background: var(--teal); }
     .chart-bar__label { font-size: 9px; color: var(--text-light); letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; }
     .chart-divider { border: none; border-top: 1px solid var(--border); margin: 0 24px; }
 
-    /* ── Revenue row ── */
+    /* ── Revenue rows ── */
     .rev-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 24px; border-bottom: 1px solid var(--border); font-size: 12px; }
     .rev-row:last-child { border-bottom: none; }
     .rev-row__label { color: var(--text-mid); }
@@ -220,27 +201,24 @@
     tbody tr:last-child td { border-bottom: none; }
     tbody tr:hover { background: #fafcfb; }
 
-    /* Badges */
+    /* ── Badges ── */
     .badge { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 20px; white-space: nowrap; letter-spacing: 0.04em; }
     .badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
     .badge--pending   { color: var(--amber); background: var(--amber-bg); }
     .badge--delivered { color: var(--green); background: var(--green-bg); }
-    .badge--cancelled { color: var(--red);   background: var(--red-bg);   }
-    .badge--shipped   { color: var(--blue);  background: var(--blue-bg);  }
+    .badge--cancelled { color: var(--red);   background: var(--red-bg); }
+    .badge--shipped   { color: var(--blue);  background: var(--blue-bg); }
 
-    /* ── Activity list ── */
+    /* ── Activity feed ── */
     .activity-list { padding: 4px 0; }
     .activity-item { display: flex; align-items: flex-start; gap: 12px; padding: 14px 24px; border-bottom: 1px solid var(--border); }
     .activity-item:last-child { border-bottom: none; }
-    .activity-dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      flex-shrink: 0; margin-top: 4px;
-    }
-    .activity-dot--teal   { background: var(--teal); }
-    .activity-dot--green  { background: var(--green); }
-    .activity-dot--amber  { background: var(--amber); }
-    .activity-dot--red    { background: var(--red); }
-    .activity-dot--blue   { background: var(--blue); }
+    .activity-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+    .activity-dot--teal  { background: var(--teal); }
+    .activity-dot--green { background: var(--green); }
+    .activity-dot--amber { background: var(--amber); }
+    .activity-dot--red   { background: var(--red); }
+    .activity-dot--blue  { background: var(--blue); }
     .activity-text { font-size: 12px; color: var(--text-mid); line-height: 1.5; flex: 1; }
     .activity-text strong { color: var(--text); font-weight: 600; }
     .activity-time { font-size: 10px; color: var(--text-light); white-space: nowrap; margin-top: 2px; }
@@ -255,27 +233,32 @@
     .product-name { font-size: 12.5px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .product-brand { font-size: 10px; color: var(--text-light); margin-top: 1px; }
     .product-sales { text-align: right; flex-shrink: 0; }
-    .product-sales__val { font-size: 12px; font-weight: 600; color: var(--text); }
+    .product-sales__val   { font-size: 12px; font-weight: 600; color: var(--text); }
     .product-sales__units { font-size: 10px; color: var(--text-light); }
 
     /* ── Progress bars ── */
     .progress-section { padding: 16px 24px; display: flex; flex-direction: column; gap: 14px; }
     .progress-item__top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; }
     .progress-item__label { font-size: 12px; color: var(--text-mid); }
-    .progress-item__val { font-size: 12px; font-weight: 600; color: var(--text); }
+    .progress-item__val   { font-size: 12px; font-weight: 600; color: var(--text); }
     .progress-track { height: 5px; background: var(--border); border-radius: 10px; overflow: hidden; }
-    .progress-fill { height: 100%; border-radius: 10px; }
-    .progress-fill--teal   { background: var(--teal); }
-    .progress-fill--green  { background: var(--green); }
-    .progress-fill--amber  { background: var(--amber); }
-    .progress-fill--blue   { background: var(--blue); }
+    .progress-fill  { height: 100%; border-radius: 10px; }
+    .progress-fill--teal  { background: var(--teal); }
+    .progress-fill--green { background: var(--green); }
+    .progress-fill--amber { background: var(--amber); }
+    .progress-fill--blue  { background: var(--blue); }
 
-    /* Footer */
+    /* ── Toast ── */
+    .toast { position: fixed; bottom: 24px; right: 24px; background: var(--text); color: #fff; padding: 12px 18px; border-radius: 6px; font-size: 12.5px; font-weight: 500; z-index: 9999; transform: translateY(80px); opacity: 0; transition: transform 0.25s, opacity 0.25s; pointer-events: none; max-width: 320px; }
+    .toast.show    { transform: translateY(0); opacity: 1; }
+    .toast.success { background: var(--green); }
+    .toast.error   { background: var(--red); }
+
+    /* ── Footer ── */
     .page-footer { text-align: center; padding: 20px 32px; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); border-top: 1px solid var(--border); }
   </style>
 </head>
 <body>
-
 <div class="layout">
 
   <!-- ── Sidebar ── -->
@@ -349,9 +332,39 @@
       <span class="topbar__title">Operational Administrator Hub</span>
       <div class="topbar__right">
         <span class="topbar__date" id="topbarDate"></span>
-        <button class="topbar__bell" aria-label="Notifications">
-          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-        </button>
+
+        <!-- ── Notification Bell ── -->
+        <div class="notif-wrap" id="notifWrap">
+          <button class="notif-bell" id="notifBell" onclick="toggleDropdown()">
+            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+            </svg>
+            <span class="notif-count" id="notifCount" style="display:none">0</span>
+          </button>
+
+          <div class="notif-dropdown" id="notifDropdown">
+            <div class="notif-header">
+              <div class="notif-header-left">
+                <span>New Orders</span>
+                <div class="notif-tabs">
+                  <button class="notif-tab active" id="tabAll"    onclick="switchTab('all')">All</button>
+                  <button class="notif-tab"         id="tabUnread" onclick="switchTab('unread')">Unread</button>
+                  <button class="notif-tab"         id="tabRead"   onclick="switchTab('read')">Read</button>
+                </div>
+              </div>
+              <button onclick="markAllRead()" class="notif-clear">Mark all read</button>
+            </div>
+            <div class="notif-list" id="notifList">
+              <div class="notif-empty">No new orders</div>
+            </div>
+            <div class="notif-footer">
+              <span class="notif-footer-count" id="notifFooterCount">0 notifications</span>
+              <button onclick="clearAll()" class="notif-clear">Clear all</button>
+            </div>
+          </div>
+        </div>
+        <!-- ── /Notification Bell ── -->
+
       </div>
     </header>
 
@@ -375,15 +388,14 @@
       <!-- ── Stat Cards ── -->
       <div class="stat-grid">
 
-        <!-- Total Revenue -->
         <div class="stat-card">
           <div class="stat-card__top">
             <div class="stat-card__icon stat-card__icon--teal">
               <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             </div>
-            <span class="stat-card__trend stat-card__trend--up">
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/></svg>
-              <%= typeof revenueGrowth !== 'undefined' ? revenueGrowth : '0' %>%
+            <span class="stat-card__trend stat-card__trend--<%= (typeof revenueGrowth !== 'undefined' && revenueGrowth >= 0) ? 'up' : 'down' %>">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="<%= (typeof revenueGrowth !== 'undefined' && revenueGrowth >= 0) ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7' %>"/></svg>
+              <%= typeof revenueGrowth !== 'undefined' ? Math.abs(revenueGrowth) : '0' %>%
             </span>
           </div>
           <div>
@@ -393,7 +405,6 @@
           </div>
         </div>
 
-        <!-- Total Orders -->
         <div class="stat-card">
           <div class="stat-card__top">
             <div class="stat-card__icon stat-card__icon--blue">
@@ -411,7 +422,6 @@
           </div>
         </div>
 
-        <!-- Total Customers -->
         <div class="stat-card">
           <div class="stat-card__top">
             <div class="stat-card__icon stat-card__icon--green">
@@ -429,7 +439,6 @@
           </div>
         </div>
 
-        <!-- Total Products -->
         <div class="stat-card">
           <div class="stat-card__top">
             <div class="stat-card__icon stat-card__icon--amber">
@@ -449,19 +458,16 @@
 
       </div><!-- /.stat-grid -->
 
-      <!-- ── Row: Sales Chart + Revenue Summary ── -->
+      <!-- ── Sales Chart + Order Status ── -->
       <div class="three-col">
 
-        <!-- Sales Chart -->
         <div class="section-card">
           <div class="section-card__header">
             <span class="section-card__title">Monthly Sales</span>
             <span class="section-card__meta">Last 7 months</span>
           </div>
           <div class="chart-area">
-            <div class="chart-bars" id="salesChart">
-              <!-- Rendered by JS from monthlySales data -->
-            </div>
+            <div class="chart-bars" id="salesChart"></div>
           </div>
           <hr class="chart-divider"/>
           <div class="rev-row">
@@ -478,7 +484,6 @@
           </div>
         </div>
 
-        <!-- Revenue breakdown -->
         <div class="section-card">
           <div class="section-card__header">
             <span class="section-card__title">Order Status</span>
@@ -489,43 +494,34 @@
                 <span class="progress-item__label">Delivered</span>
                 <span class="progress-item__val"><%= typeof deliveredOrders !== 'undefined' ? deliveredOrders : '0' %></span>
               </div>
-              <div class="progress-track">
-                <div class="progress-fill progress-fill--green" style="width: <%= typeof deliveredPct !== 'undefined' ? deliveredPct : 0 %>%"></div>
-              </div>
+              <div class="progress-track"><div class="progress-fill progress-fill--green" style="width:<%= typeof deliveredPct !== 'undefined' ? deliveredPct : 0 %>%"></div></div>
             </div>
             <div>
               <div class="progress-item__top">
                 <span class="progress-item__label">Pending</span>
                 <span class="progress-item__val"><%= typeof pendingOrders !== 'undefined' ? pendingOrders : '0' %></span>
               </div>
-              <div class="progress-track">
-                <div class="progress-fill progress-fill--amber" style="width: <%= typeof pendingPct !== 'undefined' ? pendingPct : 0 %>%"></div>
-              </div>
+              <div class="progress-track"><div class="progress-fill progress-fill--amber" style="width:<%= typeof pendingPct !== 'undefined' ? pendingPct : 0 %>%"></div></div>
             </div>
             <div>
               <div class="progress-item__top">
                 <span class="progress-item__label">Shipped</span>
                 <span class="progress-item__val"><%= typeof shippedOrders !== 'undefined' ? shippedOrders : '0' %></span>
               </div>
-              <div class="progress-track">
-                <div class="progress-fill progress-fill--blue" style="width: <%= typeof shippedPct !== 'undefined' ? shippedPct : 0 %>%"></div>
-              </div>
+              <div class="progress-track"><div class="progress-fill progress-fill--blue" style="width:<%= typeof shippedPct !== 'undefined' ? shippedPct : 0 %>%"></div></div>
             </div>
             <div>
               <div class="progress-item__top">
                 <span class="progress-item__label">Cancelled</span>
                 <span class="progress-item__val"><%= typeof cancelledOrders !== 'undefined' ? cancelledOrders : '0' %></span>
               </div>
-              <div class="progress-track">
-                <div class="progress-fill" style="width: <%= typeof cancelledPct !== 'undefined' ? cancelledPct : 0 %>%; background: var(--red);"></div>
-              </div>
+              <div class="progress-track"><div class="progress-fill" style="width:<%= typeof cancelledPct !== 'undefined' ? cancelledPct : 0 %>%;background:var(--red)"></div></div>
             </div>
           </div>
 
           <hr class="chart-divider"/>
 
-          <!-- Quick links -->
-          <div style="padding: 14px 24px; display: flex; flex-direction: column; gap: 10px;">
+          <div style="padding:14px 24px;display:flex;flex-direction:column;gap:10px;">
             <a href="/admin/orders" style="display:flex;align-items:center;justify-content:space-between;text-decoration:none;padding:9px 12px;border-radius:4px;background:var(--bg);font-size:12px;font-weight:500;color:var(--text-mid);transition:background 0.15s;" onmouseover="this.style.background='var(--teal-light)';this.style.color='var(--teal)'" onmouseout="this.style.background='var(--bg)';this.style.color='var(--text-mid)'">
               <span>View All Orders</span>
               <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
@@ -539,15 +535,13 @@
               <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
             </a>
           </div>
-
         </div>
 
       </div><!-- /.three-col -->
 
-      <!-- ── Row: Recent Orders + Activity ── -->
-      <div class="two-col" style="margin-bottom: 24px;">
+      <!-- ── Recent Orders + Activity ── -->
+      <div class="two-col">
 
-        <!-- Recent Orders -->
         <div class="section-card">
           <div class="section-card__header">
             <span class="section-card__title">Recent Orders</span>
@@ -573,8 +567,8 @@
                     <td>
                       <% const s = (o.status || '').toLowerCase(); %>
                       <% if (s === 'delivered') { %><span class="badge badge--delivered">Delivered</span>
-                      <% } else if (s === 'pending') { %><span class="badge badge--pending">Pending</span>
-                      <% } else if (s === 'shipped' || s === 'processing') { %><span class="badge badge--shipped">Shipped</span>
+                      <% } else if (s === 'confirmed' || s === 'pending') { %><span class="badge badge--pending">Confirmed</span>
+                      <% } else if (s === 'dispatched' || s === 'processing') { %><span class="badge badge--shipped">Shipped</span>
                       <% } else if (s === 'cancelled') { %><span class="badge badge--cancelled">Cancelled</span>
                       <% } else { %><span class="badge badge--pending"><%= o.status || 'N/A' %></span><% } %>
                     </td>
@@ -588,7 +582,6 @@
           </div>
         </div>
 
-        <!-- Activity Feed -->
         <div class="section-card">
           <div class="section-card__header">
             <span class="section-card__title">Recent Activity</span>
@@ -606,7 +599,6 @@
               </div>
               <% }) %>
             <% } else { %>
-              <!-- Placeholder activity items when no data -->
               <div class="activity-item">
                 <div class="activity-dot activity-dot--teal"></div>
                 <div style="flex:1">
@@ -618,10 +610,11 @@
           </div>
         </div>
 
-      </div>
+      </div><!-- /.two-col -->
 
-      <!-- ── Top Products ── -->
+      <!-- ── Top Products + Quick Stats ── -->
       <div class="two-col">
+
         <div class="section-card">
           <div class="section-card__header">
             <span class="section-card__title">Top Selling Products</span>
@@ -653,104 +646,277 @@
           <% } %>
         </div>
 
-        <!-- Quick Stats summary -->
         <div class="section-card">
           <div class="section-card__header">
             <span class="section-card__title">Quick Stats</span>
           </div>
-          <div style="padding: 8px 0;">
-            <div class="rev-row">
-              <span class="rev-row__label">Total Reviews</span>
-              <span class="rev-row__val"><%= typeof totalReviews !== 'undefined' ? totalReviews : '0' %></span>
-            </div>
-            <div class="rev-row">
-              <span class="rev-row__label">Avg. Rating</span>
-              <span class="rev-row__val rev-row__val--teal">⭐ <%= typeof avgRating !== 'undefined' ? avgRating : '0.0' %></span>
-            </div>
-            <div class="rev-row">
-              <span class="rev-row__label">Active Coupons</span>
-              <span class="rev-row__val"><%= typeof activeCoupons !== 'undefined' ? activeCoupons : '0' %></span>
-            </div>
-            <div class="rev-row">
-              <span class="rev-row__label">Blocked Users</span>
-              <span class="rev-row__val" style="color:var(--red)"><%= typeof blockedUsers !== 'undefined' ? blockedUsers : '0' %></span>
-            </div>
-            <div class="rev-row">
-              <span class="rev-row__label">Pending Refunds</span>
-              <span class="rev-row__val" style="color:var(--amber)"><%= typeof pendingRefunds !== 'undefined' ? pendingRefunds : '0' %></span>
-            </div>
-            <div class="rev-row">
-              <span class="rev-row__label">Active Banners</span>
-              <span class="rev-row__val"><%= typeof activeBanners !== 'undefined' ? activeBanners : '0' %></span>
-            </div>
-            <div class="rev-row">
-              <span class="rev-row__label">Total Categories</span>
-              <span class="rev-row__val"><%= typeof totalCategories !== 'undefined' ? totalCategories : '0' %></span>
-            </div>
-            <div class="rev-row">
-              <span class="rev-row__label">Total Brands</span>
-              <span class="rev-row__val"><%= typeof totalBrands !== 'undefined' ? totalBrands : '0' %></span>
-            </div>
+          <div style="padding:8px 0;">
+            <div class="rev-row"><span class="rev-row__label">Total Reviews</span><span class="rev-row__val"><%= typeof totalReviews !== 'undefined' ? totalReviews : '0' %></span></div>
+            <div class="rev-row"><span class="rev-row__label">Avg. Rating</span><span class="rev-row__val rev-row__val--teal">⭐ <%= typeof avgRating !== 'undefined' ? avgRating : '0.0' %></span></div>
+            <div class="rev-row"><span class="rev-row__label">Active Coupons</span><span class="rev-row__val"><%= typeof activeCoupons !== 'undefined' ? activeCoupons : '0' %></span></div>
+            <div class="rev-row"><span class="rev-row__label">Blocked Users</span><span class="rev-row__val" style="color:var(--red)"><%= typeof blockedUsers !== 'undefined' ? blockedUsers : '0' %></span></div>
+            <div class="rev-row"><span class="rev-row__label">Pending Refunds</span><span class="rev-row__val" style="color:var(--amber)"><%= typeof pendingRefunds !== 'undefined' ? pendingRefunds : '0' %></span></div>
+            <div class="rev-row"><span class="rev-row__label">Active Banners</span><span class="rev-row__val"><%= typeof activeBanners !== 'undefined' ? activeBanners : '0' %></span></div>
+            <div class="rev-row"><span class="rev-row__label">Total Categories</span><span class="rev-row__val"><%= typeof totalCategories !== 'undefined' ? totalCategories : '0' %></span></div>
+            <div class="rev-row"><span class="rev-row__label">Total Brands</span><span class="rev-row__val"><%= typeof totalBrands !== 'undefined' ? totalBrands : '0' %></span></div>
           </div>
         </div>
-      </div>
+
+      </div><!-- /.two-col -->
 
     </div><!-- /.content -->
 
-    <footer class="page-footer">
-      © 2026 Velmora Chroné. All Rights Reserved. Admin Panel.
-    </footer>
+    <footer class="page-footer">© 2026 Velmora Chroné. All Rights Reserved. Admin Panel.</footer>
   </div><!-- /.main -->
-</div>
+</div><!-- /.layout -->
 
+<div class="toast" id="toast"></div>
+
+<script src="/socket.io/socket.io.js"></script>
 <script>
-  // ── Live date in topbar ──
-  (function() {
+  // ── Topbar date ────────────────────────────────────────────────────────────
+  (function () {
     const el = document.getElementById('topbarDate');
-    if (!el) return;
-    const now = new Date();
-    el.textContent = now.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+    if (el) el.textContent = new Date().toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
   })();
 
-  // ── Sales chart bars ──
-  (function() {
+  // ── Sales chart ────────────────────────────────────────────────────────────
+  (function () {
     const container = document.getElementById('salesChart');
     if (!container) return;
-
-    // Data from server (monthlySales should be array of { label, value } objects)
-    // Falls back to placeholder bars if not provided
-    const raw = <%- typeof monthlySales !== 'undefined' ? JSON.stringify(monthlySales) : 'null' %>;
-
-    const data = raw && raw.length > 0 ? raw : [
-      { label: 'Nov', value: 30 },
-      { label: 'Dec', value: 65 },
-      { label: 'Jan', value: 45 },
-      { label: 'Feb', value: 80 },
-      { label: 'Mar', value: 55 },
-      { label: 'Apr', value: 70 },
-      { label: 'May', value: 90 }
+    const raw  = <%- typeof monthlySales !== 'undefined' ? JSON.stringify(monthlySales) : 'null' %>;
+    const data = (raw && raw.length > 0) ? raw : [
+      { label: 'Nov', value: 30 }, { label: 'Dec', value: 65 },
+      { label: 'Jan', value: 45 }, { label: 'Feb', value: 80 },
+      { label: 'Mar', value: 55 }, { label: 'Apr', value: 70 },
+      { label: 'May', value: 90 },
     ];
-
-    const max = Math.max(...data.map(d => d.value), 1);
+    const max    = Math.max(...data.map(d => d.value), 1);
     const lastIdx = data.length - 1;
-
-    data.forEach(function(d, i) {
-      const pct = Math.max((d.value / max) * 100, 4);
-      const wrap = document.createElement('div');
-      wrap.className = 'chart-bar-wrap';
-      const bar = document.createElement('div');
-      bar.className = 'chart-bar' + (i === lastIdx ? ' active' : '');
-      bar.style.height = pct + 'px';
-      bar.title = d.label + ': ' + d.value;
-      const lbl = document.createElement('div');
-      lbl.className = 'chart-bar__label';
-      lbl.textContent = d.label;
-      wrap.appendChild(bar);
-      wrap.appendChild(lbl);
-      container.appendChild(wrap);
+    data.forEach(function (d, i) {
+      const pct  = Math.max((d.value / max) * 100, 4);
+      const wrap = document.createElement('div'); wrap.className = 'chart-bar-wrap';
+      const bar  = document.createElement('div'); bar.className = 'chart-bar' + (i === lastIdx ? ' active' : '');
+      bar.style.height = pct + 'px'; bar.title = d.label + ': ₹' + Number(d.value).toLocaleString('en-IN');
+      const lbl  = document.createElement('div'); lbl.className = 'chart-bar__label'; lbl.textContent = d.label;
+      wrap.appendChild(bar); wrap.appendChild(lbl); container.appendChild(wrap);
     });
   })();
-</script>
 
+  // ── Toast ──────────────────────────────────────────────────────────────────
+  function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className   = `toast ${type} show`;
+    setTimeout(() => { t.className = 'toast'; }, 3500);
+  }
+
+  // ── Notification sound ─────────────────────────────────────────────────────
+  function playNotifSound() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const t   = ctx.currentTime;
+      [0, 0.18].forEach((delay, i) => {
+        const osc  = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(i === 0 ? 880 : 660, t + delay);
+        gain.gain.setValueAtTime(0.3, t + delay);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + delay + 0.4);
+        osc.start(t + delay); osc.stop(t + delay + 0.4);
+      });
+    } catch (_) {}
+  }
+
+  // ── localStorage helpers ───────────────────────────────────────────────────
+  const STORAGE_KEY = 'vc_admin_notifs';
+  const SEEN_KEY    = 'vc_seen_order_ids';
+
+  function loadNotifications() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch { return []; }
+  }
+  function saveNotifications() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(notifications)); } catch (_) {}
+  }
+  function loadSeenIds() {
+    try { return new Set(JSON.parse(localStorage.getItem(SEEN_KEY) || '[]')); } catch { return new Set(); }
+  }
+  function saveSeenIds(set) {
+    try {
+      const arr = [...set].slice(-500);
+      localStorage.setItem(SEEN_KEY, JSON.stringify(arr));
+    } catch (_) {}
+  }
+
+  // ── Notification state ─────────────────────────────────────────────────────
+  let notifications = loadNotifications();
+  let seenIds       = loadSeenIds();
+  let currentTab    = 'all';
+
+  function getVisible() {
+    if (currentTab === 'unread') return notifications.filter(n => !n.read);
+    if (currentTab === 'read')   return notifications.filter(n =>  n.read);
+    return notifications;
+  }
+  function unreadCount() { return notifications.filter(n => !n.read).length; }
+
+  function updateBadge() {
+    const badge = document.getElementById('notifCount');
+    const count = unreadCount();
+    badge.textContent   = count > 9 ? '9+' : count;
+    badge.style.display = count > 0 ? 'flex' : 'none';
+  }
+
+  function updateFooter() {
+    document.getElementById('notifFooterCount').textContent =
+      notifications.length + ' total · ' + unreadCount() + ' unread';
+  }
+
+  function timeAgo(date) {
+    const s = Math.floor((Date.now() - new Date(date)) / 1000);
+    if (s < 60)   return 'just now';
+    if (s < 3600) return Math.floor(s / 60) + 'm ago';
+    return Math.floor(s / 3600) + 'h ago';
+  }
+
+  function renderList() {
+    const list    = document.getElementById('notifList');
+    const visible = getVisible();
+    list.innerHTML = '';
+    if (visible.length === 0) {
+      list.innerHTML = `<div class="notif-empty">${
+        currentTab === 'unread' ? 'No unread notifications' :
+        currentTab === 'read'   ? 'No read notifications'   : 'No new orders'
+      }</div>`;
+      return;
+    }
+    visible.forEach(n => {
+      const el = document.createElement('div');
+      el.className  = 'notif-item' + (n.read ? ' read' : '');
+      el.dataset.id = n.id;
+      el.innerHTML  = `
+        <div class="notif-item__dot"></div>
+        <div class="notif-item__body-wrap">
+          <div class="notif-item__top">
+            <span class="notif-item__id">${n.orderNumber}</span>
+            <span class="notif-item__time">${timeAgo(n.createdAt)}</span>
+          </div>
+          <div class="notif-item__info">
+            ₹${Number(n.grandTotal).toLocaleString('en-IN')} &nbsp;·&nbsp; ${n.itemCount} item${n.itemCount !== 1 ? 's' : ''} &nbsp;·&nbsp; ${n.paymentMethod}
+          </div>
+          ${n.customerName ? `<div class="notif-item__customer">${n.customerName}</div>` : ''}
+        </div>
+        <div class="notif-item__actions">
+          <button class="notif-mark-btn" onclick="toggleRead('${n.id}', event)">
+            ${n.read ? 'Mark unread' : 'Mark read'}
+          </button>
+          <a href="/admin/orders/${n.id}" class="notif-view-btn" onclick="markOneRead('${n.id}')">View</a>
+        </div>`;
+      list.appendChild(el);
+    });
+  }
+
+  function toggleRead(id, e) {
+    e.preventDefault(); e.stopPropagation();
+    const n = notifications.find(x => x.id === id);
+    if (!n) return;
+    n.read = !n.read;
+    saveNotifications();
+    updateBadge(); updateFooter(); renderList();
+  }
+
+  function markOneRead(id) {
+    const n = notifications.find(x => x.id === id);
+    if (n) { n.read = true; saveNotifications(); }
+    updateBadge(); updateFooter();
+  }
+
+  function markAllRead() {
+    notifications.forEach(n => { n.read = true; });
+    saveNotifications();
+    updateBadge(); updateFooter(); renderList();
+  }
+
+  function clearAll() {
+    notifications = [];
+    saveNotifications();
+    // Intentionally keep seenIds — cleared items must not re-appear on next poll
+    updateBadge(); updateFooter(); renderList();
+    document.getElementById('notifDropdown').classList.remove('open');
+  }
+
+  function switchTab(tab) {
+    currentTab = tab;
+    document.querySelectorAll('.notif-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+    renderList();
+  }
+
+  function toggleDropdown() {
+    document.getElementById('notifDropdown').classList.toggle('open');
+  }
+  document.addEventListener('click', (e) => {
+    if (!document.getElementById('notifWrap').contains(e.target)) {
+      document.getElementById('notifDropdown').classList.remove('open');
+    }
+  });
+
+  // ── Add notification ───────────────────────────────────────────────────────
+  function addNotification(order) {
+    const id = String(order._id);
+
+    // Already seen this order ID — skip entirely
+    if (seenIds.has(id)) return;
+    seenIds.add(id);
+    saveSeenIds(seenIds);
+
+    // Deduplicate within the notification list (belt + suspenders)
+    if (notifications.find(n => n.id === id)) {
+      updateBadge(); updateFooter(); renderList();
+      return;
+    }
+
+    notifications.unshift({
+      id,
+      orderNumber  : order.orderNumber || ('#' + id.slice(-6).toUpperCase()),
+      grandTotal   : order.grandTotal  ?? order.pricing?.grandTotal ?? 0,
+      itemCount    : order.itemCount   ?? order.items?.length ?? 0,
+      paymentMethod: order.paymentMethod || 'COD',
+      customerName : order.customerName || '',
+      createdAt    : order.createdAt,
+      read         : false,
+    });
+    saveNotifications();
+
+    updateBadge(); updateFooter(); renderList();
+    playNotifSound();
+    showToast(
+      `New order ${notifications[0].orderNumber} — ₹${Number(notifications[0].grandTotal).toLocaleString('en-IN')}`,
+      'success'
+    );
+  }
+
+  // ── Socket.io ──────────────────────────────────────────────────────────────
+  const socket = io();
+  socket.emit('join-admin');
+  socket.on('new-order', (order) => addNotification(order));
+
+  // ── Polling fallback every 30s ─────────────────────────────────────────────
+  async function pollRecent() {
+    try {
+      const res  = await fetch('/admin/orders/notify/recent');
+      const data = await res.json();
+      if (data.success) data.orders.forEach(addNotification);
+    } catch (_) {}
+  }
+  pollRecent();
+  setInterval(pollRecent, 30_000);
+
+  // ── Init UI from persisted state ───────────────────────────────────────────
+  updateBadge();
+  updateFooter();
+  renderList();
+</script>
 </body>
 </html>

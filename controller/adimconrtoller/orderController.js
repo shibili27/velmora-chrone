@@ -159,9 +159,9 @@ export const updateOrderStatus = async (req, res) => {
     }
 
     if (status === 'returned') {
-      updateFields.returnStatus           = 'pending';
-      updateFields.returnRequestedAt      = new Date();
-      updateFields.returnRejectionReason  = '';
+      updateFields.returnStatus          = 'pending';
+      updateFields.returnRequestedAt     = new Date();
+      updateFields.returnRejectionReason = '';
     }
 
     const order = await Order.findByIdAndUpdate(
@@ -218,5 +218,33 @@ export const handleReturnRequest = async (req, res) => {
   } catch (err) {
     console.error('handleReturnRequest error:', err);
     return res.status(500).json({ success: false, message: 'Server error. Please try again.' });
+  }
+};
+
+// ── Polling fallback: returns orders placed in the last 60 seconds ─────────
+export const getRecentOrders = async (req, res) => {
+  try {
+    const since  = new Date(Date.now() - 60 * 1000);
+    const orders = await Order.find({ createdAt: { $gte: since } })
+      .populate('user', 'name')
+      .sort({ createdAt: -1 })
+      .limit(10)
+      .lean();
+
+    res.json({
+      success: true,
+      orders : orders.map(o => ({
+        _id          : o._id,
+        orderNumber  : o.orderNumber,
+        grandTotal   : o.pricing.grandTotal,
+        itemCount    : o.items.length,
+        paymentMethod: o.paymentMethod,
+        customerName : o.user?.name || 'Customer',
+        createdAt    : o.createdAt,
+      })),
+    });
+  } catch (err) {
+    console.error('getRecentOrders error:', err);
+    res.json({ success: false, orders: [] });
   }
 };
