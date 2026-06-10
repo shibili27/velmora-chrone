@@ -7,7 +7,6 @@ import cloudinary from '../../config/cloudinary.js';
 import { broadcast } from '../../public/utils/ssemanager.js';
 
 
-// ── Dashboard ────────────────────────────────────────────────────────────────
 
 export const getDashboard = async (req, res) => {
   try {
@@ -36,6 +35,9 @@ export const getDashboard = async (req, res) => {
       lastMonthRevenueAgg,
       monthlySalesAgg,
       topProductsAgg,
+      thisMonthOrders,
+      lastMonthOrders,
+      lastMonthCustomers,
     ] = await Promise.all([
 
       Order.countDocuments(),
@@ -53,32 +55,27 @@ export const getDashboard = async (req, res) => {
       Category.countDocuments({ isDeleted: false }),
       Brand.countDocuments({ isDeleted: false }),
 
-      // Recent 6 orders
       Order.find()
         .populate('user', 'name email')
         .sort({ createdAt: -1 })
         .limit(6)
         .lean(),
 
-      // All-time revenue (delivered only)
       Order.aggregate([
         { $match: { orderStatus: 'delivered' } },
         { $group: { _id: null, total: { $sum: '$pricing.grandTotal' } } },
       ]),
 
-      // Today's revenue
       Order.aggregate([
         { $match: { orderStatus: 'delivered', createdAt: { $gte: todayStart } } },
         { $group: { _id: null, total: { $sum: '$pricing.grandTotal' } } },
       ]),
 
-      // Last month revenue (for growth %)
       Order.aggregate([
         { $match: { orderStatus: 'delivered', createdAt: { $gte: lastMonthStart, $lte: lastMonthEnd } } },
         { $group: { _id: null, total: { $sum: '$pricing.grandTotal' } } },
       ]),
 
-      // Last 7 months sales
       Order.aggregate([
         { $match: { orderStatus: 'delivered' } },
         {
@@ -92,7 +89,6 @@ export const getDashboard = async (req, res) => {
         { $limit: 7 },
       ]),
 
-      // Top 5 selling products
       Order.aggregate([
         { $match: { orderStatus: 'delivered' } },
         { $unwind: '$items' },
@@ -110,11 +106,16 @@ export const getDashboard = async (req, res) => {
         { $sort: { totalSold: -1 } },
         { $limit: 5 },
       ]),
+
+      Order.countDocuments({ createdAt: { $gte: monthStart } }),
+
+      Order.countDocuments({ createdAt: { $gte: lastMonthStart, $lte: lastMonthEnd } }),
+
+      User.countDocuments({ role: 'user', createdAt: { $gte: lastMonthStart, $lte: lastMonthEnd } }),
     ]);
 
-    // ── Derived values ────────────────────────────────────────────────────────
-    const totalRevenue     = Math.round(revenueAgg[0]?.total      ?? 0);
-    const todayRevenue     = Math.round(todayRevenueAgg[0]?.total  ?? 0);
+    const totalRevenue     = Math.round(revenueAgg[0]?.total       ?? 0);
+    const todayRevenue     = Math.round(todayRevenueAgg[0]?.total   ?? 0);
     const lastMonthRevenue = Math.round(lastMonthRevenueAgg[0]?.total ?? 0);
 
     const thisMonthEntry = monthlySalesAgg.find(
@@ -124,7 +125,15 @@ export const getDashboard = async (req, res) => {
 
     const revenueGrowth = lastMonthRevenue > 0
       ? Math.round(((thisMonthRevenue - lastMonthRevenue) / lastMonthRevenue) * 100)
-      : 0;
+      : thisMonthRevenue > 0 ? 100 : 0;
+
+    const ordersGrowth = lastMonthOrders > 0
+      ? Math.round(((thisMonthOrders - lastMonthOrders) / lastMonthOrders) * 100)
+      : thisMonthOrders > 0 ? 100 : 0;
+
+    const customersGrowth = lastMonthCustomers > 0
+      ? Math.round(((newCustomers - lastMonthCustomers) / lastMonthCustomers) * 100)
+      : newCustomers > 0 ? 100 : 0;
 
     const avgOrderValue = deliveredOrders > 0
       ? Math.round(totalRevenue / deliveredOrders)
@@ -134,21 +143,18 @@ export const getDashboard = async (req, res) => {
       ? Math.round(Math.max(...monthlySalesAgg.map(m => m.revenue)))
       : 0;
 
-    // Order status percentages
     const safeTotal    = totalOrders || 1;
     const deliveredPct = Math.round((deliveredOrders / safeTotal) * 100);
     const pendingPct   = Math.round((pendingOrders   / safeTotal) * 100);
     const shippedPct   = Math.round((shippedOrders   / safeTotal) * 100);
     const cancelledPct = Math.round((cancelledOrders / safeTotal) * 100);
 
-    // Monthly sales chart
     const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     const monthlySales = monthlySalesAgg.map(m => ({
       label: MONTH_NAMES[m._id.month - 1],
       value: Math.round(m.revenue),
     }));
 
-    // Map recentOrders to EJS shape (template uses o.userId.name / o.totalAmount)
     const recentOrdersMapped = recentOrders.map(o => ({
       _id:         o._id,
       orderId:     o.orderNumber,
@@ -157,7 +163,6 @@ export const getDashboard = async (req, res) => {
       status:      o.orderStatus,
     }));
 
-    // Activity feed
     const colorMap = {
       confirmed:  'teal',
       processing: 'blue',
@@ -172,7 +177,6 @@ export const getDashboard = async (req, res) => {
       time:    new Date(o.createdAt).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }),
     }));
 
-    // Top products — images array shape for EJS
     const topProducts = topProductsAgg.map(p => ({
       ...p,
       images: p.image ? [p.image] : [],
@@ -182,15 +186,14 @@ export const getDashboard = async (req, res) => {
       adminName: req.session.adminName,
       adminRole: req.session.adminRole,
 
-      // Stat cards
       totalRevenue,
       todayRevenue,
       revenueGrowth,
       totalOrders,
-      ordersGrowth:    0,
+      ordersGrowth,
       pendingOrders,
       totalCustomers,
-      customersGrowth: 0,
+      customersGrowth,
       newCustomers,
       totalProducts,
       outOfStock,
@@ -198,13 +201,11 @@ export const getDashboard = async (req, res) => {
       totalCategories,
       totalBrands,
 
-      // Chart
       monthlySales,
       avgOrderValue,
       highestMonth,
       conversionRate: 0,
 
-      // Order status progress bars
       deliveredOrders,
       shippedOrders,
       cancelledOrders,
@@ -213,12 +214,10 @@ export const getDashboard = async (req, res) => {
       shippedPct,
       cancelledPct,
 
-      // Tables / feeds
       recentOrders:   recentOrdersMapped,
       recentActivity,
       topProducts,
 
-      // Quick stats
       totalReviews:   0,
       avgRating:      '0.0',
       activeCoupons:  0,
@@ -233,7 +232,6 @@ export const getDashboard = async (req, res) => {
 };
 
 
-// ── Categories ───────────────────────────────────────────────────────────────
 
 export const getCategories = async (req, res) => {
   try {
@@ -331,7 +329,6 @@ export const deleteCategory = async (req, res) => {
 };
 
 
-// ── Products ─────────────────────────────────────────────────────────────────
 
 export const getProducts = async (req, res) => {
   try {
@@ -551,7 +548,6 @@ export const deleteProduct = async (req, res) => {
 };
 
 
-// ── Brands ───────────────────────────────────────────────────────────────────
 
 export const getBrands = async (req, res) => {
   try {
