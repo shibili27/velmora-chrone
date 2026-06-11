@@ -1,6 +1,7 @@
 import Order      from '../models/order.js';
 import Product    from '../models/product.js';
 import PDFDocument from 'pdfkit';
+import { restoreStockAndBroadcast } from './checkoutService.js';
 
 export const fetchOrders = async ({ userId, search, page }) => {
   const limit     = 8;
@@ -38,13 +39,11 @@ export const fetchOrderDetail = async ({ orderId, userId }) => {
   return order;
 };
 
-
 export const fetchOrderForSSE = async ({ orderId, userId }) => {
   const order = await Order.findOne({ _id: orderId, user: userId }).lean();
   if (!order) throw Object.assign(new Error('Order not found'), { status: 404 });
   return order;
 };
-
 
 export const cancelEntireOrder = async ({ orderId, userId, reason }) => {
   const order = await Order.findOne({ _id: orderId, user: userId });
@@ -58,10 +57,11 @@ export const cancelEntireOrder = async ({ orderId, userId, reason }) => {
     );
   }
 
-  const stockOps = order.items
-    .filter(i => i.status === 'active')
-    .map(i => Product.findByIdAndUpdate(i.product, { $inc: { stock: i.quantity } }));
-  await Promise.all(stockOps);
+  await Promise.all(
+    order.items
+      .filter(i => i.status === 'active')
+      .map(i => restoreStockAndBroadcast(i.product, i.quantity, i.variantName || null))
+  );
 
   order.items.forEach(i => {
     if (i.status === 'active') i.status = 'cancelled';
@@ -73,7 +73,6 @@ export const cancelEntireOrder = async ({ orderId, userId, reason }) => {
 
   return order;
 };
-
 
 export const cancelSingleItem = async ({ orderId, userId, itemId, reason }) => {
   if (!itemId) throw Object.assign(new Error('itemId is required.'), { status: 400 });
@@ -93,7 +92,7 @@ export const cancelSingleItem = async ({ orderId, userId, itemId, reason }) => {
   if (!item) throw Object.assign(new Error('Item not found in order.'), { status: 404 });
   if (item.status === 'cancelled') throw Object.assign(new Error('Item is already cancelled.'), { status: 400 });
 
-  await Product.findByIdAndUpdate(item.product, { $inc: { stock: item.quantity } });
+  await restoreStockAndBroadcast(item.product, item.quantity, item.variantName || null);
 
   item.status           = 'cancelled';
   item.cancellationNote = (reason || '').trim();
@@ -107,7 +106,6 @@ export const cancelSingleItem = async ({ orderId, userId, itemId, reason }) => {
   await order.save();
   return { order, allCancelled };
 };
-
 
 export const requestReturn = async ({ orderId, userId, reason }) => {
   if (!reason) throw Object.assign(new Error('Return reason is required.'), { status: 400 });
@@ -126,16 +124,15 @@ export const requestReturn = async ({ orderId, userId, reason }) => {
     );
   }
 
-  order.orderStatus = 'returned';
-  order.returnStatus = 'pending';
-  order.returnReason = reason;
+  order.orderStatus       = 'returned';
+  order.returnStatus      = 'pending';
+  order.returnReason      = reason;
   order.returnRequestedAt = new Date();
   order.returnRejectionReason = '';
   await order.save();
 
   return order;
 };
-
 
 export const generateInvoicePDF = async ({ orderId, userId, res }) => {
   const order = await Order.findOne({ _id: orderId, user: userId }).lean();
@@ -152,7 +149,6 @@ export const generateInvoicePDF = async ({ orderId, userId, res }) => {
   res.setHeader('Content-Disposition', `attachment; filename="invoice-${order.orderNumber}.pdf"`);
   doc.pipe(res);
 
-  // ── Header ──
   doc.rect(50, 40, W, 70).fill(DARK);
   doc.fillColor('#f5f2eb').font('Helvetica-Bold').fontSize(18).text('VELMORA CHRONÉ', 60, 58);
   doc.fillColor(GOLD).font('Helvetica').fontSize(8).text('L U X U R Y  T I M E P I E C E S', 60, 80);
@@ -160,7 +156,6 @@ export const generateInvoicePDF = async ({ orderId, userId, res }) => {
     .text('INVOICE', 450, 58, { align: 'right', width: 95 })
     .text(`#${order.orderNumber}`, 450, 72, { align: 'right', width: 95 });
 
-  
   let y = 130;
   const placed = new Date(order.createdAt).toLocaleDateString('en-IN', {
     day: '2-digit', month: 'long', year: 'numeric',
@@ -170,7 +165,6 @@ export const generateInvoicePDF = async ({ orderId, userId, res }) => {
   doc.text(`Payment: ${order.paymentMethod === 'COD' ? 'Cash on Delivery' : order.paymentMethod}`, 250, y);
   doc.text(`Status: ${order.orderStatus.toUpperCase()}`, 420, y);
 
-  //  Shipping address 
   y += 24;
   doc.fillColor(GOLD).font('Helvetica-Bold').fontSize(7).text('SHIP TO', 50, y);
   y += 12;
@@ -181,7 +175,6 @@ export const generateInvoicePDF = async ({ orderId, userId, res }) => {
     .text(`${addr.city}${addr.state ? ', ' + addr.state : ''} — ${addr.pincode}`, 50, y + 24)
     .text(addr.phone, 50, y + 36);
 
-  //  Items table 
   y += 70;
   doc.rect(50, y, W, 18).fill('#f0ece3');
   doc.fillColor(DARK).font('Helvetica-Bold').fontSize(7.5);
@@ -209,7 +202,6 @@ export const generateInvoicePDF = async ({ orderId, userId, res }) => {
     y += 24;
   });
 
-  // Pricing summary
   doc.moveTo(50, y).lineTo(545, y).strokeColor('#dddddd').lineWidth(0.5).stroke();
   y += 14;
 
@@ -231,7 +223,6 @@ export const generateInvoicePDF = async ({ orderId, userId, res }) => {
   y += 4;
   addRow('TOTAL PAID', `Rs.${p.grandTotal.toLocaleString('en-IN')}`, true);
 
-  
   y += 30;
   doc.moveTo(50, y).lineTo(545, y).strokeColor(GOLD).lineWidth(0.5).stroke();
   y += 10;

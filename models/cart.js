@@ -1,4 +1,3 @@
-// models/cart.js
 import mongoose from 'mongoose';
 
 const MAX_QTY_PER_ITEM = 5;
@@ -9,6 +8,10 @@ const cartItemSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Product',
       required: true,
+    },
+    variantName: {
+      type: String,
+      default: null,
     },
     quantity: {
       type: Number,

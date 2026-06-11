@@ -6,7 +6,7 @@ import Order     from '../../models/order.js';
 import cloudinary from '../../config/cloudinary.js';
 import { broadcast } from '../../public/utils/ssemanager.js';
 
-
+//  dash
 
 export const getDashboard = async (req, res) => {
   try {
@@ -232,6 +232,7 @@ export const getDashboard = async (req, res) => {
 };
 
 
+// cat
 
 export const getCategories = async (req, res) => {
   try {
@@ -260,6 +261,8 @@ export const getCategories = async (req, res) => {
     res.redirect('/admin/dashboard');
   }
 };
+
+
 
 export const addCategory = async (req, res) => {
   try {
@@ -329,7 +332,7 @@ export const deleteCategory = async (req, res) => {
 };
 
 
-
+// prod
 export const getProducts = async (req, res) => {
   try {
     const search = req.query.search?.trim() || '';

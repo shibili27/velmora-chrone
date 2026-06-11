@@ -60,7 +60,8 @@ export const getFilteredProducts = async ({ search, sort, category, brand, minPr
 
   const [categories, brands, total, products] = await Promise.all([
     Category.find(categoryFilter).sort({ name: 1 }).lean(),
-    Brand.find({ isDeleted: false }).sort({ name: 1 }).lean(),
+    Product.distinct('brand',query)
+    .then(brandIds => Brand.find({_id:{$in: brandIds}, isDeleted:false}).sort({name:1}).lean()),
 
     brandNotFound ? 0 : Product.aggregate([
       { $match: query },
@@ -99,7 +100,6 @@ export const getFilteredProducts = async ({ search, sort, category, brand, minPr
 export const getProductById = async (productId) => {
   const product = await Product.findOne({ _id: productId, isDeleted: false })
     .populate('category')
-    .populate('brand')
     .lean();
 
   if (!product) throw Object.assign(new Error('notfound'), { status: 404 });
@@ -107,16 +107,23 @@ export const getProductById = async (productId) => {
   if (!product.category || product.category.isDeleted || product.category.isListed === false)
     throw Object.assign(new Error('category'), { status: 410, product });
 
-  const related = await Product.find({
-    _id      : { $ne: product._id },
-    category : product.category._id,
-    isDeleted: false,
-    isListed : { $ne: false },
-  })
-    .populate('category')
-    .populate('brand')
-    .limit(4)
-    .lean();
+  // brand sp
+  const [brand, related] = await Promise.all([
+    Brand.findById(product.brand).lean(),
+
+    Product.find({
+      _id      : { $ne: product._id },
+      category : product.category._id,
+      isDeleted: false,
+      isListed : { $ne: false },
+    })
+      .populate('category')
+      .populate('brand')
+      .limit(4)
+      .lean(),
+  ]);
+
+  product.brand = brand;
 
   return { product, related };
 };

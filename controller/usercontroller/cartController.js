@@ -22,7 +22,7 @@ export const addToCart = async (req, res) => {
     const userId = req.session.user || req.user?._id;
     if (!userId) return res.status(401).json({ success: false, message: 'Please login to continue', redirectUrl: '/login' });
 
-    const cartCount = await cartService.addItemToCart(userId, req.body.productId, req.body.quantity);
+    const cartCount = await cartService.addItemToCart(userId, req.body.productId, req.body.quantity, req.body.variantName || null);
     res.json({ success: true, message: 'Added to cart', cartCount });
   } catch (err) {
     console.error('[addToCart]', err);

@@ -45,25 +45,33 @@ export const getCleanCart = async (userId) => {
   return cart;
 };
 
-export const addItemToCart = async (userId, productId, quantity) => {
+export const addItemToCart = async (userId, productId, quantity, variantName = null) => {
   const qty     = Math.max(1, parseInt(quantity, 10) || 1);
   const product = await getValidProduct(productId);
+
+  const variantStock = variantName
+    ? product.colorVariants?.find(v => v.name === variantName)?.stock ?? product.stock
+    : product.stock;
+
+  if (variantStock === 0) throw Object.assign(new Error('This colour variant is out of stock'), { status: 400 });
 
   let cart = await Cart.findOne({ user: userId });
   if (!cart) cart = new Cart({ user: userId, items: [] });
 
-  const existingIndex = cart.items.findIndex(i => i.product.toString() === productId);
+  const existingIndex = cart.items.findIndex(
+    i => i.product.toString() === productId && i.variantName === variantName
+  );
 
   if (existingIndex > -1) {
     const newQty = cart.items[existingIndex].quantity + qty;
-    if (newQty > product.stock) throw Object.assign(new Error(`Only ${product.stock} unit(s) available. You already have ${cart.items[existingIndex].quantity} in your cart.`), { status: 400 });
-    if (newQty > MAX_QTY)       throw Object.assign(new Error(`Maximum ${MAX_QTY} units allowed per item.`), { status: 400 });
+    if (newQty > variantStock) throw Object.assign(new Error(`Only ${variantStock} unit(s) available. You already have ${cart.items[existingIndex].quantity} in your cart.`), { status: 400 });
+    if (newQty > MAX_QTY)      throw Object.assign(new Error(`Maximum ${MAX_QTY} units allowed per item.`), { status: 400 });
     cart.items[existingIndex].quantity = newQty;
     cart.items[existingIndex].price    = product.price;
   } else {
-    if (qty > product.stock) throw Object.assign(new Error(`Only ${product.stock} unit(s) in stock.`), { status: 400 });
-    if (qty > MAX_QTY)       throw Object.assign(new Error(`Maximum ${MAX_QTY} units allowed per item.`), { status: 400 });
-    cart.items.push({ product: productId, quantity: qty, price: product.price });
+    if (qty > variantStock) throw Object.assign(new Error(`Only ${variantStock} unit(s) in stock.`), { status: 400 });
+    if (qty > MAX_QTY)      throw Object.assign(new Error(`Maximum ${MAX_QTY} units allowed per item.`), { status: 400 });
+    cart.items.push({ product: productId, variantName, quantity: qty, price: product.price });
   }
 
   await cart.save();
@@ -86,6 +94,10 @@ export const updateItem = async (userId, itemId, action) => {
     throw Object.assign(new Error('Product is no longer available and has been removed from your cart.'), { status: 403, removed: true });
   }
 
+  const variantStock = item.variantName
+    ? product.colorVariants?.find(v => v.name === item.variantName)?.stock ?? product.stock
+    : product.stock;
+
   let newQty = item.quantity;
   if (action === 'inc') newQty += 1;
   if (action === 'dec') newQty -= 1;
@@ -100,8 +112,8 @@ export const updateItem = async (userId, itemId, action) => {
     };
   }
 
-  if (newQty > product.stock) throw Object.assign(new Error(`Only ${product.stock} unit(s) available.`), { status: 400, maxStock: product.stock });
-  if (newQty > MAX_QTY)       throw Object.assign(new Error(`Maximum ${MAX_QTY} units allowed per item.`), { status: 400, maxQty: MAX_QTY });
+  if (newQty > variantStock) throw Object.assign(new Error(`Only ${variantStock} unit(s) available.`), { status: 400, maxStock: variantStock });
+  if (newQty > MAX_QTY)      throw Object.assign(new Error(`Maximum ${MAX_QTY} units allowed per item.`), { status: 400, maxQty: MAX_QTY });
 
   cart.items[itemIndex].quantity = newQty;
   await cart.save();
