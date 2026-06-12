@@ -108,20 +108,18 @@ export const getProductById = async (productId) => {
     throw Object.assign(new Error('category'), { status: 410, product });
 
   // brand sp
-  const [brand, related] = await Promise.all([
-    Brand.findById(product.brand).lean(),
+  const brand = await Brand.findById(product.brand).lean();
 
-    Product.find({
-      _id      : { $ne: product._id },
-      category : product.category._id,
-      isDeleted: false,
-      isListed : { $ne: false },
-    })
-      .populate('category')
-      .populate('brand')
-      .limit(4)
-      .lean(),
-  ]);
+  const related = await Product.find({
+    _id      : { $ne: product._id },
+    category : product.category._id,
+    isDeleted: false,
+    isListed : { $ne: false },
+  })
+    .populate('category')
+    .populate('brand')
+    .limit(4)
+    .lean();
 
   product.brand = brand;
 
