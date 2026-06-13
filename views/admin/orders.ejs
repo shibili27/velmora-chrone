@@ -850,7 +850,6 @@
     tbody.insertBefore(tr, tbody.firstChild);
   }
 
-  // ── Socket.io ─────────────────────────────────────────────────────────────
   const socket = io();
   socket.emit('join-admin');
   socket.on('new-order', (order) => addNotification(order));
@@ -865,7 +864,6 @@
     socket.emit('join-admin');
   });
 
-  // ── Polling fallback every 30s ────────────────────────────────────────────
   async function pollRecent() {
     try {
       const res  = await fetch('/admin/orders/notify/recent');
@@ -876,7 +874,7 @@
   pollRecent();
   setInterval(pollRecent, 30_000);
 
-  // ── Init UI from persisted state ──────────────────────────────────────────
+
   updateBadge();
   updateFooter();
   renderList();

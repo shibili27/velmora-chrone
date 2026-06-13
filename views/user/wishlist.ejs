@@ -504,14 +504,12 @@
     }
   }
 
-  // ── Cart badge on load ──────────────────────────────────────────────────
   fetch('/api/cart/count').then(r => r.json()).then(d => updateCartBadge(d.count || 0)).catch(() => {});
 
-  // ── Prevent back-nav to cached page ────────────────────────────────────
   history.pushState(null, null, window.location.href);
   window.addEventListener('popstate', () => history.pushState(null, null, window.location.href));
 
-  // ── SSE: live stock updates ─────────────────────────────────────────────
+  // ── SSE: live 
   (function () {
     const es = new EventSource('/sse/products');
     es.addEventListener('productUpdate', function (e) {

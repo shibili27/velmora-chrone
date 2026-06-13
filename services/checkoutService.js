@@ -83,6 +83,7 @@ export const decrementStockAndBroadcast = async (cartItem) => {
   });
 };
 
+// restock
 export const restoreStockAndBroadcast = async (productId, qty, variantName = null) => {
   const product = await Product.findById(productId).select('stock colorVariants isListed isDeleted price');
   if (!product) return;
@@ -103,10 +104,10 @@ export const restoreStockAndBroadcast = async (productId, qty, variantName = nul
 
   broadcast('productUpdate', {
     productId    : String(productId),
-    stock        : broadcastStock,
-    price        : product.price,
-    isListed     : product.isListed !== false,
-    isDeleted    : product.isDeleted || false,
+    stock: broadcastStock,
+    price: product.price,
+    isListed: product.isListed !== false,
+    isDeleted: product.isDeleted || false,
     colorVariants: (product.colorVariants || []).map(v => ({ name: v.name, hex: v.hex, stock: v.stock })),
   });
 };
