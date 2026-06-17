@@ -2,15 +2,20 @@ import mongoose from 'mongoose';
 import { getIO } from '../utils/socket.js';
 
 const orderItemSchema = new mongoose.Schema({
-  product          : { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
-  name             : { type: String, required: true },
-  brand            : { type: String, default: '' },
-  image            : { type: String, default: '' },
-  quantity         : { type: Number, required: true, min: 1 },
-  price            : { type: Number, required: true },
-  totalPrice       : { type: Number, required: true },
-  status           : { type: String, enum: ['active', 'cancelled'], default: 'active' },
-  cancellationNote : { type: String, default: '' },
+  product              : { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
+  name                 : { type: String, required: true },
+  brand                : { type: String, default: '' },
+  image                : { type: String, default: '' },
+  variantName          : { type: String, default: null },
+  quantity             : { type: Number, required: true, min: 1 },
+  price                : { type: Number, required: true },
+  totalPrice           : { type: Number, required: true },
+  status               : { type: String, enum: ['active', 'cancelled'], default: 'active' },
+  cancellationNote     : { type: String, default: '' },
+  returnStatus         : { type: String, enum: ['none', 'pending', 'accepted', 'rejected'], default: 'none' },
+  returnReason         : { type: String, default: '' },
+  returnRequestedAt    : { type: Date, default: null },
+  returnRejectionReason: { type: String, default: '' },
 }, { _id: true });
 
 const addressSchema = new mongoose.Schema({
@@ -54,7 +59,6 @@ const orderSchema = new mongoose.Schema({
   returnRequestedAt     : { type: Date, default: null },
 }, { timestamps: true });
 
-
 orderSchema.pre('save', async function () {
   this._wasNew = this.isNew;
   if (this.isNew) {
@@ -64,7 +68,6 @@ orderSchema.pre('save', async function () {
     this.orderNumber = `VC-${datePart}-${seq}`;
   }
 });
-
 
 orderSchema.post('save', function (doc) {
   if (!this._wasNew) return;

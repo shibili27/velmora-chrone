@@ -50,6 +50,38 @@ export const buildPriceSummary = (cart, couponDiscount = 0) => {
   };
 };
 
+export const validateStockBeforeOrder = async (cartItems) => {
+  const errors = [];
+
+  for (const cartItem of cartItems) {
+    const product     = await Product.findById(cartItem.product._id).select('name stock colorVariants isDeleted isListed');
+    const variantName = cartItem.variantName || null;
+
+    if (!product || product.isDeleted || product.isListed === false) {
+      errors.push(`"${cartItem.product.name}" is no longer available.`);
+      continue;
+    }
+
+    let availableStock = 0;
+    if (product.colorVariants?.length > 0 && variantName) {
+      const variant = product.colorVariants.find(v => v.name === variantName);
+      availableStock = variant ? variant.stock : 0;
+    } else {
+      availableStock = product.stock;
+    }
+
+    if (availableStock < cartItem.quantity) {
+      if (availableStock === 0) {
+        errors.push(`"${product.name}" is out of stock.`);
+      } else {
+        errors.push(`"${product.name}" — only ${availableStock} unit(s) available, you requested ${cartItem.quantity}.`);
+      }
+    }
+  }
+
+  return errors;
+};
+
 export const decrementStockAndBroadcast = async (cartItem) => {
   const productId   = cartItem.product._id;
   const qty         = cartItem.quantity;
@@ -83,7 +115,6 @@ export const decrementStockAndBroadcast = async (cartItem) => {
   });
 };
 
-// restock
 export const restoreStockAndBroadcast = async (productId, qty, variantName = null) => {
   const product = await Product.findById(productId).select('stock colorVariants isListed isDeleted price');
   if (!product) return;
@@ -104,10 +135,10 @@ export const restoreStockAndBroadcast = async (productId, qty, variantName = nul
 
   broadcast('productUpdate', {
     productId    : String(productId),
-    stock: broadcastStock,
-    price: product.price,
-    isListed: product.isListed !== false,
-    isDeleted: product.isDeleted || false,
+    stock        : broadcastStock,
+    price        : product.price,
+    isListed     : product.isListed !== false,
+    isDeleted    : product.isDeleted || false,
     colorVariants: (product.colorVariants || []).map(v => ({ name: v.name, hex: v.hex, stock: v.stock })),
   });
 };
@@ -150,6 +181,11 @@ export const placeOrder = async (userId, { addressId, session }) => {
   if (!cart || !cart.items.length) throw Object.assign(new Error('Your cart is empty.'), { status: 400 });
   if (!cartIsValid(cart))          throw Object.assign(new Error('Some items are no longer available. Please review your cart.'), { status: 400 });
 
+  const stockErrors = await validateStockBeforeOrder(cart.items);
+  if (stockErrors.length > 0) {
+    throw Object.assign(new Error(stockErrors[0]), { status: 400, stockErrors });
+  }
+
   const user = await User.findById(userId).select('name email phone addresses');
   const shippingAddress = addressId
     ? user.addresses?.id(addressId)
@@ -175,7 +211,6 @@ export const placeOrder = async (userId, { addressId, session }) => {
 
   const order = await Order.create({
     user        : userId,
-    orderNumber : `VC-${Date.now().toString().slice(-8)}`,
     items       : orderItems,
     shippingAddress: {
       fullName: shippingAddress.fullName || user.name,

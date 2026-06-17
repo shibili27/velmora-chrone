@@ -16,213 +16,57 @@
     body{font-family:'Jost',sans-serif;background:#111110;color:#f5f2eb;overflow-x:hidden;min-height:100vh}
     ::-webkit-scrollbar{width:2px}::-webkit-scrollbar-track{background:#111110}::-webkit-scrollbar-thumb{background:#c9a96e}
 
-    /* GRAIN */
     body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
       background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
       opacity:.016}
 
-    /* ══════════════════════════════
-       NAV — pure CSS, no Tailwind
-    ══════════════════════════════ */
-    .nav-root{
-      position:fixed;top:0;left:0;right:0;z-index:200;
-      background:rgba(17,17,16,0.92);
-      backdrop-filter:blur(18px) saturate(1.4);
-      -webkit-backdrop-filter:blur(18px) saturate(1.4);
-      border-bottom:1px solid rgba(245,242,235,0.06);
-      transition:box-shadow .3s;
-    }
+    .nav-root{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(17,17,16,0.92);backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);border-bottom:1px solid rgba(245,242,235,0.06);transition:box-shadow .3s}
     .nav-root.scrolled{box-shadow:0 2px 24px rgba(0,0,0,.5)}
-    .nav-inner{
-      display:flex;align-items:center;
-      justify-content:space-between;
-      padding:1rem 2rem;
-      position:relative;min-height:60px;
-    }
+    .nav-inner{display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;position:relative;min-height:60px}
     @media(min-width:768px){.nav-inner{padding:1rem 3rem}}
-
-    /* Logo — always centred absolutely */
-    .nav-logo{
-      font-family:'Cormorant Garamond',serif;
-      font-size:.85rem;font-weight:300;
-      letter-spacing:.25em;text-transform:uppercase;
-      color:#f5f2eb;text-decoration:none;
-      position:absolute;left:50%;transform:translateX(-50%);
-      white-space:nowrap;
-    }
-
-    /* Left links — desktop only */
+    .nav-logo{font-family:'Cormorant Garamond',serif;font-size:.85rem;font-weight:300;letter-spacing:.25em;text-transform:uppercase;color:#f5f2eb;text-decoration:none;position:absolute;left:50%;transform:translateX(-50%);white-space:nowrap}
     .nav-left{display:none;align-items:center;gap:2rem}
     @media(min-width:768px){.nav-left{display:flex}}
-
-    /* Right cluster */
     .nav-right{display:flex;align-items:center;gap:.65rem;margin-left:auto}
-
-    /* Nav links */
-    .nav-link{
-      font-family:'Jost',sans-serif;
-      font-size:.53rem;font-weight:400;
-      letter-spacing:.2em;text-transform:uppercase;
-      color:rgba(245,242,235,.45);text-decoration:none;
-      transition:color .2s;position:relative;padding-bottom:2px;white-space:nowrap;
-    }
+    .nav-link{font-family:'Jost',sans-serif;font-size:.53rem;font-weight:400;letter-spacing:.2em;text-transform:uppercase;color:rgba(245,242,235,.45);text-decoration:none;transition:color .2s;position:relative;padding-bottom:2px;white-space:nowrap}
     .nav-link::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:1px;background:#c9a96e;transition:width .3s}
-    .nav-link:hover{color:rgba(245,242,235,.9)}
-    .nav-link:hover::after{width:100%}
-
-    /* Logout — desktop only */
-    .nav-logout{display:none}
-    @media(min-width:768px){.nav-logout{display:inline}}
-
-    /* Icon button */
-    .nav-icon-btn{
-      position:relative;width:36px;height:36px;
-      display:flex;align-items:center;justify-content:center;
-      color:rgba(245,242,235,.5);
-      background:rgba(255,255,255,.03);
-      border:1px solid rgba(201,169,110,.12);
-      border-radius:10px;cursor:pointer;text-decoration:none;
-      transition:color .22s,background .22s,border-color .22s,
-                 transform .18s cubic-bezier(.34,1.56,.64,1),box-shadow .22s;
-      box-shadow:0 1px 0 rgba(255,255,255,.04) inset,0 2px 6px rgba(0,0,0,.35);
-    }
-    .nav-icon-btn::before{
-      content:'';position:absolute;inset:0;border-radius:10px;
-      background:linear-gradient(135deg,rgba(255,255,255,.08) 0%,transparent 55%);
-      pointer-events:none;
-    }
-    .nav-icon-btn:hover{
-      color:#c9a96e;background:rgba(201,169,110,.08);
-      border-color:rgba(201,169,110,.35);
-      transform:translateY(-2px) scale(1.06);
-      box-shadow:0 1px 0 rgba(255,255,255,.06) inset,0 6px 20px rgba(0,0,0,.5),0 0 14px rgba(201,169,110,.15);
-    }
-    .cart-badge{
-      position:absolute;top:-5px;right:-5px;
-      width:14px;height:14px;border-radius:50%;
-      background:linear-gradient(135deg,#d4b97e,#c9a96e);
-      font-size:.38rem;font-weight:600;color:#111110;
-      display:flex;align-items:center;justify-content:center;
-      box-shadow:0 2px 6px rgba(201,169,110,.4);
-    }
-
-    /* Hamburger — mobile only */
+    .nav-link:hover{color:rgba(245,242,235,.9)}.nav-link:hover::after{width:100%}
+    .nav-logout{display:none}@media(min-width:768px){.nav-logout{display:inline}}
+    .nav-icon-btn{position:relative;width:36px;height:36px;display:flex;align-items:center;justify-content:center;color:rgba(245,242,235,.5);background:rgba(255,255,255,.03);border:1px solid rgba(201,169,110,.12);border-radius:10px;cursor:pointer;text-decoration:none;transition:color .22s,background .22s,border-color .22s,transform .18s cubic-bezier(.34,1.56,.64,1),box-shadow .22s;box-shadow:0 1px 0 rgba(255,255,255,.04) inset,0 2px 6px rgba(0,0,0,.35)}
+    .nav-icon-btn::before{content:'';position:absolute;inset:0;border-radius:10px;background:linear-gradient(135deg,rgba(255,255,255,.08) 0%,transparent 55%);pointer-events:none}
+    .nav-icon-btn:hover{color:#c9a96e;background:rgba(201,169,110,.08);border-color:rgba(201,169,110,.35);transform:translateY(-2px) scale(1.06)}
     .hamburger{display:flex;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:3px}
     @media(min-width:768px){.hamburger{display:none}}
     .hamburger span{display:block;width:20px;height:1px;background:rgba(245,242,235,.6);transition:transform .3s,opacity .3s}
     .hamburger.open span:nth-child(1){transform:translateY(6px) rotate(45deg)}
     .hamburger.open span:nth-child(2){opacity:0}
     .hamburger.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
-
-    /* Mobile menu */
     .mobile-menu{display:none;flex-direction:column;background:#0d0d0c;padding:1.5rem 2rem;gap:1rem;border-top:1px solid rgba(245,242,235,.05)}
     .mobile-menu.open{display:flex}
     .mobile-menu .nav-link{font-size:.68rem;padding:.45rem 0;border-bottom:1px solid rgba(245,242,235,.04);color:rgba(245,242,235,.5)}
-    /* ══ END NAV ══ */
 
-    /* ══════════════════════════════
-       PAGE HERO — with step trail
-    ══════════════════════════════ */
-    .page-hero{
-      padding:5.5rem 2rem 2.5rem;
-      background:linear-gradient(180deg,#080807 0%,#111110 100%);
-      border-bottom:1px solid rgba(201,169,110,.08);
-      position:relative;overflow:hidden;text-align:center;
-    }
+    .page-hero{padding:5.5rem 2rem 2.5rem;background:linear-gradient(180deg,#080807 0%,#111110 100%);border-bottom:1px solid rgba(201,169,110,.08);position:relative;overflow:hidden;text-align:center}
     @media(min-width:768px){.page-hero{padding:5.5rem 3rem 2.5rem}}
-    .page-hero::before{
-      content:'';position:absolute;top:-60px;left:50%;transform:translateX(-50%);
-      width:700px;height:420px;border-radius:50%;
-      background:radial-gradient(ellipse,rgba(201,169,110,.07) 0%,transparent 70%);
-      pointer-events:none;
-    }
-    .page-hero::after{
-      content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
-      background:linear-gradient(90deg,transparent,rgba(201,169,110,.25),transparent);
-    }
-    .page-hero-scan{
-      position:absolute;top:0;left:-100%;width:60%;height:100%;
-      background:linear-gradient(90deg,transparent,rgba(201,169,110,.022),transparent);
-      animation:heroScan 7s ease-in-out infinite;pointer-events:none;z-index:0;
-    }
+    .page-hero::before{content:'';position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:700px;height:420px;border-radius:50%;background:radial-gradient(ellipse,rgba(201,169,110,.07) 0%,transparent 70%);pointer-events:none}
+    .page-hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(201,169,110,.25),transparent)}
+    .page-hero-scan{position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(201,169,110,.022),transparent);animation:heroScan 7s ease-in-out infinite;pointer-events:none;z-index:0}
     @keyframes heroScan{0%{left:-60%}100%{left:140%}}
-    .page-hero-inner{
-      max-width:900px;margin:0 auto;
-      position:relative;z-index:1;
-      display:flex;flex-direction:column;align-items:center;
-    }
-
-    /* Small eyebrow tag */
-    .page-hero-tag{
-      font-family:'Jost',sans-serif;font-size:.42rem;
-      letter-spacing:.38em;text-transform:uppercase;
-      color:rgba(201,169,110,.55);margin-bottom:1.2rem;
-      display:flex;align-items:center;gap:.65rem;
-    }
+    .page-hero-inner{max-width:900px;margin:0 auto;position:relative;z-index:1;display:flex;flex-direction:column;align-items:center}
+    .page-hero-tag{font-family:'Jost',sans-serif;font-size:.42rem;letter-spacing:.38em;text-transform:uppercase;color:rgba(201,169,110,.55);margin-bottom:1.2rem;display:flex;align-items:center;gap:.65rem}
     .page-hero-tag::before,.page-hero-tag::after{content:'';width:24px;height:1px;background:#c9a96e;opacity:.45}
-
-    /* ── STEP TRAIL (hero centrepiece) ── */
-    .hero-steps{
-      display:flex;align-items:center;justify-content:center;
-      gap:0;margin-bottom:1.6rem;
-    }
-
-    .hero-step{
-      display:flex;flex-direction:column;align-items:center;gap:.55rem;
-      position:relative;
-    }
-
-    /* connector line between steps */
-    .hero-step-line{
-      width:clamp(48px,8vw,100px);height:1px;
-      background:rgba(245,242,235,.08);
-      flex-shrink:0;margin-top:-18px; /* align with circle centre */
-    }
+    .hero-steps{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:1.6rem}
+    .hero-step{display:flex;flex-direction:column;align-items:center;gap:.55rem;position:relative}
+    .hero-step-line{width:clamp(48px,8vw,100px);height:1px;background:rgba(245,242,235,.08);flex-shrink:0;margin-top:-18px}
     .hero-step-line.done{background:linear-gradient(90deg,rgba(201,169,110,.5),rgba(201,169,110,.2))}
-
-    /* circle */
-    .hero-step-circle{
-      width:38px;height:38px;border-radius:50%;
-      display:flex;align-items:center;justify-content:center;
-      border:1.5px solid rgba(245,242,235,.1);
-      background:rgba(245,242,235,.03);
-      font-family:'Jost',sans-serif;font-size:.55rem;
-      color:rgba(245,242,235,.2);
-      position:relative;z-index:1;
-      transition:border-color .3s,background .3s,box-shadow .3s;
-    }
-    .hero-step.done .hero-step-circle{
-      border-color:rgba(201,169,110,.5);
-      background:rgba(201,169,110,.08);
-      color:#c9a96e;
-      box-shadow:0 0 18px rgba(201,169,110,.18);
-    }
-    .hero-step.active .hero-step-circle{
-      border-color:#c9a96e;
-      background:linear-gradient(135deg,rgba(201,169,110,.18),rgba(201,169,110,.06));
-      color:#e0c47e;
-      box-shadow:0 0 28px rgba(201,169,110,.28),0 0 8px rgba(201,169,110,.15);
-    }
-
-    /* label */
-    .hero-step-label{
-      font-family:'Jost',sans-serif;
-      font-size:.42rem;letter-spacing:.22em;text-transform:uppercase;
-      color:rgba(245,242,235,.2);white-space:nowrap;
-    }
+    .hero-step-circle{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1.5px solid rgba(245,242,235,.1);background:rgba(245,242,235,.03);font-family:'Jost',sans-serif;font-size:.55rem;color:rgba(245,242,235,.2);position:relative;z-index:1;transition:border-color .3s,background .3s,box-shadow .3s}
+    .hero-step.done .hero-step-circle{border-color:rgba(201,169,110,.5);background:rgba(201,169,110,.08);color:#c9a96e;box-shadow:0 0 18px rgba(201,169,110,.18)}
+    .hero-step.active .hero-step-circle{border-color:#c9a96e;background:linear-gradient(135deg,rgba(201,169,110,.18),rgba(201,169,110,.06));color:#e0c47e;box-shadow:0 0 28px rgba(201,169,110,.28),0 0 8px rgba(201,169,110,.15)}
+    .hero-step-label{font-family:'Jost',sans-serif;font-size:.42rem;letter-spacing:.22em;text-transform:uppercase;color:rgba(245,242,235,.2);white-space:nowrap}
     .hero-step.done .hero-step-label{color:rgba(201,169,110,.5)}
     .hero-step.active .hero-step-label{color:rgba(201,169,110,.85)}
-
-    /* Security line */
-    .hero-secure-line{
-      display:flex;align-items:center;justify-content:center;gap:.5rem;
-      font-family:'Jost',sans-serif;font-size:.4rem;
-      letter-spacing:.22em;text-transform:uppercase;
-      color:rgba(245,242,235,.15);margin-top:.25rem;
-    }
+    .hero-secure-line{display:flex;align-items:center;justify-content:center;gap:.5rem;font-family:'Jost',sans-serif;font-size:.4rem;letter-spacing:.22em;text-transform:uppercase;color:rgba(245,242,235,.15);margin-top:.25rem}
     .hero-secure-line svg{width:9px;height:9px;flex-shrink:0;color:rgba(201,169,110,.35)}
 
-    /* BREADCRUMB */
     .breadcrumb{max-width:1200px;margin:0 auto;padding:.75rem 2rem 0;display:flex;align-items:center;gap:6px;flex-wrap:wrap;position:relative;z-index:1}
     @media(min-width:768px){.breadcrumb{padding:.75rem 3rem 0}}
     .bc-item{font-family:'Jost',sans-serif;font-size:.46rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(245,242,235,.25);text-decoration:none;transition:color .2s}
@@ -230,17 +74,14 @@
     .bc-sep{color:rgba(245,242,235,.12);font-size:.46rem}
     .bc-current{font-family:'Jost',sans-serif;font-size:.46rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(201,169,110,.6)}
 
-    /* LAYOUT */
     .checkout-wrap{max-width:1200px;margin:0 auto;padding:2rem 2rem 5rem;display:grid;grid-template-columns:1fr 380px;gap:2.5rem;align-items:start;position:relative;z-index:1}
     @media(min-width:768px){.checkout-wrap{padding:2rem 3rem 5rem}}
     @media(max-width:960px){.checkout-wrap{grid-template-columns:1fr}}
 
-    /* SECTION LABEL */
     .section-label{font-family:'Jost',sans-serif;font-size:.4rem;letter-spacing:.3em;text-transform:uppercase;color:rgba(201,169,110,.45);margin-bottom:.9rem;display:flex;align-items:center;gap:.6rem}
     .section-label::before{content:'';width:14px;height:1px;background:rgba(201,169,110,.3);flex-shrink:0}
     .section-block{margin-bottom:2rem}
 
-    /* ADDRESS CARDS */
     .addr-grid{display:flex;flex-direction:column;gap:.65rem}
     .addr-card{background:rgba(245,242,235,.02);border:1px solid rgba(245,242,235,.07);border-radius:14px;padding:1.1rem 1.25rem;cursor:pointer;transition:border-color .25s,background .25s;position:relative;display:flex;align-items:flex-start;gap:1rem}
     .addr-card:hover{border-color:rgba(201,169,110,.18);background:rgba(201,169,110,.03)}
@@ -258,15 +99,12 @@
     .addr-btn{font-family:'Jost',sans-serif;font-size:.4rem;letter-spacing:.16em;text-transform:uppercase;color:rgba(201,169,110,.55);background:none;border:none;cursor:pointer;padding:0;transition:color .2s;text-decoration:underline;text-underline-offset:3px}
     .addr-btn:hover{color:#c9a96e}
 
-    /* NO ADDRESS */
     .no-addr{border:1px dashed rgba(245,242,235,.08);border-radius:14px;padding:2rem;text-align:center}
     .no-addr p{font-family:'Jost',sans-serif;font-size:.6rem;color:rgba(245,242,235,.2);margin-bottom:1rem}
 
-    /* ADD ADDRESS BTN */
     .btn-add-addr{display:flex;align-items:center;justify-content:center;gap:.5rem;width:100%;padding:.8rem;border:1px dashed rgba(201,169,110,.2);border-radius:10px;background:transparent;color:rgba(201,169,110,.45);font-family:'Jost',sans-serif;font-size:.46rem;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;transition:border-color .25s,color .25s,background .25s;margin-top:.65rem}
     .btn-add-addr:hover{border-color:rgba(201,169,110,.4);color:#c9a96e;background:rgba(201,169,110,.03)}
 
-    /* ITEM LIST */
     .item-list{display:flex;flex-direction:column;gap:.75rem}
     .item-card{background:rgba(245,242,235,.02);border:1px solid rgba(245,242,235,.06);border-radius:14px;padding:1rem 1.1rem;display:grid;grid-template-columns:72px 1fr auto;gap:1rem;align-items:center;position:relative;overflow:hidden;transition:border-color .25s}
     .item-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.04),transparent)}
@@ -285,14 +123,12 @@
     .item-subtotal{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:300;color:rgba(201,169,110,.85)}
     .item-tax-note{font-family:'Jost',sans-serif;font-size:.36rem;letter-spacing:.08em;color:rgba(245,242,235,.18);text-align:right}
 
-    /* PAYMENT METHOD */
     .payment-box{background:rgba(201,169,110,.04);border:1px solid rgba(201,169,110,.14);border-radius:12px;padding:1.1rem;display:flex;gap:.85rem;align-items:flex-start}
     .payment-icon{width:34px;height:34px;border-radius:8px;background:rgba(201,169,110,.08);border:1px solid rgba(201,169,110,.18);display:flex;align-items:center;justify-content:center;flex-shrink:0}
     .payment-icon svg{width:15px;height:15px;color:#c9a96e}
     .payment-title{font-family:'Jost',sans-serif;font-size:.5rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(201,169,110,.7);margin-bottom:3px}
     .payment-desc{font-family:'Jost',sans-serif;font-size:.55rem;font-weight:300;color:rgba(245,242,235,.28);line-height:1.65}
 
-    /* SUMMARY CARD */
     .summary-card{background:rgba(245,242,235,.02);border:1px solid rgba(245,242,235,.06);border-radius:16px;padding:1.5rem;position:sticky;top:84px;transition:border-color .25s}
     .summary-card:hover{border-color:rgba(201,169,110,.1)}
     .summary-title{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:300;color:#f5f2eb;margin-bottom:1.25rem;padding-bottom:.75rem;border-bottom:1px solid rgba(245,242,235,.06)}
@@ -307,7 +143,6 @@
     .summary-total-val{font-family:'Cormorant Garamond',serif;font-size:1.65rem;font-weight:300;color:#f5f2eb}
     .tax-note{font-family:'Jost',sans-serif;font-size:.42rem;color:rgba(245,242,235,.18);margin-top:.3rem;text-align:right}
 
-    /* COUPON */
     .coupon-row{display:flex;gap:6px;margin:1rem 0}
     .coupon-input{flex:1;background:rgba(245,242,235,.03);border:none;border-bottom:1px solid rgba(245,242,235,.1);font-family:'Jost',sans-serif;font-size:.62rem;color:#f5f2eb;padding:.35rem 0;outline:none;transition:border-color .2s}
     .coupon-input::placeholder{color:rgba(245,242,235,.18)}
@@ -317,7 +152,6 @@
     .coupon-msg{font-family:'Jost',sans-serif;font-size:.46rem;margin-top:.3rem;letter-spacing:.05em}
     .coupon-msg.ok{color:rgba(74,222,128,.7)}.coupon-msg.err{color:rgba(248,113,113,.7)}
 
-    /* PLACE ORDER BUTTON */
     .btn-place{display:block;width:100%;padding:.9rem;border:none;border-radius:100px;cursor:pointer;font-family:'Jost',sans-serif;font-size:.52rem;letter-spacing:.25em;text-transform:uppercase;color:#0d0b08;background:linear-gradient(135deg,#e0c47e 0%,#c9a96e 50%,#b8913d 100%);position:relative;overflow:hidden;transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .22s;box-shadow:0 1px 0 rgba(255,255,255,.35) inset,0 4px 18px rgba(185,140,55,.3),0 1px 4px rgba(0,0,0,.4);margin-top:1.25rem;text-align:center}
     .btn-place::after{content:'';position:absolute;top:0;left:-75%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);transform:skewX(-18deg);transition:left .55s ease}
     .btn-place:hover::after{left:130%}
@@ -327,11 +161,9 @@
     .btn-continue{display:block;width:100%;background:none;color:rgba(245,242,235,.3);font-family:'Jost',sans-serif;font-size:.48rem;letter-spacing:.2em;text-transform:uppercase;padding:.65rem;border:1px solid rgba(245,242,235,.07);border-radius:100px;margin-top:.65rem;cursor:pointer;transition:all .2s;text-align:center;text-decoration:none}
     .btn-continue:hover{border-color:rgba(245,242,235,.18);color:rgba(245,242,235,.6)}
 
-    /* SECURE NOTE */
     .secure-note{display:flex;align-items:center;justify-content:center;gap:.4rem;margin-top:.85rem;font-family:'Jost',sans-serif;font-size:.38rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(245,242,235,.18)}
     .secure-note svg{width:9px;height:9px;flex-shrink:0}
 
-    /* ADDRESS MODAL */
     .modal-overlay{position:fixed;inset:0;background:rgba(8,8,7,.82);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:500;display:flex;align-items:center;justify-content:center;padding:1rem;opacity:0;pointer-events:none;transition:opacity .3s}
     .modal-overlay.open{opacity:1;pointer-events:all}
     .modal-box{background:#111110;border:1px solid rgba(201,169,110,.18);border-radius:16px;padding:2rem 1.75rem;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;transform:translateY(20px);transition:transform .3s;position:relative}
@@ -346,20 +178,25 @@
     .form-row.full{grid-template-columns:1fr}
     .form-group{display:flex;flex-direction:column;gap:4px}
     .form-label{font-family:'Jost',sans-serif;font-size:.38rem;letter-spacing:.22em;text-transform:uppercase;color:rgba(201,169,110,.4)}
+    .form-error{font-family:'Jost',sans-serif;font-size:.38rem;color:rgba(248,113,113,.8);margin-top:2px;display:none}
     .vc-input{width:100%;background:rgba(245,242,235,.03);border:1px solid rgba(245,242,235,.08);padding:.65rem .85rem;font-family:'Jost',sans-serif;font-size:.72rem;font-weight:300;color:#f5f2eb;outline:none;border-radius:7px;transition:border-color .25s,background .25s,box-shadow .25s;appearance:none;-webkit-appearance:none}
     .vc-input::placeholder{color:rgba(245,242,235,.18)}
     .vc-input:focus{border-color:rgba(201,169,110,.4);background:rgba(201,169,110,.03);box-shadow:0 0 0 3px rgba(201,169,110,.06)}
-    .vc-input.error{border-color:rgba(248,113,113,.45)}
+    .vc-input.error{border-color:rgba(248,113,113,.55);box-shadow:0 0 0 3px rgba(248,113,113,.08)}
     select.vc-input{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='rgba(201,169,110,0.45)' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:2rem}
     select.vc-input option{background:#1a1a18;color:#f5f2eb}
 
-    /* TOAST */
     .toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(8px);background:#1c1c1a;border:1px solid rgba(245,242,235,.08);border-radius:100px;font-family:'Jost',sans-serif;font-size:.55rem;letter-spacing:.08em;color:rgba(245,242,235,.65);padding:.6rem 1.5rem;box-shadow:0 8px 32px rgba(0,0,0,.5);z-index:9999;opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;white-space:nowrap}
     .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
     .toast.err{border-color:rgba(248,113,113,.3);color:#f87171}
     .toast.gold{border-color:rgba(201,169,110,.3);color:#c9a96e}
 
-    /* MISC */
+    .stock-error-banner{background:rgba(248,113,113,.07);border:1px solid rgba(248,113,113,.25);border-radius:10px;padding:1rem 1.2rem;margin-bottom:1.25rem;display:none}
+    .stock-error-banner.visible{display:block}
+    .stock-error-title{font-family:'Jost',sans-serif;font-size:.46rem;letter-spacing:.18em;text-transform:uppercase;color:#f87171;margin-bottom:.4rem;display:flex;align-items:center;gap:.4rem}
+    .stock-error-title svg{width:12px;height:12px;flex-shrink:0}
+    .stock-error-msg{font-family:'Jost',sans-serif;font-size:.58rem;font-weight:300;color:rgba(248,113,113,.8);line-height:1.6}
+
     @keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
     .fade-up{animation:fadeUp .75s ease both}
     .d1{animation-delay:.1s}.d2{animation-delay:.22s}.d3{animation-delay:.38s}
@@ -367,7 +204,6 @@
     .reveal.visible{opacity:1;transform:translateY(0)}
     .rule{height:1px;background:linear-gradient(90deg,transparent,rgba(201,169,110,.18),transparent);position:relative;z-index:1}
 
-    /* FOOTER */
     .footer{background:#0a0a09;padding:4rem 2rem 1.5rem;border-top:1px solid rgba(245,242,235,.05);position:relative;z-index:1}
     @media(min-width:768px){.footer{padding:4rem 3rem 1.5rem}}
     .footer-top{display:grid;grid-template-columns:1fr;gap:2.5rem;padding-bottom:2.5rem;border-bottom:1px solid rgba(245,242,235,.05)}
@@ -390,22 +226,15 @@
 </head>
 <body>
 
-<!-- ══ NAV ══ -->
 <nav class="nav-root" id="navbar">
   <div class="nav-inner">
-
-    <!-- Left: nav links (desktop only) -->
     <div class="nav-left">
       <a href="/home"     class="nav-link">Home</a>
       <a href="/products" class="nav-link">Collection</a>
       <a href="/home"     class="nav-link">About</a>
       <a href="/home"     class="nav-link">Contact</a>
     </div>
-
-    <!-- Centre: logo -->
     <a href="/home" class="nav-logo">Velmora Chroné</a>
-
-    <!-- Right cluster -->
     <div class="nav-right">
       <a href="/cart" class="nav-icon-btn" aria-label="Cart">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -419,10 +248,7 @@
         <span></span><span></span><span></span>
       </button>
     </div>
-
   </div>
-
-  <!-- Mobile dropdown -->
   <div class="mobile-menu" id="mobileMenu">
     <a href="/home"     class="nav-link">Home</a>
     <a href="/products" class="nav-link">Collection</a>
@@ -432,31 +258,18 @@
   </div>
 </nav>
 
-<!-- ══ PAGE HERO — STEP TRAIL ══ -->
 <div class="page-hero">
   <div class="page-hero-scan"></div>
   <div class="page-hero-inner">
-
-    <!-- eyebrow -->
     <p class="page-hero-tag fade-up d1">Secure Checkout</p>
-
-    <!-- ── STEP TRAIL ── -->
     <div class="hero-steps fade-up d2">
-
-      <!-- Step 1: Cart (done) -->
       <div class="hero-step done">
         <div class="hero-step-circle">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="20 6 9 17 4 12"/>
-          </svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
         </div>
         <span class="hero-step-label">Cart</span>
       </div>
-
-      <!-- Connector -->
       <div class="hero-step-line done"></div>
-
-      <!-- Step 2: Checkout (active) -->
       <div class="hero-step active">
         <div class="hero-step-circle">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -467,11 +280,7 @@
         </div>
         <span class="hero-step-label">Checkout</span>
       </div>
-
-      <!-- Connector -->
       <div class="hero-step-line"></div>
-
-      <!-- Step 3: Confirm Order (pending) -->
       <div class="hero-step">
         <div class="hero-step-circle">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -480,21 +289,16 @@
         </div>
         <span class="hero-step-label">Confirm Order</span>
       </div>
-
-    </div><!-- /hero-steps -->
-
-    <!-- security line -->
+    </div>
     <div class="hero-secure-line fade-up d3">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
       </svg>
       Cash on Delivery · 256-bit SSL Encrypted
     </div>
-
   </div>
 </div>
 
-<!-- BREADCRUMB -->
 <div class="breadcrumb">
   <a href="/home"     class="bc-item">Home</a>
   <span class="bc-sep">·</span>
@@ -505,13 +309,10 @@
   <span class="bc-current">Checkout</span>
 </div>
 
-<!-- ══ MAIN LAYOUT ══ -->
 <div class="checkout-wrap">
 
-  <!-- ══ LEFT COLUMN ══ -->
   <div>
 
-    <!-- DELIVERY ADDRESS -->
     <div class="section-block reveal">
       <div class="section-label">Delivery Address</div>
 
@@ -563,7 +364,6 @@
       </button>
     </div>
 
-    <!-- ORDER ITEMS -->
     <div class="section-block reveal">
       <div class="section-label">Your Timepieces</div>
       <div class="item-list">
@@ -597,7 +397,6 @@
       </div>
     </div>
 
-    <!-- PAYMENT METHOD -->
     <div class="section-block reveal">
       <div class="section-label">Payment Method</div>
       <div class="payment-box">
@@ -614,12 +413,19 @@
       </div>
     </div>
 
-  </div><!-- /left col -->
+  </div>
 
-  <!-- ══ RIGHT COLUMN: SUMMARY ══ -->
   <div>
     <div class="summary-card reveal">
       <div class="summary-title">Order Summary</div>
+
+      <div class="stock-error-banner" id="stockErrorBanner">
+        <div class="stock-error-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Stock Unavailable
+        </div>
+        <div class="stock-error-msg" id="stockErrorMsg"></div>
+      </div>
 
       <div class="summary-row">
         <span class="summary-key">Subtotal (<%= items.length %> item<%= items.length !== 1 ? 's' : '' %>)</span>
@@ -654,7 +460,6 @@
         <% } %>
       </div>
 
-      <!-- Coupon field -->
       <div class="coupon-row">
         <input class="coupon-input" type="text" id="couponInput" placeholder="Promo / coupon code"/>
         <button class="coupon-apply-btn" onclick="applyCoupon()">Apply</button>
@@ -689,11 +494,10 @@
     </div>
   </div>
 
-</div><!-- /checkout-wrap -->
+</div>
 
 <div class="rule"></div>
 
-<!-- ══ FOOTER ══ -->
 <footer class="footer">
   <div style="max-width:1200px;margin:0 auto">
     <div class="footer-top">
@@ -728,7 +532,7 @@
         <p style="font-family:'Jost',sans-serif;font-size:.6rem;color:rgba(245,242,235,.2);line-height:1.75;margin-bottom:.75rem;font-weight:300">Subscribe for exclusive deals &amp; new arrivals.</p>
         <div style="display:flex;align-items:center;border-bottom:1px solid rgba(201,169,110,.2);padding-bottom:.3rem">
           <input type="email" placeholder="Enter your email address" style="flex:1;background:transparent;border:none;outline:none;font-family:'Jost',sans-serif;font-size:.63rem;color:#f5f2eb;min-width:0"/>
-          <button style="background:none;border:none;cursor:pointer;color:rgba(201,169,110,.45);transition:color .2s" onmouseover="this.style.color='#c9a96e'" onmouseout="this.style.color='rgba(201,169,110,0.45)'">
+          <button style="background:none;border:none;cursor:pointer;color:rgba(201,169,110,.45)" onmouseover="this.style.color='#c9a96e'" onmouseout="this.style.color='rgba(201,169,110,0.45)'">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
           </button>
         </div>
@@ -745,7 +549,7 @@
   </div>
 </footer>
 
-<!-- ══ ADDRESS MODAL ══ -->
+<!-- ADDRESS MODAL -->
 <div class="modal-overlay" id="addrModal" onclick="if(event.target===this)closeModal()">
   <div class="modal-box">
     <div class="modal-title-row">
@@ -761,16 +565,19 @@
       <div class="form-group">
         <label class="form-label">Full Name *</label>
         <input class="vc-input" id="mName" type="text" placeholder="Your full name"/>
+        <span class="form-error" id="err-mName">Full name is required.</span>
       </div>
       <div class="form-group">
         <label class="form-label">Phone *</label>
-        <input class="vc-input" id="mPhone" type="tel" placeholder="+91 98xxx xxxxx" maxlength="10"/>
+        <input class="vc-input" id="mPhone" type="tel" placeholder="10-digit mobile number" maxlength="10"/>
+        <span class="form-error" id="err-mPhone">Enter a valid 10-digit phone number.</span>
       </div>
     </div>
     <div class="form-row full">
       <div class="form-group">
         <label class="form-label">Address Line *</label>
         <input class="vc-input" id="mLine1" type="text" placeholder="House / Flat, Street, Area"/>
+        <span class="form-error" id="err-mLine1">Address line is required.</span>
       </div>
     </div>
     <div class="form-row full">
@@ -783,6 +590,7 @@
       <div class="form-group">
         <label class="form-label">City *</label>
         <input class="vc-input" id="mCity" type="text" placeholder="City"/>
+        <span class="form-error" id="err-mCity">City is required.</span>
       </div>
       <div class="form-group">
         <label class="form-label">State *</label>
@@ -800,12 +608,14 @@
           <option>Telangana</option><option>Tripura</option><option>Uttar Pradesh</option>
           <option>Uttarakhand</option><option>West Bengal</option>
         </select>
+        <span class="form-error" id="err-mState">Please select a state.</span>
       </div>
     </div>
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">PIN Code *</label>
         <input class="vc-input" id="mPin" type="text" placeholder="6-digit PIN" maxlength="6"/>
+        <span class="form-error" id="err-mPin">Enter a valid 6-digit PIN code.</span>
       </div>
       <div class="form-group">
         <label class="form-label">Address Type</label>
@@ -817,8 +627,6 @@
       </div>
     </div>
 
-    <div id="modalError" style="font-family:'Jost',sans-serif;font-size:.5rem;color:rgba(248,113,113,.8);margin-top:.75rem;display:none"></div>
-
     <div style="display:flex;gap:.75rem;margin-top:1.25rem">
       <button class="btn-place" style="flex:1;margin-top:0" id="modalSaveBtn" onclick="saveAddress()">Save Address</button>
       <button onclick="closeModal()" style="background:none;border:1px solid rgba(245,242,235,.1);border-radius:100px;color:rgba(245,242,235,.3);font-family:'Jost',sans-serif;font-size:.46rem;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;padding:0 1.25rem;transition:all .2s;flex-shrink:0">Cancel</button>
@@ -826,11 +634,9 @@
   </div>
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
 <script>
-  /* ── NAV ── */
   const navbar     = document.getElementById('navbar');
   const hamburger  = document.getElementById('hamburger');
   const mobileMenu = document.getElementById('mobileMenu');
@@ -844,7 +650,6 @@
     mobileMenu.classList.toggle('open');
   });
 
-  /* ── REVEAL ON SCROLL ── */
   const revealEls = document.querySelectorAll('.reveal');
   const observer  = new IntersectionObserver(entries => {
     entries.forEach((e, i) => {
@@ -856,7 +661,6 @@
   }, { threshold: 0.06 });
   revealEls.forEach(el => observer.observe(el));
 
-  /* ── TOAST ── */
   let toastTimer;
   function showToast(msg, type = '') {
     const t = document.getElementById('toast');
@@ -866,15 +670,29 @@
     toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
   }
 
-  /* ── ADDRESS SELECTION ── */
   function selectAddr(card, addrId) {
     document.querySelectorAll('.addr-card').forEach(c => c.classList.remove('selected'));
     card.classList.add('selected');
     document.getElementById('selectedAddressId').value = addrId;
   }
 
-  /* ── MODAL ── */
   let modalMode = 'add';
+
+  function clearFieldErrors() {
+    ['mName','mPhone','mLine1','mCity','mState','mPin'].forEach(id => {
+      const el = document.getElementById(id);
+      const errEl = document.getElementById('err-' + id);
+      if (el) el.classList.remove('error');
+      if (errEl) errEl.style.display = 'none';
+    });
+  }
+
+  function setFieldError(id, show) {
+    const el    = document.getElementById(id);
+    const errEl = document.getElementById('err-' + id);
+    if (el)    el.classList.toggle('error', show);
+    if (errEl) errEl.style.display = show ? 'block' : 'none';
+  }
 
   function openAddModal() {
     modalMode = 'add';
@@ -882,11 +700,10 @@
     document.getElementById('editAddressId').value = '';
     ['mName','mPhone','mLine1','mLine2','mCity','mPin'].forEach(id => {
       document.getElementById(id).value = '';
-      document.getElementById(id).classList.remove('error');
     });
     document.getElementById('mState').value = '';
     document.getElementById('mType').value  = 'Home';
-    document.getElementById('modalError').style.display = 'none';
+    clearFieldErrors();
     document.getElementById('addrModal').classList.add('open');
   }
 
@@ -905,7 +722,7 @@
     for (const opt of sel.options) {
       if (opt.value === state || opt.text === state) { sel.value = opt.value; break; }
     }
-    document.getElementById('modalError').style.display = 'none';
+    clearFieldErrors();
     document.getElementById('addrModal').classList.add('open');
   }
 
@@ -915,7 +732,12 @@
 
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
-  /* ── SAVE ADDRESS ── */
+  ['mName','mPhone','mLine1','mCity','mPin'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', () => setFieldError(id, false));
+  });
+  document.getElementById('mState').addEventListener('change', () => setFieldError('mState', false));
+
   async function saveAddress() {
     const name  = document.getElementById('mName').value.trim();
     const phone = document.getElementById('mPhone').value.trim();
@@ -925,17 +747,22 @@
     const pin   = document.getElementById('mPin').value.trim();
     const type  = document.getElementById('mType').value;
 
-    const errors = [];
-    if (!name)  errors.push('Full name is required.');
-    if (!phone || !/^\d{10}$/.test(phone)) errors.push('Enter a valid 10-digit phone number.');
-    if (!line1) errors.push('Address line is required.');
-    if (!city)  errors.push('City is required.');
-    if (!state) errors.push('Please select a state.');
-    if (!pin || !/^\d{6}$/.test(pin)) errors.push('Enter a valid 6-digit PIN code.');
+    clearFieldErrors();
 
-    const errEl = document.getElementById('modalError');
-    if (errors.length) { errEl.textContent = errors[0]; errEl.style.display = 'block'; return; }
-    errEl.style.display = 'none';
+    let hasError = false;
+
+    if (!name)                          { setFieldError('mName',  true); hasError = true; }
+    if (!phone || !/^\d{10}$/.test(phone)) { setFieldError('mPhone', true); hasError = true; }
+    if (!line1)                         { setFieldError('mLine1', true); hasError = true; }
+    if (!city)                          { setFieldError('mCity',  true); hasError = true; }
+    if (!state)                         { setFieldError('mState', true); hasError = true; }
+    if (!pin || !/^\d{6}$/.test(pin))   { setFieldError('mPin',   true); hasError = true; }
+
+    if (hasError) {
+      const firstErr = document.querySelector('.vc-input.error');
+      if (firstErr) firstErr.focus();
+      return;
+    }
 
     const payload = { fullName: name, phone, line1, city, state, pincode: pin, addressType: type };
     const btn = document.getElementById('modalSaveBtn');
@@ -950,19 +777,18 @@
       });
       const data = await res.json();
       if (!res.ok || data.success === false) {
-        errEl.textContent = data.message || 'Failed to save address.'; errEl.style.display = 'block'; return;
+        showToast(data.message || 'Failed to save address.', 'err'); return;
       }
       showToast(addrId ? 'Address updated.' : 'Address saved.', 'gold');
       closeModal();
       setTimeout(() => window.location.reload(), 600);
     } catch (_) {
-      errEl.textContent = 'Something went wrong. Please try again.'; errEl.style.display = 'block';
+      showToast('Something went wrong. Please try again.', 'err');
     } finally {
       btn.disabled = false; btn.textContent = 'Save Address';
     }
   }
 
-  /* ── COUPON ── */
   async function applyCoupon() {
     const code = document.getElementById('couponInput').value.trim().toUpperCase();
     const msg  = document.getElementById('couponMsg');
@@ -983,10 +809,23 @@
     } catch (_) { msg.textContent = 'Could not apply coupon.'; msg.className = 'coupon-msg err'; }
   }
 
-  /* ── PLACE ORDER ── */
+  function showStockError(message) {
+    const banner  = document.getElementById('stockErrorBanner');
+    const msgEl   = document.getElementById('stockErrorMsg');
+    msgEl.textContent = message;
+    banner.classList.add('visible');
+    banner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function hideStockError() {
+    document.getElementById('stockErrorBanner').classList.remove('visible');
+  }
+
   async function placeOrder() {
     const addressId = document.getElementById('selectedAddressId').value;
     if (!addressId) { showToast('Please select a delivery address.', 'err'); return; }
+
+    hideStockError();
 
     const btn = document.getElementById('placeOrderBtn');
     btn.disabled = true; btn.textContent = 'Processing…';
@@ -998,7 +837,11 @@
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
-        showToast(data.message || 'Failed to place order.', 'err');
+        if (data.stockErrors && data.stockErrors.length > 0) {
+          showStockError(data.stockErrors.join(' '));
+        } else {
+          showToast(data.message || 'Failed to place order.', 'err');
+        }
         btn.disabled = false; btn.textContent = 'Place Order · COD'; return;
       }
       window.location.href = `/checkout/success?orderId=${data.orderId}`;
@@ -1008,7 +851,6 @@
     }
   }
 
-  /* ── PREVENT BACK NAV ── */
   history.pushState(null, null, window.location.href);
   window.addEventListener('popstate', () => history.pushState(null, null, window.location.href));
 </script>

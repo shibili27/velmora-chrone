@@ -52,6 +52,7 @@ import {
   cancelOrder,
   cancelItem,
   returnOrder,
+  returnItem,
   downloadInvoice,
   streamOrderStatus,
 } from '../controller/usercontroller/orderController.js';
@@ -136,12 +137,14 @@ router.post('/checkout/apply-coupon', isAuth, applyCoupon);
 
 
 router.get('/orders', isAuth, noCache, getOrders);
-router.get('/orders/:id/status-stream', isAuth, streamOrderStatus);
-router.get('/orders/:id/invoice', isAuth, downloadInvoice);
-router.get('/orders/:id', isAuth, getOrderDetail);
-router.post('/orders/:id/cancel', isAuth, cancelOrder);
-router.post('/orders/:id/cancel-item', isAuth, cancelItem);
-router.post('/orders/:id/return', isAuth, returnOrder);
+// orderNumber-based routes — specific sub-paths first, then the detail catch-all
+router.get('/orders/:orderNumber/status-stream', isAuth, streamOrderStatus);
+router.get('/orders/:orderNumber/invoice',       isAuth, downloadInvoice);
+router.post('/orders/:orderNumber/cancel',       isAuth, cancelOrder);
+router.post('/orders/:orderNumber/cancel-item',  isAuth, cancelItem);
+router.post('/orders/:orderNumber/return',       isAuth, returnOrder);
+router.post('/orders/:orderNumber/return-item',  isAuth, returnItem);
+router.get('/orders/:orderNumber',               isAuth, getOrderDetail);
 
 
 router.get('/wishlist', isAuth, getWishlist);

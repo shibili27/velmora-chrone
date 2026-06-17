@@ -6,12 +6,13 @@ const LIMIT = 15;
 export const listOrders = async (req, res) => {
   try {
     const {
-      page   = 1,
-      search = '',
-      status = 'all',
-      sort   = 'date_desc',
+      page         = 1,
+      search       = '',
+      status       = 'all',
+      sort         = 'date_desc',
       from,
       to,
+      returnFilter = '',
     } = req.query;
 
     const currentPage = Math.max(1, parseInt(page));
@@ -20,6 +21,10 @@ export const listOrders = async (req, res) => {
 
     if (status && status !== 'all' && validStatuses.includes(status)) {
       query.orderStatus = status;
+    }
+
+    if (returnFilter && ['pending', 'accepted', 'rejected'].includes(returnFilter)) {
+      query.returnStatus = returnFilter;
     }
 
     if (from || to) {
@@ -95,22 +100,25 @@ export const listOrders = async (req, res) => {
       counts.all  += count;
     });
 
+    counts.returnPending = await Order.countDocuments({ returnStatus: 'pending' });
+
     const totalPages = Math.ceil(totalOrders / LIMIT);
 
     res.render('admin/orders', {
-      adminName     : req.session.adminName || 'Admin',
-      adminRole     : req.session.adminRole || 'Administrator',
+      adminName          : req.session.adminName || 'Admin',
+      adminRole          : req.session.adminRole || 'Administrator',
       orders,
       totalOrders,
       counts,
       currentPage,
       totalPages,
-      limit         : LIMIT,
-      currentStatus : status,
-      currentSearch : search,
-      currentSort   : sort,
-      currentFrom   : from || '',
-      currentTo     : to   || '',
+      limit              : LIMIT,
+      currentStatus      : status,
+      currentSearch      : search,
+      currentSort        : sort,
+      currentFrom        : from || '',
+      currentTo          : to   || '',
+      currentReturnFilter: returnFilter,
     });
   } catch (err) {
     console.error('listOrders error:', err);
@@ -221,7 +229,6 @@ export const handleReturnRequest = async (req, res) => {
   }
 };
 
-// ── Polling fallback: returns orders placed in the last 60 seconds ─────────
 export const getRecentOrders = async (req, res) => {
   try {
     const since  = new Date(Date.now() - 60 * 1000);

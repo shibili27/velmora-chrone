@@ -35,7 +35,6 @@
     html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--bg); color: var(--text); }
     .layout { display: flex; min-height: 100vh; }
 
-    /* ── Sidebar ── */
     .sidebar { width: var(--sidebar-w); background: var(--white); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; }
     .sidebar__brand { padding: 24px 20px 18px; border-bottom: 1px solid var(--border); }
     .sidebar__brand-name { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 600; letter-spacing: 0.06em; color: var(--text); line-height: 1.2; }
@@ -54,7 +53,6 @@
     .btn-logout:hover { background: var(--red); color: #fff; border-color: var(--red); }
     .btn-logout svg { width: 14px; height: 14px; }
 
-    /* ── Main ── */
     .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
     .topbar { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 32px; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
     .topbar__title { font-size: 13px; font-weight: 500; color: var(--text-mid); letter-spacing: 0.04em; }
@@ -62,7 +60,6 @@
     .topbar__date  { font-size: 11px; color: var(--text-light); letter-spacing: 0.04em; }
     .content { padding: 32px; flex: 1; }
 
-    /* ── Notification bell ── */
     .notif-wrap { position: relative; }
     .notif-bell { position: relative; background: none; border: 1px solid var(--border); border-radius: 6px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-mid); transition: background 0.15s, color 0.15s; }
     .notif-bell:hover { background: var(--teal-light); color: var(--teal); border-color: var(--teal); }
@@ -101,32 +98,33 @@
     .notif-footer { padding: 10px 16px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
     .notif-footer-count { font-size: 10px; color: var(--text-light); }
 
-    /* ── Live indicator ── */
     .live-dot { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 600; color: var(--green); letter-spacing: 0.06em; }
     .live-dot__pulse { width: 7px; height: 7px; border-radius: 50%; background: var(--green); animation: livePulse 1.8s ease-in-out infinite; }
     @keyframes livePulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.4; transform:scale(0.65); } }
 
-    /* ── Page header ── */
     .page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px; }
     .page-header__title { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 600; color: var(--text); }
     .page-header__sub   { font-size: 12px; color: var(--text-light); margin-top: 3px; }
 
-    /* ── Flash ── */
     .flash { padding: 11px 16px; border-radius: 6px; font-size: 12.5px; font-weight: 500; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
     .flash--success { background: var(--green-bg); color: var(--green); border: 1px solid #bbf7d0; }
     .flash--error   { background: var(--red-bg);   color: var(--red);   border: 1px solid #fecaca; }
 
-    /* ── Stat strip ── */
-    .stat-strip { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 24px; }
-    .stat-pill { background: var(--white); border: 1px solid var(--border); border-radius: 6px; padding: 14px 18px; display: flex; flex-direction: column; gap: 4px; cursor: pointer; transition: box-shadow 0.15s, border-color 0.15s; text-decoration: none; }
+    /* Stat strip — 7 pills now */
+    .stat-strip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin-bottom: 24px; }
+    .stat-pill { background: var(--white); border: 1px solid var(--border); border-radius: 6px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; cursor: pointer; transition: box-shadow 0.15s, border-color 0.15s; text-decoration: none; }
     .stat-pill:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.06); border-color: var(--teal); }
     .stat-pill.active { border-color: var(--teal); background: var(--teal-light); }
-    .stat-pill__label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); }
-    .stat-pill__val   { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; color: var(--text); }
+    .stat-pill__label { font-size: 9px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); }
+    .stat-pill__val   { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 600; color: var(--text); }
     .stat-pill.active .stat-pill__label { color: var(--teal-dark); }
     .stat-pill.active .stat-pill__val   { color: var(--teal); }
+    /* Return-pending pill special colour */
+    .stat-pill--amber.active { border-color: var(--amber); background: var(--amber-bg); }
+    .stat-pill--amber.active .stat-pill__label { color: #92400e; }
+    .stat-pill--amber.active .stat-pill__val   { color: var(--amber); }
+    .stat-pill--amber:hover { border-color: var(--amber); }
 
-    /* ── Toolbar ── */
     .toolbar { background: var(--white); border: 1px solid var(--border); border-radius: 6px; padding: 16px 20px; margin-bottom: 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
     .search-wrap { position: relative; flex: 1; min-width: 200px; }
     .search-wrap svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: var(--text-light); pointer-events: none; }
@@ -143,7 +141,6 @@
     .btn--outline:hover { background: var(--bg); color: var(--text); }
     .btn svg { width: 13px; height: 13px; }
 
-    /* ── Table ── */
     .section-card { background: var(--white); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
     .section-card__header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
     .section-card__title  { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text); }
@@ -159,7 +156,10 @@
     @keyframes rowFlash { 0% { background:#e8f4f3; } 60% { background:#e8f4f3; } 100% { background:transparent; } }
     .empty-row td { text-align: center; padding: 48px; color: var(--text-light); font-size: 13px; }
 
-    /* ── Status select ── */
+    /* Return pending row highlight */
+    tbody tr.return-pending { background: #fffbeb; }
+    tbody tr.return-pending:hover { background: #fef9ec; }
+
     .status-select { font-family: 'Jost', sans-serif; font-size: 11px; font-weight: 600; padding: 4px 8px; border-radius: 20px; border: none; cursor: pointer; outline: none; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%235a6461' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 6px center; padding-right: 22px; }
     .status-select.s-confirmed  { color: var(--teal);   background-color: var(--teal-light); }
     .status-select.s-processing { color: var(--blue);   background-color: var(--blue-bg); }
@@ -169,13 +169,15 @@
     .status-select.s-returned   { color: var(--amber);  background-color: var(--amber-bg); }
     .status-select:disabled { opacity: 1; cursor: not-allowed; }
 
-    /* ── User cell ── */
+    /* Return badge inline */
+    .return-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 9px; font-weight: 600; padding: 2px 7px; border-radius: 10px; background: var(--amber-bg); color: var(--amber); border: 1px solid #fcd34d; white-space: nowrap; margin-left: 4px; }
+    .return-badge__dot { width: 5px; height: 5px; border-radius: 50%; background: var(--amber); animation: livePulse 1.6s ease-in-out infinite; }
+
     .user-cell   { display: flex; align-items: center; gap: 9px; }
     .user-avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--teal); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 11px; font-weight: 600; flex-shrink: 0; }
     .user-name   { font-size: 12.5px; font-weight: 500; color: var(--text); white-space: nowrap; }
     .user-email  { font-size: 10px; color: var(--text-light); margin-top: 1px; }
 
-    /* ── Pagination ── */
     .pagination { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-top: 1px solid var(--border); }
     .pagination__info  { font-size: 11px; color: var(--text-light); }
     .pagination__pages { display: flex; align-items: center; gap: 4px; }
@@ -185,10 +187,8 @@
     .page-btn:disabled, .page-btn.disabled { opacity: 0.4; cursor: default; pointer-events: none; }
     .page-btn svg { width: 12px; height: 12px; }
 
-    /* ── Footer ── */
     .page-footer { text-align: center; padding: 20px 32px; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); border-top: 1px solid var(--border); }
 
-    /* ── Toast ── */
     .toast { position: fixed; bottom: 24px; right: 24px; background: var(--text); color: #fff; padding: 12px 18px; border-radius: 6px; font-size: 12.5px; font-weight: 500; z-index: 9999; transform: translateY(80px); opacity: 0; transition: transform 0.25s, opacity 0.25s; pointer-events: none; max-width: 320px; }
     .toast.show    { transform: translateY(0); opacity: 1; }
     .toast.success { background: var(--green); }
@@ -198,7 +198,6 @@
 <body>
 <div class="layout">
 
-  <!-- ── Sidebar ── -->
   <aside class="sidebar">
     <div class="sidebar__brand">
       <div class="sidebar__brand-name">Velmora<br>Chroné</div>
@@ -262,7 +261,6 @@
     </div>
   </aside>
 
-  <!-- ── Main ── -->
   <div class="main">
     <header class="topbar">
       <span class="topbar__title">Order Management</span>
@@ -319,13 +317,13 @@
       <% } %>
 
       <div class="page-header">
-        <div class="page-header__left">
+        <div>
           <div class="page-header__title">Orders</div>
           <div class="page-header__sub">Manage and track all customer orders</div>
         </div>
       </div>
 
-      <!-- ── Stat Strip — clicking these navigates with status filter ── -->
+      <!-- Stat Strip — 7 pills including Return Pending -->
       <div class="stat-strip">
         <a href="/admin/orders?status=all&page=1" class="stat-pill <%= (currentStatus === 'all' || !currentStatus) ? 'active' : '' %>">
           <div class="stat-pill__label">All Orders</div>
@@ -347,9 +345,17 @@
           <div class="stat-pill__label">Delivered</div>
           <div class="stat-pill__val"><%= counts.delivered || 0 %></div>
         </a>
+        <a href="/admin/orders?status=cancelled&page=1" class="stat-pill <%= currentStatus === 'cancelled' ? 'active' : '' %>">
+          <div class="stat-pill__label">Cancelled</div>
+          <div class="stat-pill__val"><%= counts.cancelled || 0 %></div>
+        </a>
+        <!-- Return Pending pill — amber theme -->
+        <a href="/admin/orders?returnFilter=pending&page=1" class="stat-pill stat-pill--amber <%= currentReturnFilter === 'pending' ? 'active' : '' %>">
+          <div class="stat-pill__label">Return Req.</div>
+          <div class="stat-pill__val"><%= counts.returnPending || 0 %></div>
+        </a>
       </div>
 
-      <!-- ── FIXED: removed duplicate hidden status input ── -->
       <form method="GET" action="/admin/orders" id="filterForm">
         <input type="hidden" name="page" value="1"/>
         <div class="toolbar">
@@ -365,6 +371,13 @@
             <option value="delivered"  <%= currentStatus === 'delivered'  ? 'selected' : '' %>>Delivered</option>
             <option value="cancelled"  <%= currentStatus === 'cancelled'  ? 'selected' : '' %>>Cancelled</option>
             <option value="returned"   <%= currentStatus === 'returned'   ? 'selected' : '' %>>Returned</option>
+          </select>
+          <!-- Return status filter -->
+          <select name="returnFilter" class="filter-select" onchange="document.getElementById('filterForm').submit()">
+            <option value=""        <%= !currentReturnFilter ? 'selected' : '' %>>All Returns</option>
+            <option value="pending" <%= currentReturnFilter === 'pending'  ? 'selected' : '' %>>Return Pending</option>
+            <option value="accepted"<%= currentReturnFilter === 'accepted' ? 'selected' : '' %>>Return Accepted</option>
+            <option value="rejected"<%= currentReturnFilter === 'rejected' ? 'selected' : '' %>>Return Rejected</option>
           </select>
           <select name="sort" class="filter-select" onchange="document.getElementById('filterForm').submit()">
             <option value="date_desc"   <%= currentSort === 'date_desc'   ? 'selected' : '' %>>Newest First</option>
@@ -408,13 +421,26 @@
               <% if (orders && orders.length > 0) { %>
                 <% orders.forEach(function(order) { %>
                 <%
-                  const isTerminal = ['cancelled','returned','delivered'].includes(order.orderStatus);
+                  const isTerminal    = ['cancelled','returned','delivered'].includes(order.orderStatus);
+                  const hasReturnPend = order.returnStatus === 'pending';
                 %>
-                <tr data-order-id="<%= order._id %>">
+                <tr data-order-id="<%= order._id %>" class="<%= hasReturnPend ? 'return-pending' : '' %>">
                   <td>
-                    <span style="font-family:'Cormorant Garamond',serif;font-size:13px;font-weight:600;color:var(--teal)">
-                      <%= order.orderNumber || '#' + order._id.toString().slice(-6).toUpperCase() %>
-                    </span>
+                    <div style="display:flex;flex-direction:column;gap:3px">
+                      <span style="font-family:'Cormorant Garamond',serif;font-size:13px;font-weight:600;color:var(--teal)">
+                        <%= order.orderNumber || '#' + order._id.toString().slice(-6).toUpperCase() %>
+                      </span>
+                      <% if (hasReturnPend) { %>
+                        <span class="return-badge">
+                          <span class="return-badge__dot"></span>
+                          Return Requested
+                        </span>
+                      <% } else if (order.returnStatus === 'accepted') { %>
+                        <span style="font-size:9px;color:var(--green);font-weight:600">Return Accepted</span>
+                      <% } else if (order.returnStatus === 'rejected') { %>
+                        <span style="font-size:9px;color:var(--red);font-weight:600">Return Rejected</span>
+                      <% } %>
+                    </div>
                   </td>
                   <td style="color:var(--text-mid);font-size:12px;white-space:nowrap">
                     <%= new Date(order.createdAt).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' }) %>
@@ -488,18 +514,19 @@
             Showing <%= (currentPage - 1) * limit + 1 %>–<%= Math.min(currentPage * limit, totalOrders) %> of <%= totalOrders %> orders
           </div>
           <div class="pagination__pages">
+            <% const qBase = `status=${currentStatus||'all'}&search=${currentSearch||''}&sort=${currentSort||'date_desc'}&from=${currentFrom||''}&to=${currentTo||''}&returnFilter=${currentReturnFilter||''}`; %>
             <% if (currentPage > 1) { %>
-              <a href="/admin/orders?page=<%= currentPage-1 %>&status=<%= currentStatus||'all' %>&search=<%= currentSearch||'' %>&sort=<%= currentSort||'date_desc' %>&from=<%= currentFrom||'' %>&to=<%= currentTo||'' %>" class="page-btn">
+              <a href="/admin/orders?page=<%= currentPage-1 %>&<%= qBase %>" class="page-btn">
                 <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
               </a>
             <% } else { %>
               <span class="page-btn disabled"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg></span>
             <% } %>
             <% for (let p = Math.max(1, currentPage-2); p <= Math.min(totalPages, currentPage+2); p++) { %>
-              <a href="/admin/orders?page=<%= p %>&status=<%= currentStatus||'all' %>&search=<%= currentSearch||'' %>&sort=<%= currentSort||'date_desc' %>&from=<%= currentFrom||'' %>&to=<%= currentTo||'' %>" class="page-btn <%= p === currentPage ? 'active' : '' %>"><%= p %></a>
+              <a href="/admin/orders?page=<%= p %>&<%= qBase %>" class="page-btn <%= p === currentPage ? 'active' : '' %>"><%= p %></a>
             <% } %>
             <% if (currentPage < totalPages) { %>
-              <a href="/admin/orders?page=<%= currentPage+1 %>&status=<%= currentStatus||'all' %>&search=<%= currentSearch||'' %>&sort=<%= currentSort||'date_desc' %>&from=<%= currentFrom||'' %>&to=<%= currentTo||'' %>" class="page-btn">
+              <a href="/admin/orders?page=<%= currentPage+1 %>&<%= qBase %>" class="page-btn">
                 <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
               </a>
             <% } else { %>
@@ -519,13 +546,11 @@
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
-  // ── Topbar date ──────────────────────────────────────────────────────────
   (function () {
     const el = document.getElementById('topbarDate');
     if (el) el.textContent = new Date().toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
   })();
 
-  // ── Status progression constants ─────────────────────────────────────────
   const STATUS_ORDER = ['confirmed', 'processing', 'dispatched', 'delivered'];
   const TERMINAL     = ['cancelled', 'returned', 'delivered'];
 
@@ -536,7 +561,6 @@
     return STATUS_ORDER.slice(idx + 1);
   }
 
-  // Lock invalid options on page load
   document.querySelectorAll('.status-select:not([disabled])').forEach(sel => {
     const current = sel.dataset.currentStatus || sel.value;
     sel.dataset.currentStatus = current;
@@ -548,10 +572,8 @@
     });
   });
 
-  // ── Status colour helper ─────────────────────────────────────────────────
   function refreshSelectColor(sel) { sel.className = 'status-select s-' + sel.value; }
 
-  // ── Inline status update ─────────────────────────────────────────────────
   async function updateStatus(sel) {
     const orderId   = sel.dataset.orderId;
     const newStatus = sel.value;
@@ -600,7 +622,6 @@
     }
   }
 
-  // ── Notification sound ───────────────────────────────────────────────────
   function playNotifSound() {
     try {
       const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -620,7 +641,6 @@
     } catch (_) {}
   }
 
-  // ── Toast ────────────────────────────────────────────────────────────────
   function showToast(msg, type = 'success') {
     const t = document.getElementById('toast');
     t.textContent = msg;
@@ -628,7 +648,6 @@
     setTimeout(() => { t.className = 'toast'; }, 3500);
   }
 
-  // ── localStorage helpers ─────────────────────────────────────────────────
   const STORAGE_KEY = 'vc_admin_notifs';
   const SEEN_KEY    = 'vc_seen_order_ids';
 
@@ -642,13 +661,9 @@
     try { return new Set(JSON.parse(localStorage.getItem(SEEN_KEY) || '[]')); } catch { return new Set(); }
   }
   function saveSeenIds(set) {
-    try {
-      const arr = [...set].slice(-500);
-      localStorage.setItem(SEEN_KEY, JSON.stringify(arr));
-    } catch (_) {}
+    try { localStorage.setItem(SEEN_KEY, JSON.stringify([...set].slice(-500))); } catch (_) {}
   }
 
-  // ── Notification state ───────────────────────────────────────────────────
   let notifications = loadNotifications();
   let seenIds       = loadSeenIds();
   let currentTab    = 'all';
@@ -666,12 +681,10 @@
     badge.textContent   = count > 9 ? '9+' : count;
     badge.style.display = count > 0 ? 'flex' : 'none';
   }
-
   function updateFooter() {
     document.getElementById('notifFooterCount').textContent =
       `${notifications.length} total · ${unreadCount()} unread`;
   }
-
   function timeAgo(date) {
     const s = Math.floor((Date.now() - new Date(date)) / 1000);
     if (s < 60)   return 'just now';
@@ -754,7 +767,6 @@
       document.getElementById('notifDropdown').classList.remove('open');
   });
 
-  // ── Add notification + inject live row ───────────────────────────────────
   function addNotification(order) {
     const id = String(order._id);
     if (seenIds.has(id)) return;
@@ -788,10 +800,8 @@
   function injectOrderRow(order) {
     const tbody = document.getElementById('ordersTableBody');
     if (!tbody) return;
-
     const emptyRow = document.getElementById('emptyRow');
     if (emptyRow) emptyRow.remove();
-
     if (tbody.querySelector(`tr[data-order-id="${order._id}"]`)) return;
 
     const id     = String(order._id);
@@ -807,9 +817,7 @@
     tr.dataset.orderId = id;
     tr.classList.add('new-order-flash');
     tr.innerHTML = `
-      <td>
-        <span style="font-family:'Cormorant Garamond',serif;font-size:13px;font-weight:600;color:var(--teal)">${num}</span>
-      </td>
+      <td><span style="font-family:'Cormorant Garamond',serif;font-size:13px;font-weight:600;color:var(--teal)">${num}</span></td>
       <td style="color:var(--text-mid);font-size:12px;white-space:nowrap">
         ${date.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})}
         <div style="font-size:10px;color:var(--text-light)">${date.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}</div>
@@ -817,22 +825,14 @@
       <td>
         <div class="user-cell">
           <div class="user-avatar">${name.charAt(0).toUpperCase()}</div>
-          <div>
-            <div class="user-name">${name}</div>
-            <div class="user-email">${email}</div>
-          </div>
+          <div><div class="user-name">${name}</div><div class="user-email">${email}</div></div>
         </div>
       </td>
       <td style="color:var(--text-mid);font-size:12px">${items} item${items !== 1 ? 's' : ''}</td>
       <td style="font-weight:600">₹${Number(total).toLocaleString('en-IN')}</td>
+      <td><span style="font-size:11px;background:var(--bg);padding:3px 8px;border-radius:4px;color:var(--text-mid);font-weight:500">${method}</span></td>
       <td>
-        <span style="font-size:11px;background:var(--bg);padding:3px 8px;border-radius:4px;color:var(--text-mid);font-weight:500">${method}</span>
-      </td>
-      <td>
-        <select class="status-select s-confirmed"
-          data-order-id="${id}"
-          data-current-status="confirmed"
-          onchange="updateStatus(this)">
+        <select class="status-select s-confirmed" data-order-id="${id}" data-current-status="confirmed" onchange="updateStatus(this)">
           <option value="confirmed" selected>Confirmed</option>
           <option value="processing">Processing</option>
           <option value="dispatched">Dispatched</option>
@@ -853,7 +853,6 @@
   const socket = io();
   socket.emit('join-admin');
   socket.on('new-order', (order) => addNotification(order));
-
   socket.on('disconnect', () => {
     const dot = document.getElementById('liveDot');
     if (dot) dot.style.color = 'var(--text-light)';
@@ -873,7 +872,6 @@
   }
   pollRecent();
   setInterval(pollRecent, 30_000);
-
 
   updateBadge();
   updateFooter();

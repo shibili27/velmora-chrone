@@ -107,12 +107,10 @@
     .order-card:nth-child(6) { animation-delay: 0.35s; }
     @keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* Card Head */
     .card-head { display: flex; align-items: center; justify-content: space-between; padding: 18px 24px 14px; border-bottom: 1px solid rgba(245,242,235,0.05); gap: 14px; flex-wrap: wrap; }
     .order-num { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; font-weight: 400; letter-spacing: 0.06em; color: #f5f2eb; margin-bottom: 3px; }
     .order-date { font-family: 'Jost', sans-serif; font-size: 0.5rem; color: rgba(245,242,235,0.25); letter-spacing: 0.07em; }
 
-    /* Badges */
     .badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 13px; font-family: 'Jost', sans-serif; font-size: 0.4rem; letter-spacing: 0.16em; text-transform: uppercase; font-weight: 400; border-radius: 100px; white-space: nowrap; transition: background 0.4s, color 0.4s, border-color 0.4s; }
     .badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
     .badge-confirmed  { background: rgba(96,165,250,0.08);  color: #60a5fa; border: 1px solid rgba(96,165,250,0.2);  }
@@ -122,11 +120,9 @@
     .badge-cancelled  { background: rgba(248,113,113,0.08); color: #f87171; border: 1px solid rgba(248,113,113,0.2); }
     .badge-returned   { background: rgba(136,136,128,0.08); color: rgba(245,242,235,0.3); border: 1px solid rgba(245,242,235,0.07); }
 
-    /* Live dot on badge */
     .badge-live-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; flex-shrink: 0; animation: livePulse 1.8s ease-in-out infinite; }
     @keyframes livePulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.35; transform: scale(0.65); } }
 
-    /* Card Items */
     .card-items { padding: 10px 24px; }
     .item-row { display: flex; align-items: center; gap: 14px; padding: 10px 0; border-bottom: 1px solid rgba(245,242,235,0.04); }
     .item-row:last-child { border-bottom: none; }
@@ -140,7 +136,6 @@
     .item-price { font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; color: rgba(201,169,110,0.75); white-space: nowrap; flex-shrink: 0; }
     .more-items { font-family: 'Jost', sans-serif; font-size: 0.42rem; color: rgba(245,242,235,0.15); letter-spacing: 0.12em; text-transform: uppercase; text-align: center; padding: 7px 0 2px; }
 
-    /* Card Footer */
     .card-foot { display: flex; align-items: center; justify-content: space-between; padding: 13px 24px; border-top: 1px solid rgba(245,242,235,0.05); gap: 14px; flex-wrap: wrap; }
     .order-total-label { font-family: 'Jost', sans-serif; font-size: 0.4rem; color: rgba(245,242,235,0.18); letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 3px; }
     .order-total-amt { font-family: 'Cormorant Garamond', serif; font-size: 1.45rem; color: #f5f2eb; letter-spacing: 0.04em; }
@@ -155,7 +150,6 @@
     .btn-invoice { display: inline-flex; align-items: center; gap: 6px; padding: 0.6rem 1.2rem; border: 1px solid rgba(201,169,110,0.25); border-radius: 100px; background: rgba(201,169,110,0.04); color: rgba(201,169,110,0.6); font-family: 'Jost', sans-serif; font-size: 0.42rem; letter-spacing: 0.16em; text-transform: uppercase; cursor: pointer; transition: all 0.22s; white-space: nowrap; text-decoration: none; }
     .btn-invoice:hover { border-color: rgba(201,169,110,0.55); color: #c9a96e; background: rgba(201,169,110,0.08); transform: translateY(-1px); }
 
-    /* ═══ TOAST ═══ */
     .status-toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(120%); z-index: 500; background: #1a1916; border: 1px solid rgba(201,169,110,0.3); border-radius: 12px; padding: 0.85rem 1.5rem; display: flex; align-items: center; gap: 0.75rem; box-shadow: 0 8px 32px rgba(0,0,0,0.5); transition: transform 0.5s cubic-bezier(.34,1.56,.64,1), opacity 0.4s; opacity: 0; min-width: 280px; max-width: 90vw; }
     .status-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
     .toast-icon { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(201,169,110,0.12); flex-shrink: 0; }
@@ -164,14 +158,12 @@
     .toast-title { font-family: 'Jost', sans-serif; font-size: 0.55rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #f5f2eb; margin-bottom: 0.2rem; }
     .toast-sub { font-family: 'Jost', sans-serif; font-size: 0.48rem; color: rgba(245,242,235,0.35); letter-spacing: 0.04em; }
 
-    /* ═══ PAGINATION ═══ */
     .pagination { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 3.5rem; padding-top: 2rem; border-top: 1px solid rgba(245,242,235,0.05); }
     .page-btn { display: inline-flex; align-items: center; justify-content: center; min-width: 36px; height: 36px; padding: 0 6px; border: 1px solid rgba(245,242,235,0.08); border-radius: 8px; font-family: 'Jost', sans-serif; font-size: 0.55rem; font-weight: 300; color: rgba(245,242,235,0.35); text-decoration: none; transition: all 0.2s; background: rgba(245,242,235,0.02); }
     .page-btn:hover { border-color: rgba(201,169,110,0.35); color: #c9a96e; background: rgba(201,169,110,0.04); }
     .page-btn.active { background: linear-gradient(135deg, #c9a96e, #b8913d); border-color: #c9a96e; color: #0d0b08; font-weight: 500; }
     .page-btn.disabled { opacity: 0.2; pointer-events: none; }
 
-    /* ═══ EMPTY / NO RESULTS ═══ */
     .empty-state { padding: 5rem 2rem; text-align: center; }
     .empty-state h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 300; color: rgba(245,242,235,0.2); margin-bottom: 10px; }
     .empty-state p { font-family: 'Jost', sans-serif; font-size: 0.58rem; letter-spacing: 0.1em; color: rgba(245,242,235,0.15); margin-bottom: 2rem; line-height: 1.8; }
@@ -181,7 +173,6 @@
     .no-results p { font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; font-weight: 300; color: rgba(245,242,235,0.18); margin-bottom: 6px; }
     .no-results span { font-family: 'Jost', sans-serif; font-size: 0.5rem; color: rgba(245,242,235,0.1); letter-spacing: 0.08em; }
 
-    /* ═══ FOOTER ═══ */
     .footer { background: #0a0a09; padding: 4rem 2rem 1.5rem; border-top: 1px solid rgba(245,242,235,0.05); position: relative; z-index: 1; }
     @media(min-width:768px) { .footer { padding: 4rem 3rem 1.5rem; } }
     .footer-top { display: grid; grid-template-columns: 1fr; gap: 2.5rem; padding-bottom: 2.5rem; border-bottom: 1px solid rgba(245,242,235,0.05); max-width: 1200px; margin: 0 auto; }
@@ -201,7 +192,6 @@
     .footer-legal a { font-family: 'Jost', sans-serif; font-size: 0.44rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(245,242,235,0.18); text-decoration: none; transition: color 0.2s; }
     .footer-legal a:hover { color: rgba(245,242,235,0.5); }
 
-    /* ═══ UTIL ═══ */
     .rule { height: 1px; background: linear-gradient(90deg, transparent, rgba(201,169,110,0.18), transparent); }
     .fade-up { animation: fadeUp .75s ease both; }
     .d1 { animation-delay: .1s; } .d2 { animation-delay: .22s; } .d3 { animation-delay: .35s; }
@@ -220,7 +210,6 @@
 </head>
 <body>
 
-<!-- ══ NAV ══ -->
 <nav class="nav-root" id="navbar">
   <div class="nav-inner">
     <div class="hidden md:flex items-center gap-8">
@@ -251,7 +240,6 @@
   </div>
 </nav>
 
-<!-- ══ HERO ══ -->
 <div class="page-hero">
   <div class="hero-scan"></div>
   <div class="page-hero-inner">
@@ -267,12 +255,10 @@
   </div>
 </div>
 
-<!-- ══ MAIN ══ -->
 <div class="orders-wrap">
 
   <% if (total > 0 || search) { %>
 
-  <!-- Toolbar -->
   <div class="toolbar reveal">
     <span class="orders-count"><strong><%= total %></strong> order<%= total !== 1 ? 's' : '' %> found</span>
     <form class="search-form" action="/orders" method="GET">
@@ -289,7 +275,6 @@
     </form>
   </div>
 
-  <!-- Filter tabs -->
   <% if (!search && orders.length > 0) { %>
   <div class="filter-row reveal" id="filterRow">
     <button class="f-tab active" data-filter="all">All</button>
@@ -304,29 +289,25 @@
 
   <% if (orders.length > 0) { %>
 
-  <!-- Cards -->
   <div id="cardsContainer">
   <% orders.forEach(function(order) { %>
     <%
-      const statusVal = order.orderStatus;
+      const statusVal  = order.orderStatus;
       const isTerminal = statusVal === 'delivered' || statusVal === 'cancelled' || statusVal === 'returned';
     %>
-    <div class="order-card" data-status="<%= statusVal %>" data-order-id="<%= order._id %>">
+    <div class="order-card" data-status="<%= statusVal %>" data-order-num="<%= order.orderNumber %>">
 
-      <!-- Head -->
       <div class="card-head">
         <div>
           <div class="order-num"><%= order.orderNumber %></div>
           <div class="order-date">Placed on <%= new Date(order.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' }) %></div>
         </div>
-        <!-- Badge — the live-dot class replaces the static ::before dot -->
-        <span class="badge badge-<%= statusVal %>" id="badge-<%= order._id %>">
-          <span class="badge-live-dot <%= isTerminal ? '' : '' %>"></span>
-          <span id="badge-text-<%= order._id %>"><%= statusVal.charAt(0).toUpperCase() + statusVal.slice(1) %></span>
+        <span class="badge badge-<%= statusVal %>" id="badge-<%= order.orderNumber %>">
+          <span class="badge-live-dot"></span>
+          <span id="badge-text-<%= order.orderNumber %>"><%= statusVal.charAt(0).toUpperCase() + statusVal.slice(1) %></span>
         </span>
       </div>
 
-      <!-- Items -->
       <div class="card-items">
         <% order.items.slice(0, 2).forEach(function(item) { %>
           <div class="item-row">
@@ -349,20 +330,19 @@
         <% } %>
       </div>
 
-      <!-- Footer -->
       <div class="card-foot">
         <div>
           <div class="order-total-label">Order Total</div>
           <div class="order-total-amt">₹<%= order.pricing.grandTotal.toLocaleString('en-IN') %></div>
         </div>
-        <div class="card-actions" id="actions-<%= order._id %>">
+        <div class="card-actions" id="actions-<%= order.orderNumber %>">
           <% if (order.orderStatus === 'delivered') { %>
-            <a href="/orders/<%= order._id %>/invoice" class="btn-invoice">
+            <a href="/orders/<%= order.orderNumber %>/invoice" class="btn-invoice">
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
               Invoice
             </a>
           <% } %>
-          <a href="/orders/<%= order._id %>" class="btn-view">View Details</a>
+          <a href="/orders/<%= order.orderNumber %>" class="btn-view">View Details</a>
         </div>
       </div>
 
@@ -370,7 +350,6 @@
   <% }); %>
   </div>
 
-  <!-- Pagination -->
   <% if (totalPages > 1) { %>
   <div class="pagination reveal">
     <a href="/orders?search=<%= encodeURIComponent(search) %>&page=<%= page - 1 %>" class="page-btn <%= page <= 1 ? 'disabled' : '' %>">
@@ -397,7 +376,6 @@
   <% } %>
 
   <% } else { %>
-  <!-- Empty State -->
   <div class="empty-state reveal">
     <svg width="52" height="52" fill="none" stroke="rgba(201,169,110,0.1)" stroke-width="0.6" viewBox="0 0 24 24" style="margin:0 auto 1.5rem;display:block"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
     <h3>No Orders Yet</h3>
@@ -408,7 +386,6 @@
 
 </div>
 
-<!-- ══ TOAST ══ -->
 <div class="status-toast" id="statusToast">
   <div class="toast-icon" id="toastIcon">
     <svg viewBox="0 0 24 24" fill="none" stroke="#c9a96e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" id="toastSvg">
@@ -423,7 +400,6 @@
 
 <div class="rule"></div>
 
-<!-- ══ FOOTER ══ -->
 <footer class="footer">
   <div style="max-width:1200px;margin:0 auto;">
     <div class="footer-top">
@@ -466,7 +442,6 @@
 </footer>
 
 <script>
-  /* ── Nav ── */
   const navbar = document.getElementById('navbar');
   window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', scrollY > 30), { passive: true });
   const hamburger = document.getElementById('hamburger');
@@ -474,18 +449,15 @@
   hamburger.addEventListener('click', () => { hamburger.classList.toggle('open'); mobileMenu.classList.toggle('open'); });
   mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => { hamburger.classList.remove('open'); mobileMenu.classList.remove('open'); }));
 
-  /* ── Reveal ── */
   const revealEls = document.querySelectorAll('.reveal');
   const observer = new IntersectionObserver(entries => {
     entries.forEach((e, i) => { if (e.isIntersecting) { setTimeout(() => e.target.classList.add('visible'), i * 60); observer.unobserve(e.target); } });
   }, { threshold: 0.06 });
   revealEls.forEach(el => observer.observe(el));
 
-  /* ── Cart count ── */
   fetch('/api/cart/count', { headers: { 'Accept': 'application/json' } })
     .then(r => r.json()).then(d => { if (d.count !== undefined) document.getElementById('cartCount').textContent = d.count; }).catch(() => {});
 
-  /* ── Filter tabs ── */
   const tabs  = document.querySelectorAll('.f-tab');
   const cards = document.querySelectorAll('.order-card');
   tabs.forEach(tab => {
@@ -508,34 +480,13 @@
     });
   });
 
-  /* ── Esc clears search ── */
   const searchInput = document.querySelector('.search-input');
   if (searchInput) searchInput.addEventListener('keydown', e => { if (e.key === 'Escape') window.location.href = '/orders'; });
 
-  /* ══════════════════════════════════════════
-     LIVE TRACKING — SSE per order card
-  ══════════════════════════════════════════ */
-
   const BADGE_CLASSES = ['badge-confirmed','badge-processing','badge-dispatched','badge-delivered','badge-cancelled','badge-returned'];
+  const STAGE_LABELS  = { confirmed: 'Order Confirmed', processing: 'Processing Order', dispatched: 'Out for Delivery', delivered: 'Delivered', cancelled: 'Order Cancelled', returned: 'Return Initiated' };
+  const STAGE_SUBS    = { confirmed: 'Your order has been confirmed.', processing: 'Your order is being prepared.', dispatched: 'Your order is on the way!', delivered: 'Your order has been delivered.', cancelled: 'Your order has been cancelled.', returned: 'Return process has started.' };
 
-  const STAGE_LABELS = {
-    confirmed:  'Order Confirmed',
-    processing: 'Processing Order',
-    dispatched: 'Out for Delivery',
-    delivered:  'Delivered',
-    cancelled:  'Order Cancelled',
-    returned:   'Return Initiated',
-  };
-  const STAGE_SUBS = {
-    confirmed:  'Your order has been confirmed.',
-    processing: 'Your order is being prepared.',
-    dispatched: 'Your order is on the way!',
-    delivered:  'Your order has been delivered.',
-    cancelled:  'Your order has been cancelled.',
-    returned:   'Return process has started.',
-  };
-
-  /* Toast */
   let toastTimer;
   function showToast(status, orderNum) {
     const toast     = document.getElementById('statusToast');
@@ -543,19 +494,12 @@
     const toastSvg  = document.getElementById('toastSvg');
     const title     = document.getElementById('toastTitle');
     const sub       = document.getElementById('toastSub');
-
     const isCancelled = status === 'cancelled';
     const isReturned  = status === 'returned';
-
     title.textContent = (orderNum ? orderNum + ' — ' : '') + (STAGE_LABELS[status] || 'Status Updated');
     sub.textContent   = STAGE_SUBS[status] || 'Your order status has changed.';
-
-    toastIcon.style.background = isCancelled ? 'rgba(239,68,68,.12)'
-                               : isReturned  ? 'rgba(251,146,60,.12)'
-                               : 'rgba(201,169,110,.12)';
-    toastSvg.setAttribute('stroke', isCancelled ? 'rgba(239,68,68,.85)'
-                                  : isReturned  ? 'rgba(251,146,60,.85)'
-                                  : '#c9a96e');
+    toastIcon.style.background = isCancelled ? 'rgba(239,68,68,.12)' : isReturned ? 'rgba(251,146,60,.12)' : 'rgba(201,169,110,.12)';
+    toastSvg.setAttribute('stroke', isCancelled ? 'rgba(239,68,68,.85)' : isReturned ? 'rgba(251,146,60,.85)' : '#c9a96e');
     if (isCancelled) {
       toastSvg.innerHTML = '<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>';
     } else if (isReturned) {
@@ -563,72 +507,51 @@
     } else {
       toastSvg.innerHTML = '<polyline points="20 6 9 17 4 12"/>';
     }
-
     clearTimeout(toastTimer);
     toast.classList.add('show');
     toastTimer = setTimeout(() => toast.classList.remove('show'), 4500);
   }
 
-  /* Apply status update to a card */
-  function applyCardStatus(orderId, newStatus, orderNum) {
-    const card      = document.querySelector(`.order-card[data-order-id="${orderId}"]`);
-    const badgeEl   = document.getElementById('badge-' + orderId);
-    const badgeText = document.getElementById('badge-text-' + orderId);
-    const actionsEl = document.getElementById('actions-' + orderId);
+  function applyCardStatus(orderNum, newStatus) {
+    const card      = document.querySelector(`.order-card[data-order-num="${orderNum}"]`);
+    const badgeEl   = document.getElementById('badge-' + orderNum);
+    const badgeText = document.getElementById('badge-text-' + orderNum);
+    const actionsEl = document.getElementById('actions-' + orderNum);
     if (!card || !badgeEl) return;
-
     const prev = card.dataset.status;
-    if (prev === newStatus) return;               // no change, skip
-
-    /* Update data-status for filter tabs */
+    if (prev === newStatus) return;
     card.dataset.status = newStatus;
-
-    /* Re-apply active filter so card hides/shows correctly */
     const activeTab = document.querySelector('.f-tab.active');
     if (activeTab && activeTab.dataset.filter !== 'all') {
       card.classList.toggle('hidden', card.dataset.status !== activeTab.dataset.filter);
     }
-
-    /* Swap badge class */
     BADGE_CLASSES.forEach(c => badgeEl.classList.remove(c));
     badgeEl.classList.add('badge-' + newStatus);
-
-    /* Update badge text */
     badgeText.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
-
-    /* Stop pulsing dot for terminal statuses */
     const dot = badgeEl.querySelector('.badge-live-dot');
     const isTerminal = newStatus === 'delivered' || newStatus === 'cancelled' || newStatus === 'returned';
     if (dot) dot.style.animationPlayState = isTerminal ? 'paused' : 'running';
-
-    /* Inject Invoice button if newly delivered */
     if (newStatus === 'delivered' && actionsEl) {
       const existingInvoice = actionsEl.querySelector('.btn-invoice');
       if (!existingInvoice) {
         const invoiceBtn = document.createElement('a');
-        invoiceBtn.href      = `/orders/${orderId}/invoice`;
+        invoiceBtn.href      = `/orders/${orderNum}/invoice`;
         invoiceBtn.className = 'btn-invoice';
         invoiceBtn.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Invoice`;
         actionsEl.insertBefore(invoiceBtn, actionsEl.firstChild);
       }
     }
-
-    /* Show toast */
     showToast(newStatus, orderNum);
   }
 
-  /* Collect all order IDs + numbers from the rendered cards */
-  const orderCards = document.querySelectorAll('.order-card[data-order-id]');
+  const orderCards     = document.querySelectorAll('.order-card[data-order-num]');
   const sseConnections = {};
 
   orderCards.forEach(card => {
-    const orderId  = card.dataset.orderId;
-    const orderNum = card.querySelector('.order-num')?.textContent?.trim() || '';
-
-    /* Skip terminal statuses — no need to stream */
+    const orderNum     = card.dataset.orderNum;
     const initialStatus = card.dataset.status;
+
     if (initialStatus === 'delivered' || initialStatus === 'cancelled' || initialStatus === 'returned') {
-      /* Pause the pulsing dot */
       const dot = card.querySelector('.badge-live-dot');
       if (dot) dot.style.animationPlayState = 'paused';
       return;
@@ -637,20 +560,15 @@
     let reconnectDelay = 3000;
 
     function connect() {
-      const sse = new EventSource('/orders/' + orderId + '/status-stream');
-      sseConnections[orderId] = sse;
-
+      const sse = new EventSource('/orders/' + orderNum + '/status-stream');
+      sseConnections[orderNum] = sse;
       sse.onopen = () => { reconnectDelay = 3000; };
-
       sse.addEventListener('orderStatus', (e) => {
         try {
           const data = JSON.parse(e.data);
-          if (data.orderStatus) {
-            applyCardStatus(orderId, data.orderStatus.toLowerCase(), orderNum);
-          }
+          if (data.orderStatus) applyCardStatus(orderNum, data.orderStatus.toLowerCase());
         } catch (_) {}
       });
-
       sse.onerror = () => {
         sse.close();
         setTimeout(connect, reconnectDelay);
@@ -661,7 +579,6 @@
     connect();
   });
 
-  /* Clean up SSE connections when page unloads */
   window.addEventListener('beforeunload', () => {
     Object.values(sseConnections).forEach(sse => sse.close());
   });

@@ -4,11 +4,11 @@ import * as orderService  from '../../services/orderService.js';
 export const streamOrderStatus = async (req, res) => {
   try {
     const order = await orderService.fetchOrderForSSE({
-      orderId : req.params.id,
-      userId  : req.user._id,
+      orderNumber : req.params.orderNumber,
+      userId      : req.user._id,
     });
 
-    addOrderClient(req.params.id, res);
+    addOrderClient(order._id.toString(), res);
     res.write(`event: orderStatus\ndata: ${JSON.stringify({ orderStatus: order.orderStatus })}\n\n`);
   } catch (err) {
     console.error('[streamOrderStatus]', err);
@@ -35,8 +35,8 @@ export const getOrders = async (req, res) => {
 export const getOrderDetail = async (req, res) => {
   try {
     const order = await orderService.fetchOrderDetail({
-      orderId : req.params.id,
-      userId  : req.user._id,
+      orderNumber : req.params.orderNumber,
+      userId      : req.user._id,
     });
 
     res.render('user/orderDetail', { order });
@@ -47,13 +47,12 @@ export const getOrderDetail = async (req, res) => {
   }
 };
 
-
 export const cancelOrder = async (req, res) => {
   try {
     await orderService.cancelEntireOrder({
-      orderId : req.params.id,
-      userId  : req.user._id,
-      reason  : req.body.reason,
+      orderNumber : req.params.orderNumber,
+      userId      : req.user._id,
+      reason      : req.body.reason,
     });
 
     return res.json({ success: true, message: 'Order cancelled successfully.' });
@@ -63,14 +62,13 @@ export const cancelOrder = async (req, res) => {
   }
 };
 
-
 export const cancelItem = async (req, res) => {
   try {
     const { allCancelled } = await orderService.cancelSingleItem({
-      orderId : req.params.id,
-      userId  : req.user._id,
-      itemId  : req.body.itemId,
-      reason  : req.body.reason,
+      orderNumber : req.params.orderNumber,
+      userId      : req.user._id,
+      itemId      : req.body.itemId,
+      reason      : req.body.reason,
     });
 
     return res.json({ success: true, message: 'Item cancelled.', allCancelled });
@@ -80,13 +78,12 @@ export const cancelItem = async (req, res) => {
   }
 };
 
-
 export const returnOrder = async (req, res) => {
   try {
     await orderService.requestReturn({
-      orderId : req.params.id,
-      userId  : req.user._id,
-      reason  : (req.body.reason || '').trim(),
+      orderNumber : req.params.orderNumber,
+      userId      : req.user._id,
+      reason      : (req.body.reason || '').trim(),
     });
 
     return res.json({ success: true, message: 'Return request submitted successfully.' });
@@ -96,12 +93,27 @@ export const returnOrder = async (req, res) => {
   }
 };
 
+export const returnItem = async (req, res) => {
+  try {
+    await orderService.requestItemReturn({
+      orderNumber : req.params.orderNumber,
+      userId      : req.user._id,
+      itemId      : req.body.itemId,
+      reason      : (req.body.reason || '').trim(),
+    });
+
+    return res.json({ success: true, message: 'Item return request submitted successfully.' });
+  } catch (err) {
+    console.error('[returnItem]', err);
+    return res.status(err.status || 500).json({ success: false, message: err.message || 'Server error.' });
+  }
+};
 
 export const downloadInvoice = async (req, res) => {
   try {
     await orderService.generateInvoicePDF({
-      orderId : req.params.id,
-      userId  : req.user._id,
+      orderNumber : req.params.orderNumber,
+      userId      : req.user._id,
       res,
     });
   } catch (err) {

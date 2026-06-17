@@ -20,8 +20,8 @@ export const fetchOrders = async ({ userId, search, page }) => {
     ];
   }
 
-  const total      = await Order.countDocuments(baseQuery);
-  const totalPages = Math.ceil(total / limit) || 1;
+  const total       = await Order.countDocuments(baseQuery);
+  const totalPages  = Math.ceil(total / limit) || 1;
   const currentPage = Math.min(safePage, totalPages);
 
   const orders = await Order.find(baseQuery)
@@ -33,20 +33,20 @@ export const fetchOrders = async ({ userId, search, page }) => {
   return { orders, total, page: currentPage, totalPages };
 };
 
-export const fetchOrderDetail = async ({ orderId, userId }) => {
-  const order = await Order.findOne({ _id: orderId, user: userId }).lean();
+export const fetchOrderDetail = async ({ orderNumber, userId }) => {
+  const order = await Order.findOne({ orderNumber, user: userId }).lean();
   if (!order) throw Object.assign(new Error('Order not found'), { status: 404 });
   return order;
 };
 
-export const fetchOrderForSSE = async ({ orderId, userId }) => {
-  const order = await Order.findOne({ _id: orderId, user: userId }).lean();
+export const fetchOrderForSSE = async ({ orderNumber, userId }) => {
+  const order = await Order.findOne({ orderNumber, user: userId }).lean();
   if (!order) throw Object.assign(new Error('Order not found'), { status: 404 });
   return order;
 };
 
-export const cancelEntireOrder = async ({ orderId, userId, reason }) => {
-  const order = await Order.findOne({ _id: orderId, user: userId });
+export const cancelEntireOrder = async ({ orderNumber, userId, reason }) => {
+  const order = await Order.findOne({ orderNumber, user: userId });
   if (!order) throw Object.assign(new Error('Order not found.'), { status: 404 });
 
   const cancellable = ['confirmed', 'processing'];
@@ -74,10 +74,10 @@ export const cancelEntireOrder = async ({ orderId, userId, reason }) => {
   return order;
 };
 
-export const cancelSingleItem = async ({ orderId, userId, itemId, reason }) => {
+export const cancelSingleItem = async ({ orderNumber, userId, itemId, reason }) => {
   if (!itemId) throw Object.assign(new Error('itemId is required.'), { status: 400 });
 
-  const order = await Order.findOne({ _id: orderId, user: userId });
+  const order = await Order.findOne({ orderNumber, user: userId });
   if (!order) throw Object.assign(new Error('Order not found.'), { status: 404 });
 
   const cancellable = ['confirmed', 'processing'];
@@ -107,10 +107,10 @@ export const cancelSingleItem = async ({ orderId, userId, itemId, reason }) => {
   return { order, allCancelled };
 };
 
-export const requestReturn = async ({ orderId, userId, reason }) => {
+export const requestReturn = async ({ orderNumber, userId, reason }) => {
   if (!reason) throw Object.assign(new Error('Return reason is required.'), { status: 400 });
 
-  const order = await Order.findOne({ _id: orderId, user: userId });
+  const order = await Order.findOne({ orderNumber, user: userId });
   if (!order) throw Object.assign(new Error('Order not found.'), { status: 404 });
 
   if (order.orderStatus !== 'delivered') {
@@ -124,18 +124,55 @@ export const requestReturn = async ({ orderId, userId, reason }) => {
     );
   }
 
-  order.orderStatus       = 'returned';
-  order.returnStatus      = 'pending';
-  order.returnReason      = reason;
-  order.returnRequestedAt = new Date();
+  order.orderStatus           = 'returned';
+  order.returnStatus          = 'pending';
+  order.returnReason          = reason;
+  order.returnRequestedAt     = new Date();
   order.returnRejectionReason = '';
   await order.save();
 
   return order;
 };
 
-export const generateInvoicePDF = async ({ orderId, userId, res }) => {
-  const order = await Order.findOne({ _id: orderId, user: userId }).lean();
+export const requestItemReturn = async ({ orderNumber, userId, itemId, reason }) => {
+  if (!itemId) throw Object.assign(new Error('itemId is required.'), { status: 400 });
+  if (!reason) throw Object.assign(new Error('Return reason is required.'), { status: 400 });
+
+  const order = await Order.findOne({ orderNumber, user: userId });
+  if (!order) throw Object.assign(new Error('Order not found.'), { status: 404 });
+
+  if (order.orderStatus !== 'delivered') {
+    throw Object.assign(new Error('Only delivered orders can have items returned.'), { status: 400 });
+  }
+
+  const item = order.items.id(itemId);
+  if (!item) throw Object.assign(new Error('Item not found in order.'), { status: 404 });
+  if (item.status === 'cancelled') throw Object.assign(new Error('This item was cancelled.'), { status: 400 });
+  if (item.returnStatus && item.returnStatus !== 'none') {
+    throw Object.assign(new Error('A return request has already been submitted for this item.'), { status: 400 });
+  }
+
+  item.returnStatus      = 'pending';
+  item.returnReason      = reason;
+  item.returnRequestedAt = new Date();
+
+  const allItemsReturnRequested = order.items
+    .filter(i => i.status === 'active')
+    .every(i => i.returnStatus === 'pending' || i._id.toString() === itemId);
+
+  if (allItemsReturnRequested) {
+    order.returnStatus      = 'pending';
+    order.returnReason      = 'Multiple item returns requested.';
+    order.returnRequestedAt = new Date();
+    order.orderStatus       = 'returned';
+  }
+
+  await order.save();
+  return order;
+};
+
+export const generateInvoicePDF = async ({ orderNumber, userId, res }) => {
+  const order = await Order.findOne({ orderNumber, user: userId }).lean();
   if (!order) throw Object.assign(new Error('Order not found.'), { status: 404 });
 
   const doc  = new PDFDocument({ margin: 50, size: 'A4' });
