@@ -18,8 +18,8 @@ export const getValidProduct = async (productId) => {
 };
 
 export const getCleanCart = async (userId) => {
-  let cart = await Cart.findOne({ user: userId }).populate({
-    path   : 'items.product',
+  const cart = await Cart.findOne({ user: userId }).populate({
+    path    : 'items.product',
     populate: [
       { path: 'category', select: 'name isBlocked' },
       { path: 'brand',    select: 'name' },
@@ -28,17 +28,28 @@ export const getCleanCart = async (userId) => {
 
   if (!cart) return null;
 
-  const validItems = cart.items.filter(item => {
-    const p = item.product;
-    return p && !p.isDeleted && p.isListed && !p.category?.isBlocked && p.stock > 0;
-  });
+  // Only remove items whose product was hard-deleted (no document at all)
+  // Keep OOS / unlisted items so the cart page can show warnings
+  const existingItems = cart.items.filter(item => item.product);
 
-  let modified = validItems.length !== cart.items.length;
-  cart.items   = validItems;
+  let modified = existingItems.length !== cart.items.length;
+  cart.items   = existingItems;
 
+  // Cap quantities — but keep the item visible even if OOS
   for (const item of cart.items) {
-    if (item.quantity > item.product.stock) { item.quantity = item.product.stock; modified = true; }
-    if (item.quantity > MAX_QTY)            { item.quantity = MAX_QTY;            modified = true; }
+    const p            = item.product;
+    const variantStock = item.variantName
+      ? p.colorVariants?.find(v => v.name === item.variantName)?.stock ?? p.stock
+      : p.stock;
+
+    if (variantStock > 0 && item.quantity > variantStock) {
+      item.quantity = variantStock;
+      modified      = true;
+    }
+    if (item.quantity > MAX_QTY) {
+      item.quantity = MAX_QTY;
+      modified      = true;
+    }
   }
 
   if (modified) await cart.save();

@@ -6,9 +6,17 @@ export const getCart = async (req, res) => {
     const cart   = await cartService.getCleanCart(userId);
     const empty  = { items: [], totalItems: 0, subtotal: 0 };
 
-    const finalCart   = cart || empty;
+    const finalCart = cart || empty;
+
     const canCheckout = finalCart.items?.length > 0 &&
-      finalCart.items.every(i => i.product.stock > 0 && i.quantity <= i.product.stock);
+      finalCart.items.every(i => {
+        const p            = i.product;
+        const variantStock = i.variantName
+          ? p.colorVariants?.find(v => v.name === i.variantName)?.stock ?? p.stock
+          : p.stock;
+        return !p.isDeleted && p.isListed && !p.category?.isBlocked &&
+               variantStock > 0 && i.quantity <= variantStock;
+      });
 
     res.render('user/cart', { cart: finalCart, canCheckout, MAX_QTY: cartService.MAX_QTY });
   } catch (err) {

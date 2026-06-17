@@ -124,13 +124,22 @@ export const requestReturn = async ({ orderNumber, userId, reason }) => {
     );
   }
 
-  order.orderStatus           = 'returned';
-  order.returnStatus          = 'pending';
-  order.returnReason          = reason;
-  order.returnRequestedAt     = new Date();
+  order.orderStatus       = 'returned';
+  order.returnStatus      = 'pending';
+  order.returnReason      = reason;
+  order.returnRequestedAt = new Date();
   order.returnRejectionReason = '';
-  await order.save();
 
+  // Mark all active items as return pending too
+  order.items.forEach(i => {
+    if (i.status === 'active' && i.returnStatus === 'none') {
+      i.returnStatus      = 'pending';
+      i.returnReason      = reason;
+      i.returnRequestedAt = new Date();
+    }
+  });
+
+  await order.save();
   return order;
 };
 
@@ -147,8 +156,8 @@ export const requestItemReturn = async ({ orderNumber, userId, itemId, reason })
 
   const item = order.items.id(itemId);
   if (!item) throw Object.assign(new Error('Item not found in order.'), { status: 404 });
-  if (item.status === 'cancelled') throw Object.assign(new Error('This item was cancelled.'), { status: 400 });
-  if (item.returnStatus && item.returnStatus !== 'none') {
+  if (item.status === 'cancelled') throw Object.assign(new Error('This item was cancelled and cannot be returned.'), { status: 400 });
+  if (item.returnStatus !== 'none') {
     throw Object.assign(new Error('A return request has already been submitted for this item.'), { status: 400 });
   }
 
@@ -156,13 +165,15 @@ export const requestItemReturn = async ({ orderNumber, userId, itemId, reason })
   item.returnReason      = reason;
   item.returnRequestedAt = new Date();
 
-  const allItemsReturnRequested = order.items
-    .filter(i => i.status === 'active')
-    .every(i => i.returnStatus === 'pending' || i._id.toString() === itemId);
+  // If every active item now has a return request, bubble up to order level
+  const activeItems = order.items.filter(i => i.status === 'active');
+  const allPending  = activeItems.every(i =>
+    i.returnStatus === 'pending' || i._id.toString() === itemId
+  );
 
-  if (allItemsReturnRequested) {
+  if (allPending) {
     order.returnStatus      = 'pending';
-    order.returnReason      = 'Multiple item returns requested.';
+    order.returnReason      = 'All items return requested.';
     order.returnRequestedAt = new Date();
     order.orderStatus       = 'returned';
   }

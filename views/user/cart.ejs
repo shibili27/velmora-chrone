@@ -204,7 +204,7 @@
       <a href="/profile" class="nav-icon-btn" aria-label="Profile">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       </a>
-        <a href="/wishlist" class="nav-icon-btn wish-active" aria-label="Wishlist">
+      <a href="/wishlist" class="nav-icon-btn wish-active" aria-label="Wishlist">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
       </a>
       <a href="/cart" class="nav-icon-btn wish-active" aria-label="Cart" style="position:relative">
@@ -261,11 +261,17 @@
 
       <div id="cartItemsList">
         <% cart.items.forEach(item => {
-          const p = item.product;
-          const brandName = p.brand ? (typeof p.brand === 'object' ? p.brand.name : p.brand) : null;
-          const isBlocked = p.isDeleted || !p.isListed || p.category?.isBlocked;
-          const isOOS     = p.stock === 0;
-          const isLow     = p.stock > 0 && p.stock <= 5;
+          const p          = item.product;
+          const brandName  = p.brand ? (typeof p.brand === 'object' ? p.brand.name : p.brand) : null;
+          const isBlocked  = p.isDeleted || !p.isListed || p.category?.isBlocked;
+
+          /* ── variant-aware stock ── */
+          const variantStock = item.variantName
+            ? (p.colorVariants?.find(v => v.name === item.variantName)?.stock ?? p.stock)
+            : p.stock;
+
+          const isOOS = variantStock === 0;
+          const isLow = variantStock > 0 && variantStock <= 5;
         %>
         <div class="cart-item" id="cartItem-<%= item._id %>"
              data-product-id="<%= p._id %>"
@@ -289,6 +295,9 @@
                 <% if (brandName) { %><div class="item-brand"><%= brandName %></div><% } %>
                 <a href="/products/<%= p._id %>" class="item-name"><%= p.name %></a>
                 <div class="item-category"><%= p.category?.name || '' %></div>
+                <% if (item.variantName) { %>
+                  <div class="item-category" style="color:rgba(201,169,110,.45)"><%= item.variantName %></div>
+                <% } %>
                 <div class="item-price-unit">₹<%= item.price.toLocaleString('en-IN') %> each</div>
               </div>
               <button class="remove-btn" onclick="removeItem('<%= item._id %>')" title="Remove">
@@ -301,7 +310,7 @@
             <% } else if (isOOS) { %>
               <span class="item-warning">Out of Stock</span>
             <% } else if (isLow) { %>
-              <span class="item-low">Only <%= p.stock %> left</span>
+              <span class="item-low">Only <%= variantStock %> left</span>
             <% } %>
 
             <div class="item-bottom">
@@ -311,7 +320,7 @@
                   onclick="updateQty('<%= item._id %>', 'dec')">−</button>
                 <span class="qty-val" id="qty-<%= item._id %>"><%= item.quantity %></span>
                 <button class="qty-btn"
-                  <%= (isOOS || isBlocked || item.quantity >= Math.min(p.stock, MAX_QTY)) ? 'disabled' : '' %>
+                  <%= (isOOS || isBlocked || item.quantity >= Math.min(variantStock, MAX_QTY)) ? 'disabled' : '' %>
                   onclick="updateQty('<%= item._id %>', 'inc')">+</button>
               </div>
               <span class="item-total" id="total-<%= item._id %>">₹<%= (item.price * item.quantity).toLocaleString('en-IN') %></span>
@@ -509,15 +518,13 @@
 
   function closeClearDialog() {
     document.getElementById('vcOverlay').classList.remove('open');
-    /* NOTE: do NOT null out _pendingClearCallback here —
-       the confirm button saves it before calling this */
   }
 
   document.getElementById('vcConfirmBtn').addEventListener('click', async () => {
-    const cb = _pendingClearCallback;   /* save BEFORE closing */
+    const cb = _pendingClearCallback;
     _pendingClearCallback = null;
     closeClearDialog();
-    if (cb) await cb();                 /* then run it */
+    if (cb) await cb();
   });
 
   document.addEventListener('keydown', e => {
