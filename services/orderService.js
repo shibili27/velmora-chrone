@@ -130,7 +130,7 @@ export const requestReturn = async ({ orderNumber, userId, reason }) => {
   order.returnRequestedAt = new Date();
   order.returnRejectionReason = '';
 
-  // Mark all active items as return pending too
+  
   order.items.forEach(i => {
     if (i.status === 'active' && i.returnStatus === 'none') {
       i.returnStatus      = 'pending';
@@ -165,7 +165,6 @@ export const requestItemReturn = async ({ orderNumber, userId, itemId, reason })
   item.returnReason      = reason;
   item.returnRequestedAt = new Date();
 
-  // If every active item now has a return request, bubble up to order level
   const activeItems = order.items.filter(i => i.status === 'active');
   const allPending  = activeItems.every(i =>
     i.returnStatus === 'pending' || i._id.toString() === itemId

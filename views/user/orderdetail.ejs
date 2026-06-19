@@ -776,10 +776,37 @@
                   Order Cancelled
                 </div>
               <% } %>
-              <% if (isReturned) { %>
+
+              <%
+                /* ── Order-level return outcome ──
+                   Reflects whatever the admin has set on order.returnStatus.
+                   'pending'  -> awaiting admin review
+                   'accepted' -> admin approved the return
+                   'rejected' -> admin rejected the return (show reason if present)
+                */
+              %>
+              <% if (order.returnStatus === 'pending') { %>
                 <div class="btn-disabled">
                   <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.75"/></svg>
                   Return Requested
+                </div>
+              <% } else if (order.returnStatus === 'accepted') { %>
+                <div class="btn-disabled" style="border-color:rgba(74,222,128,0.25);color:var(--green);opacity:0.7;">
+                  <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                  Return Accepted
+                </div>
+              <% } else if (order.returnStatus === 'rejected') { %>
+                <div class="btn-disabled" style="border-color:rgba(248,113,113,0.25);color:var(--red);opacity:0.7;">
+                  <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                  Return Rejected
+                </div>
+                <% if (order.returnRejectionReason) { %>
+                  <p class="action-note" style="color:var(--red);">Reason: <%= order.returnRejectionReason %></p>
+                <% } %>
+              <% } else if (isReturned) { %>
+                <div class="btn-disabled">
+                  <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.75"/></svg>
+                  Returned
                 </div>
               <% } %>
 

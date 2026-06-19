@@ -82,9 +82,10 @@ export const returnOrder = async (req, res) => {
   try {
     await orderService.requestReturn({
       orderNumber : req.params.orderNumber,
-      userId      : req.user._id,
-      reason      : (req.body.reason || '').trim(),
+      userId: req.user._id,
+      reason: (req.body.reason || '').trim(),
     });
+    console.log(req.body)
 
     return res.json({ success: true, message: 'Return request submitted successfully.' });
   } catch (err) {
