@@ -328,8 +328,10 @@
       <a href="<%= isLoggedIn ? '/profile' : '/login' %>" class="nav-icon-btn" aria-label="Profile">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       </a>
+      <!-- ── WISHLIST NAV ICON WITH BADGE ── -->
       <a href="<%= isLoggedIn ? '/wishlist' : '/login' %>" class="nav-icon-btn" aria-label="Wishlist" id="navWishlistBtn">
         <svg id="navHeartSvg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        <span class="cart-badge" id="wishCountNav" style="display:none">0</span>
       </a>
       <a href="<%= isLoggedIn ? '/cart' : '/login' %>" class="nav-icon-btn" aria-label="Cart" style="position:relative">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
@@ -621,7 +623,6 @@
 
 <div class="toast" id="toast"><span class="toast-dot"></span><span id="toastMsg"></span></div>
 
-
 <script>
   const PRODUCT_ID     = '<%= product._id %>';
   const MAX_QTY        = 5;
@@ -784,7 +785,6 @@
     if (nameEl) nameEl.textContent = name;
   }
 
-  // Mutable flat stock — overwritten immediately by the live stock fetch on load
   let currentFlatStock = <%= initialStock %>;
 
   function updateStockUI(stock) {
@@ -861,90 +861,60 @@
     document.getElementById('qtyPlus').disabled  = val >= cap;
   }
 
-  // ✅ KEY FIX: fetch live stock from DB on every page load.
-  // The EJS bakes initialStock into the HTML at render time, but if another
-  // user purchased between renders, that value is stale. This call overwrites
-  // the UI with the actual current DB value immediately after the page loads,
-  // so the user always sees the correct stock before they can click anything.
   async function syncStockFromDB() {
     try {
       const res  = await fetch(`/products/${PRODUCT_ID}/stock`);
       if (!res.ok) return;
       const data = await res.json();
       if (!data.success) return;
-
       if (COLOR_VARIANTS.length > 0 && data.colorVariants?.length > 0) {
-        // Patch each variant's stock from the live DB response
         data.colorVariants.forEach(updated => {
           const match = COLOR_VARIANTS.find(v => v.name === updated.name);
           if (match) match.stock = updated.stock;
         });
-        // Update UI for the currently selected variant
         updateStockUI(COLOR_VARIANTS[activeVariantIndex].stock);
       } else {
-        // Flat-stock product
         currentFlatStock = data.stock;
         updateStockUI(data.stock);
       }
     } catch (err) {
       console.warn('[syncStockFromDB] failed silently:', err);
-      // Non-fatal — page still works, SSE will pick up changes
     }
   }
-
-  // Run immediately on page load — before user can interact
   syncStockFromDB();
 
   async function handleAddToCart(productId) {
     if (!IS_LOGGED_IN) { window.location.href = '/login'; return; }
-
     const currentStock = getCurrentStock();
-    if (currentStock === 0) {
-      showToast('This item is currently out of stock', true);
-      return;
-    }
-
+    if (currentStock === 0) { showToast('This item is currently out of stock', true); return; }
     const qty = parseInt(document.getElementById('qtyInput').value) || 1;
     const btn = document.getElementById('addCartBtn');
     btn.disabled = true;
     btn.textContent = 'Adding…';
-
     try {
       const body = { productId, quantity: qty };
       if (COLOR_VARIANTS.length > 0) {
         body.variantIndex = activeVariantIndex;
         body.variantName  = COLOR_VARIANTS[activeVariantIndex].name;
       }
-
       const res  = await fetch('/cart/add', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify(body)
       });
-
       let data = {};
       const contentType = res.headers.get('content-type') || '';
-      if (contentType.includes('application/json')) {
-        data = await res.json();
-      }
-
-      if (res.status === 401) {
-        window.location.href = data.redirectUrl || '/login';
-        return;
-      }
-
+      if (contentType.includes('application/json')) data = await res.json();
+      if (res.status === 401) { window.location.href = data.redirectUrl || '/login'; return; }
       if (!res.ok) {
         showToast(data.message || 'Could not add to cart', true);
-        // ✅ If server says out of stock, sync UI immediately
         if (res.status === 400) await syncStockFromDB();
         return;
       }
-
       showToast('Added to cart ✓');
       if (data.cartCount !== undefined) {
         document.getElementById('cartCount').textContent = data.cartCount;
       }
-
     } catch (err) {
       console.error('Cart error:', err);
       showToast('Something went wrong', true);
@@ -956,25 +926,44 @@
     }
   }
 
+  // ── Wishlist ──────────────────────────────────────────────────────────────
   let wishlisted = false;
-  function applyWishlistUI(state) {
-    const btn = document.getElementById('wishlistBtn'), heartSvg = document.getElementById('heartSvg');
-    if (btn) btn.classList.toggle('active', state);
-    if (heartSvg) { heartSvg.setAttribute('fill', state ? '#f87171' : 'none'); heartSvg.setAttribute('stroke', state ? '#f87171' : 'currentColor'); }
-    const navBtn = document.getElementById('navWishlistBtn'), navHeart = document.getElementById('navHeartSvg');
-    if (navBtn)   navBtn.classList.toggle('wishlisted', state);
-    if (navHeart) { navHeart.setAttribute('fill', state ? '#f87171' : 'none'); navHeart.setAttribute('stroke', state ? '#f87171' : 'currentColor'); }
+
+  function updateWishBadge(count) {
+    const el = document.getElementById('wishCountNav');
+    if (!el) return;
+    el.textContent = count > 99 ? '99+' : count;
+    el.style.display = count > 0 ? 'flex' : 'none';
   }
+
+  function applyWishlistUI(state) {
+    const btn     = document.getElementById('wishlistBtn');
+    const heartSvg = document.getElementById('heartSvg');
+    if (btn)      btn.classList.toggle('active', state);
+    if (heartSvg) {
+      heartSvg.setAttribute('fill',   state ? '#f87171' : 'none');
+      heartSvg.setAttribute('stroke', state ? '#f87171' : 'currentColor');
+    }
+    const navBtn   = document.getElementById('navWishlistBtn');
+    const navHeart = document.getElementById('navHeartSvg');
+    if (navBtn)   navBtn.classList.toggle('wishlisted', state);
+    if (navHeart) {
+      navHeart.setAttribute('fill',   state ? '#f87171' : 'none');
+      navHeart.setAttribute('stroke', state ? '#f87171' : 'currentColor');
+    }
+  }
+
   async function checkWishlistStatus() {
     if (!IS_LOGGED_IN) return;
     try {
-      const res = await fetch(`/wishlist/status/${PRODUCT_ID}`, { headers: { 'Accept': 'application/json' } });
+      const res  = await fetch(`/wishlist/status/${PRODUCT_ID}`, { headers: { 'Accept': 'application/json' } });
       if (!res.ok) return;
       const data = await res.json();
       wishlisted = !!data.wishlisted;
       applyWishlistUI(wishlisted);
     } catch {}
   }
+
   async function handleWishlistToggle() {
     if (!IS_LOGGED_IN) { window.location.href = '/login'; return; }
     const btn = document.getElementById('wishlistBtn');
@@ -991,11 +980,31 @@
       wishlisted = !!data.wishlisted;
       applyWishlistUI(wishlisted);
       showToast(wishlisted ? 'Added to wishlist ♥' : 'Removed from wishlist');
+      // Refresh nav badge after toggle
+      fetch('/api/wishlist/count', { headers: { 'Accept': 'application/json' } })
+        .then(r => r.json())
+        .then(d => updateWishBadge(d.count || 0))
+        .catch(() => {});
     } catch { showToast('Something went wrong', true); }
     finally { if (btn) btn.disabled = false; }
   }
+
   checkWishlistStatus();
 
+  // ── Nav badges on load ────────────────────────────────────────────────────
+  if (IS_LOGGED_IN) {
+    fetch('/api/cart/count', { headers: { 'Accept': 'application/json' } })
+      .then(r => r.json())
+      .then(d => { if (d.count !== undefined) document.getElementById('cartCount').textContent = d.count; })
+      .catch(() => {});
+
+    fetch('/api/wishlist/count', { headers: { 'Accept': 'application/json' } })
+      .then(r => r.json())
+      .then(d => updateWishBadge(d.count || 0))
+      .catch(() => {});
+  }
+
+  // ── Nav scroll + hamburger ────────────────────────────────────────────────
   const navbar = document.getElementById('navbar');
   window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', scrollY > 20), { passive: true });
   document.getElementById('hamburger').addEventListener('click', function () {
@@ -1003,13 +1012,7 @@
     document.getElementById('mobileMenu').classList.toggle('open');
   });
 
-  if (IS_LOGGED_IN) {
-    fetch('/api/cart/count', { headers: { 'Accept': 'application/json' } })
-      .then(r => r.json())
-      .then(d => { if (d.count !== undefined) document.getElementById('cartCount').textContent = d.count; })
-      .catch(() => {});
-  }
-
+  // ── Reveal on scroll ──────────────────────────────────────────────────────
   const revealEls = document.querySelectorAll('.reveal');
   const revealObs = new IntersectionObserver(entries => {
     entries.forEach((e, i) => {
@@ -1021,6 +1024,7 @@
   }, { threshold: 0.06 });
   revealEls.forEach(el => revealObs.observe(el));
 
+  // ── Tabs ──────────────────────────────────────────────────────────────────
   function openTab(id) {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
@@ -1029,6 +1033,7 @@
     document.querySelector('.tabs-root').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
+  // ── Toast ─────────────────────────────────────────────────────────────────
   let toastTimer;
   function showToast(msg, isErr = false) {
     const toast = document.getElementById('toast');
@@ -1038,7 +1043,7 @@
     toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
   }
 
-  // ── SSE: live stock/price updates with auto-reconnect ──
+  // ── SSE: live stock/price updates with auto-reconnect ─────────────────────
   (function () {
     let es = null;
     let reconnectDelay = 3000;

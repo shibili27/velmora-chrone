@@ -1,4 +1,6 @@
 import Order from '../../models/Order.js';
+import Wallet from '../../models/wallet.js'; // adjust path/casing to match your actual file
+import Product from '../../models/product.js';
 import { broadcastOrderUpdate } from '../../public/utils/ssemanager.js';
 
 const LIMIT = 15;
@@ -100,7 +102,14 @@ export const listOrders = async (req, res) => {
       counts.all  += count;
     });
 
-    counts.returnPending = await Order.countDocuments({ returnStatus: 'pending' });
+    // Pending count now covers BOTH order-level pending returns
+    // AND orders that have at least one item-level pending return.
+    counts.returnPending = await Order.countDocuments({
+      $or: [
+        { returnStatus: 'pending' },
+        { 'items.returnStatus': 'pending' },
+      ],
+    });
 
     const totalPages = Math.ceil(totalOrders / LIMIT);
 
@@ -191,6 +200,11 @@ export const updateOrderStatus = async (req, res) => {
   }
 };
 
+/**
+ * ── Order-level return verification ──────────────────────────────────────
+ * Customer requested to return the WHOLE order. Admin accepts or rejects.
+ * On acceptance, the full grandTotal is credited to the customer's wallet.
+ */
 export const handleReturnRequest = async (req, res) => {
   try {
     const { decision, rejectionReason } = req.body;
@@ -209,10 +223,31 @@ export const handleReturnRequest = async (req, res) => {
       return res.status(400).json({ success: false, message: 'No pending return request on this order.' });
     }
 
-    order.returnStatus = decision;
+    if (decision === 'accepted') {
+      // Credit the wallet FIRST. If this throws, we don't want the order
+      // marked as accepted with no refund actually issued.
+      const wallet = await Wallet.getOrCreate(order.user);
+      await wallet.credit(
+        order.pricing.grandTotal,
+        `Refund for returned order ${order.orderNumber}`,
+        'return_refund',
+        order
+      );
 
-    if (decision === 'rejected' && rejectionReason && rejectionReason.trim()) {
-      order.returnRejectionReason = rejectionReason.trim();
+      order.returnStatus = 'accepted';
+      order.orderStatus  = 'returned';
+      // Mark every still-active item as returned too, so item-level and
+      // order-level state stay consistent.
+      order.items.forEach(item => {
+        if (item.status === 'active') {
+          item.returnStatus = 'accepted';
+        }
+      });
+    } else {
+      order.returnStatus = 'rejected';
+      if (rejectionReason && rejectionReason.trim()) {
+        order.returnRejectionReason = rejectionReason.trim();
+      }
     }
 
     await order.save();
@@ -221,11 +256,167 @@ export const handleReturnRequest = async (req, res) => {
 
     return res.json({
       success : true,
-      message : decision === 'accepted' ? 'Return accepted. Refund initiated.' : 'Return rejected.',
+      message : decision === 'accepted' ? 'Return accepted. Refund credited to wallet.' : 'Return rejected.',
     });
   } catch (err) {
     console.error('handleReturnRequest error:', err);
-    return res.status(500).json({ success: false, message: 'Server error. Please try again.' });
+    return res.status(500).json({ success: false, message: err.message || 'Server error. Please try again.' });
+  }
+};
+
+/**
+ * ── Item-level return verification ───────────────────────────────────────
+ * Customer requested to return ONE item within a multi-item order.
+ * On acceptance, only that item's totalPrice is credited to the wallet.
+ * If every item in the order ends up returned, the parent order is flipped
+ * to 'returned' / 'accepted' as well so the two views stay in sync.
+ */
+export const handleItemReturnRequest = async (req, res) => {
+  try {
+    const { decision, rejectionReason } = req.body;
+    const { id: orderId, itemId } = req.params;
+
+    if (!['accepted', 'rejected'].includes(decision)) {
+      return res.status(400).json({ success: false, message: 'Invalid decision. Must be accepted or rejected.' });
+    }
+
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Order not found.' });
+    }
+
+    const item = order.items.id(itemId);
+    if (!item) {
+      return res.status(404).json({ success: false, message: 'Item not found on this order.' });
+    }
+
+    if (item.returnStatus !== 'pending') {
+      return res.status(400).json({ success: false, message: 'No pending return request on this item.' });
+    }
+
+    if (decision === 'accepted') {
+      const wallet = await Wallet.getOrCreate(order.user);
+      await wallet.credit(
+        item.totalPrice,
+        `Refund for returned item "${item.name}" — order ${order.orderNumber}`,
+        'return_refund',
+        order
+      );
+
+      item.returnStatus = 'accepted';
+
+      // If every active-or-returned item has now been returned, cascade
+      // the whole order to 'returned' so both views agree.
+      const allResolved = order.items.every(
+        i => i.status !== 'active' || i.returnStatus === 'accepted'
+      );
+      if (allResolved) {
+        order.orderStatus  = 'returned';
+        order.returnStatus = 'accepted';
+      }
+    } else {
+      item.returnStatus = 'rejected';
+      if (rejectionReason && rejectionReason.trim()) {
+        item.returnRejectionReason = rejectionReason.trim();
+      }
+    }
+
+    await order.save();
+
+    broadcastOrderUpdate(order._id.toString(), { orderStatus: order.orderStatus });
+
+    return res.json({
+      success : true,
+      message : decision === 'accepted' ? 'Item return accepted. Refund credited to wallet.' : 'Item return rejected.',
+    });
+  } catch (err) {
+    console.error('handleItemReturnRequest error:', err);
+    return res.status(500).json({ success: false, message: err.message || 'Server error. Please try again.' });
+  }
+};
+
+/**
+ * ── Add returned item back to stock ──────────────────────────────────────
+ * Manual, deliberate action — admin clicks this AFTER physically receiving
+ * and inspecting the returned item. Only available once returnStatus is
+ * 'accepted' on that item, and only once (guarded by item.restocked).
+ *
+ * Increments the matching colorVariant's stock by the returned quantity,
+ * then recomputes product.stock as the sum of all variant stocks — same
+ * pattern your addProduct/editProduct controllers already use.
+ *
+ * If the item has no variantName, or the variant can no longer be found
+ * (renamed/deleted since the order was placed), falls back to bumping
+ * product.stock directly and tells the admin this happened.
+ */
+export const restockItem = async (req, res) => {
+  try {
+    const { id: orderId, itemId } = req.params;
+
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Order not found.' });
+    }
+
+    const item = order.items.id(itemId);
+    if (!item) {
+      return res.status(404).json({ success: false, message: 'Item not found on this order.' });
+    }
+
+    if (item.returnStatus !== 'accepted') {
+      return res.status(400).json({ success: false, message: 'This item\'s return has not been accepted yet.' });
+    }
+
+    if (item.restocked) {
+      return res.status(400).json({ success: false, message: 'This item has already been added back to stock.' });
+    }
+
+    const product = await Product.findById(item.product);
+    if (!product) {
+      // Product was deleted entirely — nothing to restock, but still let
+      // the admin mark it as handled so it stops showing the button.
+      item.restocked = true;
+      await order.save();
+      return res.json({
+        success: true,
+        message: 'Product no longer exists — nothing to restock, but marked as handled.',
+      });
+    }
+
+    let fallbackUsed = false;
+
+    if (item.variantName && Array.isArray(product.colorVariants) && product.colorVariants.length > 0) {
+      const variant = product.colorVariants.find(v => v.name === item.variantName);
+      if (variant) {
+        variant.stock = (variant.stock || 0) + item.quantity;
+        // Recompute total stock from all variants, matching addProduct/editProduct.
+        product.stock = product.colorVariants.reduce((sum, v) => sum + (v.stock || 0), 0);
+      } else {
+        // Variant name on the order no longer matches any current variant
+        // (renamed or removed since purchase) — fall back safely.
+        product.stock = (product.stock || 0) + item.quantity;
+        fallbackUsed = true;
+      }
+    } else {
+      // No variant recorded on this item at all — bump plain stock.
+      product.stock = (product.stock || 0) + item.quantity;
+      fallbackUsed = true;
+    }
+
+    await product.save();
+
+    item.restocked = true;
+    await order.save();
+
+    return res.json({
+      success: true,
+      message: fallbackUsed
+        ? `Added ${item.quantity} unit(s) back to total stock (variant "${item.variantName || 'none'}" not found — applied to overall stock instead).`
+        : `Added ${item.quantity} unit(s) back to "${item.variantName}" stock.`,
+    });
+  } catch (err) {
+    console.error('restockItem error:', err);
+    return res.status(500).json({ success: false, message: err.message || 'Server error. Please try again.' });
   }
 };
 

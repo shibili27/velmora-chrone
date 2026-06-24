@@ -1,7 +1,48 @@
 import Order      from '../models/order.js';
 import Product    from '../models/product.js';
+import Wallet     from '../models/wallet.js';
 import PDFDocument from 'pdfkit';
 import { restoreStockAndBroadcast } from './checkoutService.js';
+
+// ── Helpers ───────────────────────────────────────────────────────────────
+
+/**
+ * Determines the refund amount for an order.
+ * For Razorpay: full grandTotal.
+ * For COD: no refund (nothing was paid online).
+ * For Wallet: full grandTotal (was debited from wallet).
+ * Returns 0 if nothing should be refunded.
+ */
+const getRefundAmount = (order) => {
+  if (order.paymentMethod === 'COD')       return 0;
+  if (order.paymentMethod === 'Razorpay' && order.paymentStatus !== 'paid') return 0;
+  return order.pricing.grandTotal;
+};
+
+/**
+ * Calculates the refund amount for a single cancelled item proportionally.
+ * Uses the item's totalPrice relative to the order subtotal to prorate
+ * discounts (coupon + item discount) and tax/shipping.
+ */
+const getItemRefundAmount = (order, item) => {
+  if (order.paymentMethod === 'COD') return 0;
+  if (order.paymentMethod === 'Razorpay' && order.paymentStatus !== 'paid') return 0;
+
+  // If only one active item remains (or this is the last), just refund what remains
+  const activeItems = order.items.filter(i => i.status === 'active');
+  if (activeItems.length === 1) {
+    // This is effectively a full cancellation — caller should handle via cancelEntireOrder
+    return order.pricing.grandTotal;
+  }
+
+  // Prorate: item's share of the grand total
+  const subtotal    = order.pricing.subtotal;
+  const itemShare   = subtotal > 0 ? item.totalPrice / subtotal : 0;
+  const refund      = Math.round(order.pricing.grandTotal * itemShare);
+  return refund;
+};
+
+// ── Read operations ───────────────────────────────────────────────────────
 
 export const fetchOrders = async ({ userId, search, page }) => {
   const limit     = 8;
@@ -45,6 +86,8 @@ export const fetchOrderForSSE = async ({ orderNumber, userId }) => {
   return order;
 };
 
+// ── Cancellation ──────────────────────────────────────────────────────────
+
 export const cancelEntireOrder = async ({ orderNumber, userId, reason }) => {
   const order = await Order.findOne({ orderNumber, user: userId });
   if (!order) throw Object.assign(new Error('Order not found.'), { status: 404 });
@@ -57,6 +100,7 @@ export const cancelEntireOrder = async ({ orderNumber, userId, reason }) => {
     );
   }
 
+  // Restore stock for all active items
   await Promise.all(
     order.items
       .filter(i => i.status === 'active')
@@ -71,7 +115,20 @@ export const cancelEntireOrder = async ({ orderNumber, userId, reason }) => {
   order.cancellationNote = (reason || '').trim();
   await order.save();
 
-  return order;
+  // Wallet refund — immediate for Razorpay/Wallet paid orders
+  const refundAmount = getRefundAmount(order);
+  if (refundAmount > 0) {
+    const wallet = await Wallet.getOrCreate(userId);
+    await wallet.credit(
+      refundAmount,
+      `Refund for cancelled order ${order.orderNumber}`,
+      'cancellation_refund',
+      order
+    );
+    return { order, refunded: true, refundAmount };
+  }
+
+  return { order, refunded: false, refundAmount: 0 };
 };
 
 export const cancelSingleItem = async ({ orderNumber, userId, itemId, reason }) => {
@@ -89,8 +146,11 @@ export const cancelSingleItem = async ({ orderNumber, userId, itemId, reason }) 
   }
 
   const item = order.items.id(itemId);
-  if (!item) throw Object.assign(new Error('Item not found in order.'), { status: 404 });
+  if (!item)                   throw Object.assign(new Error('Item not found in order.'),        { status: 404 });
   if (item.status === 'cancelled') throw Object.assign(new Error('Item is already cancelled.'), { status: 400 });
+
+  // Calculate refund BEFORE mutating the order
+  const refundAmount = getItemRefundAmount(order, item);
 
   await restoreStockAndBroadcast(item.product, item.quantity, item.variantName || null);
 
@@ -104,8 +164,24 @@ export const cancelSingleItem = async ({ orderNumber, userId, itemId, reason }) 
   }
 
   await order.save();
-  return { order, allCancelled };
+
+  // Wallet refund — immediate
+  let refunded = false;
+  if (refundAmount > 0) {
+    const wallet = await Wallet.getOrCreate(userId);
+    await wallet.credit(
+      refundAmount,
+      `Refund for cancelled item "${item.name}" in order ${order.orderNumber}`,
+      'cancellation_refund',
+      order
+    );
+    refunded = true;
+  }
+
+  return { order, allCancelled, refunded, refundAmount };
 };
+
+// ── Return requests ───────────────────────────────────────────────────────
 
 export const requestReturn = async ({ orderNumber, userId, reason }) => {
   if (!reason) throw Object.assign(new Error('Return reason is required.'), { status: 400 });
@@ -124,13 +200,12 @@ export const requestReturn = async ({ orderNumber, userId, reason }) => {
     );
   }
 
-  order.orderStatus       = 'returned';
-  order.returnStatus      = 'pending';
-  order.returnReason      = reason;
-  order.returnRequestedAt = new Date();
+  order.orderStatus           = 'returned';
+  order.returnStatus          = 'pending';
+  order.returnReason          = reason;
+  order.returnRequestedAt     = new Date();
   order.returnRejectionReason = '';
 
-  
   order.items.forEach(i => {
     if (i.status === 'active' && i.returnStatus === 'none') {
       i.returnStatus      = 'pending';
@@ -155,11 +230,9 @@ export const requestItemReturn = async ({ orderNumber, userId, itemId, reason })
   }
 
   const item = order.items.id(itemId);
-  if (!item) throw Object.assign(new Error('Item not found in order.'), { status: 404 });
-  if (item.status === 'cancelled') throw Object.assign(new Error('This item was cancelled and cannot be returned.'), { status: 400 });
-  if (item.returnStatus !== 'none') {
-    throw Object.assign(new Error('A return request has already been submitted for this item.'), { status: 400 });
-  }
+  if (!item)                      throw Object.assign(new Error('Item not found in order.'),                              { status: 404 });
+  if (item.status === 'cancelled') throw Object.assign(new Error('This item was cancelled and cannot be returned.'),      { status: 400 });
+  if (item.returnStatus !== 'none') throw Object.assign(new Error('A return request has already been submitted for this item.'), { status: 400 });
 
   item.returnStatus      = 'pending';
   item.returnReason      = reason;
@@ -180,6 +253,165 @@ export const requestItemReturn = async ({ orderNumber, userId, itemId, reason })
   await order.save();
   return order;
 };
+
+// ── Admin: accept / reject returns (with wallet refund on accept) ─────────
+
+/**
+ * Admin accepts an entire order return.
+ * Restores stock + credits wallet immediately.
+ */
+export const acceptOrderReturn = async ({ orderNumber }) => {
+  const order = await Order.findOne({ orderNumber });
+  if (!order) throw Object.assign(new Error('Order not found.'), { status: 404 });
+
+  if (order.returnStatus !== 'pending') {
+    throw Object.assign(new Error('No pending return request on this order.'), { status: 400 });
+  }
+
+  // Restore stock for every active item with a pending return
+  await Promise.all(
+    order.items
+      .filter(i => i.status === 'active' && i.returnStatus === 'pending')
+      .map(i => restoreStockAndBroadcast(i.product, i.quantity, i.variantName || null))
+  );
+
+  order.returnStatus = 'accepted';
+  order.items.forEach(i => {
+    if (i.status === 'active' && i.returnStatus === 'pending') {
+      i.returnStatus = 'accepted';
+    }
+  });
+  await order.save();
+
+  // Wallet refund — only if the order was paid online or via wallet
+  const refundAmount = getRefundAmount(order);
+  if (refundAmount > 0) {
+    const wallet = await Wallet.getOrCreate(order.user);
+    await wallet.credit(
+      refundAmount,
+      `Refund for returned order ${order.orderNumber}`,
+      'return_refund',
+      order
+    );
+    return { order, refunded: true, refundAmount };
+  }
+
+  return { order, refunded: false, refundAmount: 0 };
+};
+
+/**
+ * Admin rejects an entire order return.
+ * No stock or wallet changes.
+ */
+export const rejectOrderReturn = async ({ orderNumber, rejectionReason }) => {
+  const order = await Order.findOne({ orderNumber });
+  if (!order) throw Object.assign(new Error('Order not found.'), { status: 404 });
+
+  if (order.returnStatus !== 'pending') {
+    throw Object.assign(new Error('No pending return request on this order.'), { status: 400 });
+  }
+
+  order.returnStatus          = 'rejected';
+  order.returnRejectionReason = (rejectionReason || '').trim();
+  order.orderStatus           = 'delivered'; // revert to delivered
+  order.items.forEach(i => {
+    if (i.status === 'active' && i.returnStatus === 'pending') {
+      i.returnStatus           = 'rejected';
+      i.returnRejectionReason  = (rejectionReason || '').trim();
+    }
+  });
+  await order.save();
+  return order;
+};
+
+/**
+ * Admin accepts a single-item return.
+ * Restores stock + credits wallet proportionally.
+ */
+export const acceptItemReturn = async ({ orderNumber, itemId }) => {
+  if (!itemId) throw Object.assign(new Error('itemId is required.'), { status: 400 });
+
+  const order = await Order.findOne({ orderNumber });
+  if (!order) throw Object.assign(new Error('Order not found.'), { status: 404 });
+
+  const item = order.items.id(itemId);
+  if (!item)                         throw Object.assign(new Error('Item not found.'),                    { status: 404 });
+  if (item.returnStatus !== 'pending') throw Object.assign(new Error('Item has no pending return request.'), { status: 400 });
+
+  // Calculate refund BEFORE mutating
+  const refundAmount = getItemRefundAmount(order, item);
+
+  await restoreStockAndBroadcast(item.product, item.quantity, item.variantName || null);
+
+  item.returnStatus = 'accepted';
+
+  // If all active items are now accepted → mark order-level as accepted too
+  const activeItems = order.items.filter(i => i.status === 'active');
+  const allAccepted = activeItems.every(i => i.returnStatus === 'accepted');
+  if (allAccepted) order.returnStatus = 'accepted';
+
+  await order.save();
+
+  // Wallet refund
+  let refunded = false;
+  if (refundAmount > 0) {
+    const wallet = await Wallet.getOrCreate(order.user);
+    await wallet.credit(
+      refundAmount,
+      `Refund for returned item "${item.name}" in order ${order.orderNumber}`,
+      'return_refund',
+      order
+    );
+    refunded = true;
+  }
+
+  return { order, refunded, refundAmount };
+};
+
+/**
+ * Admin rejects a single-item return.
+ */
+export const rejectItemReturn = async ({ orderNumber, itemId, rejectionReason }) => {
+  if (!itemId) throw Object.assign(new Error('itemId is required.'), { status: 400 });
+
+  const order = await Order.findOne({ orderNumber });
+  if (!order) throw Object.assign(new Error('Order not found.'), { status: 404 });
+
+  const item = order.items.id(itemId);
+  if (!item)                           throw Object.assign(new Error('Item not found.'),                    { status: 404 });
+  if (item.returnStatus !== 'pending') throw Object.assign(new Error('Item has no pending return request.'), { status: 400 });
+
+  item.returnStatus          = 'rejected';
+  item.returnRejectionReason = (rejectionReason || '').trim();
+
+  // If all active items are now settled (accepted/rejected) → update order-level return status
+  const activeItems  = order.items.filter(i => i.status === 'active');
+  const allSettled   = activeItems.every(i => ['accepted', 'rejected', 'none'].includes(i.returnStatus) && i.returnStatus !== 'pending');
+  const anyAccepted  = activeItems.some(i => i.returnStatus === 'accepted');
+  if (allSettled) {
+    order.returnStatus = anyAccepted ? 'accepted' : 'rejected';
+    if (order.returnStatus === 'rejected') {
+      order.returnRejectionReason = (rejectionReason || '').trim();
+      order.orderStatus = 'delivered';
+    }
+  }
+
+  await order.save();
+  return order;
+};
+
+// ── Wallet read ───────────────────────────────────────────────────────────
+
+export const fetchWallet = async (userId) => {
+  const wallet = await Wallet.getOrCreate(userId);
+  // Return transactions newest-first for display
+  const transactions = [...wallet.transactions].sort(
+    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+  );
+  return { balance: wallet.balance, transactions };
+};
+
+// ── Invoice PDF ───────────────────────────────────────────────────────────
 
 export const generateInvoicePDF = async ({ orderNumber, userId, res }) => {
   const order = await Order.findOne({ orderNumber, user: userId }).lean();

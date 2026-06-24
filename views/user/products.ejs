@@ -121,57 +121,27 @@
 
     /* ── SIDEBAR ── */
     .filters-sidebar { width:210px; flex-shrink:0; position:sticky; top:70px; }
-
-    /* ─── FILTER TOGGLE BUTTON — refined dark luxury ─── */
     .filter-toggle-btn {
-      width: 100%;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0.72rem 0.95rem;
-      background: rgba(14,13,11,0.7);
-      border: 1px solid rgba(201,169,110,0.14);
-      border-radius: 8px;
-      cursor: pointer;
-      margin-bottom: 8px;
+      width: 100%; display: flex; align-items: center; justify-content: space-between;
+      padding: 0.72rem 0.95rem; background: rgba(14,13,11,0.7);
+      border: 1px solid rgba(201,169,110,0.14); border-radius: 8px;
+      cursor: pointer; margin-bottom: 8px;
       transition: background 0.22s, border-color 0.22s, box-shadow 0.22s;
-      box-shadow:
-        0 1px 0 rgba(255,255,255,0.04) inset,
-        0 2px 8px rgba(0,0,0,0.35);
+      box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 2px 8px rgba(0,0,0,0.35);
     }
-    .filter-toggle-btn:hover {
-      background: rgba(201,169,110,0.06);
-      border-color: rgba(201,169,110,0.28);
-      box-shadow:
-        0 0 0 3px rgba(201,169,110,0.04),
-        0 1px 0 rgba(255,255,255,0.04) inset;
-    }
-    .filter-toggle-btn.active {
-      background: rgba(201,169,110,0.07);
-      border-color: rgba(201,169,110,0.32);
-    }
-    .filter-toggle-label {
-      display: flex; align-items: center; gap: 7px;
-      font-family: 'Jost', sans-serif;
-      font-size: 0.44rem; font-weight: 400; letter-spacing: 0.26em; text-transform: uppercase;
-      color: rgba(201,169,110,0.6);
-    }
+    .filter-toggle-btn:hover { background: rgba(201,169,110,0.06); border-color: rgba(201,169,110,0.28); box-shadow: 0 0 0 3px rgba(201,169,110,0.04), 0 1px 0 rgba(255,255,255,0.04) inset; }
+    .filter-toggle-btn.active { background: rgba(201,169,110,0.07); border-color: rgba(201,169,110,0.32); }
+    .filter-toggle-label { display: flex; align-items: center; gap: 7px; font-family: 'Jost', sans-serif; font-size: 0.44rem; font-weight: 400; letter-spacing: 0.26em; text-transform: uppercase; color: rgba(201,169,110,0.6); }
     .filter-dot { width:4px; height:4px; border-radius:50%; background:#c9a96e; display:none; flex-shrink:0; box-shadow:0 0 5px rgba(201,169,110,0.55); }
     .filter-dot.show { display:inline-block; }
     .filter-toggle-chevron { color:rgba(201,169,110,0.3); transition:transform 0.32s cubic-bezier(.4,0,.2,1); flex-shrink:0; }
     .filter-toggle-chevron.open { transform:rotate(180deg); }
-
     .filter-content { overflow:hidden; max-height:0; opacity:0; transition:max-height 0.4s cubic-bezier(.4,0,.2,1),opacity 0.3s; }
     .filter-content.open { max-height:1100px; opacity:1; }
-
-    .filter-block {
-      background: rgba(14,13,11,0.5);
-      border: 1px solid rgba(245,242,235,0.06);
-      border-radius: 8px; padding: 0.9rem; margin-bottom: 6px;
-      transition: border-color 0.25s;
-    }
+    .filter-block { background: rgba(14,13,11,0.5); border: 1px solid rgba(245,242,235,0.06); border-radius: 8px; padding: 0.9rem; margin-bottom: 6px; transition: border-color 0.25s; }
     .filter-block:hover { border-color:rgba(201,169,110,0.1); }
     .filter-block-title { font-family:'Jost',sans-serif; font-size:0.38rem; letter-spacing:0.3em; text-transform:uppercase; color:rgba(201,169,110,0.4); margin-bottom:0.75rem; display:flex; align-items:center; gap:0.5rem; }
     .filter-block-title::before { content:''; width:8px; height:1px; background:rgba(201,169,110,0.25); flex-shrink:0; }
-
     .vc-input { width:100%; background:rgba(245,242,235,0.03); border:1px solid rgba(245,242,235,0.08); padding:0.6rem 0.8rem; font-family:'Jost',sans-serif; font-size:0.7rem; font-weight:300; color:#f5f2eb; outline:none; border-radius:6px; transition:border-color 0.25s,background 0.25s,box-shadow 0.25s; appearance:none; -webkit-appearance:none; }
     .vc-input::placeholder { color:rgba(245,242,235,0.18); }
     .vc-input:focus { border-color:rgba(201,169,110,0.4); background:rgba(201,169,110,0.03); box-shadow:0 0 0 3px rgba(201,169,110,0.06); }
@@ -185,69 +155,21 @@
     .brand-item { display:flex; align-items:center; gap:7px; font-family:'Jost',sans-serif; font-size:0.65rem; font-weight:300; color:rgba(245,242,235,0.35); cursor:pointer; transition:color 0.2s; padding:2px 0; }
     .brand-item:hover { color:rgba(245,242,235,0.75); }
     .brand-item input[type=radio] { accent-color:#c9a96e; flex-shrink:0; }
-
-    /* ─── APPLY FILTERS BUTTON — luxury gold, refined ─── */
     .btn-apply {
-      width: 100%;
-      padding: 0.65rem 1rem;
-      border: 1px solid rgba(201,169,110,0.35);
-      border-radius: 6px;
-      cursor: pointer;
-      font-family: 'Jost', sans-serif;
-      font-size: 0.42rem;
-      letter-spacing: 0.24em;
-      text-transform: uppercase;
-      font-weight: 400;
-      color: rgba(201,169,110,0.9);
-      background: rgba(201,169,110,0.07);
+      width: 100%; padding: 0.65rem 1rem; border: 1px solid rgba(201,169,110,0.35); border-radius: 6px; cursor: pointer;
+      font-family: 'Jost', sans-serif; font-size: 0.42rem; letter-spacing: 0.24em; text-transform: uppercase; font-weight: 400;
+      color: rgba(201,169,110,0.9); background: rgba(201,169,110,0.07);
       position: relative; overflow: hidden;
       transition: background 0.22s, border-color 0.22s, color 0.22s, box-shadow 0.22s, transform 0.18s;
-      box-shadow:
-        0 1px 0 rgba(255,255,255,0.06) inset,
-        0 3px 12px rgba(0,0,0,0.35);
-      margin-top: 6px;
+      box-shadow: 0 1px 0 rgba(255,255,255,0.06) inset, 0 3px 12px rgba(0,0,0,0.35); margin-top: 6px;
     }
-    .btn-apply::before {
-      content: '';
-      position: absolute; inset: 0;
-      background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, transparent 55%);
-      pointer-events: none;
-      border-radius: 6px;
-    }
-    .btn-apply::after {
-      content: '';
-      position: absolute; top: 0; left: -75%; width: 50%; height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-      transform: skewX(-18deg);
-      transition: left 0.5s ease;
-    }
-    .btn-apply:hover {
-      background: rgba(201,169,110,0.14);
-      border-color: rgba(201,169,110,0.6);
-      color: #c9a96e;
-      box-shadow:
-        0 0 0 3px rgba(201,169,110,0.08),
-        0 1px 0 rgba(255,255,255,0.06) inset,
-        0 4px 16px rgba(0,0,0,0.4);
-      transform: translateY(-1px);
-    }
-    .btn-apply:hover::after { left: 130%; }
-    .btn-apply:active {
-      transform: translateY(0);
-      background: rgba(201,169,110,0.1);
-    }
-
-    /* ─── CLEAR ALL — subtle ghost link ─── */
-    .btn-clear {
-      display: block; text-align: center;
-      font-family: 'Jost', sans-serif;
-      font-size: 0.38rem; letter-spacing: 0.18em; text-transform: uppercase;
-      color: rgba(245,242,235,0.12);
-      text-decoration: none;
-      margin-top: 9px;
-      transition: color 0.2s;
-    }
-    .btn-clear:hover { color: rgba(201,169,110,0.4); }
+    .btn-apply::before { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(255,255,255,0.06) 0%,transparent 55%); pointer-events:none; border-radius:6px; }
+    .btn-apply::after { content:''; position:absolute; top:0; left:-75%; width:50%; height:100%; background:linear-gradient(90deg,transparent,rgba(255,255,255,0.1),transparent); transform:skewX(-18deg); transition:left 0.5s ease; }
+    .btn-apply:hover { background:rgba(201,169,110,0.14); border-color:rgba(201,169,110,0.6); color:#c9a96e; box-shadow:0 0 0 3px rgba(201,169,110,0.08),0 1px 0 rgba(255,255,255,0.06) inset,0 4px 16px rgba(0,0,0,0.4); transform:translateY(-1px); }
+    .btn-apply:hover::after { left:130%; }
+    .btn-apply:active { transform:translateY(0); background:rgba(201,169,110,0.1); }
+    .btn-clear { display:block; text-align:center; font-family:'Jost',sans-serif; font-size:0.38rem; letter-spacing:0.18em; text-transform:uppercase; color:rgba(245,242,235,0.12); text-decoration:none; margin-top:9px; transition:color 0.2s; }
+    .btn-clear:hover { color:rgba(201,169,110,0.4); }
 
     /* ── PRODUCTS AREA ── */
     .products-area { flex:1; min-width:0; }
@@ -269,15 +191,15 @@
     .prod-img-wrap { aspect-ratio:1/1; overflow:hidden; background:#1a1a18; position:relative; border-radius:12px 12px 0 0; }
     .prod-img-wrap::after { content:''; position:absolute; inset:0; background:linear-gradient(180deg,transparent 55%,rgba(10,10,9,.45) 100%); pointer-events:none; z-index:1; }
     .prod-img { width:100%; height:100%; object-fit:cover; object-position:center; transition:transform 0.6s cubic-bezier(.25,.46,.45,.94); filter:brightness(.88) contrast(1.04) saturate(.8); display:block; }
-    .oos-badge { position: absolute; top: 8px; left: 8px; z-index: 10; background: rgba(17,17,16,0.82); border: 1px solid rgba(201,169,110,0.35); color: rgba(201,169,110,0.9); font-family: 'Jost', sans-serif; font-size: 0.36rem; font-weight: 400; letter-spacing: 0.18em; text-transform: uppercase; padding: 3px 7px; border-radius: 4px; backdrop-filter: blur(4px); pointer-events: none; }
-    .oos-badge.unavailable { border-color: rgba(200,80,60,0.35); color: rgba(220,100,80,0.9); }
+    .oos-badge { position:absolute; top:8px; left:8px; z-index:10; background:rgba(17,17,16,0.82); border:1px solid rgba(201,169,110,0.35); color:rgba(201,169,110,0.9); font-family:'Jost',sans-serif; font-size:0.36rem; font-weight:400; letter-spacing:0.18em; text-transform:uppercase; padding:3px 7px; border-radius:4px; backdrop-filter:blur(4px); pointer-events:none; }
+    .oos-badge.unavailable { border-color:rgba(200,80,60,0.35); color:rgba(220,100,80,0.9); }
     .prod-body { padding:0.7rem 0.85rem 0.95rem; border-top:1px solid rgba(201,169,110,0.07); flex:1; display:flex; flex-direction:column; }
     .prod-brand { font-family:'Jost',sans-serif; font-size:0.34rem; letter-spacing:0.24em; text-transform:uppercase; color:rgba(201,169,110,0.55); margin-bottom:1px; }
     .prod-cat { font-family:'Jost',sans-serif; font-size:0.34rem; letter-spacing:0.16em; text-transform:uppercase; color:rgba(201,169,110,0.32); margin-bottom:4px; }
     .prod-name { font-family:'Cormorant Garamond',serif; font-size:0.95rem; font-weight:300; color:#f5f2eb; line-height:1.2; flex:1; margin-bottom:3px; }
     .prod-price { font-family:'Jost',sans-serif; font-size:0.56rem; color:rgba(201,169,110,0.65); letter-spacing:0.04em; margin-top:auto; padding-top:5px; }
     .prod-card.is-oos .prod-img { filter:brightness(.6) contrast(1) saturate(.4); }
-    .prod-card.is-oos .prod-name, .prod-card.is-oos .prod-price { opacity: 0.5; }
+    .prod-card.is-oos .prod-name, .prod-card.is-oos .prod-price { opacity:0.5; }
 
     .empty-state { padding:5rem 2rem; text-align:center; }
     .empty-state-icon { width:48px; height:48px; margin:0 auto 1.25rem; opacity:0.1; display:block; }
@@ -365,6 +287,8 @@
 
 <!-- ════ NAV ════ -->
 <nav class="nav-root" id="navbar">
+
+  <!-- DESKTOP NAV -->
   <div class="nav-desktop">
     <div class="nav-links">
       <a href="/home"     class="nav-link">Home</a>
@@ -375,28 +299,46 @@
     </div>
     <a href="/home" class="nav-logo">Velmora<br/>Chroné</a>
     <div class="nav-icons-desktop">
-      <a href="/profile"  class="nav-icon-btn" aria-label="Profile"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></a>
-      <a href="/wishlist" class="nav-icon-btn" aria-label="Wishlist"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></a>
-      <a href="/cart" class="nav-icon-btn" aria-label="Cart"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg><span class="cart-badge" id="cartCountDesktop">0</span></a>
+      <a href="/profile" class="nav-icon-btn" aria-label="Profile">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </a>
+      <a href="/wishlist" class="nav-icon-btn" aria-label="Wishlist">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        <span class="cart-badge" id="wishBadgeDesktop" style="display:none">0</span>
+      </a>
+      <a href="/cart" class="nav-icon-btn" aria-label="Cart">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <span class="cart-badge" id="cartCountDesktop">0</span>
+      </a>
       <a href="/logout" class="nav-link" style="font-size:0.46rem;margin-left:4px;">Logout</a>
     </div>
   </div>
+
+  <!-- MOBILE NAV -->
   <div class="nav-mobile">
     <div class="nav-mob-left">
       <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
     </div>
     <a href="/home" class="nav-mob-center">Velmora<br/>Chroné</a>
     <div class="nav-mob-right">
-      <a href="/wishlist" class="mob-icon-btn" aria-label="Wishlist"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></a>
-      <a href="/cart" class="mob-icon-btn" aria-label="Cart" style="position:relative;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg><span class="cart-badge" id="cartCountMobile">0</span></a>
+      <a href="/wishlist" class="mob-icon-btn" aria-label="Wishlist">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        <span class="cart-badge" id="wishBadgeMobile" style="display:none">0</span>
+      </a>
+      <a href="/cart" class="mob-icon-btn" aria-label="Cart" style="position:relative;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <span class="cart-badge" id="cartCountMobile">0</span>
+      </a>
     </div>
   </div>
+
+  <!-- MOBILE MENU -->
   <div class="mobile-menu" id="mobileMenu">
     <a href="/home"     class="mob-link"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home</a>
     <a href="/products" class="mob-link active"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Collection</a>
     <a href="/orders"   class="mob-link"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/></svg>Orders</a>
     <a href="/profile"  class="mob-link"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>My Profile</a>
-    <a href="/wishlist"  class="mob-link"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>Wishlist</a>
+    <a href="/wishlist" class="mob-link"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>Wishlist</a>
     <a href="/cart"     class="mob-link"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>Cart</a>
     <a href="/logout"   class="mob-link" style="color:rgba(201,169,110,0.6);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Logout</a>
   </div>
@@ -456,7 +398,6 @@
         </span>
         <svg class="filter-toggle-chevron" id="filterChevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
       </button>
-
       <div class="filter-content" id="filterContent">
         <div class="filter-block">
           <div class="filter-block-title">Category</div>
@@ -640,9 +581,11 @@
 </footer>
 
 <script>
+  // ── Nav scroll ──────────────────────────────────────────────────────────
   const navbar = document.getElementById('navbar');
   window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', scrollY > 30), { passive:true });
 
+  // ── Mobile menu ─────────────────────────────────────────────────────────
   const hamburger  = document.getElementById('hamburger');
   const mobileMenu = document.getElementById('mobileMenu');
   hamburger.addEventListener('click', () => {
@@ -654,6 +597,7 @@
     hamburger.classList.remove('open'); mobileMenu.classList.remove('open');
   }));
 
+  // ── Desktop filter toggle ────────────────────────────────────────────────
   const filterToggleDesktop = document.getElementById('filterToggleDesktop');
   const filterContent       = document.getElementById('filterContent');
   const filterChevron       = document.getElementById('filterChevron');
@@ -671,6 +615,7 @@
     filterChevron.classList.toggle('open', sidebarOpen);
   });
 
+  // ── Mobile filter drawer ─────────────────────────────────────────────────
   const mobFilterBtn  = document.getElementById('mobFilterBtn');
   const filterOverlay = document.getElementById('filterOverlay');
   const filterDrawer  = document.getElementById('filterDrawer');
@@ -681,25 +626,46 @@
   filterOverlay.addEventListener('click', closeDrawer);
   drawerClose.addEventListener('click', closeDrawer);
 
+  // ── Reveal on scroll ─────────────────────────────────────────────────────
   const obs = new IntersectionObserver(entries => {
     entries.forEach((e,i) => { if (e.isIntersecting) { setTimeout(()=>e.target.classList.add('visible'), i*55); obs.unobserve(e.target); } });
   }, { threshold:0.05 });
   document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 
+  // ── Badge helpers ────────────────────────────────────────────────────────
+  function updateWishBadge(count) {
+    ['wishBadgeDesktop','wishBadgeMobile'].forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.textContent = count > 99 ? '99+' : count;
+      el.style.display = count > 0 ? 'flex' : 'none';
+    });
+  }
+  function updateCartBadge(count) {
+    ['cartCountDesktop','cartCountMobile'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = count > 99 ? '99+' : count;
+    });
+  }
+
+  // ── Fetch cart + wishlist counts on load ─────────────────────────────────
   fetch('/api/cart/count', { headers:{ 'Accept':'application/json' } })
     .then(r => r.json())
-    .then(d => {
-      if (d.count !== undefined) {
-        document.getElementById('cartCountDesktop').textContent = d.count;
-        document.getElementById('cartCountMobile').textContent  = d.count;
-      }
-    }).catch(() => {});
+    .then(d => { if (d.count !== undefined) updateCartBadge(d.count); })
+    .catch(() => {});
 
+  fetch('/api/wishlist/count', { headers:{ 'Accept':'application/json' } })
+    .then(r => r.json())
+    .then(d => updateWishBadge(d.count || 0))
+    .catch(() => {});
+
+  // ── Sort ─────────────────────────────────────────────────────────────────
   function applySort(val) {
     document.getElementById('sortInput').value = val;
     document.getElementById('filterFormTop').submit();
   }
 
+  // ── SSE: live stock updates ───────────────────────────────────────────────
   (function () {
     const es = new EventSource('/sse/products');
     es.addEventListener('productUpdate', function (e) {

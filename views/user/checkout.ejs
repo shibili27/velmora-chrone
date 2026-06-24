@@ -10,6 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Jost:wght@200;300;400;500&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet"/>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     html{scroll-behavior:smooth}
@@ -123,11 +124,15 @@
     .item-subtotal{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:300;color:rgba(201,169,110,.85)}
     .item-tax-note{font-family:'Jost',sans-serif;font-size:.36rem;letter-spacing:.08em;color:rgba(245,242,235,.18);text-align:right}
 
-    .payment-box{background:rgba(201,169,110,.04);border:1px solid rgba(201,169,110,.14);border-radius:12px;padding:1.1rem;display:flex;gap:.85rem;align-items:flex-start}
+    .payment-box{background:rgba(201,169,110,.04);border:1px solid rgba(201,169,110,.14);border-radius:12px;padding:1.1rem;display:flex;gap:.85rem;align-items:flex-start;transition:border-color .25s,background .25s,box-shadow .25s;margin-bottom:.65rem}
+    .payment-box:last-child{margin-bottom:0}
+    .payment-box.selected{border-color:rgba(201,169,110,.5);background:rgba(201,169,110,.07);box-shadow:0 0 0 1px rgba(201,169,110,.15) inset}
+    .payment-box.disabled{opacity:.45;cursor:not-allowed!important;pointer-events:none}
     .payment-icon{width:34px;height:34px;border-radius:8px;background:rgba(201,169,110,.08);border:1px solid rgba(201,169,110,.18);display:flex;align-items:center;justify-content:center;flex-shrink:0}
     .payment-icon svg{width:15px;height:15px;color:#c9a96e}
     .payment-title{font-family:'Jost',sans-serif;font-size:.5rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(201,169,110,.7);margin-bottom:3px}
     .payment-desc{font-family:'Jost',sans-serif;font-size:.55rem;font-weight:300;color:rgba(245,242,235,.28);line-height:1.65}
+    .wallet-insufficient{color:rgba(248,113,113,.75)!important}
 
     .summary-card{background:rgba(245,242,235,.02);border:1px solid rgba(245,242,235,.06);border-radius:16px;padding:1.5rem;position:sticky;top:84px;transition:border-color .25s}
     .summary-card:hover{border-color:rgba(201,169,110,.1)}
@@ -294,7 +299,7 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
       </svg>
-      Cash on Delivery · 256-bit SSL Encrypted
+      Choose payment method below · 256-bit SSL Encrypted
     </div>
   </div>
 </div>
@@ -313,6 +318,7 @@
 
   <div>
 
+    <!-- DELIVERY ADDRESS -->
     <div class="section-block reveal">
       <div class="section-label">Delivery Address</div>
 
@@ -337,9 +343,9 @@
                 <button class="addr-btn"
                   onclick="openEditModal(event,
                     '<%= addr._id %>',
-                    `<%= (addr.fullName || addr.name || '').replace(/`/g, '') %>`,
-                    `<%= (addr.line1 || addr.addressLine || '').replace(/`/g, '') %>`,
-                    `<%= (addr.city || '').replace(/`/g, '') %>`,
+                    `<%= (addr.fullName || addr.name || '').replace(/\`/g, '') %>`,
+                    `<%= (addr.line1 || addr.addressLine || '').replace(/\`/g, '') %>`,
+                    `<%= (addr.city || '').replace(/\`/g, '') %>`,
                     '<%= addr.state || '' %>',
                     '<%= addr.pincode || addr.pin || '' %>',
                     '<%= addr.phone || '' %>'
@@ -364,6 +370,7 @@
       </button>
     </div>
 
+    <!-- ITEMS -->
     <div class="section-block reveal">
       <div class="section-label">Your Timepieces</div>
       <div class="item-list">
@@ -397,9 +404,12 @@
       </div>
     </div>
 
+    <!-- PAYMENT METHOD -->
     <div class="section-block reveal">
       <div class="section-label">Payment Method</div>
-      <div class="payment-box">
+
+      <!-- COD -->
+      <div class="payment-box" id="payCod" onclick="selectPaymentMethod('COD')" style="cursor:pointer">
         <div class="payment-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
             <rect x="2" y="5" width="20" height="14" rx="2"/>
@@ -411,10 +421,56 @@
           <div class="payment-desc">Pay in cash when your timepiece arrives at your door. No advance payment needed — our courier will collect upon delivery. Signature required.</div>
         </div>
       </div>
+
+      <!-- RAZORPAY -->
+      <div class="payment-box" id="payRazorpay" onclick="selectPaymentMethod('Razorpay')" style="cursor:pointer">
+        <div class="payment-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="1" y="4" width="22" height="16" rx="2"/>
+            <line x1="1" y1="9" x2="23" y2="9"/>
+          </svg>
+        </div>
+        <div>
+          <div class="payment-title">Pay Online</div>
+          <div class="payment-desc">Pay securely via Card, UPI, Netbanking or Wallet through Razorpay. Instant confirmation, no cash needed on delivery.</div>
+        </div>
+      </div>
+
+      <!-- WALLET -->
+      <%
+        const walletSufficient = walletBalance >= pricing.grandTotal;
+      %>
+      <div class="payment-box <%= walletSufficient ? '' : 'disabled' %>"
+           id="payWallet"
+           onclick="<%= walletSufficient ? "selectPaymentMethod('Wallet')" : '' %>"
+           style="cursor:<%= walletSufficient ? 'pointer' : 'not-allowed' %>">
+        <div class="payment-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 12V8H6a2 2 0 0 1 0-4h14v4"/>
+            <path d="M4 6v12a2 2 0 0 0 2 2h14v-4"/>
+            <path d="M18 12a2 2 0 0 0 0 4h4v-4z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="payment-title">Pay from Wallet</div>
+          <div class="payment-desc">
+            Balance: <strong style="color:#c9a96e">₹<%= walletBalance.toLocaleString('en-IN') %></strong>
+            <% if (!walletSufficient) { %>
+              &nbsp;·&nbsp;<span class="wallet-insufficient">
+                Insufficient — need ₹<%= (pricing.grandTotal - walletBalance).toLocaleString('en-IN') %> more
+              </span>
+            <% } else { %>
+              &nbsp;·&nbsp;<span style="color:rgba(74,222,128,.7)">Sufficient to pay</span>
+            <% } %>
+          </div>
+        </div>
+      </div>
+
     </div>
 
-  </div>
+  </div><!-- /left col -->
 
+  <!-- ORDER SUMMARY -->
   <div>
     <div class="summary-card reveal">
       <div class="summary-title">Order Summary</div>
@@ -460,10 +516,27 @@
         <% } %>
       </div>
 
-      <div class="coupon-row">
+      <% if (couponCode) { %>
+      <div class="coupon-row" id="couponAppliedRow" style="justify-content:space-between;align-items:center">
+        <span style="font-family:'Jost',sans-serif;font-size:.58rem;color:#c9a96e;letter-spacing:.06em">
+          ✓ <%= couponCode %> applied
+        </span>
+        <button class="coupon-apply-btn" onclick="removeCoupon()" style="color:rgba(248,113,113,.75);border-color:rgba(248,113,113,.25)">Remove</button>
+      </div>
+      <div class="coupon-row" id="couponInputRow" style="display:none">
         <input class="coupon-input" type="text" id="couponInput" placeholder="Promo / coupon code"/>
         <button class="coupon-apply-btn" onclick="applyCoupon()">Apply</button>
       </div>
+      <% } else { %>
+      <div class="coupon-row" id="couponInputRow">
+        <input class="coupon-input" type="text" id="couponInput" placeholder="Promo / coupon code"/>
+        <button class="coupon-apply-btn" onclick="applyCoupon()">Apply</button>
+      </div>
+      <div class="coupon-row" id="couponAppliedRow" style="display:none;justify-content:space-between;align-items:center">
+        <span style="font-family:'Jost',sans-serif;font-size:.58rem;color:#c9a96e;letter-spacing:.06em" id="couponAppliedLabel"></span>
+        <button class="coupon-apply-btn" onclick="removeCoupon()" style="color:rgba(248,113,113,.75);border-color:rgba(248,113,113,.25)">Remove</button>
+      </div>
+      <% } %>
       <div class="coupon-msg" id="couponMsg"></div>
 
       <div class="summary-divider"></div>
@@ -480,7 +553,7 @@
       <button class="btn-place" id="placeOrderBtn"
         <%= (!addresses || addresses.length === 0) ? 'disabled' : '' %>
         onclick="placeOrder()">
-        Place Order · COD
+        Place Order · <span id="placeOrderMethodLabel">COD</span>
       </button>
 
       <a href="/cart" class="btn-continue">← Back to Cart</a>
@@ -494,7 +567,7 @@
     </div>
   </div>
 
-</div>
+</div><!-- /checkout-wrap -->
 
 <div class="rule"></div>
 
@@ -748,21 +821,14 @@
     const type  = document.getElementById('mType').value;
 
     clearFieldErrors();
-
     let hasError = false;
-
-    if (!name)                          { setFieldError('mName',  true); hasError = true; }
+    if (!name)                             { setFieldError('mName',  true); hasError = true; }
     if (!phone || !/^\d{10}$/.test(phone)) { setFieldError('mPhone', true); hasError = true; }
-    if (!line1)                         { setFieldError('mLine1', true); hasError = true; }
-    if (!city)                          { setFieldError('mCity',  true); hasError = true; }
-    if (!state)                         { setFieldError('mState', true); hasError = true; }
-    if (!pin || !/^\d{6}$/.test(pin))   { setFieldError('mPin',   true); hasError = true; }
-
-    if (hasError) {
-      const firstErr = document.querySelector('.vc-input.error');
-      if (firstErr) firstErr.focus();
-      return;
-    }
+    if (!line1)                            { setFieldError('mLine1', true); hasError = true; }
+    if (!city)                             { setFieldError('mCity',  true); hasError = true; }
+    if (!state)                            { setFieldError('mState', true); hasError = true; }
+    if (!pin || !/^\d{6}$/.test(pin))      { setFieldError('mPin',   true); hasError = true; }
+    if (hasError) { document.querySelector('.vc-input.error')?.focus(); return; }
 
     const payload = { fullName: name, phone, line1, city, state, pincode: pin, addressType: type };
     const btn = document.getElementById('modalSaveBtn');
@@ -789,6 +855,12 @@
     }
   }
 
+  function updateSummaryFromPricing(pricing) {
+    if (!pricing) return;
+    document.querySelector('.summary-total-val').textContent =
+      '₹' + Number(pricing.grandTotal).toLocaleString('en-IN');
+  }
+
   async function applyCoupon() {
     const code = document.getElementById('couponInput').value.trim().toUpperCase();
     const msg  = document.getElementById('couponMsg');
@@ -802,16 +874,43 @@
         msg.textContent = data.message || 'Invalid coupon.'; msg.className = 'coupon-msg err'; return;
       }
       msg.textContent = data.message || 'Coupon applied!'; msg.className = 'coupon-msg ok';
-      if (data.newTotal !== undefined) {
-        document.querySelector('.summary-total-val').textContent =
-          '₹' + Number(data.newTotal).toLocaleString('en-IN');
-      }
+      updateSummaryFromPricing(data.pricing);
+      setTimeout(() => window.location.reload(), 600);
     } catch (_) { msg.textContent = 'Could not apply coupon.'; msg.className = 'coupon-msg err'; }
   }
 
+  async function removeCoupon() {
+    const msg = document.getElementById('couponMsg');
+    try {
+      const res  = await fetch('/checkout/remove-coupon', { method: 'POST' });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        msg.textContent = data.message || 'Could not remove coupon.'; msg.className = 'coupon-msg err'; return;
+      }
+      showToast(data.message || 'Coupon removed.', 'gold');
+      updateSummaryFromPricing(data.pricing);
+      setTimeout(() => window.location.reload(), 400);
+    } catch (_) {
+      msg.textContent = 'Could not remove coupon.'; msg.className = 'coupon-msg err';
+    }
+  }
+
+  // ── Payment method selection ────────────────────────────────────────────
+  let selectedPaymentMethod = 'COD';
+
+  function selectPaymentMethod(method) {
+    selectedPaymentMethod = method;
+    document.getElementById('payCod').classList.toggle('selected',      method === 'COD');
+    document.getElementById('payRazorpay').classList.toggle('selected', method === 'Razorpay');
+    document.getElementById('payWallet').classList.toggle('selected',   method === 'Wallet');
+    const labels = { COD: 'COD', Razorpay: 'Online', Wallet: 'Wallet' };
+    document.getElementById('placeOrderMethodLabel').textContent = labels[method] || method;
+  }
+  selectPaymentMethod('COD'); // default
+
   function showStockError(message) {
-    const banner  = document.getElementById('stockErrorBanner');
-    const msgEl   = document.getElementById('stockErrorMsg');
+    const banner = document.getElementById('stockErrorBanner');
+    const msgEl  = document.getElementById('stockErrorMsg');
     msgEl.textContent = message;
     banner.classList.add('visible');
     banner.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -824,12 +923,25 @@
   async function placeOrder() {
     const addressId = document.getElementById('selectedAddressId').value;
     if (!addressId) { showToast('Please select a delivery address.', 'err'); return; }
-
     hideStockError();
 
+    if (selectedPaymentMethod === 'COD')      return placeCodOrder(addressId);
+    if (selectedPaymentMethod === 'Razorpay') return placeRazorpayOrder(addressId);
+    if (selectedPaymentMethod === 'Wallet')   return placeWalletOrder(addressId);
+  }
+
+  function resetPlaceOrderBtn() {
+    const btn = document.getElementById('placeOrderBtn');
+    btn.disabled = false;
+    btn.innerHTML = 'Place Order · <span id="placeOrderMethodLabel">' +
+      ({ COD: 'COD', Razorpay: 'Online', Wallet: 'Wallet' }[selectedPaymentMethod] || selectedPaymentMethod) +
+      '</span>';
+  }
+
+  // ── COD ─────────────────────────────────────────────────────────────────
+  async function placeCodOrder(addressId) {
     const btn = document.getElementById('placeOrderBtn');
     btn.disabled = true; btn.textContent = 'Processing…';
-
     try {
       const res  = await fetch('/checkout/place-order', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -837,17 +949,108 @@
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
-        if (data.stockErrors && data.stockErrors.length > 0) {
-          showStockError(data.stockErrors.join(' '));
-        } else {
-          showToast(data.message || 'Failed to place order.', 'err');
-        }
-        btn.disabled = false; btn.textContent = 'Place Order · COD'; return;
+        if (data.stockErrors?.length) showStockError(data.stockErrors.join(' '));
+        else showToast(data.message || 'Failed to place order.', 'err');
+        resetPlaceOrderBtn(); return;
       }
       window.location.href = `/checkout/success?orderId=${data.orderId}`;
     } catch (_) {
       showToast('Something went wrong. Please try again.', 'err');
-      btn.disabled = false; btn.textContent = 'Place Order · COD';
+      resetPlaceOrderBtn();
+    }
+  }
+
+  // ── Wallet ───────────────────────────────────────────────────────────────
+  async function placeWalletOrder(addressId) {
+    const btn = document.getElementById('placeOrderBtn');
+    btn.disabled = true; btn.textContent = 'Processing…';
+    try {
+      const res  = await fetch('/checkout/place-order-wallet', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ addressId }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        if (data.stockErrors?.length) showStockError(data.stockErrors.join(' '));
+        else showToast(data.message || 'Failed to place order.', 'err');
+        resetPlaceOrderBtn(); return;
+      }
+      window.location.href = `/checkout/success?orderId=${data.orderId}`;
+    } catch (_) {
+      showToast('Something went wrong. Please try again.', 'err');
+      resetPlaceOrderBtn();
+    }
+  }
+
+  // ── Razorpay ─────────────────────────────────────────────────────────────
+  async function placeRazorpayOrder(addressId) {
+    const btn = document.getElementById('placeOrderBtn');
+    btn.disabled = true; btn.textContent = 'Initiating payment…';
+    try {
+      const res  = await fetch('/checkout/razorpay/create-order', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ addressId }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        if (data.stockErrors?.length) showStockError(data.stockErrors.join(' '));
+        else showToast(data.message || 'Could not initiate payment.', 'err');
+        resetPlaceOrderBtn(); return;
+      }
+
+      const options = {
+        key      : data.keyId,
+        amount   : data.amount,
+        currency : data.currency,
+        name     : 'Velmora Chroné',
+        description: 'Order ' + data.orderNumber,
+        order_id : data.razorpayOrderId,
+        prefill  : data.prefill,
+        theme    : { color: '#c9a96e' },
+        handler  : async function (response) {
+          try {
+            const verifyRes = await fetch('/checkout/razorpay/verify', {
+              method: 'POST', headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                orderId           : data.orderId,
+                razorpayOrderId   : response.razorpay_order_id,
+                razorpayPaymentId : response.razorpay_payment_id,
+                razorpaySignature : response.razorpay_signature,
+              }),
+            });
+            const verifyData = await verifyRes.json();
+            if (!verifyRes.ok || !verifyData.success) {
+              window.location.href = `/checkout/failure?orderId=${data.orderId}`; return;
+            }
+            window.location.href = `/checkout/success?orderId=${verifyData.orderId}`;
+          } catch (_) {
+            window.location.href = `/checkout/failure?orderId=${data.orderId}`;
+          }
+        },
+        modal: {
+          ondismiss: async function () {
+            await fetch('/checkout/razorpay/failed', {
+              method: 'POST', headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ orderId: data.orderId, reason: 'Payment cancelled by user.' }),
+            }).catch(() => {});
+            window.location.href = `/checkout/failure?orderId=${data.orderId}`;
+          },
+        },
+      };
+
+      const rzp = new Razorpay(options);
+      rzp.on('payment.failed', async function (response) {
+        await fetch('/checkout/razorpay/failed', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderId: data.orderId, reason: response.error?.description || 'Payment failed.' }),
+        }).catch(() => {});
+        window.location.href = `/checkout/failure?orderId=${data.orderId}`;
+      });
+      rzp.open();
+      resetPlaceOrderBtn();
+    } catch (_) {
+      showToast('Something went wrong. Please try again.', 'err');
+      resetPlaceOrderBtn();
     }
   }
 

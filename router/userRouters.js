@@ -44,7 +44,12 @@ import {
   getCheckout,
   placeOrder,
   getOrderSuccess,
+  getOrderFailure,
   applyCoupon,
+  removeCoupon,
+  createRazorpayOrder,
+  verifyRazorpayPayment,
+  markRazorpayFailed,
 } from '../controller/usercontroller/checkoutController.js';
 import {
   getOrders,
@@ -133,7 +138,14 @@ router.get('/api/cart/count', isAuth, getCartCount);
 router.get('/checkout', isAuth, noCache, getCheckout);
 router.post('/checkout/place-order',  isAuth, placeOrder);
 router.get('/checkout/success', isAuth, noCache, getOrderSuccess);
-router.post('/checkout/apply-coupon', isAuth, applyCoupon);
+router.get('/checkout/failure', isAuth, noCache, getOrderFailure);
+router.post('/checkout/apply-coupon',  isAuth, applyCoupon);
+router.post('/checkout/remove-coupon', isAuth, removeCoupon);
+
+// Razorpay
+router.post('/checkout/razorpay/create-order', isAuth, createRazorpayOrder);
+router.post('/checkout/razorpay/verify',       isAuth, verifyRazorpayPayment);
+router.post('/checkout/razorpay/failed',       isAuth, markRazorpayFailed);
 
 
 router.get('/orders', isAuth, noCache, getOrders);

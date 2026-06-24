@@ -248,7 +248,6 @@
     }
     .item-price.struck { text-decoration: line-through; color: var(--text-dim); font-size: 15px; }
 
-    /* Item action buttons */
     .btn-cancel-item {
       padding: 5px 12px; border: 1px solid rgba(248,113,113,0.25); color: var(--red);
       background: rgba(248,113,113,0.04); font-family: 'Jost', sans-serif;
@@ -338,6 +337,27 @@
       font-size: 0.5rem; color: var(--text-dim); letter-spacing: 0.06em;
       text-align: center; line-height: 1.6; padding: 0 4px;
     }
+
+    /* ── Refund notice ── */
+    .refund-notice {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 12px 14px; border-radius: 6px;
+      border: 1px solid rgba(74,222,128,0.2);
+      background: rgba(74,222,128,0.05);
+    }
+    .refund-notice svg { flex-shrink: 0; margin-top: 1px; color: var(--green); }
+    .refund-notice-text { font-size: 0.52rem; color: var(--green); letter-spacing: 0.04em; line-height: 1.65; }
+    .refund-notice-text strong { display: block; font-size: 0.58rem; margin-bottom: 2px; }
+
+    .refund-pending-notice {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 12px 14px; border-radius: 6px;
+      border: 1px solid rgba(251,191,36,0.2);
+      background: rgba(251,191,36,0.05);
+    }
+    .refund-pending-notice svg { flex-shrink: 0; margin-top: 1px; color: var(--amber); }
+    .refund-pending-notice-text { font-size: 0.52rem; color: var(--amber); letter-spacing: 0.04em; line-height: 1.65; }
+    .refund-pending-notice-text strong { display: block; font-size: 0.58rem; margin-bottom: 2px; }
 
     .order-note { margin-top: 4px; padding: 14px 18px; border-left: 2px solid var(--border); background: rgba(255,255,255,0.015); }
     .order-note.cancelled-note { border-left-color: rgba(248,113,113,0.4); }
@@ -453,6 +473,13 @@
   /* Progress steps */
   const STEPS  = ['confirmed','processing','dispatched','delivered'];
   const stepIdx = STEPS.indexOf(s);
+
+  /* Whether payment was made online (Razorpay paid or Wallet) */
+  const paidOnline = order.paymentMethod === 'Wallet' ||
+    (order.paymentMethod === 'Razorpay' && order.paymentStatus === 'paid');
+
+  /* Refund amount for cancelled orders */
+  const cancellationRefundAmount = isCancelled && paidOnline ? order.pricing.grandTotal : 0;
 
   /* Check if every active item already has a return request — hides the whole-order return btn */
   const allItemsReturnPending = isReturnable && order.items
@@ -580,7 +607,6 @@
                     <div class="item-brand" style="color:rgba(201,169,110,0.5)"><%= item.variantName %></div>
                   <% } %>
 
-                  <%/* Status tags */%>
                   <% if (isCancelledItem) { %>
                     <div class="item-status-tag cancelled">
                       <svg width="9" height="9" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -674,6 +700,8 @@
               <div class="payment-icon">
                 <% if (order.paymentMethod === 'COD') { %>
                   <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M22 10H2"/><circle cx="12" cy="14" r="1" fill="currentColor"/></svg>
+                <% } else if (order.paymentMethod === 'Wallet') { %>
+                  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20 12V8H6a2 2 0 0 1 0-4h14v4"/><path d="M4 6v12a2 2 0 0 0 2 2h14v-4"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg>
                 <% } else { %>
                   <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
                 <% } %>
@@ -761,7 +789,7 @@
                 </button>
               <% } %>
 
-              <!-- Return whole order (only if not all items already requested) -->
+              <!-- Return whole order -->
               <% if (isReturnable && !allItemsReturnPending) { %>
                 <button class="btn-danger" onclick="openReturn()">
                   <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.75"/></svg>
@@ -769,32 +797,53 @@
                 </button>
               <% } %>
 
-              <!-- Terminal state indicators -->
-              <% if (isCancelled) { %>
+              <!-- ── Cancellation refund notice ── -->
+              <% if (isCancelled && cancellationRefundAmount > 0) { %>
+                <div class="refund-notice">
+                  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                  <div class="refund-notice-text">
+                    <strong>Refund Credited</strong>
+                    ₹<%= cancellationRefundAmount.toLocaleString('en-IN') %> has been added to your wallet.
+                  </div>
+                </div>
+              <% } else if (isCancelled && !paidOnline) { %>
                 <div class="btn-disabled">
                   <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
                   Order Cancelled
                 </div>
               <% } %>
 
-              <%
-                /* ── Order-level return outcome ──
-                   Reflects whatever the admin has set on order.returnStatus.
-                   'pending'  -> awaiting admin review
-                   'accepted' -> admin approved the return
-                   'rejected' -> admin rejected the return (show reason if present)
-                */
-              %>
+              <!-- ── Return outcome ── -->
               <% if (order.returnStatus === 'pending') { %>
                 <div class="btn-disabled">
                   <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.75"/></svg>
                   Return Requested
                 </div>
+                <% if (paidOnline) { %>
+                  <div class="refund-pending-notice">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <div class="refund-pending-notice-text">
+                      <strong>Refund Pending</strong>
+                      ₹<%= order.pricing.grandTotal.toLocaleString('en-IN') %> will be credited to your wallet once admin approves the return.
+                    </div>
+                  </div>
+                <% } %>
+
               <% } else if (order.returnStatus === 'accepted') { %>
                 <div class="btn-disabled" style="border-color:rgba(74,222,128,0.25);color:var(--green);opacity:0.7;">
                   <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
                   Return Accepted
                 </div>
+                <% if (paidOnline) { %>
+                  <div class="refund-notice">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                    <div class="refund-notice-text">
+                      <strong>Refund Credited</strong>
+                      ₹<%= order.pricing.grandTotal.toLocaleString('en-IN') %> has been added to your wallet.
+                    </div>
+                  </div>
+                <% } %>
+
               <% } else if (order.returnStatus === 'rejected') { %>
                 <div class="btn-disabled" style="border-color:rgba(248,113,113,0.25);color:var(--red);opacity:0.7;">
                   <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
@@ -803,6 +852,7 @@
                 <% if (order.returnRejectionReason) { %>
                   <p class="action-note" style="color:var(--red);">Reason: <%= order.returnRejectionReason %></p>
                 <% } %>
+
               <% } else if (isReturned) { %>
                 <div class="btn-disabled">
                   <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.75"/></svg>
@@ -845,7 +895,12 @@
       </button>
       <div class="modal-eyebrow">Confirm Action</div>
       <h3>Cancel Order</h3>
-      <p>You're about to cancel the entire order <strong style="color:var(--text)"><%= order.orderNumber %></strong>. All items will be cancelled and stock restored.</p>
+      <p>
+        You're about to cancel the entire order <strong style="color:var(--text)"><%= order.orderNumber %></strong>. All items will be cancelled and stock restored.
+        <% if (paidOnline) { %>
+          <br/><br/><span style="color:var(--green)">₹<%= order.pricing.grandTotal.toLocaleString('en-IN') %> will be refunded to your wallet immediately.</span>
+        <% } %>
+      </p>
       <div class="modal-field">
         <label class="modal-label" for="cancelOrderReason">Reason <span style="color:var(--text-dim);font-size:0.38rem;">(optional)</span></label>
         <textarea class="modal-textarea" id="cancelOrderReason" placeholder="Let us know why you're cancelling…"></textarea>
@@ -866,7 +921,7 @@
       </button>
       <div class="modal-eyebrow">Confirm Action</div>
       <h3>Cancel Item</h3>
-      <p>Cancel <strong id="cancelItemNameDisplay" style="color:var(--text)"></strong> from this order? The item's stock will be restored.</p>
+      <p>Cancel <strong id="cancelItemNameDisplay" style="color:var(--text)"></strong> from this order? The item's stock will be restored.<% if (paidOnline) { %> A proportional refund will be added to your wallet immediately.<% } %></p>
       <div class="modal-field">
         <label class="modal-label" for="cancelItemReason">Reason <span style="color:var(--text-dim);font-size:0.38rem;">(optional)</span></label>
         <textarea class="modal-textarea" id="cancelItemReason" placeholder="Reason for cancelling this item…"></textarea>
@@ -887,7 +942,7 @@
       </button>
       <div class="modal-eyebrow">Return Request</div>
       <h3>Return Order</h3>
-      <p>Tell us why you'd like to return <strong style="color:var(--text)"><%= order.orderNumber %></strong>. A reason is required to process your return.</p>
+      <p>Tell us why you'd like to return <strong style="color:var(--text)"><%= order.orderNumber %></strong>.<% if (paidOnline) { %> Once approved by our team, ₹<%= order.pricing.grandTotal.toLocaleString('en-IN') %> will be refunded to your wallet.<% } %></p>
       <div class="modal-field">
         <label class="modal-label" for="returnReason">Return Reason <span>*</span></label>
         <textarea class="modal-textarea" id="returnReason" placeholder="e.g. Received wrong item, product damaged on arrival…"></textarea>
@@ -908,7 +963,7 @@
       </button>
       <div class="modal-eyebrow">Item Return Request</div>
       <h3>Return Item</h3>
-      <p>Request a return for <strong id="returnItemNameDisplay" style="color:var(--text)"></strong>. Please provide a reason — our team will review within 2–3 business days.</p>
+      <p>Request a return for <strong id="returnItemNameDisplay" style="color:var(--text)"></strong>.<% if (paidOnline) { %> A proportional refund will be credited to your wallet after admin approval.<% } %> Our team will review within 2–3 business days.</p>
       <div class="modal-field">
         <label class="modal-label" for="returnItemReason">Return Reason <span>*</span></label>
         <textarea class="modal-textarea" id="returnItemReason" placeholder="e.g. Defective item, wrong size, changed my mind…"></textarea>
@@ -929,11 +984,9 @@
     let pendingCancelItemId = null;
     let pendingReturnItemId = null;
 
-    /* Nav scroll */
     const navbar = document.getElementById('navbar');
     window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', scrollY > 10), { passive: true });
 
-    /* Toast */
     let toastTimer;
     function showToast(msg, isErr = false) {
       const toast = document.getElementById('toast');
@@ -943,7 +996,6 @@
       toastTimer = setTimeout(() => toast.classList.remove('show'), 3500);
     }
 
-    /* Modals */
     function openModal(id) {
       document.getElementById(id).classList.add('open');
       document.body.style.overflow = 'hidden';
@@ -959,7 +1011,6 @@
       if (e.key === 'Escape') document.querySelectorAll('.modal-backdrop.open').forEach(bd => closeModal(bd.id));
     });
 
-    /* ── Cancel Order ── */
     function openCancelOrder() { openModal('modalCancelOrder'); }
     async function confirmCancelOrder() {
       const reason = document.getElementById('cancelOrderReason').value.trim();
@@ -983,7 +1034,6 @@
       }
     }
 
-    /* ── Cancel Item ── */
     function openCancelItem(itemId, itemName) {
       pendingCancelItemId = itemId;
       document.getElementById('cancelItemNameDisplay').textContent = itemName;
@@ -1014,7 +1064,6 @@
       }
     }
 
-    /* ── Return Entire Order ── */
     function openReturn() { openModal('modalReturn'); }
     async function confirmReturn() {
       const reason = document.getElementById('returnReason').value.trim();
@@ -1039,7 +1088,6 @@
       }
     }
 
-    /* ── Return Single Item ── */
     function openReturnItem(itemId, itemName) {
       pendingReturnItemId = itemId;
       document.getElementById('returnItemNameDisplay').textContent = itemName;

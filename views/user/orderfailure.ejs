@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate"/>
+  <meta http-equiv="Pragma" content="no-cache"/>
+  <meta http-equiv="Expires" content="0"/>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Payment Failed — Velmora Chroné</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Jost:wght@200;300;400;500&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet"/>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:'Jost',sans-serif;background:#111110;color:#f5f2eb;overflow-x:hidden;min-height:100vh;display:flex;flex-direction:column}
+    ::-webkit-scrollbar{width:2px}::-webkit-scrollbar-track{background:#111110}::-webkit-scrollbar-thumb{background:#c9a96e}
+
+    body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity:.016}
+
+    .nav-root{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(17,17,16,0.92);backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);border-bottom:1px solid rgba(245,242,235,0.06);transition:box-shadow .3s}
+    .nav-root.scrolled{box-shadow:0 2px 24px rgba(0,0,0,.5)}
+    .nav-inner{display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;position:relative;min-height:60px}
+    @media(min-width:768px){.nav-inner{padding:1rem 3rem}}
+    .nav-logo{font-family:'Cormorant Garamond',serif;font-size:.85rem;font-weight:300;letter-spacing:.25em;text-transform:uppercase;color:#f5f2eb;text-decoration:none;position:absolute;left:50%;transform:translateX(-50%);white-space:nowrap}
+    .nav-left{display:none;align-items:center;gap:2rem}
+    @media(min-width:768px){.nav-left{display:flex}}
+    .nav-right{display:flex;align-items:center;gap:.65rem;margin-left:auto}
+    .nav-link{font-family:'Jost',sans-serif;font-size:.53rem;font-weight:400;letter-spacing:.2em;text-transform:uppercase;color:rgba(245,242,235,.45);text-decoration:none;transition:color .2s;position:relative;padding-bottom:2px;white-space:nowrap}
+    .nav-link::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:1px;background:#c9a96e;transition:width .3s}
+    .nav-link:hover{color:rgba(245,242,235,.9)}.nav-link:hover::after{width:100%}
+    .nav-logout{display:none}@media(min-width:768px){.nav-logout{display:inline}}
+    .nav-icon-btn{position:relative;width:36px;height:36px;display:flex;align-items:center;justify-content:center;color:rgba(245,242,235,.5);background:rgba(255,255,255,.03);border:1px solid rgba(201,169,110,.12);border-radius:10px;cursor:pointer;text-decoration:none;transition:color .22s,background .22s,border-color .22s,transform .18s cubic-bezier(.34,1.56,.64,1),box-shadow .22s;box-shadow:0 1px 0 rgba(255,255,255,.04) inset,0 2px 6px rgba(0,0,0,.35)}
+    .nav-icon-btn::before{content:'';position:absolute;inset:0;border-radius:10px;background:linear-gradient(135deg,rgba(255,255,255,.08) 0%,transparent 55%);pointer-events:none}
+    .nav-icon-btn:hover{color:#c9a96e;background:rgba(201,169,110,.08);border-color:rgba(201,169,110,.35);transform:translateY(-2px) scale(1.06)}
+    .hamburger{display:flex;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:3px}
+    @media(min-width:768px){.hamburger{display:none}}
+    .hamburger span{display:block;width:20px;height:1px;background:rgba(245,242,235,.6);transition:transform .3s,opacity .3s}
+    .hamburger.open span:nth-child(1){transform:translateY(6px) rotate(45deg)}
+    .hamburger.open span:nth-child(2){opacity:0}
+    .hamburger.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+    .mobile-menu{display:none;flex-direction:column;background:#0d0d0c;padding:1.5rem 2rem;gap:1rem;border-top:1px solid rgba(245,242,235,.05)}
+    .mobile-menu.open{display:flex}
+    .mobile-menu .nav-link{font-size:.68rem;padding:.45rem 0;border-bottom:1px solid rgba(245,242,235,.04);color:rgba(245,242,235,.5)}
+
+    .page-hero{padding:5.5rem 2rem 2.5rem;background:linear-gradient(180deg,#080807 0%,#111110 100%);border-bottom:1px solid rgba(239,68,68,.08);position:relative;overflow:hidden;text-align:center}
+    @media(min-width:768px){.page-hero{padding:5.5rem 3rem 2.5rem}}
+    .page-hero::before{content:'';position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:700px;height:420px;border-radius:50%;background:radial-gradient(ellipse,rgba(239,68,68,.06) 0%,transparent 70%);pointer-events:none}
+    .page-hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(239,68,68,.2),transparent)}
+    .page-hero-inner{max-width:700px;margin:0 auto;position:relative;z-index:1;display:flex;flex-direction:column;align-items:center}
+    .page-hero-tag{font-family:'Jost',sans-serif;font-size:.42rem;letter-spacing:.38em;text-transform:uppercase;color:rgba(239,68,68,.6);margin-bottom:1.2rem;display:flex;align-items:center;gap:.65rem}
+    .page-hero-tag::before,.page-hero-tag::after{content:'';width:24px;height:1px;background:#ef4444;opacity:.45}
+
+    .fail-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3.5rem 1.5rem 5rem;position:relative;z-index:1;text-align:center}
+
+    .fail-illus{width:130px;height:130px;margin:0 auto 2.2rem;position:relative;animation:fadeUp .8s ease both}
+    .fail-glow{animation:fadeGlowRed 3s ease-in-out infinite}
+    .fail-ring{transform-origin:65px 65px;animation:pulseRingRed 2.8s ease-in-out infinite}
+    .fail-x{animation:popIn .65s cubic-bezier(.34,1.56,.64,1) .25s both}
+
+    @keyframes pulseRingRed{0%,100%{opacity:.35;transform:scale(.94)}50%{opacity:.9;transform:scale(1.06)}}
+    @keyframes popIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+    @keyframes fadeGlowRed{0%,100%{opacity:.25}50%{opacity:.7}}
+
+    .fail-tag{font-family:'Jost',sans-serif;font-size:.42rem;letter-spacing:.38em;text-transform:uppercase;color:rgba(239,68,68,.65);margin-bottom:.8rem;display:flex;align-items:center;justify-content:center;gap:.65rem;animation:fadeUp .8s ease .2s both}
+    .fail-tag::before,.fail-tag::after{content:'';width:24px;height:1px;background:#ef4444;opacity:.45}
+    .fail-title{font-family:'Playfair Display',serif;font-weight:400;font-size:clamp(1.8rem,4.5vw,3rem);line-height:1.05;color:#f5f2eb;margin-bottom:.6rem;animation:fadeUp .8s ease .3s both}
+    .fail-title em{font-style:italic;background:linear-gradient(125deg,#f87171 0%,#ef4444 45%,#b91c1c 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .fail-sub{font-family:'Jost',sans-serif;font-size:.65rem;font-weight:300;color:rgba(245,242,235,.3);line-height:1.85;max-width:460px;margin:0 auto 1.75rem;animation:fadeUp .8s ease .4s both}
+
+    .order-ref{display:inline-flex;align-items:center;gap:.75rem;background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.18);border-radius:10px;padding:.6rem 1.35rem;margin-bottom:2rem;animation:fadeUp .8s ease .5s both}
+    .order-ref-label{font-family:'Jost',sans-serif;font-size:.38rem;letter-spacing:.22em;text-transform:uppercase;color:rgba(245,242,235,.22)}
+    .order-ref-sep{width:1px;height:14px;background:rgba(239,68,68,.2)}
+    .order-ref-val{font-family:'Jost',sans-serif;font-size:.65rem;font-weight:400;color:#f87171;letter-spacing:.1em}
+
+    .fail-card{background:rgba(245,242,235,.02);border:1px solid rgba(245,242,235,.06);border-radius:16px;padding:1.5rem;width:100%;max-width:480px;margin:0 auto 2.5rem;animation:fadeUp .8s ease .6s both;text-align:left}
+    .fail-card-title{font-family:'Jost',sans-serif;font-size:.4rem;letter-spacing:.28em;text-transform:uppercase;color:rgba(239,68,68,.5);margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
+    .fail-card-title::before{content:'';width:12px;height:1px;background:rgba(239,68,68,.35)}
+    .fail-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.55rem;gap:1rem}
+    .fail-key{font-family:'Jost',sans-serif;font-size:.5rem;color:rgba(245,242,235,.28);letter-spacing:.06em;flex-shrink:0}
+    .fail-val{font-family:'Jost',sans-serif;font-size:.58rem;color:rgba(245,242,235,.6);letter-spacing:.04em;text-align:right}
+    .fail-val.red{color:#f87171}
+
+    .fail-btns{display:flex;gap:.85rem;flex-wrap:wrap;justify-content:center;animation:fadeUp .8s ease .7s both}
+    .btn-retry{padding:.85rem 2rem;border:none;border-radius:100px;background:linear-gradient(135deg,#f87171 0%,#ef4444 50%,#b91c1c 100%);color:#fff;font-family:'Jost',sans-serif;font-size:.5rem;letter-spacing:.22em;text-transform:uppercase;cursor:pointer;position:relative;overflow:hidden;transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .22s;box-shadow:0 1px 0 rgba(255,255,255,.25) inset,0 4px 14px rgba(185,40,40,.3);display:inline-flex;align-items:center;gap:.5rem}
+    .btn-retry::after{content:'';position:absolute;top:0;left:-75%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);transform:skewX(-18deg);transition:left .55s ease}
+    .btn-retry:hover::after{left:130%}
+    .btn-retry:hover{transform:translateY(-2px);box-shadow:0 1px 0 rgba(255,255,255,.3) inset,0 8px 24px rgba(185,40,40,.4)}
+    .btn-retry:disabled{opacity:.5;cursor:not-allowed;transform:none}
+    .btn-outline{padding:.85rem 2rem;border:1px solid rgba(245,242,235,.12);border-radius:100px;background:transparent;color:rgba(245,242,235,.5);font-family:'Jost',sans-serif;font-size:.5rem;letter-spacing:.22em;text-transform:uppercase;cursor:pointer;transition:border-color .25s,color .25s,background .25s;text-decoration:none;display:inline-flex;align-items:center;gap:.5rem}
+    .btn-outline:hover{border-color:rgba(245,242,235,.3);color:#f5f2eb;background:rgba(245,242,235,.03)}
+
+    .fail-help{font-family:'Jost',sans-serif;font-size:.46rem;letter-spacing:.08em;color:rgba(245,242,235,.18);margin-top:1.5rem;animation:fadeUp .8s ease .8s both}
+    .fail-help a{color:rgba(201,169,110,.6);text-decoration:underline;text-underline-offset:2px}
+
+    @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+
+    .rule{height:1px;background:linear-gradient(90deg,transparent,rgba(201,169,110,.18),transparent);position:relative;z-index:1}
+    .footer{background:#0a0a09;padding:2.5rem 2rem 1.5rem;border-top:1px solid rgba(245,242,235,.05);position:relative;z-index:1}
+    @media(min-width:768px){.footer{padding:2.5rem 3rem 1.5rem}}
+    .footer-bottom{display:flex;flex-direction:column;gap:.75rem;padding-top:0;align-items:center;text-align:center}
+    @media(min-width:768px){.footer-bottom{flex-direction:row;justify-content:space-between}}
+    .footer-copy{font-family:'Jost',sans-serif;font-size:.44rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(245,242,235,.12)}
+    .footer-legal{display:flex;gap:1.25rem}
+    .footer-legal a{font-family:'Jost',sans-serif;font-size:.44rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(245,242,235,.18);text-decoration:none;transition:color .2s}
+    .footer-legal a:hover{color:rgba(245,242,235,.5)}
+  </style>
+</head>
+<body>
+
+<nav class="nav-root" id="navbar">
+  <div class="nav-inner">
+    <div class="nav-left">
+      <a href="/home"     class="nav-link">Home</a>
+      <a href="/products" class="nav-link">Collection</a>
+      <a href="/home"     class="nav-link">About</a>
+      <a href="/home"     class="nav-link">Contact</a>
+    </div>
+    <a href="/home" class="nav-logo">Velmora Chroné</a>
+    <div class="nav-right">
+      <a href="/profile" class="nav-icon-btn" aria-label="Profile">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </a>
+      <a href="/logout" class="nav-link nav-logout">Logout</a>
+      <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="/home"     class="nav-link">Home</a>
+    <a href="/products" class="nav-link">Collection</a>
+    <a href="/profile"  class="nav-link">My Profile</a>
+    <a href="/logout"   class="nav-link" style="color:rgba(201,169,110,.55)">Logout</a>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <div class="page-hero-inner">
+    <p class="page-hero-tag">Payment Unsuccessful</p>
+  </div>
+</div>
+
+<div class="fail-wrap">
+
+  <div class="fail-illus">
+    <svg width="130" height="130" viewBox="0 0 130 130" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="glowGradRed" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#ef4444" stop-opacity="0.18"/>
+          <stop offset="100%" stop-color="#ef4444" stop-opacity="0"/>
+        </radialGradient>
+        <linearGradient id="ringRed" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%"   stop-color="#f87171"/>
+          <stop offset="50%"  stop-color="#ef4444"/>
+          <stop offset="100%" stop-color="#b91c1c"/>
+        </linearGradient>
+      </defs>
+      <circle cx="65" cy="65" r="63" fill="url(#glowGradRed)" class="fail-glow"/>
+      <circle class="fail-ring" cx="65" cy="65" r="35"
+              fill="none" stroke="url(#ringRed)" stroke-width="0.8" opacity="0.55"/>
+      <g class="fail-x">
+        <circle cx="65" cy="65" r="28"
+                fill="rgba(239,68,68,0.08)"
+                stroke="rgba(239,68,68,0.4)" stroke-width="1"/>
+        <line x1="54" y1="54" x2="76" y2="76" stroke="url(#ringRed)" stroke-width="3" stroke-linecap="round"/>
+        <line x1="76" y1="54" x2="54" y2="76" stroke="url(#ringRed)" stroke-width="3" stroke-linecap="round"/>
+      </g>
+    </svg>
+  </div>
+
+  <p class="fail-tag">Payment Failed</p>
+  <h1 class="fail-title">Something Went<br/><em>Wrong</em></h1>
+  <p class="fail-sub">Your payment could not be completed and no amount has been deducted. You can retry the payment, or come back to it later from your orders page.</p>
+
+  <% if (order && order.orderNumber) { %>
+  <div class="order-ref">
+    <span class="order-ref-label">Order Reference</span>
+    <span class="order-ref-sep"></span>
+    <span class="order-ref-val"><%= order.orderNumber %></span>
+  </div>
+  <% } %>
+
+  <% if (order) { %>
+  <div class="fail-card">
+    <div class="fail-card-title">Payment Details</div>
+    <div class="fail-row">
+      <span class="fail-key">Amount</span>
+      <span class="fail-val">₹<%= order.pricing.grandTotal.toLocaleString('en-IN') %></span>
+    </div>
+    <div class="fail-row">
+      <span class="fail-key">Payment Method</span>
+      <span class="fail-val">Razorpay</span>
+    </div>
+    <div class="fail-row">
+      <span class="fail-key">Status</span>
+      <span class="fail-val red">Failed</span>
+    </div>
+    <% if (order.paymentFailureReason) { %>
+    <div class="fail-row">
+      <span class="fail-key">Reason</span>
+      <span class="fail-val red"><%= order.paymentFailureReason %></span>
+    </div>
+    <% } %>
+  </div>
+  <% } %>
+
+  <div class="fail-btns">
+    <button class="btn-retry" id="retryBtn" onclick="retryPayment()">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
+      Retry Payment
+    </button>
+    <a href="/checkout" class="btn-outline">
+      Back to Checkout
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </a>
+  </div>
+
+  <p class="fail-help">Need help? <a href="mailto:support@velmorachrone.com">Contact support</a></p>
+
+</div>
+
+<div class="rule"></div>
+<footer class="footer">
+  <div style="max-width:1200px;margin:0 auto">
+    <div class="footer-bottom">
+      <span class="footer-copy">&copy; <%= new Date().getFullYear() %> Velmora Chroné. All rights reserved.</span>
+      <div class="footer-legal">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Accessibility</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const navbar     = document.getElementById('navbar');
+  const hamburger  = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobileMenu');
+  window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', scrollY > 30), { passive: true });
+  hamburger.addEventListener('click', () => {
+    hamburger.classList.toggle('open');
+    mobileMenu.classList.toggle('open');
+  });
+
+  const ORDER_ID     = '<%= order ? order._id : "" %>';
+  const RAZORPAY_KEY = '<%= process.env.RAZORPAY_KEY_ID %>';
+
+  async function retryPayment() {
+    const btn = document.getElementById('retryBtn');
+    if (!ORDER_ID) { window.location.href = '/checkout'; return; }
+
+    btn.disabled = true;
+    btn.textContent = 'Reopening payment…';
+
+    try {
+      // Re-create a fresh Razorpay order against the same cart/address rather than
+      // reusing the failed razorpayOrderId, since Razorpay orders are single-attempt
+      // once marked failed/expired on their end in many cases.
+      const res  = await fetch('/checkout/razorpay/create-order', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}), // server falls back to user's default address
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        alert(data.message || 'Could not restart payment. Please return to checkout.');
+        window.location.href = '/checkout';
+        return;
+      }
+
+      const options = {
+        key        : data.keyId,
+        amount     : data.amount,
+        currency   : data.currency,
+        name       : 'Velmora Chroné',
+        description: 'Order ' + data.orderNumber,
+        order_id   : data.razorpayOrderId,
+        prefill    : data.prefill,
+        theme      : { color: '#c9a96e' },
+        handler    : async function (response) {
+          const verifyRes = await fetch('/checkout/razorpay/verify', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              orderId           : data.orderId,
+              razorpayOrderId   : response.razorpay_order_id,
+              razorpayPaymentId : response.razorpay_payment_id,
+              razorpaySignature : response.razorpay_signature,
+            }),
+          });
+          const verifyData = await verifyRes.json();
+          if (!verifyRes.ok || !verifyData.success) {
+            window.location.href = `/checkout/failure?orderId=${data.orderId}`;
+            return;
+          }
+          window.location.href = `/checkout/success?orderId=${verifyData.orderId}`;
+        },
+        modal: {
+          ondismiss: function () {
+            btn.disabled = false;
+            btn.textContent = 'Retry Payment';
+          },
+        },
+      };
+
+      const rzp = new Razorpay(options);
+      rzp.open();
+      btn.disabled = false;
+      btn.textContent = 'Retry Payment';
+    } catch (_) {
+      alert('Something went wrong. Please try again from checkout.');
+      window.location.href = '/checkout';
+    }
+  }
+</script>
+</body>
+</html>
