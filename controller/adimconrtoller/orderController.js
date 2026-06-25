@@ -201,13 +201,65 @@ export const updateOrderStatus = async (req, res) => {
 };
 
 /**
+ * Restock a single order item's product (and matching colour variant if present).
+ * Shared helper used by handleReturnRequest (whole-order accept) so both the
+ * order-level and item-level flows restock the exact same way.
+ *
+ * Mutates `item.restocked` and the in-memory `product` doc, and SAVES the product.
+ * Does NOT save the order — caller is responsible for that (it's usually already
+ * saving the order for other reasons in the same request).
+ *
+ * Returns a small result object for logging/messaging purposes.
+ */
+async function restockOrderItem(item) {
+  if (item.restocked) {
+    return { skipped: true, reason: 'already-restocked' };
+  }
+
+  const product = await Product.findById(item.product);
+  if (!product) {
+    // Product was deleted entirely — nothing to restock, but mark handled
+    // so we don't keep trying on every future save.
+    item.restocked = true;
+    return { skipped: true, reason: 'product-not-found' };
+  }
+
+  let fallbackUsed = false;
+
+  if (item.variantName && Array.isArray(product.colorVariants) && product.colorVariants.length > 0) {
+    const variant = product.colorVariants.find(v => v.name === item.variantName);
+    if (variant) {
+      variant.stock = (variant.stock || 0) + item.quantity;
+      // Recompute total stock from all variants, matching addProduct/editProduct.
+      product.stock = product.colorVariants.reduce((sum, v) => sum + (v.stock || 0), 0);
+    } else {
+      // Variant name on the order no longer matches any current variant
+      // (renamed or removed since purchase) — fall back safely to plain stock.
+      product.stock = (product.stock || 0) + item.quantity;
+      fallbackUsed = true;
+    }
+  } else {
+    // No variant recorded on this item at all — bump plain stock.
+    product.stock = (product.stock || 0) + item.quantity;
+    fallbackUsed = true;
+  }
+
+  await product.save();
+  item.restocked = true;
+
+  return { skipped: false, fallbackUsed, product };
+}
+
+/**
  * ── Order-level return verification ──────────────────────────────────────
  * Customer requested to return the WHOLE order. Admin accepts or rejects.
- * On acceptance, the full grandTotal is credited to the customer's wallet.
+ * On acceptance, the full grandTotal is credited to the customer's wallet,
+ * and — if the admin opted in via the `restock` flag — every active item's
+ * product (and matching colour variant) has its stock increased.
  */
 export const handleReturnRequest = async (req, res) => {
   try {
-    const { decision, rejectionReason } = req.body;
+    const { decision, rejectionReason, restock = true } = req.body;
 
     if (!['accepted', 'rejected'].includes(decision)) {
       return res.status(400).json({ success: false, message: 'Invalid decision. Must be accepted or rejected.' });
@@ -222,6 +274,8 @@ export const handleReturnRequest = async (req, res) => {
     if (order.returnStatus !== 'pending') {
       return res.status(400).json({ success: false, message: 'No pending return request on this order.' });
     }
+
+    let restockedCount = 0;
 
     if (decision === 'accepted') {
       // Credit the wallet FIRST. If this throws, we don't want the order
@@ -243,6 +297,19 @@ export const handleReturnRequest = async (req, res) => {
           item.returnStatus = 'accepted';
         }
       });
+
+      // Restock — only if the admin opted in via the popup toggle.
+      if (restock) {
+        for (const item of order.items) {
+          if (item.status !== 'active') continue;
+          try {
+            const result = await restockOrderItem(item);
+            if (!result.skipped) restockedCount++;
+          } catch (stockErr) {
+            console.error(`Restock failed for item "${item.name}" on order ${order.orderNumber}:`, stockErr.message);
+          }
+        }
+      }
     } else {
       order.returnStatus = 'rejected';
       if (rejectionReason && rejectionReason.trim()) {
@@ -254,10 +321,16 @@ export const handleReturnRequest = async (req, res) => {
 
     broadcastOrderUpdate(order._id.toString(), { orderStatus: order.orderStatus });
 
-    return res.json({
-      success : true,
-      message : decision === 'accepted' ? 'Return accepted. Refund credited to wallet.' : 'Return rejected.',
-    });
+    let message;
+    if (decision === 'accepted') {
+      message = restock
+        ? `Return accepted. Refund credited to wallet. ${restockedCount} item(s) added back to stock.`
+        : 'Return accepted. Refund credited to wallet.';
+    } else {
+      message = 'Return rejected.';
+    }
+
+    return res.json({ success: true, message });
   } catch (err) {
     console.error('handleReturnRequest error:', err);
     return res.status(500).json({ success: false, message: err.message || 'Server error. Please try again.' });
@@ -273,7 +346,7 @@ export const handleReturnRequest = async (req, res) => {
  */
 export const handleItemReturnRequest = async (req, res) => {
   try {
-    const { decision, rejectionReason } = req.body;
+    const { decision, rejectionReason, restock = true } = req.body;
     const { id: orderId, itemId } = req.params;
 
     if (!['accepted', 'rejected'].includes(decision)) {
@@ -305,6 +378,14 @@ export const handleItemReturnRequest = async (req, res) => {
 
       item.returnStatus = 'accepted';
 
+      if (restock) {
+        try {
+          await restockOrderItem(item);
+        } catch (stockErr) {
+          console.error(`Restock failed for item "${item.name}" on order ${order.orderNumber}:`, stockErr.message);
+        }
+      }
+
       // If every active-or-returned item has now been returned, cascade
       // the whole order to 'returned' so both views agree.
       const allResolved = order.items.every(
@@ -335,20 +416,7 @@ export const handleItemReturnRequest = async (req, res) => {
   }
 };
 
-/**
- * ── Add returned item back to stock ──────────────────────────────────────
- * Manual, deliberate action — admin clicks this AFTER physically receiving
- * and inspecting the returned item. Only available once returnStatus is
- * 'accepted' on that item, and only once (guarded by item.restocked).
- *
- * Increments the matching colorVariant's stock by the returned quantity,
- * then recomputes product.stock as the sum of all variant stocks — same
- * pattern your addProduct/editProduct controllers already use.
- *
- * If the item has no variantName, or the variant can no longer be found
- * (renamed/deleted since the order was placed), falls back to bumping
- * product.stock directly and tells the admin this happened.
- */
+
 export const restockItem = async (req, res) => {
   try {
     const { id: orderId, itemId } = req.params;
@@ -371,46 +439,19 @@ export const restockItem = async (req, res) => {
       return res.status(400).json({ success: false, message: 'This item has already been added back to stock.' });
     }
 
-    const product = await Product.findById(item.product);
-    if (!product) {
-      // Product was deleted entirely — nothing to restock, but still let
-      // the admin mark it as handled so it stops showing the button.
-      item.restocked = true;
-      await order.save();
+    const result = await restockOrderItem(item);
+    await order.save();
+
+    if (result.skipped && result.reason === 'product-not-found') {
       return res.json({
         success: true,
         message: 'Product no longer exists — nothing to restock, but marked as handled.',
       });
     }
 
-    let fallbackUsed = false;
-
-    if (item.variantName && Array.isArray(product.colorVariants) && product.colorVariants.length > 0) {
-      const variant = product.colorVariants.find(v => v.name === item.variantName);
-      if (variant) {
-        variant.stock = (variant.stock || 0) + item.quantity;
-        // Recompute total stock from all variants, matching addProduct/editProduct.
-        product.stock = product.colorVariants.reduce((sum, v) => sum + (v.stock || 0), 0);
-      } else {
-        // Variant name on the order no longer matches any current variant
-        // (renamed or removed since purchase) — fall back safely.
-        product.stock = (product.stock || 0) + item.quantity;
-        fallbackUsed = true;
-      }
-    } else {
-      // No variant recorded on this item at all — bump plain stock.
-      product.stock = (product.stock || 0) + item.quantity;
-      fallbackUsed = true;
-    }
-
-    await product.save();
-
-    item.restocked = true;
-    await order.save();
-
     return res.json({
       success: true,
-      message: fallbackUsed
+      message: result.fallbackUsed
         ? `Added ${item.quantity} unit(s) back to total stock (variant "${item.variantName || 'none'}" not found — applied to overall stock instead).`
         : `Added ${item.quantity} unit(s) back to "${item.variantName}" stock.`,
     });

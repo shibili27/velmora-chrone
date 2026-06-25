@@ -20,11 +20,22 @@ export const getPopulatedCart = async (userId) => {
   });
 };
 
+// ── FIX: check variant stock when variantName is present ──────────────────
 export const cartIsValid = (cart) => {
   if (!cart || !cart.items.length) return false;
-  return cart.items.every(({ product: p, quantity }) =>
-    p && !p.isDeleted && p.isListed !== false && !p.category?.isBlocked && p.stock > 0 && quantity <= p.stock
-  );
+  return cart.items.every(({ product: p, quantity, variantName }) => {
+    if (!p || p.isDeleted || p.isListed === false || p.category?.isBlocked) return false;
+
+    let availableStock;
+    if (p.colorVariants?.length > 0 && variantName) {
+      const variant  = p.colorVariants.find(v => v.name === variantName);
+      availableStock = variant ? variant.stock : 0;
+    } else {
+      availableStock = p.stock;
+    }
+
+    return availableStock > 0 && quantity <= availableStock;
+  });
 };
 
 export const buildPriceSummary = (cart, couponDiscount = 0) => {
@@ -67,7 +78,7 @@ export const validateStockBeforeOrder = async (cartItems) => {
 
     let availableStock = 0;
     if (product.colorVariants?.length > 0 && variantName) {
-      const variant = product.colorVariants.find(v => v.name === variantName);
+      const variant  = product.colorVariants.find(v => v.name === variantName);
       availableStock = variant ? variant.stock : 0;
     } else {
       availableStock = product.stock;
@@ -173,7 +184,8 @@ export const applyCouponToSession = async (userId, code, session) => {
 
   const { subtotal } = buildPriceSummary(cart, 0);
 
-  const { valid, message } = coupon.validateFor(userId, subtotal);
+  // ── FIX: pass (subtotal) only — not (userId, subtotal) ───────────────
+  const { valid, message } = coupon.validateFor(subtotal);
   if (!valid) {
     throw Object.assign(new Error(message), { status: 400 });
   }
@@ -211,10 +223,11 @@ const recordCouponUsage = async (couponCode, userId) => {
   const coupon = await Coupon.findOne({ code: couponCode });
   if (!coupon) return;
 
-  const existing = coupon.usedBy.find(u => String(u.user) === String(userId));
+  const existing = coupon.usedBy?.find(u => String(u.user) === String(userId));
   if (existing) {
     existing.count += 1;
   } else {
+    coupon.usedBy = coupon.usedBy || [];
     coupon.usedBy.push({ user: userId, count: 1 });
   }
   coupon.usedCount += 1;
@@ -233,9 +246,8 @@ export const buildCheckoutData = async (userId, session) => {
   const couponCode     = session.couponCode     || null;
   const pricing        = buildPriceSummary(cart, couponDiscount);
 
-  // Fetch wallet balance to display "Pay from Wallet" option
-  const wallet         = await Wallet.getOrCreate(userId);
-  const walletBalance  = wallet.balance;
+  const wallet        = await Wallet.getOrCreate(userId);
+  const walletBalance = wallet.balance;
 
   const items = cart.items.map(item => {
     const p               = item.product;
@@ -300,8 +312,8 @@ const clearCartAndCoupon = async (cart, session) => {
 
 export const placeOrder = async (userId, { addressId, session }) => {
   const cart = await getPopulatedCart(userId);
-  if (!cart || !cart.items.length) throw Object.assign(new Error('Your cart is empty.'),                                                        { status: 400 });
-  if (!cartIsValid(cart))          throw Object.assign(new Error('Some items are no longer available. Please review your cart.'),               { status: 400 });
+  if (!cart || !cart.items.length) throw Object.assign(new Error('Your cart is empty.'),                                          { status: 400 });
+  if (!cartIsValid(cart))          throw Object.assign(new Error('Some items are no longer available. Please review your cart.'), { status: 400 });
 
   const orderItems      = await buildOrderItemsAndValidate(cart);
   const user            = await User.findById(userId).select('name email phone addresses');
@@ -313,8 +325,8 @@ export const placeOrder = async (userId, { addressId, session }) => {
   for (const item of cart.items) await decrementStockAndBroadcast(item);
 
   const order = await Order.create({
-    user        : userId,
-    items       : orderItems,
+    user           : userId,
+    items          : orderItems,
     shippingAddress: {
       fullName: shippingAddress.fullName || user.name,
       phone   : shippingAddress.phone    || user.phone || '',
@@ -347,8 +359,8 @@ export const placeOrder = async (userId, { addressId, session }) => {
 
 export const placeOrderWithWallet = async (userId, { addressId, session }) => {
   const cart = await getPopulatedCart(userId);
-  if (!cart || !cart.items.length) throw Object.assign(new Error('Your cart is empty.'),                                                        { status: 400 });
-  if (!cartIsValid(cart))          throw Object.assign(new Error('Some items are no longer available. Please review your cart.'),               { status: 400 });
+  if (!cart || !cart.items.length) throw Object.assign(new Error('Your cart is empty.'),                                          { status: 400 });
+  if (!cartIsValid(cart))          throw Object.assign(new Error('Some items are no longer available. Please review your cart.'), { status: 400 });
 
   const orderItems      = await buildOrderItemsAndValidate(cart);
   const user            = await User.findById(userId).select('name email phone addresses');
@@ -357,7 +369,6 @@ export const placeOrderWithWallet = async (userId, { addressId, session }) => {
   const couponCode      = session.couponCode     || null;
   const pricing         = buildPriceSummary(cart, couponDiscount);
 
-  // Check wallet balance BEFORE doing anything irreversible
   const wallet = await Wallet.getOrCreate(userId);
   if (wallet.balance < pricing.grandTotal) {
     throw Object.assign(
@@ -370,13 +381,11 @@ export const placeOrderWithWallet = async (userId, { addressId, session }) => {
     );
   }
 
-  // Decrement stock
   for (const item of cart.items) await decrementStockAndBroadcast(item);
 
-  // Create order
   const order = await Order.create({
-    user        : userId,
-    items       : orderItems,
+    user           : userId,
+    items          : orderItems,
     shippingAddress: {
       fullName: shippingAddress.fullName || user.name,
       phone   : shippingAddress.phone    || user.phone || '',
@@ -399,7 +408,6 @@ export const placeOrderWithWallet = async (userId, { addressId, session }) => {
     orderStatus  : 'confirmed',
   });
 
-  // Debit wallet
   await wallet.debit(
     pricing.grandTotal,
     `Payment for order ${order.orderNumber}`,
@@ -417,8 +425,8 @@ export const placeOrderWithWallet = async (userId, { addressId, session }) => {
 
 export const createRazorpayCheckoutOrder = async (userId, { addressId, session }) => {
   const cart = await getPopulatedCart(userId);
-  if (!cart || !cart.items.length) throw Object.assign(new Error('Your cart is empty.'),                                                        { status: 400 });
-  if (!cartIsValid(cart))          throw Object.assign(new Error('Some items are no longer available. Please review your cart.'),               { status: 400 });
+  if (!cart || !cart.items.length) throw Object.assign(new Error('Your cart is empty.'),                                          { status: 400 });
+  if (!cartIsValid(cart))          throw Object.assign(new Error('Some items are no longer available. Please review your cart.'), { status: 400 });
 
   const orderItems      = await buildOrderItemsAndValidate(cart);
   const user            = await User.findById(userId).select('name email phone addresses');
@@ -428,8 +436,8 @@ export const createRazorpayCheckoutOrder = async (userId, { addressId, session }
   const pricing         = buildPriceSummary(cart, couponDiscount);
 
   const order = await Order.create({
-    user        : userId,
-    items       : orderItems,
+    user           : userId,
+    items          : orderItems,
     shippingAddress: {
       fullName: shippingAddress.fullName || user.name,
       phone   : shippingAddress.phone    || user.phone || '',
@@ -452,9 +460,8 @@ export const createRazorpayCheckoutOrder = async (userId, { addressId, session }
     orderStatus  : 'confirmed',
   });
 
-  const razorpayOrder = await createRazorpayOrder(pricing.grandTotal, order.orderNumber);
-
-  order.razorpayOrderId = razorpayOrder.id;
+  const razorpayOrder       = await createRazorpayOrder(pricing.grandTotal, order.orderNumber);
+  order.razorpayOrderId     = razorpayOrder.id;
   await order.save();
 
   return {

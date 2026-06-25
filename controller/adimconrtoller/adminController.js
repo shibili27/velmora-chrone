@@ -5,6 +5,7 @@ import Brand     from '../../models/brand.js';
 import Order     from '../../models/order.js';
 import cloudinary from '../../config/cloudinary.js';
 import { broadcast } from '../../public/utils/ssemanager.js';
+import Coupon from '../../models/coupon.js';
 
 //  dash
 
@@ -640,5 +641,181 @@ export const deleteBrand = async (req, res) => {
     console.error('Delete brand error:', err);
     req.flash('error', 'Failed to delete brand.');
     res.redirect('/admin/brands');
+  }
+};
+
+
+
+
+function escapeRegex(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function validateCouponBody(body) {
+  const { code, discountType, discountValue, minOrderAmount, maxDiscount, expiryDate, usageLimit, perUserLimit } = body;
+  const errors = [];
+
+  if (!code?.trim())
+    errors.push('Coupon code is required.');
+  else if (!/^[A-Z0-9_-]{3,20}$/i.test(code.trim()))
+    errors.push('Code must be 3–20 characters — letters, numbers, _ and - only.');
+
+  if (!['percentage', 'flat'].includes(discountType))
+    errors.push('Invalid discount type.');
+
+  const val = parseFloat(discountValue);
+  if (isNaN(val) || val <= 0)
+    errors.push('Discount value must be a positive number.');
+  if (discountType === 'percentage' && val > 100)
+    errors.push('Percentage discount cannot exceed 100.');
+
+  const min = parseFloat(minOrderAmount);
+  if (!isNaN(min) && min < 0)
+    errors.push('Minimum order amount cannot be negative.');
+
+  if (maxDiscount !== '' && maxDiscount != null) {
+    const cap = parseFloat(maxDiscount);
+    if (isNaN(cap) || cap <= 0)
+      errors.push('Max discount cap must be a positive number.');
+  }
+
+  if (!expiryDate)
+    errors.push('Expiry date is required.');
+  else if (new Date(expiryDate) <= new Date())
+    errors.push('Expiry date must be in the future.');
+
+  if (usageLimit !== '' && usageLimit != null) {
+    const ul = parseInt(usageLimit);
+    if (isNaN(ul) || ul < 1) errors.push('Usage limit must be at least 1.');
+  }
+
+  if (perUserLimit !== '' && perUserLimit != null) {
+    const pl = parseInt(perUserLimit);
+    if (isNaN(pl) || pl < 1) errors.push('Per-user limit must be at least 1.');
+  }
+
+  return errors;
+}
+
+// ── GET /admin/coupons ────────────────────────────────────────────────────────
+
+export const getCoupons = async (req, res) => {
+  try {
+    const search      = req.query.search?.trim() || '';
+    const page        = Math.max(1, parseInt(req.query.page) || 1);
+    const limit       = 10;
+    const skip        = (page - 1) * limit;
+    const query       = {};
+
+    if (search) query.code = { $regex: escapeRegex(search), $options: 'i' };
+
+    const [coupons, total] = await Promise.all([
+      Coupon.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
+      Coupon.countDocuments(query),
+    ]);
+
+    const now      = new Date();
+    const enriched = coupons.map(c => ({
+      ...c,
+      isExpired:   c.expiryDate < now,
+      isExhausted: c.usageLimit !== null && c.usedCount >= c.usageLimit,
+    }));
+
+    res.render('admin/coupons', {
+      title:      'Coupons — Velmora Chroné',
+      adminName:  req.session.adminName,
+      adminRole:  req.session.adminRole,
+      coupons:    enriched,
+      total,
+      totalPages: Math.ceil(total / limit),
+      currentPage: page,
+      search,
+      error:      res.locals.error   || [],
+      success:    res.locals.success || [],
+    });
+  } catch (err) {
+    console.error('getCoupons error:', err);
+    req.flash('error', 'Failed to load coupons.');
+    res.redirect('/admin/dashboard');
+  }
+};
+
+// ── POST /admin/coupons/create ────────────────────────────────────────────────
+
+export const createCoupon = async (req, res) => {
+  try {
+    const {
+      code, discountType, discountValue,
+      minOrderAmount, maxDiscount, expiryDate,
+      usageLimit, perUserLimit, description,
+    } = req.body;
+
+    const errors = validateCouponBody(req.body);
+    if (errors.length) {
+      errors.forEach(e => req.flash('error', e));
+      return res.redirect('/admin/coupons');
+    }
+
+    const exists = await Coupon.findOne({
+      code: { $regex: `^${escapeRegex(code.trim())}$`, $options: 'i' },
+    });
+    if (exists) {
+      req.flash('error', `Coupon code "${code.trim().toUpperCase()}" already exists.`);
+      return res.redirect('/admin/coupons');
+    }
+
+    await Coupon.create({
+      code:           code.trim().toUpperCase(),
+      description:    description?.trim() || '',
+      discountType,
+      discountValue:  parseFloat(discountValue),
+      minOrderAmount: parseFloat(minOrderAmount) || 0,
+      maxDiscount:    (maxDiscount !== '' && maxDiscount != null) ? parseFloat(maxDiscount) : null,
+      expiryDate:     new Date(expiryDate),
+      usageLimit:     (usageLimit !== '' && usageLimit != null) ? parseInt(usageLimit) : null,
+      perUserLimit:   (perUserLimit !== '' && perUserLimit != null) ? parseInt(perUserLimit) : 1,
+    });
+
+    req.flash('success', 'Coupon created successfully.');
+    res.redirect('/admin/coupons');
+  } catch (err) {
+    console.error('createCoupon error:', err);
+    req.flash('error', 'Failed to create coupon.');
+    res.redirect('/admin/coupons');
+  }
+};
+
+// ── POST /admin/coupons/:id/delete ───────────────────────────────────────────
+
+export const deleteCoupon = async (req, res) => {
+  try {
+    const coupon = await Coupon.findByIdAndDelete(req.params.id);
+    if (!coupon) {
+      req.flash('error', 'Coupon not found.');
+      return res.redirect('/admin/coupons');
+    }
+    req.flash('success', `Coupon "${coupon.code}" deleted.`);
+    res.redirect('/admin/coupons');
+  } catch (err) {
+    console.error('deleteCoupon error:', err);
+    req.flash('error', 'Failed to delete coupon.');
+    res.redirect('/admin/coupons');
+  }
+};
+
+// ── POST /admin/coupons/:id/toggle  (AJAX) ───────────────────────────────────
+
+export const toggleCouponStatus = async (req, res) => {
+  try {
+    const coupon = await Coupon.findById(req.params.id);
+    if (!coupon) {
+      return res.status(404).json({ success: false, message: 'Coupon not found.' });
+    }
+    coupon.isActive = !coupon.isActive;
+    await coupon.save();
+    res.json({ success: true, isActive: coupon.isActive });
+  } catch (err) {
+    console.error('toggleCouponStatus error:', err);
+    res.status(500).json({ success: false, message: 'Server error.' });
   }
 };

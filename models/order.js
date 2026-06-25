@@ -16,6 +16,7 @@ const orderItemSchema = new mongoose.Schema({
   returnReason         : { type: String, default: '' },
   returnRequestedAt    : { type: Date, default: null },
   returnRejectionReason: { type: String, default: '' },
+  restocked            : { type: Boolean, default: false },
 }, { _id: true });
 
 const addressSchema = new mongoose.Schema({

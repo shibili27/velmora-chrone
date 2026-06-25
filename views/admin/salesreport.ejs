@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title><%= title %></title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --teal: #2d8c84; --teal-dark: #1f6e67; --teal-light: #e8f4f3;
+      --sidebar-w: 220px; --bg: #f2f4f3; --white: #ffffff;
+      --border: #e2e6e4; --text: #1a1f1e; --text-mid: #5a6461; --text-light: #9aa8a5;
+      --green: #16a34a; --green-bg: #dcfce7; --red: #dc2626; --red-bg: #fee2e2;
+      --blue: #2563eb; --blue-bg: #dbeafe; --orange: #d97706; --orange-bg: #fef3c7;
+      --purple: #7c3aed; --purple-bg: #ede9fe;
+    }
+    html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--bg); color: var(--text); }
+    .layout { display: flex; min-height: 100vh; }
+
+    /* ── Sidebar ── */
+    .sidebar { width: var(--sidebar-w); background: var(--white); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; }
+    .sidebar__brand { padding: 24px 20px 18px; border-bottom: 1px solid var(--border); }
+    .sidebar__brand-name { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 600; letter-spacing: 0.06em; color: var(--text); line-height: 1.2; }
+    .sidebar__brand-sub { font-size: 9px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-light); margin-top: 3px; }
+    .sidebar__nav { flex: 1; padding: 14px 0; overflow-y: auto; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 20px; font-size: 13px; font-weight: 500; color: var(--text-mid); text-decoration: none; transition: background 0.15s, color 0.15s; }
+    .nav-item:hover { background: var(--teal-light); color: var(--teal); }
+    .nav-item.active { background: var(--teal-light); color: var(--teal); border-right: 3px solid var(--teal); }
+    .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .sidebar__footer { padding: 16px 20px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+    .avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--teal); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 13px; font-weight: 600; flex-shrink: 0; }
+    .sidebar__footer-info { overflow: hidden; flex: 1; }
+    .sidebar__footer-name { font-size: 13px; font-weight: 600; color: var(--text); }
+    .sidebar__footer-role { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); }
+    .btn-logout { display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 6px; border: 1px solid #fecaca; background: var(--red-bg); color: var(--red); cursor: pointer; flex-shrink: 0; transition: background 0.15s; text-decoration: none; }
+    .btn-logout:hover { background: var(--red); color: #fff; border-color: var(--red); }
+    .btn-logout svg { width: 14px; height: 14px; }
+
+    /* ── Main ── */
+    .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+    .topbar { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 32px; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+    .topbar__title { font-size: 13px; font-weight: 500; color: var(--text-mid); }
+    .content { padding: 32px; flex: 1; }
+    .page-header { margin-bottom: 24px; }
+    .page-header h1 { font-size: 22px; font-weight: 600; }
+    .page-header p  { font-size: 13px; color: var(--text-mid); margin-top: 4px; }
+    .footer { text-align: center; padding: 20px; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); border-top: 1px solid var(--border); }
+
+    /* ── Flash ── */
+    .flash { padding: 12px 16px; border-radius: 4px; font-size: 13px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+    .flash--error   { background: #fdecea; color: #b00020; border: 1px solid #f5c6cb; }
+    .flash--success { background: #e8f5e9; color: #1b5e20; border: 1px solid #c8e6c9; }
+    .flash__close { margin-left: auto; background: none; border: none; cursor: pointer; color: inherit; font-size: 16px; padding: 0 4px; }
+
+    /* ── Filter bar ── */
+    .filter-card {
+      background   : var(--white);
+      border       : 1px solid var(--border);
+      border-radius: 6px;
+      padding      : 20px 24px;
+      margin-bottom: 24px;
+      display      : flex;
+      align-items  : flex-end;
+      gap          : 14px;
+      flex-wrap    : wrap;
+    }
+    .filter-group { display: flex; flex-direction: column; gap: 5px; }
+    .filter-group label {
+      font-size     : 10px;
+      font-weight   : 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color         : var(--text-mid);
+    }
+    .filter-group select,
+    .filter-group input {
+      height       : 38px;
+      border       : 1px solid var(--border);
+      border-radius: 4px;
+      padding      : 0 12px;
+      font-family  : 'Jost', sans-serif;
+      font-size    : 13px;
+      color        : var(--text);
+      background   : #fff;
+      outline      : none;
+      transition   : border-color 0.2s;
+      min-width    : 150px;
+    }
+    .filter-group select:focus,
+    .filter-group input:focus { border-color: var(--teal); }
+    .btn {
+      display    : inline-flex;
+      align-items: center;
+      gap        : 6px;
+      height     : 38px;
+      padding    : 0 16px;
+      border-radius: 4px;
+      font-family : 'Jost', sans-serif;
+      font-size   : 12px;
+      font-weight : 600;
+      letter-spacing: 0.06em;
+      cursor      : pointer;
+      border      : none;
+      transition  : opacity 0.15s;
+      text-decoration: none;
+    }
+    .btn--teal   { background: var(--teal); color: #fff; }
+    .btn--teal:hover { background: var(--teal-dark); }
+    .btn--outline { background: none; border: 1px solid var(--border); color: var(--text-mid); }
+    .btn--outline:hover { background: var(--bg); }
+    .custom-dates { display: none; align-items: flex-end; gap: 14px; flex-wrap: wrap; }
+    .custom-dates.visible { display: flex; }
+
+    /* ── Summary cards ── */
+    .summary-grid {
+      display              : grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap                  : 16px;
+      margin-bottom        : 24px;
+    }
+    .summary-card {
+      background   : var(--white);
+      border       : 1px solid var(--border);
+      border-radius: 6px;
+      padding      : 18px 20px;
+      position     : relative;
+      overflow     : hidden;
+    }
+    .summary-card::before {
+      content : '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height  : 3px;
+      background: var(--teal);
+    }
+    .summary-card.c-orange::before { background: var(--orange); }
+    .summary-card.c-red::before    { background: var(--red); }
+    .summary-card.c-blue::before   { background: var(--blue); }
+    .summary-card.c-purple::before { background: var(--purple); }
+    .summary-card.c-green::before  { background: var(--green); }
+    .summary-card__label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); margin-bottom: 8px; }
+    .summary-card__value { font-size: 22px; font-weight: 700; color: var(--text); line-height: 1; }
+    .summary-card__sub   { font-size: 11px; color: var(--text-light); margin-top: 5px; }
+
+    /* ── Chart ── */
+    .card { background: var(--white); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+    .card__header { padding: 14px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .card__title  { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-mid); }
+    .chart-wrap   { padding: 20px 24px; }
+    #salesChart   { width: 100%; height: 240px; }
+
+    /* ── Table ── */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { background: #f8faf9; }
+    th {
+      font-size     : 10px;
+      font-weight   : 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color         : var(--text-light);
+      padding       : 12px 16px;
+      text-align    : left;
+      border-bottom : 1px solid var(--border);
+      white-space   : nowrap;
+    }
+    td { padding: 12px 16px; font-size: 13px; color: var(--text); border-bottom: 1px solid var(--border); vertical-align: middle; }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: #fafcfb; }
+
+    .badge { display: inline-flex; align-items: center; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
+    .badge--confirmed  { background: var(--teal-light); color: var(--teal-dark); }
+    .badge--processing { background: var(--blue-bg);    color: var(--blue); }
+    .badge--dispatched { background: var(--purple-bg);  color: var(--purple); }
+    .badge--delivered  { background: var(--green-bg);   color: var(--green); }
+    .badge--cancelled  { background: var(--red-bg);     color: var(--red); }
+    .badge--returned   { background: var(--orange-bg);  color: var(--orange); }
+    .badge--cod        { background: #f3f4f6; color: var(--text-mid); }
+    .badge--razorpay   { background: var(--purple-bg);  color: var(--purple); }
+    .badge--wallet     { background: var(--green-bg);   color: var(--green); }
+
+    .coupon-tag {
+      display      : inline-block;
+      background   : var(--teal-light);
+      border       : 1px solid #b2deda;
+      color        : var(--teal-dark);
+      font-size    : 10px;
+      font-weight  : 600;
+      padding      : 2px 7px;
+      border-radius: 3px;
+      font-family  : monospace;
+      letter-spacing: 0.05em;
+    }
+    .text-red  { color: var(--red); font-weight: 600; }
+    .text-muted { color: var(--text-light); }
+    .mono { font-family: monospace; font-size: 12px; }
+
+    .empty-state { padding: 48px 24px; text-align: center; color: var(--text-light); font-size: 13px; }
+
+    /* ── Toast ── */
+    .toast-container { position: fixed; top: 20px; right: 20px; z-index: 500; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+    .toast { background: var(--white); border: 1px solid var(--border); border-radius: 6px; padding: 12px 16px; font-size: 13px; font-weight: 500; box-shadow: 0 4px 16px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 10px; pointer-events: all; min-width: 260px; animation: slideIn 0.25s ease; }
+    .toast--success { border-left: 3px solid var(--green); }
+    .toast--error   { border-left: 3px solid var(--red); }
+    @keyframes slideIn  { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    @keyframes slideOut { to   { transform: translateX(110%); opacity: 0; } }
+  </style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar">
+    <div class="sidebar__brand">
+      <div class="sidebar__brand-name">Velmora<br>Chroné</div>
+      <div class="sidebar__brand-sub">Admin Dashboard</div>
+    </div>
+    <nav class="sidebar__nav">
+      <a href="/admin/dashboard" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Dashboard
+      </a>
+      <a href="/admin/orders" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+        Orders
+      </a>
+      <a href="/admin/products" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"/></svg>
+        Products
+      </a>
+      <a href="/admin/reviews" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+        Rating/Review
+      </a>
+      <a href="/admin/customers" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        Customers
+      </a>
+      <a href="/admin/coupons" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+        Coupons
+      </a>
+      <a href="/admin/categories" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+        Categories
+      </a>
+      <a href="/admin/brands" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 4H7a2 2 0 01-2-2V6a2 2 0 012-2h5l2 2h3a2 2 0 012 2v12a2 2 0 01-2 2z"/></svg>
+        Brands
+      </a>
+      <a href="/admin/refunds" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
+        Refund/Return
+      </a>
+      <a href="/admin/banners" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+        Banner
+      </a>
+      <a href="/admin/referrals" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+        Referral
+      </a>
+      <a href="/admin/sales-report" class="nav-item active">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+        Sales Report
+      </a>
+    </nav>
+    <div class="sidebar__footer">
+      <div class="avatar"><%= adminName ? adminName.charAt(0).toUpperCase() : 'A' %></div>
+      <div class="sidebar__footer-info">
+        <div class="sidebar__footer-name"><%= adminName || 'Admin' %></div>
+        <div class="sidebar__footer-role">Administrator</div>
+      </div>
+      <a href="/admin/logout" class="btn-logout" title="Logout">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+      </a>
+    </div>
+  </aside>
+
+  <!-- ── Main ── -->
+  <div class="main">
+    <header class="topbar">
+      <span class="topbar__title">Operational Administrator Hub</span>
+    </header>
+
+    <div class="content">
+
+      <!-- Flash -->
+      <% if (locals.success && success) { %>
+        <div class="flash flash--success">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;flex-shrink:0"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+          <%= success %>
+          <button class="flash__close" onclick="this.parentElement.remove()">×</button>
+        </div>
+      <% } %>
+      <% if (locals.error && error) { %>
+        <div class="flash flash--error">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <%= error %>
+          <button class="flash__close" onclick="this.parentElement.remove()">×</button>
+        </div>
+      <% } %>
+
+      <!-- Page header -->
+      <div class="page-header">
+        <h1>Sales Report</h1>
+        <p>Analyse revenue, discounts, and order activity across any time period.</p>
+      </div>
+
+      <!-- Filter bar -->
+      <form method="GET" action="/admin/sales-report">
+        <div class="filter-card">
+          <div class="filter-group">
+            <label>Period</label>
+            <select name="filter" id="filterSelect" onchange="toggleCustom()">
+              <option value="daily"   <%= filter === 'daily'   ? 'selected' : '' %>>Today</option>
+              <option value="weekly"  <%= filter === 'weekly'  ? 'selected' : '' %>>Last 7 Days</option>
+              <option value="monthly" <%= filter === 'monthly' ? 'selected' : '' %>>This Month</option>
+              <option value="yearly"  <%= filter === 'yearly'  ? 'selected' : '' %>>This Year</option>
+              <option value="custom"  <%= filter === 'custom'  ? 'selected' : '' %>>Custom Range</option>
+            </select>
+          </div>
+
+          <div class="custom-dates <%= filter === 'custom' ? 'visible' : '' %>" id="customDates">
+            <div class="filter-group">
+              <label>Start Date</label>
+              <input type="date" name="startDate" value="<%= startDate %>" max="<%= new Date().toISOString().slice(0,10) %>"/>
+            </div>
+            <div class="filter-group">
+              <label>End Date</label>
+              <input type="date" name="endDate" value="<%= endDate %>" max="<%= new Date().toISOString().slice(0,10) %>"/>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn--teal">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="M21 21l-4.35-4.35"/></svg>
+            Apply
+          </button>
+        </div>
+      </form>
+
+      <!-- Summary cards -->
+      <div class="summary-grid">
+        <div class="summary-card">
+          <div class="summary-card__label">Total Orders</div>
+          <div class="summary-card__value"><%= summary.totalOrders %></div>
+          <div class="summary-card__sub">Excluding cancelled &amp; failed</div>
+        </div>
+        <div class="summary-card c-orange">
+          <div class="summary-card__label">Order Amount</div>
+          <div class="summary-card__value">₹<%= summary.totalSubtotal.toLocaleString('en-IN') %></div>
+          <div class="summary-card__sub">Subtotal before deductions</div>
+        </div>
+        <div class="summary-card c-green">
+          <div class="summary-card__label">Total Revenue</div>
+          <div class="summary-card__value">₹<%= summary.totalRevenue.toLocaleString('en-IN') %></div>
+          <div class="summary-card__sub">After all discounts &amp; tax</div>
+        </div>
+        <div class="summary-card c-red">
+          <div class="summary-card__label">Total Discount</div>
+          <div class="summary-card__value">₹<%= summary.totalDiscount.toLocaleString('en-IN') %></div>
+          <div class="summary-card__sub">Item + coupon deductions</div>
+        </div>
+        <div class="summary-card c-blue">
+          <div class="summary-card__label">Item Discounts</div>
+          <div class="summary-card__value">₹<%= summary.itemDiscount.toLocaleString('en-IN') %></div>
+          <div class="summary-card__sub">MRP vs sale price savings</div>
+        </div>
+        <div class="summary-card c-purple">
+          <div class="summary-card__label">Coupon Deductions</div>
+          <div class="summary-card__value">₹<%= summary.couponDiscount.toLocaleString('en-IN') %></div>
+          <div class="summary-card__sub">Applied coupon savings</div>
+        </div>
+      </div>
+
+      <!-- Chart -->
+      <div class="card" style="margin-bottom:24px;">
+        <div class="card__header">
+          <span class="card__title">Revenue &amp; Orders Over Time</span>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="salesChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Orders table -->
+      <div class="card">
+        <div class="card__header">
+          <span class="card__title">Order Breakdown</span>
+          <span style="font-size:12px;color:var(--text-light)"><%= summary.totalOrders %> order<%= summary.totalOrders !== 1 ? 's' : '' %></span>
+        </div>
+
+        <% if (orders.length === 0) { %>
+          <div class="empty-state">No orders found for the selected period.</div>
+        <% } else { %>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Order No.</th>
+                  <th>Date</th>
+                  <th>Customer</th>
+                  <th>Items</th>
+                  <th>Subtotal</th>
+                  <th>Item Disc.</th>
+                  <th>Coupon</th>
+                  <th>Coupon Disc.</th>
+                  <th>Tax</th>
+                  <th>Shipping</th>
+                  <th>Grand Total</th>
+                  <th>Payment</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% orders.forEach((order, i) => { %>
+                  <tr>
+                    <td class="text-muted"><%= i + 1 %></td>
+                    <td><span class="mono"><%= order.orderNumber %></span></td>
+                    <td class="text-muted" style="white-space:nowrap;">
+                      <%= new Date(order.createdAt).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' }) %>
+                    </td>
+                    <td>
+                      <div style="font-weight:500;font-size:13px;"><%= order.user?.name || '—' %></div>
+                      <div style="font-size:11px;color:var(--text-light);"><%= order.user?.email || '' %></div>
+                    </td>
+                    <td class="text-muted"><%= order.items.length %></td>
+                    <td>₹<%= (order.pricing.subtotal || 0).toLocaleString('en-IN') %></td>
+                    <td>
+                      <% if (order.pricing.itemDiscount > 0) { %>
+                        <span class="text-red">−₹<%= order.pricing.itemDiscount.toLocaleString('en-IN') %></span>
+                      <% } else { %><span class="text-muted">—</span><% } %>
+                    </td>
+                    <td>
+                      <% if (order.couponCode) { %>
+                        <span class="coupon-tag"><%= order.couponCode %></span>
+                      <% } else { %><span class="text-muted">—</span><% } %>
+                    </td>
+                    <td>
+                      <% if (order.pricing.couponDiscount > 0) { %>
+                        <span class="text-red">−₹<%= order.pricing.couponDiscount.toLocaleString('en-IN') %></span>
+                      <% } else { %><span class="text-muted">—</span><% } %>
+                    </td>
+                    <td>₹<%= (order.pricing.tax || 0).toLocaleString('en-IN') %></td>
+                    <td>
+                      <% if (order.pricing.shipping === 0) { %>
+                        <span style="color:var(--green);font-size:11px;font-weight:600;">Free</span>
+                      <% } else { %>
+                        ₹<%= order.pricing.shipping %>
+                      <% } %>
+                    </td>
+                    <td style="font-weight:700;">₹<%= (order.pricing.grandTotal || 0).toLocaleString('en-IN') %></td>
+                    <td>
+                      <span class="badge badge--<%= order.paymentMethod.toLowerCase() %>"><%= order.paymentMethod %></span>
+                    </td>
+                    <td>
+                      <span class="badge badge--<%= order.orderStatus %>"><%= order.orderStatus %></span>
+                    </td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        <% } %>
+      </div>
+
+    </div>
+    <footer class="footer">© 2026 Velmora Chroné. Admin Panel.</footer>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+  function toggleCustom() {
+    const val = document.getElementById('filterSelect').value;
+    document.getElementById('customDates').classList.toggle('visible', val === 'custom');
+  }
+
+  const chartData = <%- JSON.stringify(chartData) %>;
+  const labels    = chartData.map(d => d._id);
+  const revenues  = chartData.map(d => d.revenue);
+  const orderCts  = chartData.map(d => d.orders);
+
+  new Chart(document.getElementById('salesChart').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        {
+          label          : 'Revenue (₹)',
+          data           : revenues,
+          backgroundColor: 'rgba(45,140,132,0.15)',
+          borderColor    : '#2d8c84',
+          borderWidth    : 2,
+          borderRadius   : 3,
+          yAxisID        : 'yRev',
+        },
+        {
+          label               : 'Orders',
+          data                : orderCts,
+          type                : 'line',
+          borderColor         : '#d97706',
+          backgroundColor     : 'rgba(217,119,6,0.08)',
+          borderWidth         : 2,
+          pointRadius         : 4,
+          pointBackgroundColor: '#d97706',
+          tension             : 0.35,
+          yAxisID             : 'yOrd',
+        },
+      ],
+    },
+    options: {
+      responsive         : true,
+      maintainAspectRatio: false,
+      interaction        : { mode: 'index', intersect: false },
+      plugins: {
+        legend: { position: 'top', labels: { font: { size: 11, family: 'Jost' }, usePointStyle: true, padding: 20 } },
+        tooltip: {
+          callbacks: {
+            label(ctx) {
+              return ctx.dataset.label === 'Revenue (₹)'
+                ? ` Revenue: ₹${ctx.parsed.y.toLocaleString('en-IN')}`
+                : ` Orders: ${ctx.parsed.y}`;
+            },
+          },
+        },
+      },
+      scales: {
+        yRev: {
+          position: 'left',
+          grid    : { color: '#f0f2f1' },
+          ticks   : { font: { size: 11, family: 'Jost' }, color: '#9aa8a5', callback: v => '₹' + v.toLocaleString('en-IN') },
+        },
+        yOrd: {
+          position: 'right',
+          grid    : { drawOnChartArea: false },
+          ticks   : { font: { size: 11, family: 'Jost' }, color: '#d97706', stepSize: 1 },
+        },
+        x: {
+          grid : { display: false },
+          ticks: { font: { size: 11, family: 'Jost' }, color: '#9aa8a5' },
+        },
+      },
+    },
+  });
+</script>
+</body>
+</html>

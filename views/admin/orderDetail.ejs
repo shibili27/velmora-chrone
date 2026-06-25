@@ -104,7 +104,7 @@
     .btn-return-reject svg { width:13px; height:13px; }
 
     /* ── Return resolved banners ── */
-    .return-resolved { display:flex; align-items:center; gap:12px; padding:14px 20px; border-radius:6px; margin-bottom:20px; font-size:12.5px; font-weight:500; }
+    .return-resolved { display:flex; align-items:center; gap:12px; padding:14px 20px; border-radius:6px; margin-bottom:20px; font-size:12.5px; font-weight:500; animation: slideIn 0.3s ease; }
     .return-resolved--accepted { background:var(--green-bg); border:1px solid #86efac; color:#14532d; }
     .return-resolved--rejected { background:var(--red-bg);   border:1px solid #fca5a5; color:#7f1d1d; }
     .return-resolved svg { width:16px; height:16px; flex-shrink:0; }
@@ -144,6 +144,18 @@
     .fc-btn--reject { background: var(--red); color: #fff; }
     .fc-btn--reject:hover { background: #b91c1c; }
     .fc-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    /* ── Restock toggle row (NEW) ── */
+    .restock-toggle-row { display:flex; align-items:center; justify-content:space-between; gap:12px; background:#f8faf9; border:1px solid var(--border); border-radius:6px; padding:10px 12px; margin-top:10px; }
+    .restock-toggle-row__text { flex: 1; }
+    .restock-toggle-row__label { font-size:12px; font-weight:600; color:var(--text); }
+    .restock-toggle-row__sub   { font-size:10.5px; color:var(--text-light); margin-top:2px; line-height:1.4; }
+    .restock-switch { position:relative; display:inline-block; width:38px; height:21px; flex-shrink:0; }
+    .restock-switch input { opacity:0; width:0; height:0; }
+    .restock-switch__slider { position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background:#cbd5d1; border-radius:21px; transition:background 0.2s; }
+    .restock-switch__slider::before { content:''; position:absolute; height:17px; width:17px; left:2px; bottom:2px; background:#fff; border-radius:50%; transition:transform 0.2s; box-shadow:0 1px 2px rgba(0,0,0,0.2); }
+    .restock-switch input:checked + .restock-switch__slider { background:var(--green); }
+    .restock-switch input:checked + .restock-switch__slider::before { transform:translateX(17px); }
 
     /* ── Status locked notice ── */
     .status-locked-notice { display:flex; align-items:center; gap:8px; background:#f8faf9; border:1px solid var(--border); border-radius:5px; padding:10px 14px; font-size:12px; color:var(--text-mid); margin-top:8px; }
@@ -339,113 +351,130 @@
         const isTerminalStatus = ['cancelled', 'returned', 'delivered'].includes(order.orderStatus);
       %>
 
-      <!-- ── RETURN REQUEST ALERT ── -->
-      <% if (rStatus === 'pending') { %>
-      <div class="return-alert" id="returnAlert">
-        <div class="return-alert__icon">
-          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
-        </div>
-        <div class="return-alert__body">
-          <div class="return-alert__title">
-            <div class="return-alert__pulse"></div>
-            Return Request Pending — Action Required
-          </div>
-          <div class="return-alert__reason">
-            Customer reason:&nbsp;<span>"<%= order.returnReason || 'No reason provided' %>"</span>
-            <% if (order.returnRequestedAt) { %>
-              &nbsp;·&nbsp;Requested on <%= new Date(order.returnRequestedAt).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' }) %>
-            <% } %>
-          </div>
+      <!-- ── RETURN BANNER ZONE (this whole block gets swapped live by JS) ── -->
+      <div id="returnBannerZone">
 
-          <div class="return-alert__actions" id="returnActions">
-            <button class="btn-return-accept" id="btnAccept" onclick="toggleAcceptCard(event)">
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-              Accept Return
-            </button>
-            <button class="btn-return-reject" id="btnReject" onclick="toggleRejectCard(event)">
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-              Reject Return
-            </button>
-
-            <!-- FLOATING CARD: ACCEPT -->
-            <div class="float-card" id="acceptCard">
-              <div class="float-card__header">
-                <div class="float-card__icon float-card__icon--green">
-                  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-                </div>
-                <div>
-                  <div class="float-card__title">Confirm Accept Return</div>
-                  <div class="float-card__sub">Review the details below before proceeding</div>
-                </div>
-              </div>
-              <div class="float-card__body">
-                <div class="fcs-row"><span class="fcs-row__label">Order</span><span class="fcs-row__val"><%= order.orderNumber || order._id %></span></div>
-                <div class="fcs-row"><span class="fcs-row__label">Customer</span><span class="fcs-row__val"><%= order.user ? order.user.name : 'Unknown' %></span></div>
-                <div class="fcs-row"><span class="fcs-row__label">Items</span><span class="fcs-row__val"><%= order.items.filter(i => i.status === 'active').length %> item(s)</span></div>
-                <div class="fcs-row"><span class="fcs-row__label">Payment method</span><span class="fcs-row__val"><%= order.paymentMethod %></span></div>
-                <div class="fcs-row"><span class="fcs-row__label">Refund amount</span><span class="fcs-row__val fcs-row__val--green">₹<%= order.pricing.grandTotal.toLocaleString('en-IN') %></span></div>
-                <% if (order.returnReason) { %>
-                <div style="margin-top:10px">
-                  <div style="font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-mid);margin-bottom:5px;">Return Reason</div>
-                  <div class="float-card__reason-box">"<%= order.returnReason %>"</div>
-                </div>
-                <% } %>
-              </div>
-              <div class="float-card__footer">
-                <button class="fc-btn fc-btn--cancel" onclick="closeAllCards()">Cancel</button>
-                <button class="fc-btn fc-btn--accept" id="acceptOkBtn" onclick="confirmAccept()">
-                  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-                  Yes, Accept
-                </button>
-              </div>
+        <!-- ── RETURN REQUEST ALERT ── -->
+        <% if (rStatus === 'pending') { %>
+        <div class="return-alert" id="returnAlert">
+          <div class="return-alert__icon">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
+          </div>
+          <div class="return-alert__body">
+            <div class="return-alert__title">
+              <div class="return-alert__pulse"></div>
+              Return Request Pending — Action Required
+            </div>
+            <div class="return-alert__reason">
+              Customer reason:&nbsp;<span>"<%= order.returnReason || 'No reason provided' %>"</span>
+              <% if (order.returnRequestedAt) { %>
+                &nbsp;·&nbsp;Requested on <%= new Date(order.returnRequestedAt).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' }) %>
+              <% } %>
             </div>
 
-            <!-- FLOATING CARD: REJECT -->
-            <div class="float-card float-card--reject" id="rejectCard">
-              <div class="float-card__header">
-                <div class="float-card__icon float-card__icon--red">
-                  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+            <div class="return-alert__actions" id="returnActions">
+              <button class="btn-return-accept" id="btnAccept" onclick="toggleAcceptCard(event)">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                Accept Return
+              </button>
+              <button class="btn-return-reject" id="btnReject" onclick="toggleRejectCard(event)">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                Reject Return
+              </button>
+
+              <!-- FLOATING CARD: ACCEPT -->
+              <div class="float-card" id="acceptCard">
+                <div class="float-card__header">
+                  <div class="float-card__icon float-card__icon--green">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                  </div>
+                  <div>
+                    <div class="float-card__title">Confirm Accept Return</div>
+                    <div class="float-card__sub">Review the details below before proceeding</div>
+                  </div>
                 </div>
-                <div>
-                  <div class="float-card__title">Confirm Reject Return</div>
-                  <div class="float-card__sub">Customer will be notified of your decision</div>
+                <div class="float-card__body">
+                  <div class="fcs-row"><span class="fcs-row__label">Order</span><span class="fcs-row__val"><%= order.orderNumber || order._id %></span></div>
+                  <div class="fcs-row"><span class="fcs-row__label">Customer</span><span class="fcs-row__val"><%= order.user ? order.user.name : 'Unknown' %></span></div>
+                  <div class="fcs-row"><span class="fcs-row__label">Items</span><span class="fcs-row__val"><%= order.items.filter(i => i.status === 'active').length %> item(s)</span></div>
+                  <div class="fcs-row"><span class="fcs-row__label">Payment method</span><span class="fcs-row__val"><%= order.paymentMethod %></span></div>
+                  <div class="fcs-row"><span class="fcs-row__label">Refund amount</span><span class="fcs-row__val fcs-row__val--green">₹<%= order.pricing.grandTotal.toLocaleString('en-IN') %></span></div>
+                  <% if (order.returnReason) { %>
+                  <div style="margin-top:10px">
+                    <div style="font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-mid);margin-bottom:5px;">Return Reason</div>
+                    <div class="float-card__reason-box">"<%= order.returnReason %>"</div>
+                  </div>
+                  <% } %>
+
+                  <!-- NEW: Restock toggle -->
+                  <div class="restock-toggle-row">
+                    <div class="restock-toggle-row__text">
+                      <div class="restock-toggle-row__label">Add item(s) back to stock?</div>
+                      <div class="restock-toggle-row__sub">Increases product (and variant) inventory by the returned quantity</div>
+                    </div>
+                    <label class="restock-switch">
+                      <input type="checkbox" id="restockToggle" checked />
+                      <span class="restock-switch__slider"></span>
+                    </label>
+                  </div>
+                </div>
+                <div class="float-card__footer">
+                  <button class="fc-btn fc-btn--cancel" onclick="closeAllCards()">Cancel</button>
+                  <button class="fc-btn fc-btn--accept" id="acceptOkBtn" onclick="confirmAccept()">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                    Yes, Accept
+                  </button>
                 </div>
               </div>
-              <div class="float-card__body">
-                <div class="fcs-row"><span class="fcs-row__label">Order</span><span class="fcs-row__val"><%= order.orderNumber || order._id %></span></div>
-                <div class="fcs-row"><span class="fcs-row__label">Customer</span><span class="fcs-row__val"><%= order.user ? order.user.name : 'Unknown' %></span></div>
-                <div class="fcs-row"><span class="fcs-row__label">Refund amount</span><span class="fcs-row__val" style="color:var(--red);">₹<%= order.pricing.grandTotal.toLocaleString('en-IN') %> — Not refunded</span></div>
-                <% if (order.returnReason) { %>
-                <div class="fcs-row"><span class="fcs-row__label">Customer reason</span><span class="fcs-row__val fcs-row__val--amber">"<%= order.returnReason %>"</span></div>
-                <% } %>
-                <label class="float-card__textarea-label">Rejection Reason <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-light)">(optional)</span></label>
-                <textarea class="float-card__textarea" id="rejectReasonInput" placeholder="e.g. Item shows signs of use / not covered by return policy…"></textarea>
-              </div>
-              <div class="float-card__footer">
-                <button class="fc-btn fc-btn--cancel" onclick="closeAllCards()">Cancel</button>
-                <button class="fc-btn fc-btn--reject" id="rejectOkBtn" onclick="confirmReject()">
-                  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-                  Reject
-                </button>
+
+              <!-- FLOATING CARD: REJECT -->
+              <div class="float-card float-card--reject" id="rejectCard">
+                <div class="float-card__header">
+                  <div class="float-card__icon float-card__icon--red">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                  </div>
+                  <div>
+                    <div class="float-card__title">Confirm Reject Return</div>
+                    <div class="float-card__sub">Customer will be notified of your decision</div>
+                  </div>
+                </div>
+                <div class="float-card__body">
+                  <div class="fcs-row"><span class="fcs-row__label">Order</span><span class="fcs-row__val"><%= order.orderNumber || order._id %></span></div>
+                  <div class="fcs-row"><span class="fcs-row__label">Customer</span><span class="fcs-row__val"><%= order.user ? order.user.name : 'Unknown' %></span></div>
+                  <div class="fcs-row"><span class="fcs-row__label">Refund amount</span><span class="fcs-row__val" style="color:var(--red);">₹<%= order.pricing.grandTotal.toLocaleString('en-IN') %> — Not refunded</span></div>
+                  <% if (order.returnReason) { %>
+                  <div class="fcs-row"><span class="fcs-row__label">Customer reason</span><span class="fcs-row__val fcs-row__val--amber">"<%= order.returnReason %>"</span></div>
+                  <% } %>
+                  <label class="float-card__textarea-label">Rejection Reason <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-light)">(optional)</span></label>
+                  <textarea class="float-card__textarea" id="rejectReasonInput" placeholder="e.g. Item shows signs of use / not covered by return policy…"></textarea>
+                </div>
+                <div class="float-card__footer">
+                  <button class="fc-btn fc-btn--cancel" onclick="closeAllCards()">Cancel</button>
+                  <button class="fc-btn fc-btn--reject" id="rejectOkBtn" onclick="confirmReject()">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                    Reject
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <% } else if (rStatus === 'accepted') { %>
-      <div class="return-resolved return-resolved--accepted">
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        Return request was <strong>&nbsp;accepted&nbsp;</strong> — refund has been initiated.
-      </div>
+        <% } else if (rStatus === 'accepted') { %>
+        <div class="return-resolved return-resolved--accepted" id="returnResolvedBanner">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Return request was <strong>&nbsp;accepted&nbsp;</strong> — refund has been initiated.
+        </div>
 
-      <% } else if (rStatus === 'rejected') { %>
-      <div class="return-resolved return-resolved--rejected">
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        Return request was <strong>&nbsp;rejected.</strong>
-        <% if (order.returnRejectionReason) { %>&nbsp;Reason: <%= order.returnRejectionReason %><% } %>
-      </div>
-      <% } %>
+        <% } else if (rStatus === 'rejected') { %>
+        <div class="return-resolved return-resolved--rejected" id="returnResolvedBanner">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Return request was <strong>&nbsp;rejected.</strong>
+          <% if (order.returnRejectionReason) { %>&nbsp;Reason: <%= order.returnRejectionReason %><% } %>
+        </div>
+        <% } %>
+
+      </div><!-- /#returnBannerZone -->
 
       <div class="fc-backdrop" id="fcBackdrop" onclick="closeAllCards()"></div>
 
@@ -604,12 +633,12 @@
                   <textarea id="statusNote" placeholder="Add a note for this status change…" <%= isTerminalStatus ? 'disabled' : '' %>><%= order.cancellationNote || '' %></textarea>
                 </div>
                 <% if (isTerminalStatus) { %>
-                  <div class="status-locked-notice">
+                  <div class="status-locked-notice" id="statusLockedNotice">
                     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                    Order is <strong>&nbsp;<%= order.orderStatus %>&nbsp;</strong> — no further status changes allowed.
+                    Order is <strong>&nbsp;<span id="statusLockedLabel"><%= order.orderStatus %></span>&nbsp;</strong> — no further status changes allowed.
                   </div>
                 <% } else { %>
-                  <button class="btn btn--teal" onclick="saveStatus()">
+                  <button class="btn btn--teal" id="updateStatusBtn" onclick="saveStatus()">
                     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
                     Update Status
                   </button>
@@ -645,7 +674,7 @@
                     </div>
                   </div>
                   <% if (rStatus === 'pending') { %>
-                  <div class="timeline-item">
+                  <div class="timeline-item" id="timelineReturnPending">
                     <div class="timeline-dot timeline-dot--amber"></div>
                     <div>
                       <div class="timeline-text"><strong>Return Requested</strong> — awaiting admin review</div>
@@ -770,14 +799,16 @@
   });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAllCards(); });
 
-  /* ── Return decision ────────────────────────────────────────────────────── */
+  /* ── Return decision (NO PAGE RELOAD) ──────────────────────────────────── */
   async function confirmAccept() {
-    const btn = document.getElementById('acceptOkBtn');
+    const btn     = document.getElementById('acceptOkBtn');
+    const restock = document.getElementById('restockToggle').checked;
     btn.disabled = true; btn.innerHTML = '… Processing';
     closeAllCards();
-    await sendReturnDecision('accepted', '');
+    await sendReturnDecision('accepted', '', restock);
     btn.disabled = false; btn.innerHTML = '✓ Yes, Accept';
   }
+
   async function confirmReject() {
     const reason = document.getElementById('rejectReasonInput').value.trim();
     const btn = document.getElementById('rejectOkBtn');
@@ -786,19 +817,146 @@
     await sendReturnDecision('rejected', reason);
     btn.disabled = false; btn.innerHTML = '✕ Reject';
   }
-  async function sendReturnDecision(decision, rejectionReason) {
+
+  async function sendReturnDecision(decision, rejectionReason, restock = true) {
     try {
       const res  = await fetch(`/admin/orders/${ORDER_ID}/return`, {
         method:'PATCH', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ decision, rejectionReason }),
+        body: JSON.stringify({ decision, rejectionReason, restock }),
       });
       const data = await res.json();
       if (data.success) {
-        showToast(decision === 'accepted' ? '✓ Return accepted — refund initiated' : '✕ Return rejected',
-                  decision === 'accepted' ? 'success' : 'error');
-        setTimeout(() => location.reload(), 1500);
-      } else { showToast(data.message || 'Action failed', 'error'); }
-    } catch { showToast('Network error — please try again', 'error'); }
+        showToast(
+          decision === 'accepted'
+            ? (data.message || '✓ Return accepted — refund initiated')
+            : '✕ Return rejected',
+          decision === 'accepted' ? 'success' : 'error'
+        );
+        // Live UI update — no reload
+        applyReturnDecisionToDOM(decision, rejectionReason);
+      } else {
+        showToast(data.message || 'Action failed', 'error');
+      }
+    } catch {
+      showToast('Network error — please try again', 'error');
+    }
+  }
+
+  /* ── Apply the decision result to the page without refreshing ───────────── */
+  function applyReturnDecisionToDOM(decision, rejectionReason) {
+    const zone = document.getElementById('returnBannerZone');
+    if (!zone) return;
+
+    if (decision === 'accepted') {
+      zone.innerHTML = `
+        <div class="return-resolved return-resolved--accepted" id="returnResolvedBanner">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Return request was <strong>&nbsp;accepted&nbsp;</strong> — refund has been initiated.
+        </div>`;
+
+      // Order is now "returned" — update badge, lock status select, refresh timeline
+      const newStatus = 'returned';
+
+      const badge = document.getElementById('orderStatusBadge');
+      if (badge) {
+        badge.className   = `badge badge--${newStatus}`;
+        badge.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
+      }
+
+      lockStatusControls(newStatus);
+      replaceTimelineForTerminalStatus(newStatus, 'accepted');
+
+    } else {
+      const reasonHtml = rejectionReason
+        ? `&nbsp;Reason: ${escapeHtml(rejectionReason)}`
+        : '';
+      zone.innerHTML = `
+        <div class="return-resolved return-resolved--rejected" id="returnResolvedBanner">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Return request was <strong>&nbsp;rejected.</strong>${reasonHtml}
+        </div>`;
+
+      // Update the pending-return entry already in the timeline, if present
+      const pendingEntry = document.getElementById('timelineReturnPending');
+      if (pendingEntry) {
+        pendingEntry.id = '';
+        pendingEntry.innerHTML = `
+          <div class="timeline-dot timeline-dot--red"></div>
+          <div><div class="timeline-text"><strong>Return Rejected</strong></div></div>`;
+      } else {
+        const timeline = document.getElementById('orderTimeline');
+        if (timeline) {
+          const item = document.createElement('div');
+          item.className = 'timeline-item';
+          item.style.animation = 'slideIn 0.3s ease';
+          item.innerHTML = `
+            <div class="timeline-dot timeline-dot--red"></div>
+            <div><div class="timeline-text"><strong>Return Rejected</strong></div></div>`;
+          timeline.appendChild(item);
+        }
+      }
+      // orderStatus is unchanged on rejection — nothing else to update
+    }
+  }
+
+  function lockStatusControls(newStatus) {
+    const sel = document.getElementById('statusSelect');
+    if (sel) { sel.disabled = true; sel.value = newStatus; }
+
+    const noteArea = document.getElementById('statusNote');
+    if (noteArea) noteArea.disabled = true;
+
+    const updateBtn = document.getElementById('updateStatusBtn');
+    if (updateBtn) {
+      const notice = document.createElement('div');
+      notice.className = 'status-locked-notice';
+      notice.id = 'statusLockedNotice';
+      notice.innerHTML = `
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+        Order is <strong>&nbsp;<span id="statusLockedLabel">${newStatus}</span>&nbsp;</strong> — no further status changes allowed.`;
+      updateBtn.replaceWith(notice);
+    } else {
+      const label = document.getElementById('statusLockedLabel');
+      if (label) label.textContent = newStatus;
+    }
+  }
+
+  function replaceTimelineForTerminalStatus(newStatus, returnOutcome) {
+    const timeline = document.getElementById('orderTimeline');
+    if (!timeline) return;
+
+    // If a pending-return entry already exists in the timeline, just convert it.
+    const pendingEntry = document.getElementById('timelineReturnPending');
+    if (pendingEntry) {
+      pendingEntry.id = '';
+      pendingEntry.innerHTML = `
+        <div class="timeline-dot timeline-dot--green"></div>
+        <div><div class="timeline-text"><strong>Return Accepted</strong> — refund initiated</div></div>`;
+      return;
+    }
+
+    // Otherwise (order was mid-flow, e.g. "confirmed"/"processing" before return),
+    // append a fresh "Returned" + "Return Accepted" pair to the live timeline.
+    const wrap = document.createElement('div');
+    wrap.innerHTML = `
+      <div class="timeline-item" style="animation:slideIn 0.3s ease">
+        <div class="timeline-dot timeline-dot--${DOT_COLORS[newStatus] || 'amber'}"></div>
+        <div>
+          <div class="timeline-text"><strong>${STATUS_LABELS[newStatus] || newStatus}</strong></div>
+          <div class="timeline-time">${new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})}</div>
+        </div>
+      </div>
+      <div class="timeline-item" style="animation:slideIn 0.3s ease">
+        <div class="timeline-dot timeline-dot--green"></div>
+        <div><div class="timeline-text"><strong>Return Accepted</strong> — refund initiated</div></div>
+      </div>`;
+    while (wrap.firstChild) timeline.appendChild(wrap.firstChild);
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
   }
 
   /* ── Status update ──────────────────────────────────────────────────────── */

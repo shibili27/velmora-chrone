@@ -1,134 +1,139 @@
 import mongoose from 'mongoose';
 
-const couponSchema = new mongoose.Schema({
-  code: {
-    type      : String,
-    required  : [true, 'Coupon code is required'],
-    unique    : true,
-    uppercase : true,
-    trim      : true,
-  },
-  description: {
-    type   : String,
-    default: '',
-    trim   : true,
-  },
-  discountType: {
-    type    : String,
-    enum    : ['percentage', 'flat'],
-    required: true,
-  },
-  discountValue: {
-    type    : Number,
-    required: true,
-    min     : [0, 'Discount value cannot be negative'],
-  },
-  // Only meaningful for discountType: 'percentage' — caps the rupee amount discounted
-  maxDiscount: {
-    type   : Number,
-    default: null,
-    min    : [0, 'Max discount cannot be negative'],
-  },
-  minOrderAmount: {
-    type   : Number,
-    default: 0,
-    min    : [0, 'Minimum order amount cannot be negative'],
-  },
-  expiryDate: {
-    type    : Date,
-    required: [true, 'Expiry date is required'],
-  },
-  isActive: {
-    type   : Boolean,
-    default: true,
-  },
-  // Total number of times this coupon can be used across all users. null = unlimited.
-  usageLimit: {
-    type   : Number,
-    default: null,
-    min    : [1, 'Usage limit must be at least 1'],
-  },
-  usedCount: {
-    type   : Number,
-    default: 0,
-    min    : 0,
-  },
-  // Per-user usage limit. Most coupons should be one-time-per-user.
-  perUserLimit: {
-    type   : Number,
-    default: 1,
-    min    : [1, 'Per-user limit must be at least 1'],
-  },
-  usedBy: [{
-    user : { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    count: { type: Number, default: 1 },
-  }],
-}, { timestamps: true });
+const couponSchema = new mongoose.Schema(
+  {
+    code: {
+      type:      String,
+      required:  true,
+      unique:    true,
+      uppercase: true,
+      trim:      true,
+    },
 
-couponSchema.index({ isActive: 1, expiryDate: 1 });
+    discountType: {
+      type:     String,
+      enum:     ['flat', 'percentage', 'free_shipping'],
+      required: true,
+    },
 
-// --- Validation helpers -----------------------------------------------
+    discountValue: {
+      type:    Number,
+      default: 0,
+      min:     0,
+    },
 
-couponSchema.methods.isExpired = function () {
-  return this.expiryDate < new Date();
-};
+    minOrderValue: {
+      type:    Number,
+      default: 0,
+      min:     0,
+    },
 
-couponSchema.methods.isUsageLimitReached = function () {
-  return this.usageLimit !== null && this.usedCount >= this.usageLimit;
-};
+    maxDiscountCap: {
+      type:    Number,
+      default: null,
+      min:     0,
+    },
 
-couponSchema.methods.getUserUsage = function (userId) {
-  const entry = this.usedBy.find(u => String(u.user) === String(userId));
-  return entry ? entry.count : 0;
-};
+    expiryDate: {
+      type:     Date,
+      required: true,
+    },
 
-couponSchema.methods.hasUserReachedLimit = function (userId) {
-  return this.getUserUsage(userId) >= this.perUserLimit;
-};
+    usageLimit: {
+      type:    Number,
+      default: null,
+      min:     1,
+    },
+
+    usedCount: {
+      type:    Number,
+      default: 0,
+      min:     0,
+    },
+
+    perUserLimit: {
+      type:    Number,
+      default: null,
+      min:     1,
+    },
+
+    isActive: {
+      type:    Boolean,
+      default: true,
+    },
+
+    isDeleted: {
+      type:    Boolean,
+      default: false,
+    },
+  },
+  { timestamps: true }
+);
+
+// ─── Virtuals ────────────────────────────────────────────────────────────────
+
+couponSchema.virtual('isValid').get(function () {
+  if (!this.isActive || this.isDeleted)                                        return false;
+  if (new Date() > this.expiryDate)                                            return false;
+  if (this.usageLimit !== null && this.usedCount >= this.usageLimit)           return false;
+  return true;
+});
+
+// ─── Instance Methods ─────────────────────────────────────────────────────────
 
 /**
- * Validates a coupon against a user and an order subtotal.
- * Returns { valid: boolean, message: string }
+ * Validate a coupon for a specific order.
+ * @param {number} orderSubtotal   - Cart subtotal (before GST / discount)
+ * @param {number} userUsageCount  - How many times this user has already used this coupon
+ * @returns {{ valid: boolean, message: string }}
  */
-couponSchema.methods.validateFor = function (userId, subtotal) {
-  if (!this.isActive) {
+couponSchema.methods.validateFor = function (orderSubtotal, userUsageCount = 0) {
+  if (!this.isActive || this.isDeleted) {
     return { valid: false, message: 'This coupon is no longer active.' };
   }
-  if (this.isExpired()) {
+
+  if (new Date() > this.expiryDate) {
     return { valid: false, message: 'This coupon has expired.' };
   }
-  if (this.isUsageLimitReached()) {
+
+  if (this.usageLimit !== null && this.usedCount >= this.usageLimit) {
     return { valid: false, message: 'This coupon has reached its usage limit.' };
   }
-  if (this.hasUserReachedLimit(userId)) {
-    return { valid: false, message: 'You have already used this coupon.' };
-  }
-  if (subtotal < this.minOrderAmount) {
+
+  if (orderSubtotal < this.minOrderValue) {
     return {
-      valid  : false,
-      message: `Add items worth ₹${(this.minOrderAmount - subtotal).toLocaleString('en-IN')} more to use this coupon.`,
+      valid:   false,
+      message: `A minimum order value of ₹${this.minOrderValue} is required to use this coupon.`,
     };
   }
-  return { valid: true, message: 'Coupon is valid.' };
+
+  if (this.perUserLimit !== null && userUsageCount >= this.perUserLimit) {
+    return { valid: false, message: 'You have already used this coupon the maximum number of times.' };
+  }
+
+  return { valid: true, message: 'Coupon applied successfully.' };
 };
 
 /**
- * Calculates the discount amount for a given subtotal.
- * Applies the maxDiscount cap for percentage coupons.
+ * Calculate the discount amount for a given subtotal.
+ * @param {number} subtotal
+ * @returns {number} discount amount (never exceeds subtotal)
  */
 couponSchema.methods.calculateDiscount = function (subtotal) {
   let discount = 0;
-  if (this.discountType === 'percentage') {
-    discount = (subtotal * this.discountValue) / 100;
-    if (this.maxDiscount !== null && discount > this.maxDiscount) {
-      discount = this.maxDiscount;
-    }
-  } else {
+
+  if (this.discountType === 'flat') {
     discount = this.discountValue;
+  } else if (this.discountType === 'percentage') {
+    discount = (subtotal * this.discountValue) / 100;
+    if (this.maxDiscountCap !== null) {
+      discount = Math.min(discount, this.maxDiscountCap);
+    }
+  } else if (this.discountType === 'free_shipping') {
+    discount = 0; // shipping waiver handled separately in checkout
   }
-  // Never let discount exceed the subtotal itself
-  return Math.round(Math.min(discount, subtotal));
+
+  return Math.min(discount, subtotal); // discount can never exceed subtotal
 };
 
-const Coupon = mongoose.models.Coupon || mongoose.model('Coupon', couponSchema);
-export default Coupon;
+export default mongoose.model('Coupon', couponSchema);

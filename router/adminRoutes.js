@@ -10,14 +10,22 @@ import {
   getProducts,   addProduct,  editProduct,  deleteProduct,
   blockProduct,  unblockProduct,
   getBrands,     addBrand,    editBrand,    deleteBrand,
+  getCoupons,    createCoupon, deleteCoupon, toggleCouponStatus,
 } from '../controller/adimconrtoller/adminController.js';
 import {
   listOrders,
   getOrderDetail,
   updateOrderStatus,
-  handleReturnRequest, 
-   getRecentOrders,            
+  handleReturnRequest,
+  getRecentOrders,
 } from '../controller/adimconrtoller/orderController.js';
+import { getSalesReport } from '../controller/adimconrtoller/salesController.js';
+import {
+  getOffers, addOffer, editOffer, toggleOfferActive, deleteOffer,
+} from '../controller/adimconrtoller/offerController.js';
+import {
+  getReferralSettings, updateReferralSettings,
+} from '../controller/adimconrtoller/referralController.js';
 
 const router = express.Router();
 
@@ -169,26 +177,51 @@ router.post('/customers/:id/unblock', isAuthenticated, async (req, res) => {
   }
 });
 
-router.get('/categories',isAuthenticated, getCategories);
-router.post('/categories/add',isAuthenticated, addCategory);
-router.post('/categories/:id/edit',isAuthenticated, editCategory);
+// ── Categories ────────────────────────────────────────────────────────────────
+router.get ('/categories',            isAuthenticated, getCategories);
+router.post('/categories/add',        isAuthenticated, addCategory);
+router.post('/categories/:id/edit',   isAuthenticated, editCategory);
 router.post('/categories/:id/delete', isAuthenticated, deleteCategory);
 
-router.get('/products',isAuthenticated, getProducts);
-router.post('/products/add',isAuthenticated, addProduct);
-router.post('/products/:id/edit',isAuthenticated, editProduct);
-router.post('/products/:id/delete',  isAuthenticated, deleteProduct);
-router.post('/products/:id/block',isAuthenticated, blockProduct);
-router.post('/products/:id/unblock', isAuthenticated, unblockProduct);
+// ── Products ──────────────────────────────────────────────────────────────────
+router.get ('/products',              isAuthenticated, getProducts);
+router.post('/products/add',          isAuthenticated, addProduct);
+router.post('/products/:id/edit',     isAuthenticated, editProduct);
+router.post('/products/:id/delete',   isAuthenticated, deleteProduct);
+router.post('/products/:id/block',    isAuthenticated, blockProduct);
+router.post('/products/:id/unblock',  isAuthenticated, unblockProduct);
 
-router.get('/brands',isAuthenticated, getBrands);
-router.post('/brands/add',isAuthenticated, addBrand);
-router.post('/brands/:id/edit',isAuthenticated, editBrand);
-router.post('/brands/:id/delete', isAuthenticated, deleteBrand);
+// ── Brands ────────────────────────────────────────────────────────────────────
+router.get ('/brands',                isAuthenticated, getBrands);
+router.post('/brands/add',            isAuthenticated, addBrand);
+router.post('/brands/:id/edit',       isAuthenticated, editBrand);
+router.post('/brands/:id/delete',     isAuthenticated, deleteBrand);
 
-router.get('/orders',isAuthenticated, listOrders);
-router.get('/orders/notify/recent',    isAuthenticated, getRecentOrders);
-router.get('/orders/:id',isAuthenticated, getOrderDetail);
-router.patch('/orders/:id/status',isAuthenticated, updateOrderStatus);
-router.patch('/orders/:id/return',isAuthenticated, handleReturnRequest);  
+// ── Coupons ───────────────────────────────────────────────────────────────────
+router.get ('/coupons',               isAuthenticated, getCoupons);
+router.post('/coupons/create',        isAuthenticated, createCoupon);
+router.post('/coupons/:id/delete',    isAuthenticated, deleteCoupon);
+router.post('/coupons/:id/toggle',    isAuthenticated, toggleCouponStatus);
+
+// ── Offers ────────────────────────────────────────────────────────────────────
+router.get ('/offers',                isAuthenticated, getOffers);
+router.post('/offers/add',            isAuthenticated, addOffer);
+router.post('/offers/:id/edit',       isAuthenticated, editOffer);
+router.post('/offers/:id/toggle',     isAuthenticated, toggleOfferActive);
+router.post('/offers/:id/delete',     isAuthenticated, deleteOffer);
+
+// ── Referral Settings ─────────────────────────────────────────────────────────
+router.get ('/referrals',             isAuthenticated, getReferralSettings);
+router.post('/referrals/update',      isAuthenticated, updateReferralSettings);
+
+// ── Orders ────────────────────────────────────────────────────────────────────
+router.get  ('/orders',               isAuthenticated, listOrders);
+router.get  ('/orders/notify/recent', isAuthenticated, getRecentOrders);
+router.get  ('/orders/:id',           isAuthenticated, getOrderDetail);
+router.patch('/orders/:id/status',    isAuthenticated, updateOrderStatus);
+router.patch('/orders/:id/return',    isAuthenticated, handleReturnRequest);
+
+// ── Sales Report ──────────────────────────────────────────────────────────────
+router.get('/sales-report', isAuthenticated, getSalesReport);
+
 export default router;
