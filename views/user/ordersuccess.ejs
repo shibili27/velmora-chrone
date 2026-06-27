@@ -101,11 +101,8 @@
     .del-line.pending{background:rgba(245,242,235,.07)}
     .del-line.done{background:linear-gradient(90deg,rgba(201,169,110,.55),rgba(201,169,110,.2))}
     .del-line.cancelled-line{background:linear-gradient(90deg,rgba(239,68,68,.4),rgba(239,68,68,.1))}
-
     .del-dot{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:border-color .45s,background .45s,box-shadow .45s;border:1.5px solid rgba(245,242,235,.1);background:rgba(245,242,235,.03)}
-    .del-dot svg{width:13px;height:13px;transition:stroke .45s}
-    .del-dot svg{stroke:rgba(245,242,235,0.18)}
-
+    .del-dot svg{width:13px;height:13px;transition:stroke .45s;stroke:rgba(245,242,235,0.18)}
     .del-step.done    .del-dot{border-color:rgba(201,169,110,.45);background:rgba(201,169,110,.08);box-shadow:0 0 14px rgba(201,169,110,.15)}
     .del-step.done    .del-dot svg{stroke:#c9a96e}
     .del-step.active  .del-dot{border-color:#c9a96e;background:linear-gradient(135deg,rgba(201,169,110,.18),rgba(201,169,110,.05));box-shadow:0 0 24px rgba(201,169,110,.3),0 0 8px rgba(201,169,110,.15)}
@@ -114,7 +111,6 @@
     .del-step.cancelled .del-dot svg{stroke:rgba(239,68,68,.8)}
     .del-step.returned  .del-dot{border-color:rgba(251,146,60,.5);background:rgba(251,146,60,.08);box-shadow:0 0 18px rgba(251,146,60,.15)}
     .del-step.returned  .del-dot svg{stroke:rgba(251,146,60,.8)}
-
     .del-label{font-family:'Jost',sans-serif;font-size:.37rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(245,242,235,.2);text-align:center;transition:color .45s;white-space:nowrap}
     .del-step.done     .del-label{color:rgba(201,169,110,.5)}
     .del-step.active   .del-label{color:rgba(201,169,110,.9);font-weight:500}
@@ -152,6 +148,10 @@
     .order-total-key{font-family:'Jost',sans-serif;font-size:.48rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(245,242,235,.3)}
     .order-total-val{font-family:'Cormorant Garamond',serif;font-size:1.35rem;font-weight:300;color:#f5f2eb}
     #liveOrderStatus{transition:color .45s}
+
+    /* ── Payment method badge ── */
+    .pay-method-badge{display:inline-flex;align-items:center;gap:6px;font-family:'Jost',sans-serif;font-size:.52rem;color:rgba(245,242,235,.6);letter-spacing:.04em}
+    .pay-method-icon{width:16px;height:16px;flex-shrink:0}
 
     .success-btns{display:flex;gap:.85rem;flex-wrap:wrap;justify-content:center;animation:fadeUp .8s ease .75s both}
     .btn-gold{padding:.85rem 2rem;border:none;border-radius:100px;background:linear-gradient(135deg,#e0c47e 0%,#c9a96e 50%,#b8913d 100%);color:#0d0b08;font-family:'Jost',sans-serif;font-size:.5rem;letter-spacing:.22em;text-transform:uppercase;cursor:pointer;position:relative;overflow:hidden;transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .22s;box-shadow:0 1px 0 rgba(255,255,255,.35) inset,0 4px 14px rgba(185,140,55,.3);text-decoration:none;display:inline-flex;align-items:center;gap:.5rem}
@@ -298,7 +298,6 @@
 
   <div class="delivery-trail-wrap">
     <div class="delivery-trail" id="deliveryTrail">
-
       <div class="del-step" data-stage="confirmed" id="stage-confirmed">
         <div class="del-dot">
           <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -307,9 +306,7 @@
         </div>
         <span class="del-label">Confirmed</span>
       </div>
-
       <div class="del-line pending" id="line-confirmed"></div>
-
       <div class="del-step" data-stage="processing" id="stage-processing">
         <div class="del-dot">
           <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -319,9 +316,7 @@
         </div>
         <span class="del-label">Processing</span>
       </div>
-
       <div class="del-line pending" id="line-processing"></div>
-
       <div class="del-step" data-stage="dispatched" id="stage-dispatched">
         <div class="del-dot">
           <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -333,9 +328,7 @@
         </div>
         <span class="del-label">Dispatched</span>
       </div>
-
       <div class="del-line pending" id="line-dispatched"></div>
-
       <div class="del-step" data-stage="delivered" id="stage-delivered">
         <div class="del-dot">
           <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -345,15 +338,35 @@
         </div>
         <span class="del-label">Delivered</span>
       </div>
-
     </div>
   </div>
 
   <div class="order-card">
     <div class="order-card-title">Order Details</div>
+
+    <%
+      const pm = order.paymentMethod || 'COD';
+      let pmLabel, pmIcon;
+      if (pm === 'COD') {
+        pmLabel = 'Cash on Delivery';
+        pmIcon  = `<svg class="pay-method-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20M6 15h4"/></svg>`;
+      } else if (pm === 'Wallet') {
+        pmLabel = 'Wallet Payment';
+        pmIcon  = `<svg class="pay-method-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M20 12V8H6a2 2 0 0 1 0-4h14v4"/><path d="M4 6v12a2 2 0 0 0 2 2h14v-4"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg>`;
+      } else {
+        pmLabel = 'Online Payment (Razorpay)';
+        pmIcon  = `<svg class="pay-method-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="9" x2="23" y2="9"/></svg>`;
+      }
+    %>
+
     <div class="order-row">
       <span class="order-key">Payment Method</span>
-      <span class="order-val">Cash on Delivery</span>
+      <span class="order-val">
+        <span class="pay-method-badge">
+          <%- pmIcon %>
+          <%= pmLabel %>
+        </span>
+      </span>
     </div>
     <div class="order-row">
       <span class="order-key">Order Status</span>
@@ -374,6 +387,12 @@
       <span class="order-val" style="color:rgba(74,222,128,.7)">− ₹<%= order.pricing.itemDiscount.toLocaleString('en-IN') %></span>
     </div>
     <% } %>
+    <% if (order.pricing.couponDiscount > 0) { %>
+    <div class="order-row">
+      <span class="order-key">Coupon Discount</span>
+      <span class="order-val" style="color:rgba(74,222,128,.7)">− ₹<%= order.pricing.couponDiscount.toLocaleString('en-IN') %></span>
+    </div>
+    <% } %>
     <div class="order-row">
       <span class="order-key">GST (18%)</span>
       <span class="order-val">₹<%= order.pricing.tax.toLocaleString('en-IN') %></span>
@@ -384,13 +403,12 @@
     </div>
     <div class="order-divider"></div>
     <div class="order-total-row">
-      <span class="order-total-key">Total Paid</span>
+      <span class="order-total-key"><%= pm === 'COD' ? 'Total Payable' : 'Total Paid' %></span>
       <span class="order-total-val">₹<%= order.pricing.grandTotal.toLocaleString('en-IN') %></span>
     </div>
     <% } %>
   </div>
 
-  <!-- ✅ FIXED: Using order.orderNumber instead of order._id -->
   <div class="success-btns">
     <a href="/orders/<%= order.orderNumber %>" class="btn-outline">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
@@ -443,26 +461,11 @@
   window.addEventListener('popstate', () => history.pushState(null, null, window.location.href));
 
   const LINEAR_STAGES = ['confirmed', 'processing', 'dispatched', 'delivered'];
-  const STAGE_LABELS  = {
-    confirmed:  'Order Confirmed',
-    processing: 'Processing Order',
-    dispatched: 'Out for Delivery',
-    delivered:  'Delivered',
-    cancelled:  'Order Cancelled',
-    returned:   'Return Initiated',
-  };
-  const STAGE_SUBS = {
-    confirmed:  'Your order has been confirmed.',
-    processing: 'Your order is being prepared.',
-    dispatched: 'Your order is on the way!',
-    delivered:  'Your order has been delivered.',
-    cancelled:  'Your order has been cancelled.',
-    returned:   'Return process has started.',
-  };
+  const STAGE_LABELS  = { confirmed:'Order Confirmed', processing:'Processing Order', dispatched:'Out for Delivery', delivered:'Delivered', cancelled:'Order Cancelled', returned:'Return Initiated' };
+  const STAGE_SUBS    = { confirmed:'Your order has been confirmed.', processing:'Your order is being prepared.', dispatched:'Your order is on the way!', delivered:'Your order has been delivered.', cancelled:'Your order has been cancelled.', returned:'Return process has started.' };
 
   function applyStatus(status) {
     status = status.toLowerCase();
-
     const isCancelled = status === 'cancelled';
     const isReturned  = status === 'returned';
     const isTerminal  = isCancelled || isReturned;
@@ -472,49 +475,21 @@
       const stepEl = document.getElementById('stage-' + stage);
       const lineEl = document.getElementById('line-' + stage);
       if (!stepEl) return;
-
-      stepEl.classList.remove('done', 'active', 'cancelled', 'returned');
-      if (lineEl) lineEl.classList.remove('done', 'pending', 'cancelled-line');
-
+      stepEl.classList.remove('done','active','cancelled','returned');
+      if (lineEl) lineEl.classList.remove('done','pending','cancelled-line');
       if (isTerminal) {
         if (lineEl) lineEl.classList.add('pending');
       } else {
-        if (idx < activeIdx) {
-          stepEl.classList.add('done');
-          if (lineEl) lineEl.classList.add('done');
-        } else if (idx === activeIdx) {
-          stepEl.classList.add('active');
-          if (lineEl) lineEl.classList.add('pending');
-        } else {
-          if (lineEl) lineEl.classList.add('pending');
-        }
+        if (idx < activeIdx)       { stepEl.classList.add('done');   if (lineEl) lineEl.classList.add('done');    }
+        else if (idx === activeIdx) { stepEl.classList.add('active'); if (lineEl) lineEl.classList.add('pending'); }
+        else                        {                                  if (lineEl) lineEl.classList.add('pending'); }
       }
     });
-
-    const cancelEl   = document.getElementById('stage-cancelled');
-    const cancelLine = document.getElementById('line-cancelled');
-    if (cancelEl) {
-      cancelEl.classList.remove('done', 'active', 'cancelled', 'returned');
-      if (isCancelled) cancelEl.classList.add('cancelled', 'active');
-    }
-    if (cancelLine) {
-      cancelLine.classList.remove('done', 'pending', 'cancelled-line');
-      if (isCancelled) cancelLine.classList.add('cancelled-line');
-      else cancelLine.classList.add('pending');
-    }
-
-    const returnEl = document.getElementById('stage-returned');
-    if (returnEl) {
-      returnEl.classList.remove('done', 'active', 'cancelled', 'returned');
-      if (isReturned) returnEl.classList.add('returned', 'active');
-    }
 
     const statusEl = document.getElementById('liveOrderStatus');
     if (statusEl) {
       statusEl.textContent = status.charAt(0).toUpperCase() + status.slice(1);
-      statusEl.style.color = isCancelled ? 'rgba(239,68,68,.8)'
-                           : isReturned  ? 'rgba(251,146,60,.8)'
-                           : '#c9a96e';
+      statusEl.style.color = isCancelled ? 'rgba(239,68,68,.8)' : isReturned ? 'rgba(251,146,60,.8)' : '#c9a96e';
     }
 
     const badge     = document.getElementById('liveBadge');
@@ -535,42 +510,26 @@
     const toastSvg  = document.getElementById('toastSvg');
     const title     = document.getElementById('toastTitle');
     const sub       = document.getElementById('toastSub');
-
     title.textContent = STAGE_LABELS[status] || 'Status Updated';
     sub.textContent   = STAGE_SUBS[status]   || 'Your order status has changed.';
-
     const isCancelled = status === 'cancelled';
     const isReturned  = status === 'returned';
-
-    toastIcon.style.background = isCancelled ? 'rgba(239,68,68,.12)'
-                               : isReturned  ? 'rgba(251,146,60,.12)'
-                               : 'rgba(201,169,110,.12)';
-    toastSvg.setAttribute('stroke', isCancelled ? 'rgba(239,68,68,.85)'
-                                  : isReturned  ? 'rgba(251,146,60,.85)'
-                                  : '#c9a96e');
-
-    if (isCancelled) {
-      toastSvg.innerHTML = '<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>';
-    } else if (isReturned) {
-      toastSvg.innerHTML = '<polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/>';
-    } else {
-      toastSvg.innerHTML = '<polyline points="20 6 9 17 4 12"/>';
-    }
-
+    toastIcon.style.background = isCancelled ? 'rgba(239,68,68,.12)' : isReturned ? 'rgba(251,146,60,.12)' : 'rgba(201,169,110,.12)';
+    toastSvg.setAttribute('stroke', isCancelled ? 'rgba(239,68,68,.85)' : isReturned ? 'rgba(251,146,60,.85)' : '#c9a96e');
+    if (isCancelled)     toastSvg.innerHTML = '<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>';
+    else if (isReturned) toastSvg.innerHTML = '<polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/>';
+    else                 toastSvg.innerHTML = '<polyline points="20 6 9 17 4 12"/>';
     clearTimeout(toastTimer);
     toast.classList.add('show');
     toastTimer = setTimeout(() => toast.classList.remove('show'), 4500);
   }
 
-  // ✅ FIXED: Using order.orderNumber for SSE stream instead of order._id
   const ORDER_NUMBER = '<%= order.orderNumber %>';
-  let   sse, reconnectDelay = 3000;
+  let sse, reconnectDelay = 3000;
 
   function connectSSE() {
     sse = new EventSource('/orders/' + ORDER_NUMBER + '/status-stream');
-
     sse.onopen = () => { reconnectDelay = 3000; };
-
     sse.addEventListener('orderStatus', (e) => {
       try {
         const data = JSON.parse(e.data);
@@ -582,7 +541,6 @@
         }
       } catch (_) {}
     });
-
     sse.onerror = () => {
       sse.close();
       setTimeout(connectSSE, reconnectDelay);

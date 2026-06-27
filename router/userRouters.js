@@ -43,6 +43,7 @@ import {
 import {
   getCheckout,
   placeOrder,
+  placeOrderWithWallet,
   getOrderSuccess,
   getOrderFailure,
   applyCoupon,
@@ -61,6 +62,7 @@ import {
   downloadInvoice,
   streamOrderStatus,
 } from '../controller/usercontroller/orderController.js';
+import { getWallet } from '../controller/usercontroller/walletController.js';
 
 
 router.get('/login', isGuest, noCache, (req, res) => {
@@ -136,20 +138,19 @@ router.get('/api/cart/count', isAuth, getCartCount);
 
 
 router.get('/checkout', isAuth, noCache, getCheckout);
-router.post('/checkout/place-order',  isAuth, placeOrder);
+router.post('/checkout/place-order',        isAuth, placeOrder);
+router.post('/checkout/wallet/place-order', isAuth, placeOrderWithWallet);
 router.get('/checkout/success', isAuth, noCache, getOrderSuccess);
 router.get('/checkout/failure', isAuth, noCache, getOrderFailure);
 router.post('/checkout/apply-coupon',  isAuth, applyCoupon);
 router.post('/checkout/remove-coupon', isAuth, removeCoupon);
 
-// Razorpay
 router.post('/checkout/razorpay/create-order', isAuth, createRazorpayOrder);
 router.post('/checkout/razorpay/verify',       isAuth, verifyRazorpayPayment);
 router.post('/checkout/razorpay/failed',       isAuth, markRazorpayFailed);
 
 
 router.get('/orders', isAuth, noCache, getOrders);
-// orderNumber-based routes — specific sub-paths first, then the detail catch-all
 router.get('/orders/:orderNumber/status-stream', isAuth, streamOrderStatus);
 router.get('/orders/:orderNumber/invoice',       isAuth, downloadInvoice);
 router.post('/orders/:orderNumber/cancel',       isAuth, cancelOrder);
@@ -169,6 +170,9 @@ router.post('/wishlist/move-to-cart', isAuth, moveToCart);
 router.get('/api/wishlist/count', isAuth, getWishlistCount);
 router.get('/wishlist/status/:productId', isAuth, getWishlistStatus);
 router.post('/wishlist/toggle', isAuth, toggleWishlist);
+
+
+router.get('/wallet', isAuth, noCache, getWallet);
 
 
 router.get('/profile',   isAuth, profileController.getProfile);

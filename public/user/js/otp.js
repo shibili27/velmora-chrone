@@ -1,54 +1,76 @@
-import { showToast } from "/utils/toast.js";
+// ─── Toast (inlined to avoid module import failure) ───────────────────────────
+function showToast(type = "default", message = "") {
+  const containerId = "toast-container";
+  let container = document.getElementById(containerId);
+  if (!container) {
+    container = document.createElement("div");
+    container.id = containerId;
+    container.style.cssText =
+      "position:fixed;top:20px;right:20px;z-index:9999;";
+    document.body.appendChild(container);
+  }
 
-const inputs = document.querySelectorAll(".otp-boxes input");
-const verifyBtn = document.getElementById("verifyBtn");
-const resendBtn = document.getElementById("resendBtn");
-const timerDisplay = document.getElementById("timer");
-const error = document.getElementById("otpError");
+  const toast = document.createElement("div");
+  toast.innerText = message;
+  toast.style.cssText = `
+    padding:12px 16px;margin-top:10px;border-radius:8px;
+    color:#fff;font-size:14px;font-family:sans-serif;
+    min-width:200px;box-shadow:0 4px 10px rgba(0,0,0,0.2);
+    opacity:0;transform:translateX(100%);transition:all 0.3s ease;
+  `;
+  if (type === "success")       toast.style.background = "#28a745";
+  else if (type === "error")    toast.style.background = "#dc3545";
+  else if (type === "warning") { toast.style.background = "#ffc107"; toast.style.color = "#000"; }
+  else                          toast.style.background = "#333";
 
-let isExpired = false;
+  container.appendChild(toast);
+  setTimeout(() => { toast.style.opacity = "1"; toast.style.transform = "translateX(0)"; }, 100);
+  setTimeout(() => {
+    toast.style.opacity = "0";
+    toast.style.transform = "translateX(100%)";
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
+// ─── DOM refs ─────────────────────────────────────────────────────────────────
+const inputs      = document.querySelectorAll(".otp-boxes input");
+const verifyBtn   = document.getElementById("verifyBtn");
+const resendBtn   = document.getElementById("resendBtn");
+const timerEl     = document.getElementById("timer");
+const errorEl     = document.getElementById("otpError");
+
+let isExpired    = false;
+let isSubmitting = false;
 let countdown;
- 
+
+// ─── Input behaviour ──────────────────────────────────────────────────────────
 inputs.forEach((input, i) => {
   input.addEventListener("input", () => {
     input.value = input.value.replace(/[^0-9]/g, "");
-    if (input.value && i < inputs.length - 1) {
-      inputs[i + 1].focus();
-    }
+    if (input.value && i < inputs.length - 1) inputs[i + 1].focus();
     autoSubmitIfComplete();
   });
 
   input.addEventListener("keydown", (e) => {
-    if (e.key === "Backspace" && !input.value && i > 0) {
-      inputs[i - 1].focus();
-    }
+    if (e.key === "Backspace" && !input.value && i > 0) inputs[i - 1].focus();
   });
 
   input.addEventListener("paste", (e) => {
     e.preventDefault();
     const pasted = e.clipboardData.getData("text").replace(/[^0-9]/g, "").slice(0, 6);
     if (!pasted) return;
-
-    pasted.split("").forEach((char, idx) => {
-      if (inputs[idx]) inputs[idx].value = char;
-    });
-
-    const lastIndex = Math.min(pasted.length - 1, inputs.length - 1);
-    inputs[lastIndex].focus();
-
+    pasted.split("").forEach((char, idx) => { if (inputs[idx]) inputs[idx].value = char; });
+    inputs[Math.min(pasted.length - 1, inputs.length - 1)].focus();
     autoSubmitIfComplete();
   });
 });
 
-
 function getOTP() {
-  let otp = "";
-  inputs.forEach(input => otp += input.value);
-  return otp;
+  return [...inputs].map(i => i.value).join("");
 }
 
-
 function autoSubmitIfComplete() {
+  if (isSubmitting) return;
   const otp = getOTP();
   if (otp.length === 6) {
     if (isExpired) return showError("OTP expired. Please resend.");
@@ -56,123 +78,125 @@ function autoSubmitIfComplete() {
   }
 }
 
-
+// ─── Verify button ────────────────────────────────────────────────────────────
 verifyBtn.addEventListener("click", () => {
+  if (isSubmitting) return;
   const otp = getOTP();
   if (otp.length !== 6) return showError("Enter complete OTP");
   if (isExpired) return showError("OTP expired. Please resend.");
   submitOTP(otp);
 });
 
-
+// ─── Submit ───────────────────────────────────────────────────────────────────
 async function submitOTP(otp) {
+  if (isSubmitting) return;
+  isSubmitting    = true;
+  verifyBtn.disabled = true;
+  clearError();
+
   try {
-    const email = localStorage.getItem("verifyEmail");
     const isReset = localStorage.getItem("resetFlow") === "true";
     const endpoint = isReset ? "/verify-reset-otp" : "/verify-otp";
 
-    console.log("isReset:", isReset);
-    console.log("endpoint:", endpoint);
-
-    const res = await axios.post(endpoint, { otp, email });
+    const res = await axios.post(endpoint, { otp });
 
     if (res.data.success) {
       localStorage.removeItem("otpExpiry");
       localStorage.removeItem("verifyEmail");
-      localStorage.removeItem("resetFlow");   
-      localStorage.removeItem("signupFlow");  
-      showToast("success", res.data.message);
+      localStorage.removeItem("resetFlow");
+      localStorage.removeItem("signupFlow");
 
-      if (isReset) {
-        setTimeout(() => window.location.href = "/reset-password", 1000);
-      } else {
-        setTimeout(() => window.location.href = "/login", 1000);
-      }
+      showToast("success", res.data.message || "Verified!");
+
+      setTimeout(() => {
+        window.location.href = isReset ? "/reset-password" : "/login";
+      }, 1000);
+
+      // keep button disabled — we're navigating away
     } else {
       showError(res.data.message || "Invalid OTP");
+      isSubmitting = false;
+      verifyBtn.disabled = false;
     }
-
   } catch (err) {
-    showError("Server error. Please try again.");
+    const msg = err.response?.data?.message || "Server error. Please try again.";
+    showError(msg);
+    isSubmitting = false;
+    verifyBtn.disabled = false;
   }
 }
 
-
+// ─── Timer ────────────────────────────────────────────────────────────────────
 function setExpiry() {
   localStorage.setItem("otpExpiry", Date.now() + 59000);
 }
 
 function startTimer() {
   clearInterval(countdown);
-
   countdown = setInterval(() => {
-    let expiry = parseInt(localStorage.getItem("otpExpiry"));
-    let remaining = Math.floor((expiry - Date.now()) / 1000);
+    const expiry    = parseInt(localStorage.getItem("otpExpiry"), 10);
+    const remaining = Math.floor((expiry - Date.now()) / 1000);
 
     if (remaining <= 0) {
       clearInterval(countdown);
-      timerDisplay.innerText = "Expired";
-      timerDisplay.style.color = "red";
+      timerEl.innerText    = "Expired";
+      timerEl.style.color  = "red";
       isExpired = true;
       resendBtn.classList.remove("disabled");
       resendBtn.classList.add("active");
       return;
     }
 
-    timerDisplay.innerText = "00:" + (remaining < 10 ? "0" + remaining : remaining);
+    timerEl.innerText = "00:" + (remaining < 10 ? "0" + remaining : remaining);
   }, 1000);
 }
 
-
+// ─── Resend ───────────────────────────────────────────────────────────────────
 resendBtn.addEventListener("click", async (e) => {
   e.preventDefault();
   if (!isExpired) return;
 
   try {
     const res = await axios.post("/resend-otp");
-
     if (res.data.success) {
       setExpiry();
-      isExpired = false;
+      isExpired    = false;
+      isSubmitting = false;
 
-      inputs.forEach(input => input.value = "");
+      inputs.forEach(i => (i.value = ""));
       inputs[0].focus();
 
       resendBtn.classList.remove("active");
       resendBtn.classList.add("disabled");
-      timerDisplay.style.color = "";
+      timerEl.style.color = "";
+      clearError();
 
       startTimer();
       showToast("success", "OTP resent successfully!");
     } else {
       showError(res.data.message || "Failed to resend OTP");
     }
-
   } catch (err) {
-    showError("Server error. Please try again.");
+    showError(err.response?.data?.message || "Server error. Please try again.");
   }
 });
 
-
+// ─── Error helpers ────────────────────────────────────────────────────────────
 function showError(msg) {
-  error.style.display = "block";
-  error.textContent = msg;
+  errorEl.style.display = "block";
+  errorEl.textContent   = msg;
+}
+function clearError() {
+  errorEl.style.display = "none";
+  errorEl.textContent   = "";
 }
 
-
-const storedExpiry = localStorage.getItem("otpExpiry");
-if (!storedExpiry || Date.now() > parseInt(storedExpiry)) {
+// ─── Init ─────────────────────────────────────────────────────────────────────
+if (!localStorage.getItem("otpExpiry") || Date.now() > parseInt(localStorage.getItem("otpExpiry"), 10)) {
   setExpiry();
 }
 
-
-if (localStorage.getItem("resetFlow") === "true" && localStorage.getItem("verifyEmail")) {
-}
-
-
-window.addEventListener("pageshow", function (event) {
-  if (event.persisted) { window.location.reload(); }
-});
+window.addEventListener("pageshow", (e) => { if (e.persisted) window.location.reload(); });
 
 startTimer();
 inputs[0].focus();

@@ -115,15 +115,6 @@
     .summary-total-val{font-family:'Cormorant Garamond',serif;font-size:1.65rem;font-weight:300;color:#f5f2eb}
     .tax-note{font-family:'Jost',sans-serif;font-size:.42rem;color:rgba(245,242,235,.18);margin-top:.3rem;text-align:right}
 
-    .coupon-row{display:flex;gap:6px;margin:1rem 0}
-    .coupon-input{flex:1;background:rgba(245,242,235,.03);border:none;border-bottom:1px solid rgba(245,242,235,.1);font-family:'Jost',sans-serif;font-size:.62rem;color:#f5f2eb;padding:.35rem 0;outline:none;transition:border-color .2s}
-    .coupon-input::placeholder{color:rgba(245,242,235,.18)}
-    .coupon-input:focus{border-color:rgba(201,169,110,.4)}
-    .coupon-apply-btn{font-family:'Jost',sans-serif;font-size:.45rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(201,169,110,.7);background:none;border:1px solid rgba(201,169,110,.2);border-radius:100px;padding:0 12px;cursor:pointer;transition:all .2s;flex-shrink:0}
-    .coupon-apply-btn:hover{background:rgba(201,169,110,.08);color:#c9a96e;border-color:rgba(201,169,110,.4)}
-    .coupon-msg{font-family:'Jost',sans-serif;font-size:.48rem;margin-top:.3rem;letter-spacing:.05em}
-    .coupon-msg.ok{color:rgba(74,222,128,.7)}.coupon-msg.err{color:rgba(248,113,113,.7)}
-
     .checkout-btn{display:block;width:100%;padding:.9rem;border:none;border-radius:100px;cursor:pointer;font-family:'Jost',sans-serif;font-size:.52rem;letter-spacing:.25em;text-transform:uppercase;color:#0d0b08;background:linear-gradient(135deg,#e0c47e 0%,#c9a96e 50%,#b8913d 100%);position:relative;overflow:hidden;transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .22s;box-shadow:0 1px 0 rgba(255,255,255,.35) inset,0 4px 18px rgba(185,140,55,.3),0 1px 4px rgba(0,0,0,.4);margin-top:1.25rem;text-align:center;text-decoration:none}
     .checkout-btn::after{content:'';position:absolute;top:0;left:-75%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);transform:skewX(-18deg);transition:left .55s ease}
     .checkout-btn:hover::after{left:130%}
@@ -354,12 +345,6 @@
           <span class="summary-label">Shipping</span>
           <span class="summary-val" style="color:rgba(74,222,128,.7)">Complimentary</span>
         </div>
-
-        <div class="coupon-row">
-          <input class="coupon-input" type="text" id="couponInput" placeholder="Coupon code"/>
-          <button class="coupon-apply-btn" onclick="applyCoupon()">Apply</button>
-        </div>
-        <div class="coupon-msg" id="couponMsg"></div>
 
         <div class="summary-divider"></div>
 
@@ -604,20 +589,6 @@
       checkEmptyState();
       showToast('Item removed from cart');
     } catch (_) { if (row) row.classList.remove('removing'); showToast('Something went wrong', 'err'); }
-  }
-
-  /* ── COUPON ── */
-  async function applyCoupon() {
-    const code = document.getElementById('couponInput').value.trim().toUpperCase();
-    const msg  = document.getElementById('couponMsg');
-    if (!code) { msg.textContent = 'Please enter a coupon code'; msg.className = 'coupon-msg err'; return; }
-    try {
-      const res  = await fetch('/cart/coupon', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code }) });
-      const data = await res.json();
-      if (!res.ok || !data.success) { msg.textContent = data.message || 'Invalid coupon code'; msg.className = 'coupon-msg err'; return; }
-      msg.textContent = data.message || 'Coupon applied!'; msg.className = 'coupon-msg ok';
-      if (data.newTotal !== undefined) document.getElementById('summaryTotal').textContent = fmt(data.newTotal);
-    } catch (_) { msg.textContent = 'Could not apply coupon'; msg.className = 'coupon-msg err'; }
   }
 
   /* ── SUMMARY UPDATE ── */

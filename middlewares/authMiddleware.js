@@ -12,7 +12,10 @@ export const hasOtpSession = (req, res, next) => {
   const hasResetOtp  = req.session.resetOTP  && req.session.resetEmail;
 
   if (!hasSignupOtp && !hasResetOtp) {
-    console.log('hasOtpSession: BLOCKED → redirecting to /signup');
+    // AJAX request (axios) — return JSON, don't redirect
+    if (req.xhr || req.headers['accept']?.includes('application/json') || req.headers['content-type']?.includes('application/json')) {
+      return res.status(400).json({ success: false, message: 'Session expired. Please signup again.' });
+    }
     return res.redirect('/signup');
   }
   next();

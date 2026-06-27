@@ -6,6 +6,9 @@ import Category from '../models/category.js';
 import { isAuthenticated, isGuest } from '../middlewares/auth.js';
 import {
   getDashboard,
+  getDashboardChartData,
+  getLedgerData,
+  downloadLedgerPDF,
   getCategories, addCategory, editCategory, deleteCategory,
   getProducts,   addProduct,  editProduct,  deleteProduct,
   blockProduct,  unblockProduct,
@@ -19,7 +22,11 @@ import {
   handleReturnRequest,
   getRecentOrders,
 } from '../controller/adimconrtoller/orderController.js';
-import { getSalesReport } from '../controller/adimconrtoller/salesController.js';
+import {
+  getSalesReport,
+  exportSalesReportPDF,
+  exportSalesReportExcel,
+} from '../controller/adimconrtoller/salesController.js';
 import {
   getOffers, addOffer, editOffer, toggleOfferActive, deleteOffer,
 } from '../controller/adimconrtoller/offerController.js';
@@ -29,13 +36,15 @@ import {
 
 const router = express.Router();
 
+// ── Auth ──────────────────────────────────────────────────────────────────────
+
 router.get('/login', isGuest, (req, res) => {
   res.render('admin/login', {
-    title:      'Admin Sign In — Velmora Chroné',
-    error:      req.flash('adminError')[0]      || null,
+    title     : 'Admin Sign In — Velmora Chroné',
+    error     : req.flash('adminError')[0]      || null,
     errorField: req.flash('adminErrorField')[0] || null,
-    success:    req.flash('adminSuccess')[0]    || null,
-    formData:   req.flash('formData')[0]        || {},
+    success   : req.flash('adminSuccess')[0]    || null,
+    formData  : req.flash('formData')[0]        || {},
   });
 });
 
@@ -97,14 +106,24 @@ router.post('/login', async (req, res) => {
 });
 
 router.get('/logout', isAuthenticated, (req, res) => {
-  req.session.destroy((err) => {
+  req.session.adminId   = undefined;
+  req.session.adminName = undefined;
+  req.session.adminRole = undefined;
+
+  req.session.save((err) => {
     if (err) console.error('Logout error:', err);
-    res.clearCookie('connect.sid');
     res.redirect('/admin/login');
   });
 });
 
-router.get('/dashboard', isAuthenticated, getDashboard);
+// ── Dashboard ─────────────────────────────────────────────────────────────────
+
+router.get('/dashboard',             isAuthenticated, getDashboard);
+router.get('/dashboard/chart-data',  isAuthenticated, getDashboardChartData);
+router.get('/dashboard/ledger',      isAuthenticated, getLedgerData);
+router.get('/dashboard/ledger/pdf',  isAuthenticated, downloadLedgerPDF);
+
+// ── Customers ─────────────────────────────────────────────────────────────────
 
 router.get('/customers', isAuthenticated, async (req, res) => {
   try {
@@ -129,15 +148,15 @@ router.get('/customers', isAuthenticated, async (req, res) => {
       .limit(limit);
 
     res.render('admin/customers', {
-      title:     'Customers — Velmora Chroné Admin',
+      title    : 'Customers — Velmora Chroné Admin',
       adminName: req.session.adminName,
       adminRole: req.session.adminRole,
       customers,
       total,
       page,
-      pages: Math.ceil(total / limit),
+      pages : Math.ceil(total / limit),
       search,
-      error:   req.flash('error')[0]   || null,
+      error  : req.flash('error')[0]   || null,
       success: req.flash('success')[0] || null,
     });
   } catch (err) {
@@ -178,43 +197,50 @@ router.post('/customers/:id/unblock', isAuthenticated, async (req, res) => {
 });
 
 // ── Categories ────────────────────────────────────────────────────────────────
+
 router.get ('/categories',            isAuthenticated, getCategories);
 router.post('/categories/add',        isAuthenticated, addCategory);
 router.post('/categories/:id/edit',   isAuthenticated, editCategory);
 router.post('/categories/:id/delete', isAuthenticated, deleteCategory);
 
 // ── Products ──────────────────────────────────────────────────────────────────
-router.get ('/products',              isAuthenticated, getProducts);
-router.post('/products/add',          isAuthenticated, addProduct);
-router.post('/products/:id/edit',     isAuthenticated, editProduct);
-router.post('/products/:id/delete',   isAuthenticated, deleteProduct);
-router.post('/products/:id/block',    isAuthenticated, blockProduct);
-router.post('/products/:id/unblock',  isAuthenticated, unblockProduct);
+
+router.get ('/products',             isAuthenticated, getProducts);
+router.post('/products/add',         isAuthenticated, addProduct);
+router.post('/products/:id/edit',    isAuthenticated, editProduct);
+router.post('/products/:id/delete',  isAuthenticated, deleteProduct);
+router.post('/products/:id/block',   isAuthenticated, blockProduct);
+router.post('/products/:id/unblock', isAuthenticated, unblockProduct);
 
 // ── Brands ────────────────────────────────────────────────────────────────────
-router.get ('/brands',                isAuthenticated, getBrands);
-router.post('/brands/add',            isAuthenticated, addBrand);
-router.post('/brands/:id/edit',       isAuthenticated, editBrand);
-router.post('/brands/:id/delete',     isAuthenticated, deleteBrand);
+
+router.get ('/brands',               isAuthenticated, getBrands);
+router.post('/brands/add',           isAuthenticated, addBrand);
+router.post('/brands/:id/edit',      isAuthenticated, editBrand);
+router.post('/brands/:id/delete',    isAuthenticated, deleteBrand);
 
 // ── Coupons ───────────────────────────────────────────────────────────────────
-router.get ('/coupons',               isAuthenticated, getCoupons);
-router.post('/coupons/create',        isAuthenticated, createCoupon);
-router.post('/coupons/:id/delete',    isAuthenticated, deleteCoupon);
-router.post('/coupons/:id/toggle',    isAuthenticated, toggleCouponStatus);
+
+router.get ('/coupons',              isAuthenticated, getCoupons);
+router.post('/coupons/create',       isAuthenticated, createCoupon);
+router.post('/coupons/:id/delete',   isAuthenticated, deleteCoupon);
+router.post('/coupons/:id/toggle',   isAuthenticated, toggleCouponStatus);
 
 // ── Offers ────────────────────────────────────────────────────────────────────
-router.get ('/offers',                isAuthenticated, getOffers);
-router.post('/offers/add',            isAuthenticated, addOffer);
-router.post('/offers/:id/edit',       isAuthenticated, editOffer);
-router.post('/offers/:id/toggle',     isAuthenticated, toggleOfferActive);
-router.post('/offers/:id/delete',     isAuthenticated, deleteOffer);
+
+router.get ('/offers',               isAuthenticated, getOffers);
+router.post('/offers/add',           isAuthenticated, addOffer);
+router.post('/offers/:id/edit',      isAuthenticated, editOffer);
+router.post('/offers/:id/toggle',    isAuthenticated, toggleOfferActive);
+router.post('/offers/:id/delete',    isAuthenticated, deleteOffer);
 
 // ── Referral Settings ─────────────────────────────────────────────────────────
-router.get ('/referrals',             isAuthenticated, getReferralSettings);
-router.post('/referrals/update',      isAuthenticated, updateReferralSettings);
+
+router.get ('/referrals',            isAuthenticated, getReferralSettings);
+router.post('/referrals/update',     isAuthenticated, updateReferralSettings);
 
 // ── Orders ────────────────────────────────────────────────────────────────────
+
 router.get  ('/orders',               isAuthenticated, listOrders);
 router.get  ('/orders/notify/recent', isAuthenticated, getRecentOrders);
 router.get  ('/orders/:id',           isAuthenticated, getOrderDetail);
@@ -222,6 +248,16 @@ router.patch('/orders/:id/status',    isAuthenticated, updateOrderStatus);
 router.patch('/orders/:id/return',    isAuthenticated, handleReturnRequest);
 
 // ── Sales Report ──────────────────────────────────────────────────────────────
+// NOTE: /sales-report/export MUST come before /sales-report to avoid
+//       Express matching "export" as the :id param on a wildcard route.
+
+router.get('/sales-report/export', isAuthenticated, (req, res) => {
+  const { format } = req.query;
+  if (format === 'pdf')   return exportSalesReportPDF(req, res);
+  if (format === 'excel') return exportSalesReportExcel(req, res);
+  res.status(400).send('Invalid export format. Use ?format=pdf or ?format=excel');
+});
+
 router.get('/sales-report', isAuthenticated, getSalesReport);
 
 export default router;

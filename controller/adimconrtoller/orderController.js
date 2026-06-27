@@ -1,5 +1,5 @@
-import Order from '../../models/Order.js';
-import Wallet from '../../models/wallet.js'; // adjust path/casing to match your actual file
+import Order   from '../../models/Order.js';
+import Wallet  from '../../models/wallet.js';
 import Product from '../../models/product.js';
 import { broadcastOrderUpdate } from '../../public/utils/ssemanager.js';
 
@@ -102,8 +102,6 @@ export const listOrders = async (req, res) => {
       counts.all  += count;
     });
 
-    // Pending count now covers BOTH order-level pending returns
-    // AND orders that have at least one item-level pending return.
     counts.returnPending = await Order.countDocuments({
       $or: [
         { returnStatus: 'pending' },
@@ -147,10 +145,18 @@ export const getOrderDetail = async (req, res) => {
       return res.redirect('/admin/orders');
     }
 
+    // ── Pre-compute the refund amount the admin will see in the confirm modal.
+    // Whole-order returns: deduct shipping from what the customer actually paid.
+    // If grandTotal <= shipping (edge case like the ₹99 scenario), refund is ₹0.
+    const shippingCharge  = order.pricing.shipping || 0;
+    const refundAmount    = Math.max(0, order.pricing.grandTotal - shippingCharge);
+
     res.render('admin/orderDetail', {
-      adminName : req.session.adminName || 'Admin',
-      adminRole : req.session.adminRole || 'Administrator',
+      adminName    : req.session.adminName || 'Admin',
+      adminRole    : req.session.adminRole || 'Administrator',
       order,
+      refundAmount,   // passed to EJS so the confirm modal shows the correct figure
+      shippingCharge,
     });
   } catch (err) {
     console.error('getOrderDetail error:', err);
@@ -202,14 +208,6 @@ export const updateOrderStatus = async (req, res) => {
 
 /**
  * Restock a single order item's product (and matching colour variant if present).
- * Shared helper used by handleReturnRequest (whole-order accept) so both the
- * order-level and item-level flows restock the exact same way.
- *
- * Mutates `item.restocked` and the in-memory `product` doc, and SAVES the product.
- * Does NOT save the order — caller is responsible for that (it's usually already
- * saving the order for other reasons in the same request).
- *
- * Returns a small result object for logging/messaging purposes.
  */
 async function restockOrderItem(item) {
   if (item.restocked) {
@@ -218,8 +216,6 @@ async function restockOrderItem(item) {
 
   const product = await Product.findById(item.product);
   if (!product) {
-    // Product was deleted entirely — nothing to restock, but mark handled
-    // so we don't keep trying on every future save.
     item.restocked = true;
     return { skipped: true, reason: 'product-not-found' };
   }
@@ -230,18 +226,14 @@ async function restockOrderItem(item) {
     const variant = product.colorVariants.find(v => v.name === item.variantName);
     if (variant) {
       variant.stock = (variant.stock || 0) + item.quantity;
-      // Recompute total stock from all variants, matching addProduct/editProduct.
       product.stock = product.colorVariants.reduce((sum, v) => sum + (v.stock || 0), 0);
     } else {
-      // Variant name on the order no longer matches any current variant
-      // (renamed or removed since purchase) — fall back safely to plain stock.
       product.stock = (product.stock || 0) + item.quantity;
-      fallbackUsed = true;
+      fallbackUsed  = true;
     }
   } else {
-    // No variant recorded on this item at all — bump plain stock.
     product.stock = (product.stock || 0) + item.quantity;
-    fallbackUsed = true;
+    fallbackUsed  = true;
   }
 
   await product.save();
@@ -252,10 +244,11 @@ async function restockOrderItem(item) {
 
 /**
  * ── Order-level return verification ──────────────────────────────────────
- * Customer requested to return the WHOLE order. Admin accepts or rejects.
- * On acceptance, the full grandTotal is credited to the customer's wallet,
- * and — if the admin opted in via the `restock` flag — every active item's
- * product (and matching colour variant) has its stock increased.
+ * On acceptance the refund = grandTotal − shippingCharge.
+ * Shipping is a non-refundable fulfilment cost the business already incurred.
+ * If grandTotal ≤ shippingCharge the refund is ₹0 (never goes negative).
+ *
+ * Free-shipping orders (shipping = 0): full grandTotal is refunded as before.
  */
 export const handleReturnRequest = async (req, res) => {
   try {
@@ -278,27 +271,35 @@ export const handleReturnRequest = async (req, res) => {
     let restockedCount = 0;
 
     if (decision === 'accepted') {
-      // Credit the wallet FIRST. If this throws, we don't want the order
-      // marked as accepted with no refund actually issued.
+      // ── FIX: deduct shipping before refunding ──────────────────────────
+      // The shipping charge is a fulfilment cost the business already paid
+      // (courier fee). It is non-refundable regardless of why the item was
+      // returned. grandTotal already includes tax + shipping, so we strip
+      // only the shipping portion before crediting the wallet.
+      const shippingCharge = order.pricing.shipping || 0;
+      const refundAmount   = Math.max(0, order.pricing.grandTotal - shippingCharge);
+
       const wallet = await Wallet.getOrCreate(order.user);
-      await wallet.credit(
-        order.pricing.grandTotal,
-        `Refund for returned order ${order.orderNumber}`,
-        'return_refund',
-        order
-      );
+
+      if (refundAmount > 0) {
+        await wallet.credit(
+          refundAmount,
+          `Refund for returned order ${order.orderNumber} (shipping ₹${shippingCharge} non-refundable)`,
+          'return_refund',
+          order
+        );
+      }
+      // If refundAmount === 0 (edge case: customer paid only shipping),
+      // we still mark the return as accepted — no wallet credit needed.
 
       order.returnStatus = 'accepted';
       order.orderStatus  = 'returned';
-      // Mark every still-active item as returned too, so item-level and
-      // order-level state stay consistent.
       order.items.forEach(item => {
         if (item.status === 'active') {
           item.returnStatus = 'accepted';
         }
       });
 
-      // Restock — only if the admin opted in via the popup toggle.
       if (restock) {
         for (const item of order.items) {
           if (item.status !== 'active') continue;
@@ -323,9 +324,17 @@ export const handleReturnRequest = async (req, res) => {
 
     let message;
     if (decision === 'accepted') {
-      message = restock
-        ? `Return accepted. Refund credited to wallet. ${restockedCount} item(s) added back to stock.`
-        : 'Return accepted. Refund credited to wallet.';
+      const shippingCharge = order.pricing.shipping || 0;
+      const refundAmount   = Math.max(0, order.pricing.grandTotal - shippingCharge);
+      if (refundAmount > 0) {
+        message = restock
+          ? `Return accepted. ₹${refundAmount.toLocaleString('en-IN')} refunded to wallet (₹${shippingCharge} shipping deducted). ${restockedCount} item(s) restocked.`
+          : `Return accepted. ₹${refundAmount.toLocaleString('en-IN')} refunded to wallet (₹${shippingCharge} shipping deducted).`;
+      } else {
+        message = restock
+          ? `Return accepted. No refund issued — order total was only the shipping charge. ${restockedCount} item(s) restocked.`
+          : 'Return accepted. No refund issued — order total was only the shipping charge.';
+      }
     } else {
       message = 'Return rejected.';
     }
@@ -339,10 +348,14 @@ export const handleReturnRequest = async (req, res) => {
 
 /**
  * ── Item-level return verification ───────────────────────────────────────
- * Customer requested to return ONE item within a multi-item order.
- * On acceptance, only that item's totalPrice is credited to the wallet.
- * If every item in the order ends up returned, the parent order is flipped
- * to 'returned' / 'accepted' as well so the two views stay in sync.
+ * Shipping is an ORDER-level charge, not per-item. So when a single item
+ * is returned (not the whole order), NO shipping deduction is applied —
+ * the customer paid one shipping fee for the whole order and only one item
+ * is coming back. The refund is the item's totalPrice in full.
+ *
+ * If the LAST remaining item is returned (allResolved), the order cascades
+ * to 'returned' but shipping was already non-refundable from the original
+ * order-level charge — no further deduction needed here.
  */
 export const handleItemReturnRequest = async (req, res) => {
   try {
@@ -368,6 +381,8 @@ export const handleItemReturnRequest = async (req, res) => {
     }
 
     if (decision === 'accepted') {
+      // Item-level returns refund the item price in full —
+      // shipping is an order-level charge, not split per item.
       const wallet = await Wallet.getOrCreate(order.user);
       await wallet.credit(
         item.totalPrice,
@@ -386,8 +401,6 @@ export const handleItemReturnRequest = async (req, res) => {
         }
       }
 
-      // If every active-or-returned item has now been returned, cascade
-      // the whole order to 'returned' so both views agree.
       const allResolved = order.items.every(
         i => i.status !== 'active' || i.returnStatus === 'accepted'
       );
@@ -408,14 +421,15 @@ export const handleItemReturnRequest = async (req, res) => {
 
     return res.json({
       success : true,
-      message : decision === 'accepted' ? 'Item return accepted. Refund credited to wallet.' : 'Item return rejected.',
+      message : decision === 'accepted'
+        ? `Item return accepted. ₹${item.totalPrice.toLocaleString('en-IN')} refunded to wallet.`
+        : 'Item return rejected.',
     });
   } catch (err) {
     console.error('handleItemReturnRequest error:', err);
     return res.status(500).json({ success: false, message: err.message || 'Server error. Please try again.' });
   }
 };
-
 
 export const restockItem = async (req, res) => {
   try {

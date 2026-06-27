@@ -10,6 +10,12 @@ const couponSchema = new mongoose.Schema(
       trim:      true,
     },
 
+    description: {
+      type:    String,
+      default: '',
+      trim:    true,
+    },
+
     discountType: {
       type:     String,
       enum:     ['flat', 'percentage', 'free_shipping'],
@@ -22,6 +28,8 @@ const couponSchema = new mongoose.Schema(
       min:     0,
     },
 
+    // FIX: renamed back-and-forth mismatch — this is the single source of truth.
+    // Admin controller must write to THIS field name (see adminController patch below).
     minOrderValue: {
       type:    Number,
       default: 0,
@@ -57,6 +65,19 @@ const couponSchema = new mongoose.Schema(
       min:     1,
     },
 
+    // FIX: this was referenced in checkoutService.recordCouponUsage() but never
+    // declared in the schema, so per-user usage was never actually persisted
+    // and perUserLimit could never be enforced.
+    usedBy: {
+      type: [
+        {
+          user:  { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+          count: { type: Number, default: 1, min: 1 },
+        },
+      ],
+      default: [],
+    },
+
     isActive: {
       type:    Boolean,
       default: true,
@@ -73,9 +94,9 @@ const couponSchema = new mongoose.Schema(
 // ─── Virtuals ────────────────────────────────────────────────────────────────
 
 couponSchema.virtual('isValid').get(function () {
-  if (!this.isActive || this.isDeleted)                                        return false;
-  if (new Date() > this.expiryDate)                                            return false;
-  if (this.usageLimit !== null && this.usedCount >= this.usageLimit)           return false;
+  if (!this.isActive || this.isDeleted)                                  return false;
+  if (new Date() > this.expiryDate)                                      return false;
+  if (this.usageLimit !== null && this.usedCount >= this.usageLimit)     return false;
   return true;
 });
 
@@ -112,6 +133,16 @@ couponSchema.methods.validateFor = function (orderSubtotal, userUsageCount = 0) 
   }
 
   return { valid: true, message: 'Coupon applied successfully.' };
+};
+
+/**
+ * Get how many times a specific user has already used this coupon.
+ * @param {string|ObjectId} userId
+ * @returns {number}
+ */
+couponSchema.methods.getUserUsageCount = function (userId) {
+  const entry = this.usedBy.find(u => String(u.user) === String(userId));
+  return entry ? entry.count : 0;
 };
 
 /**

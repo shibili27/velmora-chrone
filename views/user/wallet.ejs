@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate"/>
+  <meta http-equiv="Pragma" content="no-cache"/>
+  <meta http-equiv="Expires" content="0"/>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Wallet — Velmora Chroné</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Jost:wght@200;300;400;500&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:'Jost',sans-serif;background:#111110;color:#f5f2eb;overflow-x:hidden;min-height:100vh}
+    ::-webkit-scrollbar{width:2px}::-webkit-scrollbar-track{background:#111110}::-webkit-scrollbar-thumb{background:#c9a96e}
+
+    body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity:.016}
+
+    /* ── NAV ── */
+    .nav-root{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(17,17,16,0.92);backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);border-bottom:1px solid rgba(245,242,235,0.06);transition:box-shadow .3s}
+    .nav-root.scrolled{box-shadow:0 2px 24px rgba(0,0,0,.5)}
+    .nav-inner{display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem}
+    @media(min-width:768px){.nav-inner{padding:1rem 3rem}}
+    .nav-logo{font-family:'Cormorant Garamond',serif;font-size:.85rem;font-weight:300;letter-spacing:.25em;text-transform:uppercase;color:#f5f2eb;text-decoration:none}
+    .nav-link{font-family:'Jost',sans-serif;font-size:.53rem;font-weight:400;letter-spacing:.2em;text-transform:uppercase;color:rgba(245,242,235,.45);text-decoration:none;transition:color .2s;position:relative;padding-bottom:2px}
+    .nav-link::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:1px;background:#c9a96e;transition:width .3s}
+    .nav-link:hover{color:rgba(245,242,235,.9)}.nav-link:hover::after{width:100%}
+    .nav-link.active{color:#c9a96e}.nav-link.active::after{width:100%}
+    .nav-icon-btn{position:relative;width:36px;height:36px;display:flex;align-items:center;justify-content:center;color:rgba(245,242,235,.5);background:rgba(255,255,255,.03);border:1px solid rgba(201,169,110,.12);border-radius:10px;cursor:pointer;text-decoration:none;transition:color .22s,background .22s,border-color .22s,transform .18s cubic-bezier(.34,1.56,.64,1),box-shadow .22s;box-shadow:0 1px 0 rgba(255,255,255,.04) inset,0 2px 6px rgba(0,0,0,.35)}
+    .nav-icon-btn::before{content:'';position:absolute;inset:0;border-radius:10px;background:linear-gradient(135deg,rgba(255,255,255,.08) 0%,transparent 55%);pointer-events:none}
+    .nav-icon-btn:hover{color:#c9a96e;background:rgba(201,169,110,.08);border-color:rgba(201,169,110,.35);transform:translateY(-2px) scale(1.06)}
+    .cart-badge{position:absolute;top:-5px;right:-5px;width:14px;height:14px;border-radius:50%;background:linear-gradient(135deg,#d4b97e,#c9a96e);font-size:.38rem;font-weight:600;color:#111110;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(201,169,110,.4)}
+    .hamburger{display:flex;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:3px}
+    .hamburger span{display:block;width:20px;height:1px;background:rgba(245,242,235,.6);transition:transform .3s,opacity .3s}
+    .hamburger.open span:nth-child(1){transform:translateY(6px) rotate(45deg)}
+    .hamburger.open span:nth-child(2){opacity:0}
+    .hamburger.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+    .mobile-menu{display:none;flex-direction:column;background:#0d0d0c;padding:1.5rem 2rem;gap:1rem;border-top:1px solid rgba(245,242,235,.05)}
+    .mobile-menu.open{display:flex}
+    .mobile-menu .nav-link{font-size:.68rem;padding:.45rem 0;border-bottom:1px solid rgba(245,242,235,.04);color:rgba(245,242,235,.5)}
+
+    /* ── HERO ── */
+    .page-hero{padding:5.5rem 2rem 2.8rem;background:linear-gradient(180deg,#080807 0%,#111110 100%);border-bottom:1px solid rgba(201,169,110,.08);position:relative;overflow:hidden;text-align:center}
+    @media(min-width:768px){.page-hero{padding:5.5rem 3rem 2.8rem}}
+    .page-hero::before{content:'';position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:600px;height:400px;border-radius:50%;background:radial-gradient(ellipse,rgba(201,169,110,.055) 0%,transparent 70%);pointer-events:none}
+    .page-hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(201,169,110,.25),transparent)}
+    .hero-scan{position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(201,169,110,.022),transparent);animation:heroScan 7s ease-in-out infinite;pointer-events:none;z-index:0}
+    @keyframes heroScan{0%{left:-60%}100%{left:140%}}
+    .page-hero-inner{max-width:900px;margin:0 auto;position:relative;z-index:1;display:flex;flex-direction:column;align-items:center}
+    .hero-tag{font-family:'Jost',sans-serif;font-size:.42rem;letter-spacing:.38em;text-transform:uppercase;color:rgba(201,169,110,.55);margin-bottom:.7rem;display:flex;align-items:center;gap:.65rem}
+    .hero-tag::before,.hero-tag::after{content:'';width:24px;height:1px;background:#c9a96e;opacity:.45}
+    .hero-title{font-family:'Playfair Display',serif;font-weight:400;font-size:clamp(1.6rem,3.5vw,2.6rem);line-height:1;color:#f5f2eb;letter-spacing:-.01em}
+    .hero-title em{font-style:italic;display:block;background:linear-gradient(125deg,#edd99e 0%,#c9a96e 45%,#a8873d 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;position:relative}
+    .hero-title em::after{content:'';position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);width:0;height:1px;background:linear-gradient(90deg,transparent,rgba(201,169,110,.6),transparent);animation:drawLine 1.4s cubic-bezier(.22,1,.36,1) .7s forwards}
+    @keyframes drawLine{to{width:75%}}
+
+    /* ── WRAP ── */
+    .wallet-wrap{max-width:860px;margin:0 auto;padding:3rem 2rem 6rem;position:relative;z-index:1}
+    @media(min-width:768px){.wallet-wrap{padding:3rem 3rem 6rem}}
+
+    /* ── BALANCE CARD ── */
+    .balance-card{position:relative;border:1px solid rgba(201,169,110,.22);border-radius:20px;padding:2.2rem 2.5rem;margin-bottom:2.5rem;overflow:hidden;background:rgba(201,169,110,.03)}
+    .balance-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(201,169,110,.07) 0%,transparent 65%);pointer-events:none}
+    .balance-card::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(201,169,110,.4),transparent)}
+    .balance-scan{position:absolute;top:0;left:-100%;width:55%;height:100%;background:linear-gradient(90deg,transparent,rgba(201,169,110,.04),transparent);animation:heroScan 5s ease-in-out infinite;pointer-events:none}
+    .balance-inner{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1.5rem}
+    .balance-left{}
+    .balance-eyebrow{font-family:'Jost',sans-serif;font-size:.42rem;letter-spacing:.3em;text-transform:uppercase;color:rgba(201,169,110,.5);margin-bottom:.65rem;display:flex;align-items:center;gap:.6rem}
+    .balance-eyebrow::before{content:'';width:14px;height:1px;background:rgba(201,169,110,.35);flex-shrink:0}
+    .balance-amount{font-family:'Cormorant Garamond',serif;font-size:clamp(2.6rem,6vw,4rem);font-weight:300;line-height:1;letter-spacing:-.02em;background:linear-gradient(125deg,#edd99e 0%,#c9a96e 50%,#a8873d 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .balance-amount .currency{font-size:.55em;vertical-align:super;margin-right:.1em;font-weight:400}
+    .balance-note{font-family:'Jost',sans-serif;font-size:.5rem;color:rgba(245,242,235,.2);margin-top:.6rem;letter-spacing:.06em}
+    .balance-right{display:flex;flex-direction:column;align-items:flex-end;gap:.65rem;flex-shrink:0}
+    .wallet-icon-wrap{width:64px;height:64px;border:1px solid rgba(201,169,110,.2);border-radius:16px;background:rgba(201,169,110,.06);display:flex;align-items:center;justify-content:center}
+    .wallet-icon-wrap svg{width:28px;height:28px;stroke:#c9a96e;stroke-width:1.2}
+    .balance-stats{display:flex;gap:1.2rem}
+    .bstat{display:flex;flex-direction:column;align-items:center;gap:3px;padding:.65rem 1rem;border:1px solid rgba(201,169,110,.1);border-radius:10px;background:rgba(201,169,110,.03)}
+    .bstat-num{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:300;background:linear-gradient(135deg,#d4b97e,#c9a96e);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .bstat-label{font-family:'Jost',sans-serif;font-size:.38rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(245,242,235,.22)}
+
+    /* ── FILTER TABS ── */
+    .filter-row{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:1.5rem}
+    .f-tab{padding:6px 18px;border:1px solid rgba(245,242,235,.08);background:rgba(245,242,235,.02);color:rgba(245,242,235,.32);font-family:'Jost',sans-serif;font-size:.44rem;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;border-radius:100px;transition:all .2s}
+    .f-tab:hover{border-color:rgba(201,169,110,.28);color:rgba(245,242,235,.7);background:rgba(201,169,110,.03)}
+    .f-tab.active{border-color:rgba(201,169,110,.45);color:#c9a96e;background:rgba(201,169,110,.08)}
+
+    /* ── SECTION LABEL ── */
+    .section-label{font-family:'Jost',sans-serif;font-size:.4rem;letter-spacing:.3em;text-transform:uppercase;color:rgba(201,169,110,.45);margin-bottom:1rem;display:flex;align-items:center;gap:.6rem}
+    .section-label::before{content:'';width:14px;height:1px;background:rgba(201,169,110,.3);flex-shrink:0}
+
+    /* ── TRANSACTION LIST ── */
+    .txn-list{display:flex;flex-direction:column;gap:.5rem}
+    .txn-card{background:rgba(245,242,235,.02);border:1px solid rgba(245,242,235,.06);border-radius:14px;padding:1rem 1.25rem;display:grid;grid-template-columns:38px 1fr auto;gap:.85rem;align-items:center;transition:border-color .25s,background .25s,transform .18s;animation:fadeUp .4s ease both}
+    .txn-card:hover{border-color:rgba(201,169,110,.14);background:rgba(201,169,110,.025);transform:translateX(4px)}
+    .txn-card.credit-card{border-left:2px solid rgba(74,222,128,.3)}
+    .txn-card.debit-card{border-left:2px solid rgba(248,113,113,.25)}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+    .txn-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .txn-icon.credit{background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.18)}
+    .txn-icon.credit svg{width:15px;height:15px;stroke:rgba(74,222,128,.8)}
+    .txn-icon.debit{background:rgba(248,113,113,.07);border:1px solid rgba(248,113,113,.18)}
+    .txn-icon.debit svg{width:15px;height:15px;stroke:rgba(248,113,113,.75)}
+
+    .txn-info{}
+    .txn-desc{font-family:'Jost',sans-serif;font-size:.6rem;font-weight:300;color:rgba(245,242,235,.7);margin-bottom:3px;line-height:1.4}
+    .txn-meta{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
+    .txn-date{font-family:'Jost',sans-serif;font-size:.42rem;color:rgba(245,242,235,.2);letter-spacing:.05em}
+    .txn-source-badge{font-family:'Jost',sans-serif;font-size:.36rem;letter-spacing:.12em;text-transform:uppercase;padding:2px 8px;border-radius:100px}
+    .src-cancellation_refund{background:rgba(96,165,250,.07);color:rgba(96,165,250,.7);border:1px solid rgba(96,165,250,.18)}
+    .src-return_refund{background:rgba(167,139,250,.07);color:rgba(167,139,250,.7);border:1px solid rgba(167,139,250,.18)}
+    .src-order_payment{background:rgba(201,169,110,.07);color:rgba(201,169,110,.65);border:1px solid rgba(201,169,110,.2)}
+    .src-manual_credit{background:rgba(74,222,128,.07);color:rgba(74,222,128,.65);border:1px solid rgba(74,222,128,.18)}
+    .txn-order-link{font-family:'Jost',sans-serif;font-size:.38rem;color:rgba(201,169,110,.45);letter-spacing:.08em;text-decoration:none;transition:color .2s;display:inline-flex;align-items:center;gap:3px}
+    .txn-order-link:hover{color:#c9a96e}
+
+    .txn-amount-wrap{text-align:right;flex-shrink:0}
+    .txn-amount{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:300;line-height:1}
+    .txn-amount.credit{color:rgba(74,222,128,.85)}
+    .txn-amount.debit{color:rgba(248,113,113,.8)}
+    .txn-balance-after{font-family:'Jost',sans-serif;font-size:.4rem;color:rgba(245,242,235,.18);margin-top:3px;letter-spacing:.04em}
+
+    /* ── EMPTY / NO RESULTS ── */
+    .empty-txn{padding:4rem 2rem;text-align:center;border:1px dashed rgba(245,242,235,.05);border-radius:14px;background:rgba(245,242,235,.01)}
+    .empty-txn p{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:300;color:rgba(245,242,235,.18);margin-bottom:8px}
+    .empty-txn span{font-family:'Jost',sans-serif;font-size:.5rem;color:rgba(245,242,235,.1);letter-spacing:.08em}
+
+    /* ── INFO BOX ── */
+    .info-box{background:rgba(201,169,110,.04);border:1px solid rgba(201,169,110,.12);border-radius:12px;padding:1rem 1.25rem;margin-bottom:2rem;display:flex;align-items:flex-start;gap:.85rem}
+    .info-box svg{width:16px;height:16px;flex-shrink:0;stroke:rgba(201,169,110,.55);margin-top:1px}
+    .info-box p{font-family:'Jost',sans-serif;font-size:.55rem;font-weight:300;color:rgba(245,242,235,.3);line-height:1.7;letter-spacing:.04em}
+    .info-box p strong{color:rgba(201,169,110,.6);font-weight:400}
+
+    /* ── RULE & FOOTER ── */
+    .rule{height:1px;background:linear-gradient(90deg,transparent,rgba(201,169,110,.18),transparent)}
+    .footer{background:#0a0a09;padding:2.5rem 2rem 1.5rem;border-top:1px solid rgba(245,242,235,.05);position:relative;z-index:1}
+    @media(min-width:768px){.footer{padding:2.5rem 3rem 1.5rem}}
+    .footer-bottom{display:flex;flex-direction:column;gap:.75rem;align-items:center;text-align:center}
+    @media(min-width:768px){.footer-bottom{flex-direction:row;justify-content:space-between}}
+    .footer-copy{font-family:'Jost',sans-serif;font-size:.44rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(245,242,235,.12)}
+    .footer-legal{display:flex;gap:1.25rem}
+    .footer-legal a{font-family:'Jost',sans-serif;font-size:.44rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(245,242,235,.18);text-decoration:none;transition:color .2s}
+    .footer-legal a:hover{color:rgba(245,242,235,.5)}
+
+    @media(max-width:640px){
+      .balance-inner{flex-direction:column;align-items:flex-start}
+      .balance-right{align-items:flex-start;flex-direction:row;flex-wrap:wrap}
+      .txn-card{grid-template-columns:38px 1fr auto}
+    }
+    .fade-up{animation:fadeUp .75s ease both}
+    .d1{animation-delay:.1s}.d2{animation-delay:.22s}.d3{animation-delay:.35s}
+    .reveal{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease}
+    .reveal.visible{opacity:1;transform:translateY(0)}
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav-root" id="navbar">
+  <div class="nav-inner">
+    <div class="hidden md:flex items-center gap-8" style="display:none">
+      <a href="/home"     class="nav-link" style="display:none">Home</a>
+    </div>
+    <div style="display:flex;align-items:center;gap:2rem" class="desktop-links">
+      <a href="/home"     class="nav-link">Home</a>
+      <a href="/products" class="nav-link">Collection</a>
+      <a href="/orders"   class="nav-link">Orders</a>
+      <a href="/profile"  class="nav-link">Profile</a>
+    </div>
+    <a href="/home" class="nav-logo" style="position:absolute;left:50%;transform:translateX(-50%);white-space:nowrap">Velmora Chroné</a>
+    <div style="display:flex;align-items:center;gap:.65rem;margin-left:auto">
+      <a href="/wallet" class="nav-icon-btn" aria-label="Wallet" style="border-color:rgba(201,169,110,.35);color:#c9a96e">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12V8H6a2 2 0 0 1 0-4h14v4"/><path d="M4 6v12a2 2 0 0 0 2 2h14v-4"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg>
+      </a>
+      <a href="/cart" class="nav-icon-btn" aria-label="Cart" style="position:relative">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <span class="cart-badge" id="cartCount">0</span>
+      </a>
+      <a href="/logout" class="nav-link" style="display:none" id="desktopLogout">Logout</a>
+      <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="/home"     class="nav-link">Home</a>
+    <a href="/products" class="nav-link">Collection</a>
+    <a href="/orders"   class="nav-link">Orders</a>
+    <a href="/profile"  class="nav-link">Profile</a>
+    <a href="/wallet"   class="nav-link active">Wallet</a>
+    <a href="/logout"   class="nav-link" style="color:rgba(201,169,110,.55)">Logout</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="page-hero">
+  <div class="hero-scan"></div>
+  <div class="page-hero-inner">
+    <p class="hero-tag fade-up d1">Account</p>
+    <h1 class="hero-title fade-up d2">My <em>Wallet</em></h1>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="wallet-wrap">
+
+  <%
+    const totalCredits = transactions
+      .filter(t => t.type === 'credit')
+      .reduce((s, t) => s + t.amount, 0);
+    const totalDebits = transactions
+      .filter(t => t.type === 'debit')
+      .reduce((s, t) => s + t.amount, 0);
+  %>
+
+  <!-- BALANCE CARD -->
+  <div class="balance-card reveal">
+    <div class="balance-scan"></div>
+    <div class="balance-inner">
+      <div class="balance-left">
+        <div class="balance-eyebrow">Available Balance</div>
+        <div class="balance-amount">
+          <span class="currency">₹</span><%= balance.toLocaleString('en-IN') %>
+        </div>
+        <div class="balance-note">Automatically applied at checkout when sufficient</div>
+      </div>
+      <div class="balance-right">
+        <div class="wallet-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 12V8H6a2 2 0 0 1 0-4h14v4"/>
+            <path d="M4 6v12a2 2 0 0 0 2 2h14v-4"/>
+            <path d="M18 12a2 2 0 0 0 0 4h4v-4z"/>
+          </svg>
+        </div>
+        <div class="balance-stats">
+          <div class="bstat">
+            <span class="bstat-num"><%= transactions.filter(t => t.type === 'credit').length %></span>
+            <span class="bstat-label">Credits</span>
+          </div>
+          <div class="bstat">
+            <span class="bstat-num"><%= transactions.filter(t => t.type === 'debit').length %></span>
+            <span class="bstat-label">Debits</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INFO BOX -->
+  <div class="info-box reveal">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+    <p>
+      Wallet credits are issued automatically when an order is <strong>cancelled</strong> (instant) or when a return is <strong>accepted by the admin</strong>.
+      At checkout, the wallet option appears when your balance covers the full order total.
+    </p>
+  </div>
+
+  <!-- TRANSACTIONS -->
+  <% if (transactions.length > 0) { %>
+
+  <div class="filter-row reveal" id="filterRow">
+    <button class="f-tab active" data-filter="all">All (<%= transactions.length %>)</button>
+    <button class="f-tab" data-filter="credit">Credits (<%= transactions.filter(t => t.type === 'credit').length %>)</button>
+    <button class="f-tab" data-filter="debit">Debits (<%= transactions.filter(t => t.type === 'debit').length %>)</button>
+  </div>
+
+  <div class="section-label reveal">Transaction History</div>
+
+  <div class="txn-list reveal" id="txnList">
+    <% transactions.forEach(function(txn, idx) { %>
+      <%
+        const sourceLabelMap = {
+          cancellation_refund : 'Cancellation Refund',
+          return_refund       : 'Return Refund',
+          order_payment       : 'Order Payment',
+          manual_credit       : 'Manual Credit',
+        };
+        const sourceLabel = sourceLabelMap[txn.source] || txn.source;
+        const txnDate = new Date(txn.createdAt).toLocaleDateString('en-IN', {
+          day: 'numeric', month: 'short', year: 'numeric',
+        });
+        const txnTime = new Date(txn.createdAt).toLocaleTimeString('en-IN', {
+          hour: '2-digit', minute: '2-digit', hour12: true,
+        });
+      %>
+      <div class="txn-card <%= txn.type %>-card"
+           data-type="<%= txn.type %>"
+           style="animation-delay:<%= Math.min(idx * 0.04, 0.4) %>s">
+
+        <div class="txn-icon <%= txn.type %>">
+          <% if (txn.type === 'credit') { %>
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/>
+            </svg>
+          <% } else { %>
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/>
+            </svg>
+          <% } %>
+        </div>
+
+        <div class="txn-info">
+          <div class="txn-desc"><%= txn.description %></div>
+          <div class="txn-meta">
+            <span class="txn-date"><%= txnDate %> · <%= txnTime %></span>
+            <span class="txn-source-badge src-<%= txn.source %>"><%= sourceLabel %></span>
+            <% if (txn.orderNumber) { %>
+              <a href="/orders/<%= txn.orderNumber %>" class="txn-order-link">
+                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                <%= txn.orderNumber %>
+              </a>
+            <% } %>
+          </div>
+        </div>
+
+        <div class="txn-amount-wrap">
+          <div class="txn-amount <%= txn.type %>">
+            <%= txn.type === 'credit' ? '+' : '−' %> ₹<%= txn.amount.toLocaleString('en-IN') %>
+          </div>
+          <div class="txn-balance-after">Bal: ₹<%= txn.balanceAfter.toLocaleString('en-IN') %></div>
+        </div>
+
+      </div>
+    <% }); %>
+  </div>
+
+  <% } else { %>
+  <div class="empty-txn reveal">
+    <svg width="48" height="48" fill="none" stroke="rgba(201,169,110,.1)" stroke-width=".6" viewBox="0 0 24 24" style="margin:0 auto 1.25rem;display:block"><path d="M20 12V8H6a2 2 0 0 1 0-4h14v4"/><path d="M4 6v12a2 2 0 0 0 2 2h14v-4"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg>
+    <p>No Transactions Yet</p>
+    <span>Credits from cancellations and returns will appear here.</span>
+  </div>
+  <% } %>
+
+</div><!-- /wallet-wrap -->
+
+<div class="rule"></div>
+<footer class="footer">
+  <div style="max-width:1200px;margin:0 auto">
+    <div class="footer-bottom">
+      <span class="footer-copy">&copy; <%= new Date().getFullYear() %> Velmora Chroné. All rights reserved.</span>
+      <div class="footer-legal">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Accessibility</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  /* ── NAV ── */
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', scrollY > 30), { passive: true });
+
+  const hamburger  = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobileMenu');
+  hamburger.addEventListener('click', () => {
+    hamburger.classList.toggle('open');
+    mobileMenu.classList.toggle('open');
+  });
+
+  /* show desktop nav links on md+ */
+  const desktopLinks = document.querySelector('.desktop-links');
+  const desktopLogout = document.getElementById('desktopLogout');
+  function handleResize() {
+    const isDesktop = window.innerWidth >= 768;
+    desktopLinks.style.display  = isDesktop ? 'flex' : 'none';
+    hamburger.style.display     = isDesktop ? 'none' : 'flex';
+    if (desktopLogout) desktopLogout.style.display = isDesktop ? 'inline' : 'none';
+  }
+  handleResize();
+  window.addEventListener('resize', handleResize);
+
+  /* ── REVEAL OBSERVER ── */
+  const revealEls = document.querySelectorAll('.reveal');
+  const observer  = new IntersectionObserver(entries => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 60);
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.06 });
+  revealEls.forEach(el => observer.observe(el));
+
+  /* ── CART COUNT ── */
+  fetch('/api/cart/count', { headers: { 'Accept': 'application/json' } })
+    .then(r => r.json())
+    .then(d => { if (d.count !== undefined) document.getElementById('cartCount').textContent = d.count; })
+    .catch(() => {});
+
+  /* ── FILTER TABS ── */
+  const tabs    = document.querySelectorAll('.f-tab');
+  const txnCards = document.querySelectorAll('.txn-card');
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const filter = tab.dataset.filter;
+
+      let visibleCount = 0;
+      txnCards.forEach(card => {
+        const show = filter === 'all' || card.dataset.type === filter;
+        card.style.display = show ? 'grid' : 'none';
+        if (show) visibleCount++;
+      });
+
+      /* show/hide empty message */
+      let emptyMsg = document.getElementById('filterEmpty');
+      if (visibleCount === 0) {
+        if (!emptyMsg) {
+          emptyMsg = document.createElement('div');
+          emptyMsg.id        = 'filterEmpty';
+          emptyMsg.className = 'empty-txn';
+          emptyMsg.innerHTML = `<p>No ${filter} transactions</p><span>Nothing to show for this filter.</span>`;
+          document.getElementById('txnList').appendChild(emptyMsg);
+        }
+      } else if (emptyMsg) {
+        emptyMsg.remove();
+      }
+    });
+  });
+</script>
+</body>
+</html>

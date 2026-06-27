@@ -42,9 +42,9 @@
     .topbar { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 32px; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
     .topbar__title { font-size: 13px; font-weight: 500; color: var(--text-mid); }
     .content { padding: 32px; flex: 1; }
-    .page-header { margin-bottom: 24px; }
-    .page-header h1 { font-size: 22px; font-weight: 600; }
-    .page-header p  { font-size: 13px; color: var(--text-mid); margin-top: 4px; }
+    .page-header { margin-bottom: 24px; display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .page-header-text h1 { font-size: 22px; font-weight: 600; }
+    .page-header-text p  { font-size: 13px; color: var(--text-mid); margin-top: 4px; }
     .footer { text-align: center; padding: 20px; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); border-top: 1px solid var(--border); }
 
     /* ── Flash ── */
@@ -53,95 +53,75 @@
     .flash--success { background: #e8f5e9; color: #1b5e20; border: 1px solid #c8e6c9; }
     .flash__close { margin-left: auto; background: none; border: none; cursor: pointer; color: inherit; font-size: 16px; padding: 0 4px; }
 
-    /* ── Filter bar ── */
-    .filter-card {
-      background   : var(--white);
-      border       : 1px solid var(--border);
-      border-radius: 6px;
-      padding      : 20px 24px;
-      margin-bottom: 24px;
-      display      : flex;
-      align-items  : flex-end;
-      gap          : 14px;
-      flex-wrap    : wrap;
-    }
-    .filter-group { display: flex; flex-direction: column; gap: 5px; }
-    .filter-group label {
-      font-size     : 10px;
-      font-weight   : 600;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color         : var(--text-mid);
-    }
-    .filter-group select,
-    .filter-group input {
-      height       : 38px;
-      border       : 1px solid var(--border);
-      border-radius: 4px;
-      padding      : 0 12px;
-      font-family  : 'Jost', sans-serif;
-      font-size    : 13px;
-      color        : var(--text);
-      background   : #fff;
-      outline      : none;
-      transition   : border-color 0.2s;
-      min-width    : 150px;
-    }
-    .filter-group select:focus,
-    .filter-group input:focus { border-color: var(--teal); }
+    /* ── Buttons ── */
     .btn {
-      display    : inline-flex;
-      align-items: center;
-      gap        : 6px;
-      height     : 38px;
-      padding    : 0 16px;
-      border-radius: 4px;
-      font-family : 'Jost', sans-serif;
-      font-size   : 12px;
-      font-weight : 600;
-      letter-spacing: 0.06em;
-      cursor      : pointer;
-      border      : none;
-      transition  : opacity 0.15s;
-      text-decoration: none;
+      display: inline-flex; align-items: center; gap: 6px;
+      height: 38px; padding: 0 16px; border-radius: 4px;
+      font-family: 'Jost', sans-serif; font-size: 12px; font-weight: 600;
+      letter-spacing: 0.06em; cursor: pointer; border: none;
+      transition: opacity 0.15s, background 0.15s; text-decoration: none; white-space: nowrap;
     }
-    .btn--teal   { background: var(--teal); color: #fff; }
+    .btn--teal    { background: var(--teal); color: #fff; }
     .btn--teal:hover { background: var(--teal-dark); }
     .btn--outline { background: none; border: 1px solid var(--border); color: var(--text-mid); }
     .btn--outline:hover { background: var(--bg); }
+    .btn--pdf     { background: var(--white); border: 1px solid var(--border); color: var(--text-mid); }
+    .btn--pdf:hover { background: #fef2f2; border-color: #fecaca; color: var(--red); }
+    .btn--excel   { background: var(--white); border: 1px solid var(--border); color: var(--text-mid); }
+    .btn--excel:hover { background: #f0fdf4; border-color: #bbf7d0; color: var(--green); }
+    .btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+    .export-group { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    /* ── Filter bar ── */
+    .filter-card {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 6px; padding: 20px 24px; margin-bottom: 24px;
+      display: flex; align-items: flex-end; gap: 14px; flex-wrap: wrap;
+    }
+    .filter-group { display: flex; flex-direction: column; gap: 5px; }
+    .filter-group label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-mid); }
+    .filter-group select,
+    .filter-group input {
+      height: 38px; border: 1px solid var(--border); border-radius: 4px;
+      padding: 0 12px; font-family: 'Jost', sans-serif; font-size: 13px;
+      color: var(--text); background: #fff; outline: none;
+      transition: border-color 0.2s; min-width: 150px;
+    }
+    .filter-group select:focus,
+    .filter-group input:focus { border-color: var(--teal); }
     .custom-dates { display: none; align-items: flex-end; gap: 14px; flex-wrap: wrap; }
     .custom-dates.visible { display: flex; }
 
-    /* ── Summary cards ── */
+    /* ── Summary: hero + mini grid ── */
     .summary-grid {
-      display              : grid;
-      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-      gap                  : 16px;
-      margin-bottom        : 24px;
+      display: grid;
+      grid-template-columns: 1.6fr 1fr 1fr;
+      gap: 16px; margin-bottom: 16px;
     }
+    @media (max-width: 880px) { .summary-grid { grid-template-columns: 1fr 1fr; } }
     .summary-card {
-      background   : var(--white);
-      border       : 1px solid var(--border);
-      border-radius: 6px;
-      padding      : 18px 20px;
-      position     : relative;
-      overflow     : hidden;
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 6px; padding: 18px 20px; position: relative; overflow: hidden;
     }
-    .summary-card::before {
-      content : '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height  : 3px;
-      background: var(--teal);
-    }
+    .summary-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--teal); }
     .summary-card.c-orange::before { background: var(--orange); }
     .summary-card.c-red::before    { background: var(--red); }
-    .summary-card.c-blue::before   { background: var(--blue); }
-    .summary-card.c-purple::before { background: var(--purple); }
-    .summary-card.c-green::before  { background: var(--green); }
     .summary-card__label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); margin-bottom: 8px; }
     .summary-card__value { font-size: 22px; font-weight: 700; color: var(--text); line-height: 1; }
     .summary-card__sub   { font-size: 11px; color: var(--text-light); margin-top: 5px; }
+
+    .summary-card--hero { display: flex; flex-direction: column; justify-content: center; background: linear-gradient(135deg, var(--teal-dark), var(--teal)); border: none; }
+    .summary-card--hero::before { display: none; }
+    .summary-card--hero .summary-card__label { color: rgba(255,255,255,0.75); }
+    .summary-card--hero .summary-card__value { color: #fff; font-size: 32px; }
+    .summary-card--hero .summary-card__sub { color: rgba(255,255,255,0.7); }
+
+    .summary-sub-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+    @media (max-width: 880px) { .summary-sub-grid { grid-template-columns: 1fr 1fr; } }
+    .summary-mini { background: var(--white); border: 1px solid var(--border); border-radius: 6px; padding: 14px 18px; }
+    .summary-mini__label { font-size: 9.5px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text-light); margin-bottom: 6px; }
+    .summary-mini__value { font-size: 17px; font-weight: 700; color: var(--text); }
+    .summary-mini__value.is-red { color: var(--red); }
 
     /* ── Chart ── */
     .card { background: var(--white); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
@@ -154,17 +134,7 @@
     .table-wrap { overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; }
     thead tr { background: #f8faf9; }
-    th {
-      font-size     : 10px;
-      font-weight   : 600;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color         : var(--text-light);
-      padding       : 12px 16px;
-      text-align    : left;
-      border-bottom : 1px solid var(--border);
-      white-space   : nowrap;
-    }
+    th { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
     td { padding: 12px 16px; font-size: 13px; color: var(--text); border-bottom: 1px solid var(--border); vertical-align: middle; }
     tbody tr:last-child td { border-bottom: none; }
     tbody tr:hover { background: #fafcfb; }
@@ -180,31 +150,28 @@
     .badge--razorpay   { background: var(--purple-bg);  color: var(--purple); }
     .badge--wallet     { background: var(--green-bg);   color: var(--green); }
 
-    .coupon-tag {
-      display      : inline-block;
-      background   : var(--teal-light);
-      border       : 1px solid #b2deda;
-      color        : var(--teal-dark);
-      font-size    : 10px;
-      font-weight  : 600;
-      padding      : 2px 7px;
-      border-radius: 3px;
-      font-family  : monospace;
-      letter-spacing: 0.05em;
-    }
-    .text-red  { color: var(--red); font-weight: 600; }
+    .coupon-tag { display: inline-block; background: var(--teal-light); border: 1px solid #b2deda; color: var(--teal-dark); font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 3px; font-family: monospace; letter-spacing: 0.05em; }
+    .discount-stack { display: flex; flex-direction: column; gap: 3px; align-items: flex-start; }
+    .discount-stack .text-red { font-size: 12px; }
+    .text-red   { color: var(--red); font-weight: 600; }
     .text-muted { color: var(--text-light); }
-    .mono { font-family: monospace; font-size: 12px; }
-
+    .mono       { font-family: monospace; font-size: 12px; }
     .empty-state { padding: 48px 24px; text-align: center; color: var(--text-light); font-size: 13px; }
 
-    /* ── Toast ── */
-    .toast-container { position: fixed; top: 20px; right: 20px; z-index: 500; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
-    .toast { background: var(--white); border: 1px solid var(--border); border-radius: 6px; padding: 12px 16px; font-size: 13px; font-weight: 500; box-shadow: 0 4px 16px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 10px; pointer-events: all; min-width: 260px; animation: slideIn 0.25s ease; }
-    .toast--success { border-left: 3px solid var(--green); }
-    .toast--error   { border-left: 3px solid var(--red); }
-    @keyframes slideIn  { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-    @keyframes slideOut { to   { transform: translateX(110%); opacity: 0; } }
+    /* ── Pagination ── */
+    .pagination { display: flex; align-items: center; justify-content: space-between; padding: 14px 24px; border-top: 1px solid var(--border); flex-wrap: wrap; gap: 10px; }
+    .pagination__info { font-size: 12px; color: var(--text-light); }
+    .pagination__pages { display: flex; align-items: center; gap: 4px; }
+    .page-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 32px; height: 32px; border-radius: 4px; font-size: 12px; font-weight: 500;
+      border: 1px solid var(--border); background: var(--white); color: var(--text-mid);
+      text-decoration: none; cursor: pointer; transition: all 0.15s;
+    }
+    .page-btn:hover { background: var(--teal-light); color: var(--teal); border-color: var(--teal); }
+    .page-btn.active { background: var(--teal); color: #fff; border-color: var(--teal); }
+    .page-btn.disabled { opacity: 0.4; pointer-events: none; }
+    .page-btn svg { width: 12px; height: 12px; }
   </style>
 </head>
 <body>
@@ -229,10 +196,6 @@
         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"/></svg>
         Products
       </a>
-      <a href="/admin/reviews" class="nav-item">
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
-        Rating/Review
-      </a>
       <a href="/admin/customers" class="nav-item">
         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
         Customers
@@ -249,13 +212,9 @@
         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 4H7a2 2 0 01-2-2V6a2 2 0 012-2h5l2 2h3a2 2 0 012 2v12a2 2 0 01-2 2z"/></svg>
         Brands
       </a>
-      <a href="/admin/refunds" class="nav-item">
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
-        Refund/Return
-      </a>
-      <a href="/admin/banners" class="nav-item">
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-        Banner
+      <a href="/admin/offers" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        Offers
       </a>
       <a href="/admin/referrals" class="nav-item">
         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
@@ -304,12 +263,27 @@
 
       <!-- Page header -->
       <div class="page-header">
-        <h1>Sales Report</h1>
-        <p>Analyse revenue, discounts, and order activity across any time period.</p>
+        <div class="page-header-text">
+          <h1>Sales Report</h1>
+          <p>Analyse revenue, discounts, and order activity across any time period.</p>
+        </div>
+        <!-- Export buttons — carry current filter params -->
+        <div class="export-group">
+          <a href="/admin/sales-report/export?format=excel&filter=<%= filter %>&startDate=<%= startDate %>&endDate=<%= endDate %>"
+             class="btn btn--excel">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            Export Excel
+          </a>
+          <a href="/admin/sales-report/export?format=pdf&filter=<%= filter %>&startDate=<%= startDate %>&endDate=<%= endDate %>"
+             class="btn btn--pdf">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            Export PDF
+          </a>
+        </div>
       </div>
 
       <!-- Filter bar -->
-      <form method="GET" action="/admin/sales-report">
+      <form method="GET" action="/admin/sales-report" id="filterForm">
         <div class="filter-card">
           <div class="filter-group">
             <label>Period</label>
@@ -340,37 +314,49 @@
         </div>
       </form>
 
-      <!-- Summary cards -->
+      <!-- Summary: hero card + supporting metrics -->
       <div class="summary-grid">
-        <div class="summary-card">
-          <div class="summary-card__label">Total Orders</div>
-          <div class="summary-card__value"><%= summary.totalOrders %></div>
-          <div class="summary-card__sub">Excluding cancelled &amp; failed</div>
+        <div class="summary-card summary-card--hero">
+          <div class="summary-card__label">Total Revenue</div>
+          <div class="summary-card__value">₹<%= summary.totalRevenue.toLocaleString('en-IN') %></div>
+          <div class="summary-card__sub">After all discounts &amp; tax · <%= summary.totalOrders %> order<%= summary.totalOrders !== 1 ? 's' : '' %></div>
         </div>
         <div class="summary-card c-orange">
           <div class="summary-card__label">Order Amount</div>
           <div class="summary-card__value">₹<%= summary.totalSubtotal.toLocaleString('en-IN') %></div>
           <div class="summary-card__sub">Subtotal before deductions</div>
         </div>
-        <div class="summary-card c-green">
-          <div class="summary-card__label">Total Revenue</div>
-          <div class="summary-card__value">₹<%= summary.totalRevenue.toLocaleString('en-IN') %></div>
-          <div class="summary-card__sub">After all discounts &amp; tax</div>
-        </div>
         <div class="summary-card c-red">
           <div class="summary-card__label">Total Discount</div>
           <div class="summary-card__value">₹<%= summary.totalDiscount.toLocaleString('en-IN') %></div>
-          <div class="summary-card__sub">Item + coupon deductions</div>
+          <div class="summary-card__sub">
+            <%= summary.totalSubtotal > 0 ? ((summary.totalDiscount / summary.totalSubtotal) * 100).toFixed(1) : '0.0' %>% of order amount
+          </div>
         </div>
-        <div class="summary-card c-blue">
-          <div class="summary-card__label">Item Discounts</div>
-          <div class="summary-card__value">₹<%= summary.itemDiscount.toLocaleString('en-IN') %></div>
-          <div class="summary-card__sub">MRP vs sale price savings</div>
+      </div>
+
+      <div class="summary-sub-grid">
+        <div class="summary-mini">
+          <div class="summary-mini__label">Total Orders</div>
+          <div class="summary-mini__value"><%= summary.totalOrders %></div>
         </div>
-        <div class="summary-card c-purple">
-          <div class="summary-card__label">Coupon Deductions</div>
-          <div class="summary-card__value">₹<%= summary.couponDiscount.toLocaleString('en-IN') %></div>
-          <div class="summary-card__sub">Applied coupon savings</div>
+        <div class="summary-mini">
+          <div class="summary-mini__label">Item Discounts</div>
+          <div class="summary-mini__value <%= summary.itemDiscount > 0 ? 'is-red' : '' %>">
+            <%= summary.itemDiscount > 0 ? '−' : '' %>₹<%= summary.itemDiscount.toLocaleString('en-IN') %>
+          </div>
+        </div>
+        <div class="summary-mini">
+          <div class="summary-mini__label">Coupon Deductions</div>
+          <div class="summary-mini__value <%= summary.couponDiscount > 0 ? 'is-red' : '' %>">
+            <%= summary.couponDiscount > 0 ? '−' : '' %>₹<%= summary.couponDiscount.toLocaleString('en-IN') %>
+          </div>
+        </div>
+        <div class="summary-mini">
+          <div class="summary-mini__label">Avg. Order Value</div>
+          <div class="summary-mini__value">
+            ₹<%= (summary.totalOrders > 0 ? Math.round(summary.totalRevenue / summary.totalOrders) : 0).toLocaleString('en-IN') %>
+          </div>
         </div>
       </div>
 
@@ -388,7 +374,11 @@
       <div class="card">
         <div class="card__header">
           <span class="card__title">Order Breakdown</span>
-          <span style="font-size:12px;color:var(--text-light)"><%= summary.totalOrders %> order<%= summary.totalOrders !== 1 ? 's' : '' %></span>
+          <span style="font-size:12px;color:var(--text-light)">
+            <%= totalOrders %> order<%= totalOrders !== 1 ? 's' : '' %>
+            &nbsp;·&nbsp;
+            Page <%= page %> of <%= totalPages || 1 %>
+          </span>
         </div>
 
         <% if (orders.length === 0) { %>
@@ -404,9 +394,7 @@
                   <th>Customer</th>
                   <th>Items</th>
                   <th>Subtotal</th>
-                  <th>Item Disc.</th>
-                  <th>Coupon</th>
-                  <th>Coupon Disc.</th>
+                  <th>Discounts</th>
                   <th>Tax</th>
                   <th>Shipping</th>
                   <th>Grand Total</th>
@@ -416,8 +404,13 @@
               </thead>
               <tbody>
                 <% orders.forEach((order, i) => { %>
+                  <%
+                    const itemDisc   = order.pricing.itemDiscount   || 0;
+                    const couponDisc = order.pricing.couponDiscount || 0;
+                    const totalDisc  = itemDisc + couponDisc;
+                  %>
                   <tr>
-                    <td class="text-muted"><%= i + 1 %></td>
+                    <td class="text-muted"><%= (page - 1) * limit + i + 1 %></td>
                     <td><span class="mono"><%= order.orderNumber %></span></td>
                     <td class="text-muted" style="white-space:nowrap;">
                       <%= new Date(order.createdAt).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' }) %>
@@ -429,18 +422,13 @@
                     <td class="text-muted"><%= order.items.length %></td>
                     <td>₹<%= (order.pricing.subtotal || 0).toLocaleString('en-IN') %></td>
                     <td>
-                      <% if (order.pricing.itemDiscount > 0) { %>
-                        <span class="text-red">−₹<%= order.pricing.itemDiscount.toLocaleString('en-IN') %></span>
-                      <% } else { %><span class="text-muted">—</span><% } %>
-                    </td>
-                    <td>
-                      <% if (order.couponCode) { %>
-                        <span class="coupon-tag"><%= order.couponCode %></span>
-                      <% } else { %><span class="text-muted">—</span><% } %>
-                    </td>
-                    <td>
-                      <% if (order.pricing.couponDiscount > 0) { %>
-                        <span class="text-red">−₹<%= order.pricing.couponDiscount.toLocaleString('en-IN') %></span>
+                      <% if (totalDisc > 0) { %>
+                        <div class="discount-stack">
+                          <span class="text-red">−₹<%= totalDisc.toLocaleString('en-IN') %></span>
+                          <% if (order.couponCode) { %>
+                            <span class="coupon-tag"><%= order.couponCode %></span>
+                          <% } %>
+                        </div>
                       <% } else { %><span class="text-muted">—</span><% } %>
                     </td>
                     <td>₹<%= (order.pricing.tax || 0).toLocaleString('en-IN') %></td>
@@ -463,6 +451,50 @@
               </tbody>
             </table>
           </div>
+
+          <!-- Pagination -->
+          <% if (totalPages > 1) { %>
+            <div class="pagination">
+              <span class="pagination__info">
+                Showing <%= (page - 1) * limit + 1 %>–<%= Math.min(page * limit, totalOrders) %> of <%= totalOrders %> orders
+              </span>
+              <div class="pagination__pages">
+                <!-- Prev -->
+                <a href="?filter=<%= filter %>&startDate=<%= startDate %>&endDate=<%= endDate %>&page=<%= page - 1 %>"
+                   class="page-btn <%= page <= 1 ? 'disabled' : '' %>">
+                  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+                </a>
+
+                <%
+                  const delta = 2;
+                  const rangeStart = Math.max(1, page - delta);
+                  const rangeEnd   = Math.min(totalPages, page + delta);
+                %>
+
+                <% if (rangeStart > 1) { %>
+                  <a href="?filter=<%= filter %>&startDate=<%= startDate %>&endDate=<%= endDate %>&page=1" class="page-btn">1</a>
+                  <% if (rangeStart > 2) { %><span style="padding:0 4px;color:var(--text-light);font-size:12px;">…</span><% } %>
+                <% } %>
+
+                <% for (let p = rangeStart; p <= rangeEnd; p++) { %>
+                  <a href="?filter=<%= filter %>&startDate=<%= startDate %>&endDate=<%= endDate %>&page=<%= p %>"
+                     class="page-btn <%= p === page ? 'active' : '' %>"><%= p %></a>
+                <% } %>
+
+                <% if (rangeEnd < totalPages) { %>
+                  <% if (rangeEnd < totalPages - 1) { %><span style="padding:0 4px;color:var(--text-light);font-size:12px;">…</span><% } %>
+                  <a href="?filter=<%= filter %>&startDate=<%= startDate %>&endDate=<%= endDate %>&page=<%= totalPages %>" class="page-btn"><%= totalPages %></a>
+                <% } %>
+
+                <!-- Next -->
+                <a href="?filter=<%= filter %>&startDate=<%= startDate %>&endDate=<%= endDate %>&page=<%= page + 1 %>"
+                   class="page-btn <%= page >= totalPages ? 'disabled' : '' %>">
+                  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                </a>
+              </div>
+            </div>
+          <% } %>
+
         <% } %>
       </div>
 
@@ -471,19 +503,23 @@
   </div>
 </div>
 
-<div class="toast-container" id="toastContainer"></div>
-
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
+  // ── Custom date toggle ──────────────────────────────────────────────────────
   function toggleCustom() {
     const val = document.getElementById('filterSelect').value;
     document.getElementById('customDates').classList.toggle('visible', val === 'custom');
   }
 
+  // ── Chart ───────────────────────────────────────────────────────────────────
+  // chartData._id comes from MongoDB's $dateToString as 'YYYY-MM-DD' — reformat for display.
   const chartData = <%- JSON.stringify(chartData) %>;
-  const labels    = chartData.map(d => d._id);
-  const revenues  = chartData.map(d => d.revenue);
-  const orderCts  = chartData.map(d => d.orders);
+  const labels   = chartData.map(d => {
+    const [y, m, day] = d._id.split('-');
+    return new Date(y, m - 1, day).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+  });
+  const revenues = chartData.map(d => d.revenue);
+  const orderCts = chartData.map(d => d.orders);
 
   new Chart(document.getElementById('salesChart').getContext('2d'), {
     type: 'bar',
@@ -518,7 +554,10 @@
       maintainAspectRatio: false,
       interaction        : { mode: 'index', intersect: false },
       plugins: {
-        legend: { position: 'top', labels: { font: { size: 11, family: 'Jost' }, usePointStyle: true, padding: 20 } },
+        legend: {
+          position: 'top',
+          labels  : { font: { size: 11, family: 'Jost' }, usePointStyle: true, padding: 20 },
+        },
         tooltip: {
           callbacks: {
             label(ctx) {

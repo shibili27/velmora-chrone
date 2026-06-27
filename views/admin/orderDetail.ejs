@@ -60,7 +60,6 @@
     .topbar__back:hover { background: var(--teal-light); color: var(--teal); }
     .topbar__back svg { width: 14px; height: 14px; }
     .topbar__title { font-size: 13px; font-weight: 500; color: var(--text-light); letter-spacing: 0.04em; }
-    /* Live badge in topbar */
     .live-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 600; color: var(--green); letter-spacing: 0.06em; padding: 4px 8px; border-radius: 10px; background: var(--green-bg); border: 1px solid #86efac; }
     .live-badge__dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: livePulse 1.8s ease-in-out infinite; }
     @keyframes livePulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.65)} }
@@ -126,8 +125,17 @@
     .fcs-row:last-child { border-bottom: none; }
     .fcs-row__label { color: var(--text-mid); }
     .fcs-row__val   { color: var(--text); font-weight: 500; max-width: 180px; text-align: right; }
-    .fcs-row__val--green { color: var(--green); font-weight: 700; font-size: 13px; }
-    .fcs-row__val--amber { color: var(--amber); font-style: italic; }
+    .fcs-row__val--green  { color: var(--green); font-weight: 700; font-size: 13px; }
+    .fcs-row__val--amber  { color: var(--amber); font-style: italic; }
+    .fcs-row__val--muted  { color: var(--text-light); font-size: 11px; font-weight: 400; }
+
+    /* ── Shipping deduction note in modal ── */
+    .refund-breakdown { background: #f8faf9; border: 1px solid var(--border); border-radius: 5px; padding: 8px 10px; margin-top: 6px; font-size: 11px; color: var(--text-mid); line-height: 1.6; }
+    .refund-breakdown__row { display: flex; justify-content: space-between; }
+    .refund-breakdown__row--deduct { color: var(--red); }
+    .refund-breakdown__row--total  { font-weight: 700; color: var(--text); border-top: 1px solid var(--border); margin-top: 4px; padding-top: 4px; }
+    .refund-zero-note { background: var(--amber-bg); border: 1px solid #fde68a; border-radius: 5px; padding: 7px 10px; margin-top: 6px; font-size: 11px; color: #78350f; line-height: 1.5; }
+
     .float-card__reason-box { background: #fffbeb; border: 1px solid #fde68a; border-radius: 5px; padding: 8px 10px; font-size: 11.5px; color: #78350f; line-height: 1.5; margin-bottom: 4px; font-style: italic; }
     .float-card__textarea { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 5px; font-family: 'Jost', sans-serif; font-size: 12px; color: var(--text); background: var(--bg); outline: none; resize: vertical; min-height: 68px; transition: border-color 0.15s; margin-top: 8px; }
     .float-card__textarea:focus { border-color: var(--red); background: var(--white); }
@@ -145,7 +153,7 @@
     .fc-btn--reject:hover { background: #b91c1c; }
     .fc-btn:disabled { opacity: 0.55; cursor: not-allowed; }
 
-    /* ── Restock toggle row (NEW) ── */
+    /* ── Restock toggle row ── */
     .restock-toggle-row { display:flex; align-items:center; justify-content:space-between; gap:12px; background:#f8faf9; border:1px solid var(--border); border-radius:6px; padding:10px 12px; margin-top:10px; }
     .restock-toggle-row__text { flex: 1; }
     .restock-toggle-row__label { font-size:12px; font-weight:600; color:var(--text); }
@@ -322,7 +330,6 @@
         <span style="color:var(--border)">/</span>
         <span class="topbar__title"><%= order.orderNumber || order._id %></span>
       </div>
-      <!-- Live badge -->
       <div class="live-badge" id="liveBadge">
         <div class="live-badge__dot"></div>
         LIVE
@@ -347,14 +354,21 @@
       </div>
 
       <%
-        const rStatus = order.returnStatus || 'none';
+        const rStatus          = order.returnStatus || 'none';
         const isTerminalStatus = ['cancelled', 'returned', 'delivered'].includes(order.orderStatus);
+
+        // Refund calculation — shipping is non-refundable
+        // These are passed from the controller; fall back to safe calculation if missing
+        const _shipping     = order.pricing.shipping || 0;
+        const _refundAmount = typeof refundAmount !== 'undefined'
+          ? refundAmount
+          : Math.max(0, order.pricing.grandTotal - _shipping);
+        const _hasShipping  = _shipping > 0;
       %>
 
-      <!-- ── RETURN BANNER ZONE (this whole block gets swapped live by JS) ── -->
+      <!-- ── RETURN BANNER ZONE ── -->
       <div id="returnBannerZone">
 
-        <!-- ── RETURN REQUEST ALERT ── -->
         <% if (rStatus === 'pending') { %>
         <div class="return-alert" id="returnAlert">
           <div class="return-alert__icon">
@@ -394,11 +408,56 @@
                   </div>
                 </div>
                 <div class="float-card__body">
-                  <div class="fcs-row"><span class="fcs-row__label">Order</span><span class="fcs-row__val"><%= order.orderNumber || order._id %></span></div>
-                  <div class="fcs-row"><span class="fcs-row__label">Customer</span><span class="fcs-row__val"><%= order.user ? order.user.name : 'Unknown' %></span></div>
-                  <div class="fcs-row"><span class="fcs-row__label">Items</span><span class="fcs-row__val"><%= order.items.filter(i => i.status === 'active').length %> item(s)</span></div>
-                  <div class="fcs-row"><span class="fcs-row__label">Payment method</span><span class="fcs-row__val"><%= order.paymentMethod %></span></div>
-                  <div class="fcs-row"><span class="fcs-row__label">Refund amount</span><span class="fcs-row__val fcs-row__val--green">₹<%= order.pricing.grandTotal.toLocaleString('en-IN') %></span></div>
+                  <div class="fcs-row">
+                    <span class="fcs-row__label">Order</span>
+                    <span class="fcs-row__val"><%= order.orderNumber || order._id %></span>
+                  </div>
+                  <div class="fcs-row">
+                    <span class="fcs-row__label">Customer</span>
+                    <span class="fcs-row__val"><%= order.user ? order.user.name : 'Unknown' %></span>
+                  </div>
+                  <div class="fcs-row">
+                    <span class="fcs-row__label">Items</span>
+                    <span class="fcs-row__val"><%= order.items.filter(i => i.status === 'active').length %> item(s)</span>
+                  </div>
+                  <div class="fcs-row">
+                    <span class="fcs-row__label">Payment method</span>
+                    <span class="fcs-row__val"><%= order.paymentMethod %></span>
+                  </div>
+
+                  <%# ── FIX: Refund amount now shows grandTotal − shipping ── %>
+                  <div class="fcs-row">
+                    <span class="fcs-row__label">Refund amount</span>
+                    <% if (_refundAmount > 0) { %>
+                      <span class="fcs-row__val fcs-row__val--green">₹<%= _refundAmount.toLocaleString('en-IN') %></span>
+                    <% } else { %>
+                      <span class="fcs-row__val" style="color:var(--amber);font-weight:600;">₹0 — No refund</span>
+                    <% } %>
+                  </div>
+
+                  <%# Show breakdown only when shipping was charged %>
+                  <% if (_hasShipping) { %>
+                  <div class="refund-breakdown">
+                    <div class="refund-breakdown__row">
+                      <span>Amount paid</span>
+                      <span>₹<%= order.pricing.grandTotal.toLocaleString('en-IN') %></span>
+                    </div>
+                    <div class="refund-breakdown__row refund-breakdown__row--deduct">
+                      <span>Shipping (non-refundable)</span>
+                      <span>− ₹<%= _shipping.toLocaleString('en-IN') %></span>
+                    </div>
+                    <div class="refund-breakdown__row refund-breakdown__row--total">
+                      <span>Wallet credit</span>
+                      <span>₹<%= _refundAmount.toLocaleString('en-IN') %></span>
+                    </div>
+                  </div>
+                  <% if (_refundAmount === 0) { %>
+                  <div class="refund-zero-note">
+                    ⚠ The customer paid only the shipping charge (₹<%= _shipping.toLocaleString('en-IN') %>). No wallet credit will be issued.
+                  </div>
+                  <% } %>
+                  <% } %>
+
                   <% if (order.returnReason) { %>
                   <div style="margin-top:10px">
                     <div style="font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-mid);margin-bottom:5px;">Return Reason</div>
@@ -406,7 +465,7 @@
                   </div>
                   <% } %>
 
-                  <!-- NEW: Restock toggle -->
+                  <!-- Restock toggle -->
                   <div class="restock-toggle-row">
                     <div class="restock-toggle-row__text">
                       <div class="restock-toggle-row__label">Add item(s) back to stock?</div>
@@ -439,11 +498,23 @@
                   </div>
                 </div>
                 <div class="float-card__body">
-                  <div class="fcs-row"><span class="fcs-row__label">Order</span><span class="fcs-row__val"><%= order.orderNumber || order._id %></span></div>
-                  <div class="fcs-row"><span class="fcs-row__label">Customer</span><span class="fcs-row__val"><%= order.user ? order.user.name : 'Unknown' %></span></div>
-                  <div class="fcs-row"><span class="fcs-row__label">Refund amount</span><span class="fcs-row__val" style="color:var(--red);">₹<%= order.pricing.grandTotal.toLocaleString('en-IN') %> — Not refunded</span></div>
+                  <div class="fcs-row">
+                    <span class="fcs-row__label">Order</span>
+                    <span class="fcs-row__val"><%= order.orderNumber || order._id %></span>
+                  </div>
+                  <div class="fcs-row">
+                    <span class="fcs-row__label">Customer</span>
+                    <span class="fcs-row__val"><%= order.user ? order.user.name : 'Unknown' %></span>
+                  </div>
+                  <div class="fcs-row">
+                    <span class="fcs-row__label">Refund amount</span>
+                    <span class="fcs-row__val" style="color:var(--red);">₹<%= order.pricing.grandTotal.toLocaleString('en-IN') %> — Not refunded</span>
+                  </div>
                   <% if (order.returnReason) { %>
-                  <div class="fcs-row"><span class="fcs-row__label">Customer reason</span><span class="fcs-row__val fcs-row__val--amber">"<%= order.returnReason %>"</span></div>
+                  <div class="fcs-row">
+                    <span class="fcs-row__label">Customer reason</span>
+                    <span class="fcs-row__val fcs-row__val--amber">"<%= order.returnReason %>"</span>
+                  </div>
                   <% } %>
                   <label class="float-card__textarea-label">Rejection Reason <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-light)">(optional)</span></label>
                   <textarea class="float-card__textarea" id="rejectReasonInput" placeholder="e.g. Item shows signs of use / not covered by return policy…"></textarea>
@@ -754,7 +825,6 @@
     return STATUS_ORDER.slice(idx + 1);
   }
 
-  // Lock invalid options in detail select on load
   (function lockDetailSelect() {
     const sel = document.getElementById('statusSelect');
     if (!sel || sel.disabled) return;
@@ -766,7 +836,7 @@
     });
   })();
 
-  /* ── Float card helpers ─────────────────────────────────────────────────── */
+  /* ── Float card helpers ── */
   function closeAllCards() {
     document.getElementById('acceptCard')?.classList.remove('open');
     document.getElementById('rejectCard')?.classList.remove('open');
@@ -799,7 +869,7 @@
   });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAllCards(); });
 
-  /* ── Return decision (NO PAGE RELOAD) ──────────────────────────────────── */
+  /* ── Return decision ── */
   async function confirmAccept() {
     const btn     = document.getElementById('acceptOkBtn');
     const restock = document.getElementById('restockToggle').checked;
@@ -832,7 +902,6 @@
             : '✕ Return rejected',
           decision === 'accepted' ? 'success' : 'error'
         );
-        // Live UI update — no reload
         applyReturnDecisionToDOM(decision, rejectionReason);
       } else {
         showToast(data.message || 'Action failed', 'error');
@@ -842,7 +911,6 @@
     }
   }
 
-  /* ── Apply the decision result to the page without refreshing ───────────── */
   function applyReturnDecisionToDOM(decision, rejectionReason) {
     const zone = document.getElementById('returnBannerZone');
     if (!zone) return;
@@ -854,15 +922,12 @@
           Return request was <strong>&nbsp;accepted&nbsp;</strong> — refund has been initiated.
         </div>`;
 
-      // Order is now "returned" — update badge, lock status select, refresh timeline
       const newStatus = 'returned';
-
       const badge = document.getElementById('orderStatusBadge');
       if (badge) {
         badge.className   = `badge badge--${newStatus}`;
         badge.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
       }
-
       lockStatusControls(newStatus);
       replaceTimelineForTerminalStatus(newStatus, 'accepted');
 
@@ -876,7 +941,6 @@
           Return request was <strong>&nbsp;rejected.</strong>${reasonHtml}
         </div>`;
 
-      // Update the pending-return entry already in the timeline, if present
       const pendingEntry = document.getElementById('timelineReturnPending');
       if (pendingEntry) {
         pendingEntry.id = '';
@@ -895,17 +959,14 @@
           timeline.appendChild(item);
         }
       }
-      // orderStatus is unchanged on rejection — nothing else to update
     }
   }
 
   function lockStatusControls(newStatus) {
     const sel = document.getElementById('statusSelect');
     if (sel) { sel.disabled = true; sel.value = newStatus; }
-
     const noteArea = document.getElementById('statusNote');
     if (noteArea) noteArea.disabled = true;
-
     const updateBtn = document.getElementById('updateStatusBtn');
     if (updateBtn) {
       const notice = document.createElement('div');
@@ -924,8 +985,6 @@
   function replaceTimelineForTerminalStatus(newStatus, returnOutcome) {
     const timeline = document.getElementById('orderTimeline');
     if (!timeline) return;
-
-    // If a pending-return entry already exists in the timeline, just convert it.
     const pendingEntry = document.getElementById('timelineReturnPending');
     if (pendingEntry) {
       pendingEntry.id = '';
@@ -934,9 +993,6 @@
         <div><div class="timeline-text"><strong>Return Accepted</strong> — refund initiated</div></div>`;
       return;
     }
-
-    // Otherwise (order was mid-flow, e.g. "confirmed"/"processing" before return),
-    // append a fresh "Returned" + "Return Accepted" pair to the live timeline.
     const wrap = document.createElement('div');
     wrap.innerHTML = `
       <div class="timeline-item" style="animation:slideIn 0.3s ease">
@@ -959,13 +1015,12 @@
     return div.innerHTML;
   }
 
-  /* ── Status update ──────────────────────────────────────────────────────── */
+  /* ── Status update ── */
   async function saveStatus() {
     const sel    = document.getElementById('statusSelect');
     const status = sel.value;
     const note   = document.getElementById('statusNote').value;
     const allowed = allowedNext(CURRENT_STATUS);
-
     if (status === CURRENT_STATUS) { showToast('Order is already "' + CURRENT_STATUS + '"', 'error'); return; }
     if (!allowed.includes(status)) {
       showToast('Cannot change from "' + CURRENT_STATUS + '" to "' + status + '"', 'error');
@@ -984,7 +1039,7 @@
     } catch { showToast('Network error', 'error'); }
   }
 
-  /* ── Toast ──────────────────────────────────────────────────────────────── */
+  /* ── Toast ── */
   function showToast(msg, type = 'success') {
     const t = document.getElementById('toast');
     t.textContent = msg;
@@ -992,24 +1047,17 @@
     setTimeout(() => { t.className = 'toast'; }, 3200);
   }
 
-  /* ── Socket.io — live status push ──────────────────────────────────────── */
+  /* ── Socket.io ── */
   const socket = io();
   socket.emit('join-admin');
-
-  // If another admin (or the same session) updates THIS order's status elsewhere,
-  // reflect it live without a page reload
   socket.on('order-status-updated', (data) => {
     if (String(data.orderId) !== ORDER_ID) return;
     const newStatus = data.status;
-
-    // Update the status badge in the items card header
     const badge = document.getElementById('orderStatusBadge');
     if (badge) {
       badge.className = `badge badge--${newStatus}`;
       badge.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
     }
-
-    // Update the status select if not already locked
     const sel = document.getElementById('statusSelect');
     if (sel && !sel.disabled) {
       sel.value = newStatus;
@@ -1023,8 +1071,6 @@
         });
       }
     }
-
-    // Append a new step to the live timeline
     const timeline = document.getElementById('orderTimeline');
     if (timeline) {
       const item = document.createElement('div');
@@ -1038,11 +1084,8 @@
         </div>`;
       timeline.appendChild(item);
     }
-
     showToast('Order status updated to "' + newStatus + '" (live)', 'success');
   });
-
-  // Live badge connectivity
   socket.on('disconnect', () => {
     const b = document.getElementById('liveBadge');
     if (b) { b.style.background='var(--bg)'; b.style.color='var(--text-light)'; b.style.borderColor='var(--border)'; }
@@ -1053,7 +1096,6 @@
     socket.emit('join-admin');
   });
 
-  /* spinner keyframe */
   const style = document.createElement('style');
   style.textContent = `
     @keyframes spin { to { transform: rotate(360deg); } }

@@ -11,24 +11,22 @@ const transactionSchema = new mongoose.Schema({
     required: true,
     min     : [0, 'Amount cannot be negative'],
   },
-  // Human-readable reason shown to the user
   description: {
     type    : String,
     required: true,
     trim    : true,
   },
-  // What triggered this transaction
   source: {
     type: String,
     enum: [
-      'cancellation_refund',   // order or item cancelled by user
-      'return_refund',         // admin accepted a return
-      'order_payment',         // wallet used to pay for an order
-      'manual_credit',         // admin-issued credit (future use)
+      'cancellation_refund',
+      'return_refund',
+      'order_payment',
+      'manual_credit',
+      'referral_bonus', // FIX: added so referral wallet credits have a proper source label
     ],
     required: true,
   },
-  // Reference to the order involved (if any)
   orderId: {
     type   : mongoose.Schema.Types.ObjectId,
     ref    : 'Order',
@@ -38,7 +36,6 @@ const transactionSchema = new mongoose.Schema({
     type   : String,
     default: null,
   },
-  // Running balance AFTER this transaction was applied
   balanceAfter: {
     type    : Number,
     required: true,
@@ -51,7 +48,7 @@ const walletSchema = new mongoose.Schema({
     type    : mongoose.Schema.Types.ObjectId,
     ref     : 'User',
     required: true,
-    unique  : true,
+    unique  : true,   // ← this already creates the index, no need for walletSchema.index()
   },
   balance: {
     type   : Number,
@@ -64,17 +61,8 @@ const walletSchema = new mongoose.Schema({
   },
 }, { timestamps: true });
 
-walletSchema.index({ user: 1 });
+// ← REMOVED: walletSchema.index({ user: 1 });  was causing the duplicate warning
 
-// ── Instance methods ──────────────────────────────────────────────────────
-
-/**
- * Credit the wallet and record the transaction.
- * @param {number}  amount
- * @param {string}  description  - shown to the user
- * @param {string}  source       - one of the source enum values
- * @param {object}  [order]      - optional Order doc (for orderId + orderNumber)
- */
 walletSchema.methods.credit = async function (amount, description, source, order = null) {
   if (amount <= 0) throw new Error('Credit amount must be positive.');
   this.balance = Math.round(this.balance + amount);
@@ -83,17 +71,13 @@ walletSchema.methods.credit = async function (amount, description, source, order
     amount      : Math.round(amount),
     description,
     source,
-    orderId     : order?._id    || null,
+    orderId     : order?._id        || null,
     orderNumber : order?.orderNumber || null,
     balanceAfter: this.balance,
   });
   return this.save();
 };
 
-/**
- * Debit the wallet and record the transaction.
- * Throws if balance is insufficient.
- */
 walletSchema.methods.debit = async function (amount, description, source, order = null) {
   if (amount <= 0) throw new Error('Debit amount must be positive.');
   if (this.balance < amount) {
@@ -108,18 +92,13 @@ walletSchema.methods.debit = async function (amount, description, source, order 
     amount      : Math.round(amount),
     description,
     source,
-    orderId     : order?._id    || null,
+    orderId     : order?._id        || null,
     orderNumber : order?.orderNumber || null,
     balanceAfter: this.balance,
   });
   return this.save();
 };
 
-// ── Static helpers ────────────────────────────────────────────────────────
-
-/**
- * Get or create a wallet for a user.
- */
 walletSchema.statics.getOrCreate = async function (userId) {
   let wallet = await this.findOne({ user: userId });
   if (!wallet) wallet = await this.create({ user: userId, balance: 0, transactions: [] });

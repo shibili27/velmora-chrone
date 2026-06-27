@@ -6,8 +6,10 @@ import Order     from '../../models/order.js';
 import cloudinary from '../../config/cloudinary.js';
 import { broadcast } from '../../public/utils/ssemanager.js';
 import Coupon from '../../models/coupon.js';
+import PDFDocument from 'pdfkit';
 
-//  dash
+
+// ── Dashboard ─────────────────────────────────────────────────────────────────
 
 export const getDashboard = async (req, res) => {
   try {
@@ -36,6 +38,8 @@ export const getDashboard = async (req, res) => {
       lastMonthRevenueAgg,
       monthlySalesAgg,
       topProductsAgg,
+      topCategoriesAgg,
+      topBrandsAgg,
       thisMonthOrders,
       lastMonthOrders,
       lastMonthCustomers,
@@ -87,9 +91,10 @@ export const getDashboard = async (req, res) => {
           },
         },
         { $sort: { '_id.year': 1, '_id.month': 1 } },
-        { $limit: 7 },
+        { $limit: 12 },
       ]),
 
+      // ── Top 10 Products ─────────────────────────────────────────────────────
       Order.aggregate([
         { $match: { orderStatus: 'delivered' } },
         { $unwind: '$items' },
@@ -105,13 +110,101 @@ export const getDashboard = async (req, res) => {
           },
         },
         { $sort: { totalSold: -1 } },
-        { $limit: 5 },
+        { $limit: 10 },
+      ]),
+
+      // ── Top 10 Categories ───────────────────────────────────────────────────
+      Order.aggregate([
+        { $match: { orderStatus: 'delivered' } },
+        { $unwind: '$items' },
+        { $match: { 'items.status': 'active' } },
+        {
+          $lookup: {
+            from:         'products',
+            localField:   'items.product',
+            foreignField: '_id',
+            as:           'productDoc',
+          },
+        },
+        { $unwind: { path: '$productDoc', preserveNullAndEmptyArrays: true } },
+        {
+          $lookup: {
+            from:         'categories',
+            localField:   'productDoc.category',
+            foreignField: '_id',
+            as:           'categoryDoc',
+          },
+        },
+        { $unwind: { path: '$categoryDoc', preserveNullAndEmptyArrays: true } },
+        {
+          $group: {
+            _id:          '$categoryDoc._id',
+            name:         { $first: '$categoryDoc.name' },
+            totalSold:    { $sum: '$items.quantity' },
+            totalRevenue: { $sum: '$items.totalPrice' },
+            productCount: { $addToSet: '$items.product' },
+          },
+        },
+        {
+          $project: {
+            name:         1,
+            totalSold:    1,
+            totalRevenue: 1,
+            productCount: { $size: '$productCount' },
+          },
+        },
+        { $match: { name: { $exists: true, $ne: null } } },
+        { $sort: { totalSold: -1 } },
+        { $limit: 10 },
+      ]),
+
+      // ── Top 10 Brands ───────────────────────────────────────────────────────
+      Order.aggregate([
+        { $match: { orderStatus: 'delivered' } },
+        { $unwind: '$items' },
+        { $match: { 'items.status': 'active' } },
+        {
+          $lookup: {
+            from:         'products',
+            localField:   'items.product',
+            foreignField: '_id',
+            as:           'productDoc',
+          },
+        },
+        { $unwind: { path: '$productDoc', preserveNullAndEmptyArrays: true } },
+        {
+          $lookup: {
+            from:         'brands',
+            localField:   'productDoc.brand',
+            foreignField: '_id',
+            as:           'brandDoc',
+          },
+        },
+        { $unwind: { path: '$brandDoc', preserveNullAndEmptyArrays: true } },
+        {
+          $group: {
+            _id:          '$brandDoc._id',
+            name:         { $first: '$brandDoc.name' },
+            totalSold:    { $sum: '$items.quantity' },
+            totalRevenue: { $sum: '$items.totalPrice' },
+            productCount: { $addToSet: '$items.product' },
+          },
+        },
+        {
+          $project: {
+            name:         1,
+            totalSold:    1,
+            totalRevenue: 1,
+            productCount: { $size: '$productCount' },
+          },
+        },
+        { $match: { name: { $exists: true, $ne: null } } },
+        { $sort: { totalSold: -1 } },
+        { $limit: 10 },
       ]),
 
       Order.countDocuments({ createdAt: { $gte: monthStart } }),
-
       Order.countDocuments({ createdAt: { $gte: lastMonthStart, $lte: lastMonthEnd } }),
-
       User.countDocuments({ role: 'user', createdAt: { $gte: lastMonthStart, $lte: lastMonthEnd } }),
     ]);
 
@@ -165,12 +258,9 @@ export const getDashboard = async (req, res) => {
     }));
 
     const colorMap = {
-      confirmed:  'teal',
-      processing: 'blue',
-      dispatched: 'blue',
-      delivered:  'green',
-      cancelled:  'red',
-      returned:   'amber',
+      confirmed:  'teal',   processing: 'blue',
+      dispatched: 'blue',   delivered:  'green',
+      cancelled:  'red',    returned:   'amber',
     };
     const recentActivity = recentOrders.slice(0, 8).map(o => ({
       color:   colorMap[o.orderStatus] ?? 'teal',
@@ -180,7 +270,18 @@ export const getDashboard = async (req, res) => {
 
     const topProducts = topProductsAgg.map(p => ({
       ...p,
-      images: p.image ? [p.image] : [],
+      images:       p.image ? [p.image] : [],
+      totalRevenue: Math.round(p.totalRevenue),
+    }));
+
+    const topCategories = topCategoriesAgg.map(c => ({
+      ...c,
+      totalRevenue: Math.round(c.totalRevenue),
+    }));
+
+    const topBrands = topBrandsAgg.map(b => ({
+      ...b,
+      totalRevenue: Math.round(b.totalRevenue),
     }));
 
     res.render('admin/dashboard', {
@@ -218,6 +319,8 @@ export const getDashboard = async (req, res) => {
       recentOrders:   recentOrdersMapped,
       recentActivity,
       topProducts,
+      topCategories,
+      topBrands,
 
       totalReviews:   0,
       avgRating:      '0.0',
@@ -232,8 +335,7 @@ export const getDashboard = async (req, res) => {
   }
 };
 
-
-// cat
+// ── Categories ────────────────────────────────────────────────────────────────
 
 export const getCategories = async (req, res) => {
   try {
@@ -262,8 +364,6 @@ export const getCategories = async (req, res) => {
     res.redirect('/admin/dashboard');
   }
 };
-
-
 
 export const addCategory = async (req, res) => {
   try {
@@ -332,8 +432,8 @@ export const deleteCategory = async (req, res) => {
   }
 };
 
+// ── Products ──────────────────────────────────────────────────────────────────
 
-// prod
 export const getProducts = async (req, res) => {
   try {
     const search = req.query.search?.trim() || '';
@@ -551,7 +651,7 @@ export const deleteProduct = async (req, res) => {
   }
 };
 
-
+// ── Brands ────────────────────────────────────────────────────────────────────
 
 export const getBrands = async (req, res) => {
   try {
@@ -644,15 +744,22 @@ export const deleteBrand = async (req, res) => {
   }
 };
 
-
-
+// ── Coupons ───────────────────────────────────────────────────────────────────
+// FIX: validateCouponBody / createCoupon previously validated and wrote
+// `minOrderAmount` / `maxDiscount`, but the Coupon schema defines
+// `minOrderValue` / `maxDiscountCap`. Mongoose silently dropped the
+// mismatched fields, so every coupon created via the admin panel had NO
+// minimum order value or max discount cap enforced. Renamed to match the
+// schema. Also added 'free_shipping' as a valid discountType (the schema
+// already allowed it; the validator previously rejected it), and made
+// discountValue optional for free_shipping coupons since they don't need one.
 
 function escapeRegex(str) {
   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 function validateCouponBody(body) {
-  const { code, discountType, discountValue, minOrderAmount, maxDiscount, expiryDate, usageLimit, perUserLimit } = body;
+  const { code, discountType, discountValue, minOrderValue, maxDiscountCap, expiryDate, usageLimit, perUserLimit } = body;
   const errors = [];
 
   if (!code?.trim())
@@ -660,21 +767,23 @@ function validateCouponBody(body) {
   else if (!/^[A-Z0-9_-]{3,20}$/i.test(code.trim()))
     errors.push('Code must be 3–20 characters — letters, numbers, _ and - only.');
 
-  if (!['percentage', 'flat'].includes(discountType))
+  if (!['flat', 'percentage', 'free_shipping'].includes(discountType))
     errors.push('Invalid discount type.');
 
-  const val = parseFloat(discountValue);
-  if (isNaN(val) || val <= 0)
-    errors.push('Discount value must be a positive number.');
-  if (discountType === 'percentage' && val > 100)
-    errors.push('Percentage discount cannot exceed 100.');
+  if (discountType !== 'free_shipping') {
+    const val = parseFloat(discountValue);
+    if (isNaN(val) || val <= 0)
+      errors.push('Discount value must be a positive number.');
+    if (discountType === 'percentage' && val > 100)
+      errors.push('Percentage discount cannot exceed 100.');
+  }
 
-  const min = parseFloat(minOrderAmount);
+  const min = parseFloat(minOrderValue);
   if (!isNaN(min) && min < 0)
     errors.push('Minimum order amount cannot be negative.');
 
-  if (maxDiscount !== '' && maxDiscount != null) {
-    const cap = parseFloat(maxDiscount);
+  if (maxDiscountCap !== '' && maxDiscountCap != null) {
+    const cap = parseFloat(maxDiscountCap);
     if (isNaN(cap) || cap <= 0)
       errors.push('Max discount cap must be a positive number.');
   }
@@ -696,8 +805,6 @@ function validateCouponBody(body) {
 
   return errors;
 }
-
-// ── GET /admin/coupons ────────────────────────────────────────────────────────
 
 export const getCoupons = async (req, res) => {
   try {
@@ -740,13 +847,11 @@ export const getCoupons = async (req, res) => {
   }
 };
 
-// ── POST /admin/coupons/create ────────────────────────────────────────────────
-
 export const createCoupon = async (req, res) => {
   try {
     const {
       code, discountType, discountValue,
-      minOrderAmount, maxDiscount, expiryDate,
+      minOrderValue, maxDiscountCap, expiryDate,
       usageLimit, perUserLimit, description,
     } = req.body;
 
@@ -768,9 +873,9 @@ export const createCoupon = async (req, res) => {
       code:           code.trim().toUpperCase(),
       description:    description?.trim() || '',
       discountType,
-      discountValue:  parseFloat(discountValue),
-      minOrderAmount: parseFloat(minOrderAmount) || 0,
-      maxDiscount:    (maxDiscount !== '' && maxDiscount != null) ? parseFloat(maxDiscount) : null,
+      discountValue:  parseFloat(discountValue) || 0,
+      minOrderValue:  parseFloat(minOrderValue) || 0,
+      maxDiscountCap: (maxDiscountCap !== '' && maxDiscountCap != null) ? parseFloat(maxDiscountCap) : null,
       expiryDate:     new Date(expiryDate),
       usageLimit:     (usageLimit !== '' && usageLimit != null) ? parseInt(usageLimit) : null,
       perUserLimit:   (perUserLimit !== '' && perUserLimit != null) ? parseInt(perUserLimit) : 1,
@@ -784,8 +889,6 @@ export const createCoupon = async (req, res) => {
     res.redirect('/admin/coupons');
   }
 };
-
-// ── POST /admin/coupons/:id/delete ───────────────────────────────────────────
 
 export const deleteCoupon = async (req, res) => {
   try {
@@ -803,8 +906,6 @@ export const deleteCoupon = async (req, res) => {
   }
 };
 
-// ── POST /admin/coupons/:id/toggle  (AJAX) ───────────────────────────────────
-
 export const toggleCouponStatus = async (req, res) => {
   try {
     const coupon = await Coupon.findById(req.params.id);
@@ -817,5 +918,308 @@ export const toggleCouponStatus = async (req, res) => {
   } catch (err) {
     console.error('toggleCouponStatus error:', err);
     res.status(500).json({ success: false, message: 'Server error.' });
+  }
+};
+
+// ── Dashboard Chart Data ──────────────────────────────────────────────────────
+
+export const getDashboardChartData = async (req, res) => {
+  try {
+    const period = req.query.period || 'monthly';
+    const now    = new Date();
+
+    let groupStage, matchStage, labelFn, limitCount;
+
+    if (period === 'yearly') {
+      const startYear = new Date(now.getFullYear() - 5, 0, 1);
+      matchStage  = { createdAt: { $gte: startYear } };
+      groupStage  = { year: { $year: '$createdAt' } };
+      labelFn     = (id) => String(id.year);
+      limitCount  = 6;
+
+    } else if (period === 'weekly') {
+      const startWeek = new Date(now);
+      startWeek.setDate(startWeek.getDate() - 83);
+      matchStage  = { createdAt: { $gte: startWeek } };
+      groupStage  = { year: { $year: '$createdAt' }, week: { $isoWeek: '$createdAt' } };
+      labelFn     = (id) => `W${id.week}`;
+      limitCount  = 12;
+
+    } else if (period === 'daily') {
+      const startDay = new Date(now);
+      startDay.setDate(startDay.getDate() - 29);
+      startDay.setHours(0, 0, 0, 0);
+      matchStage  = { createdAt: { $gte: startDay } };
+      groupStage  = { year: { $year: '$createdAt' }, month: { $month: '$createdAt' }, day: { $dayOfMonth: '$createdAt' } };
+      labelFn     = (id) => `${id.day}/${id.month}`;
+      limitCount  = 30;
+
+    } else {
+      const startMonth = new Date(now.getFullYear(), now.getMonth() - 11, 1);
+      matchStage  = { createdAt: { $gte: startMonth } };
+      groupStage  = { year: { $year: '$createdAt' }, month: { $month: '$createdAt' } };
+      labelFn     = (id) => {
+        const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        return MONTHS[id.month - 1];
+      };
+      limitCount  = 12;
+    }
+
+    const agg = await Order.aggregate([
+      { $match: { orderStatus: 'delivered', ...matchStage } },
+      {
+        $group: {
+          _id:     groupStage,
+          revenue: { $sum: '$pricing.grandTotal' },
+          count:   { $sum: 1 },
+        },
+      },
+      { $sort: { '_id.year': 1, '_id.month': 1, '_id.week': 1, '_id.day': 1 } },
+      { $limit: limitCount },
+    ]);
+
+    const labels  = agg.map(d => labelFn(d._id));
+    const revenue = agg.map(d => Math.round(d.revenue));
+    const orders  = agg.map(d => d.count);
+
+    res.json({ success: true, labels, revenue, orders });
+  } catch (err) {
+    console.error('getDashboardChartData error:', err);
+    res.status(500).json({ success: false, message: 'Failed to fetch chart data' });
+  }
+};
+
+// ── Ledger Data ───────────────────────────────────────────────────────────────
+
+export const getLedgerData = async (req, res) => {
+  try {
+    const { type, year, month, from, to } = req.query;
+    let startDate, endDate;
+
+    if (type === 'custom') {
+      if (!from || !to) return res.status(400).json({ success: false, message: 'from and to are required' });
+      startDate = new Date(from);
+      endDate   = new Date(to); endDate.setHours(23, 59, 59, 999);
+    } else {
+      const y = parseInt(year)  || new Date().getFullYear();
+      const m = parseInt(month) || (new Date().getMonth() + 1);
+      startDate = new Date(y, m - 1, 1);
+      endDate   = new Date(y, m, 0, 23, 59, 59, 999);
+    }
+
+    const orders = await Order.find({
+      createdAt: { $gte: startDate, $lte: endDate },
+    })
+      .populate('user', 'name email')
+      .sort({ createdAt: 1 })
+      .lean();
+
+    const mapped = orders.map(o => ({
+      _id:            o._id,
+      date:           o.createdAt,
+      orderNumber:    o.orderNumber,
+      customer:       o.user?.name || 'Unknown',
+      email:          o.user?.email || '',
+      paymentMethod:  o.paymentMethod,
+      status:         o.orderStatus,
+      subtotal:       o.pricing.subtotal,
+      itemDiscount:   o.pricing.itemDiscount || 0,
+      couponDiscount: o.pricing.couponDiscount || 0,
+      tax:            o.pricing.tax || 0,
+      shipping:       o.pricing.shipping || 0,
+      grandTotal:     o.pricing.grandTotal,
+    }));
+
+    const deliveredOrders = mapped.filter(o => o.status === 'delivered');
+    const grossRevenue    = deliveredOrders.reduce((s, o) => s + o.subtotal, 0);
+    const totalDiscount   = deliveredOrders.reduce((s, o) => s + o.itemDiscount + o.couponDiscount, 0);
+    const netRevenue      = deliveredOrders.reduce((s, o) => s + o.grandTotal, 0);
+    const totalRefunds    = mapped
+      .filter(o => o.status === 'returned')
+      .reduce((s, o) => s + o.grandTotal, 0);
+
+    res.json({
+      success: true,
+      orders:  mapped,
+      summary: {
+        totalOrders:   mapped.length,
+        grossRevenue:  Math.round(grossRevenue),
+        totalDiscount: Math.round(totalDiscount),
+        netRevenue:    Math.round(netRevenue),
+        totalRefunds:  Math.round(totalRefunds),
+        startDate,
+        endDate,
+      },
+    });
+  } catch (err) {
+    console.error('getLedgerData error:', err);
+    res.status(500).json({ success: false, message: 'Failed to fetch ledger data' });
+  }
+};
+
+// ── Ledger PDF ────────────────────────────────────────────────────────────────
+
+export const downloadLedgerPDF = async (req, res) => {
+  try {
+    const { type, year, month, from, to } = req.query;
+    let startDate, endDate, periodLabel;
+
+    if (type === 'custom') {
+      startDate   = new Date(from);
+      endDate     = new Date(to); endDate.setHours(23, 59, 59, 999);
+      periodLabel = `${new Date(from).toLocaleDateString('en-IN')} – ${new Date(to).toLocaleDateString('en-IN')}`;
+    } else {
+      const y = parseInt(year)  || new Date().getFullYear();
+      const m = parseInt(month) || (new Date().getMonth() + 1);
+      startDate   = new Date(y, m - 1, 1);
+      endDate     = new Date(y, m, 0, 23, 59, 59, 999);
+      const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      periodLabel = `${MONTHS[m - 1]} ${y}`;
+    }
+
+    const orders = await Order.find({
+      createdAt: { $gte: startDate, $lte: endDate },
+    })
+      .populate('user', 'name email')
+      .sort({ createdAt: 1 })
+      .lean();
+
+    const doc = new PDFDocument({ margin: 40, size: 'A4', layout: 'landscape' });
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="ledger-${periodLabel.replace(/\s/g, '-')}.pdf"`);
+    doc.pipe(res);
+
+    const GOLD   = '#c9a96e';
+    const DARK   = '#1a1f1e';
+    const MID    = '#5a6461';
+    const LIGHT  = '#9aa8a5';
+    const TEAL   = '#2d8c84';
+    const pageW  = doc.page.width;
+    const margin = 40;
+    const colW   = pageW - margin * 2;
+
+    // Header band
+    doc.rect(0, 0, pageW, 80).fill(DARK);
+    doc.fontSize(20).font('Helvetica-Bold').fillColor(GOLD)
+      .text('VELMORA CHRONÉ', margin, 20);
+    doc.fontSize(9).font('Helvetica').fillColor('#ffffff99')
+      .text('ADMIN LEDGER BOOK', margin, 44);
+    doc.fontSize(11).font('Helvetica-Bold').fillColor('#ffffff')
+      .text(`Period: ${periodLabel}`, margin, 20, { align: 'right' });
+    doc.fontSize(9).font('Helvetica').fillColor('#ffffff99')
+      .text(`Generated: ${new Date().toLocaleString('en-IN')}`, margin, 38, { align: 'right' });
+
+    doc.y = 96;
+
+    // Summary row
+    const delivered    = orders.filter(o => o.orderStatus === 'delivered');
+    const grossRevenue = delivered.reduce((s, o) => s + o.pricing.subtotal, 0);
+    const totalDisc    = delivered.reduce((s, o) => s + (o.pricing.itemDiscount || 0) + (o.pricing.couponDiscount || 0), 0);
+    const netRevenue   = delivered.reduce((s, o) => s + o.pricing.grandTotal, 0);
+    const totalRefunds = orders.filter(o => o.orderStatus === 'returned').reduce((s, o) => s + o.pricing.grandTotal, 0);
+
+    const summaryItems = [
+      { label: 'Total Orders',   value: String(orders.length) },
+      { label: 'Gross Revenue',  value: '₹' + Math.round(grossRevenue).toLocaleString('en-IN') },
+      { label: 'Total Discounts',value: '-₹' + Math.round(totalDisc).toLocaleString('en-IN') },
+      { label: 'Net Revenue',    value: '₹' + Math.round(netRevenue).toLocaleString('en-IN') },
+      { label: 'Total Refunds',  value: '₹' + Math.round(totalRefunds).toLocaleString('en-IN') },
+    ];
+
+    const boxW = colW / summaryItems.length;
+    const summaryY = doc.y;
+    summaryItems.forEach((item, i) => {
+      const x = margin + i * boxW;
+      doc.rect(x, summaryY, boxW - 4, 52).fillAndStroke('#f2f4f3', '#e2e6e4');
+      doc.fontSize(8).font('Helvetica').fillColor(LIGHT)
+        .text(item.label.toUpperCase(), x + 8, summaryY + 8, { width: boxW - 16 });
+      const valColor = item.label.includes('Discount') || item.label.includes('Refund') ? '#dc2626'
+        : item.label === 'Net Revenue' ? TEAL : DARK;
+      doc.fontSize(14).font('Helvetica-Bold').fillColor(valColor)
+        .text(item.value, x + 8, summaryY + 22, { width: boxW - 16 });
+    });
+    doc.y = summaryY + 64;
+
+    // Table header
+    doc.rect(margin, doc.y, colW, 22).fill(TEAL);
+    const cols = [
+      { label: '#',           x: margin,       w: 28  },
+      { label: 'Date',        x: margin + 28,  w: 70  },
+      { label: 'Order ID',    x: margin + 98,  w: 110 },
+      { label: 'Customer',    x: margin + 208, w: 120 },
+      { label: 'Payment',     x: margin + 328, w: 70  },
+      { label: 'Subtotal',    x: margin + 398, w: 80  },
+      { label: 'Discount',    x: margin + 478, w: 80  },
+      { label: 'Grand Total', x: margin + 558, w: 90  },
+      { label: 'Status',      x: margin + 648, w: 70  },
+    ];
+    const headerY = doc.y + 6;
+    cols.forEach(c => {
+      doc.fontSize(7.5).font('Helvetica-Bold').fillColor('#ffffff')
+        .text(c.label.toUpperCase(), c.x + 4, headerY, { width: c.w - 4 });
+    });
+    doc.y += 22;
+
+    // Table rows
+    orders.forEach((o, idx) => {
+      if (doc.y > doc.page.height - 80) {
+        doc.addPage({ margin: 40, size: 'A4', layout: 'landscape' });
+        doc.rect(margin, doc.y, colW, 22).fill(TEAL);
+        const hy = doc.y + 6;
+        cols.forEach(c => {
+          doc.fontSize(7.5).font('Helvetica-Bold').fillColor('#ffffff')
+            .text(c.label.toUpperCase(), c.x + 4, hy, { width: c.w - 4 });
+        });
+        doc.y += 22;
+      }
+
+      const rowBg = idx % 2 === 0 ? '#ffffff' : '#f8faf9';
+      doc.rect(margin, doc.y, colW, 18).fill(rowBg);
+
+      const rowY = doc.y + 4;
+      const disc = (o.pricing.itemDiscount || 0) + (o.pricing.couponDiscount || 0);
+
+      const statusColors = {
+        delivered:  TEAL,      confirmed:  '#d97706',
+        processing: '#2563eb', dispatched: '#2563eb',
+        cancelled:  '#dc2626', returned:   '#7c3aed',
+      };
+
+      const rowData = [
+        { col: cols[0], text: String(idx + 1),                                                    color: LIGHT          },
+        { col: cols[1], text: new Date(o.createdAt).toLocaleDateString('en-IN'),                  color: MID            },
+        { col: cols[2], text: o.orderNumber,                                                       color: TEAL           },
+        { col: cols[3], text: o.user?.name || 'Unknown',                                           color: DARK           },
+        { col: cols[4], text: o.paymentMethod,                                                     color: MID            },
+        { col: cols[5], text: '₹' + Math.round(o.pricing.subtotal).toLocaleString('en-IN'),       color: DARK           },
+        { col: cols[6], text: disc > 0 ? '-₹' + Math.round(disc).toLocaleString('en-IN') : '—',  color: '#dc2626'      },
+        { col: cols[7], text: '₹' + Math.round(o.pricing.grandTotal).toLocaleString('en-IN'),     color: DARK, bold: true },
+        { col: cols[8], text: o.orderStatus,                                                       color: statusColors[o.orderStatus] || MID },
+      ];
+
+      rowData.forEach(rd => {
+        doc.fontSize(7.5)
+          .font(rd.bold ? 'Helvetica-Bold' : 'Helvetica')
+          .fillColor(rd.color)
+          .text(rd.text, rd.col.x + 4, rowY, { width: rd.col.w - 6, ellipsis: true });
+      });
+
+      doc.moveTo(margin, doc.y + 18).lineTo(margin + colW, doc.y + 18).strokeColor('#e2e6e4').lineWidth(0.5).stroke();
+      doc.y += 18;
+    });
+
+    // Footer
+    doc.y += 16;
+    doc.fontSize(7).font('Helvetica').fillColor(LIGHT)
+      .text(
+        `Velmora Chroné Admin Ledger  ·  ${periodLabel}  ·  Generated on ${new Date().toLocaleString('en-IN')}`,
+        margin, doc.y, { align: 'center', width: colW }
+      );
+
+    doc.end();
+  } catch (err) {
+    console.error('downloadLedgerPDF error:', err);
+    res.status(500).send('Failed to generate ledger PDF');
   }
 };

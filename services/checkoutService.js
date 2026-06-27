@@ -6,6 +6,7 @@ import Coupon  from '../models/coupon.js';
 import Wallet  from '../models/wallet.js';
 import { broadcast } from '../public/utils/ssemanager.js';
 import { createRazorpayOrder, verifyPaymentSignature } from './razorpayService.js';
+import { rewardReferralIfEligible } from './referralService.js';
 
 const TAX_RATE           = 0.18;
 const SHIPPING_THRESHOLD = 50000;
@@ -20,7 +21,6 @@ export const getPopulatedCart = async (userId) => {
   });
 };
 
-// ── FIX: check variant stock when variantName is present ──────────────────
 export const cartIsValid = (cart) => {
   if (!cart || !cart.items.length) return false;
   return cart.items.every(({ product: p, quantity, variantName }) => {
@@ -42,26 +42,40 @@ export const buildPriceSummary = (cart, couponDiscount = 0) => {
   let subtotal = 0, totalDiscount = 0;
 
   for (const item of cart.items) {
-    const mrp    = item.product.mrp || item.product.price || item.price;
-    subtotal    += item.price * item.quantity;
+    const mrp = item.product.mrp || item.product.price || item.price;
+    subtotal  += item.price * item.quantity;
     if (mrp > item.price) totalDiscount += (mrp - item.price) * item.quantity;
   }
 
-  const afterDiscount = subtotal - couponDiscount;
+  // Coupon discount must never exceed subtotal — prevents negative grandTotal
+  const cappedCouponDiscount = Math.min(Math.round(couponDiscount), Math.round(subtotal));
+
+  const afterDiscount = subtotal - cappedCouponDiscount;
   const tax           = Math.round(afterDiscount * TAX_RATE);
   const shipping      = afterDiscount >= SHIPPING_THRESHOLD ? 0 : 99;
+  const grandTotal    = Math.max(Math.round(afterDiscount + tax + shipping), 0);
 
   return {
     subtotal       : Math.round(subtotal),
     itemDiscount   : Math.round(totalDiscount),
-    couponDiscount : Math.round(couponDiscount),
-    totalDiscount  : Math.round(totalDiscount + couponDiscount),
+    couponDiscount : cappedCouponDiscount,
+    totalDiscount  : Math.round(totalDiscount + cappedCouponDiscount),
     tax,
     taxRate        : TAX_RATE * 100,
     shipping,
-    grandTotal     : Math.round(afterDiscount + tax + shipping),
+    grandTotal,
     isFreeShipping : shipping === 0,
   };
+};
+
+// ── ✅ FIX: Export this and call it in your cart controller on add/remove ─
+// Clears coupon from session whenever cart composition changes, preventing
+// stale coupons from a different product carrying over to checkout.
+export const clearCouponIfCartChanged = (session) => {
+  if (session.couponCode) {
+    delete session.couponCode;
+    delete session.couponDiscount;
+  }
 };
 
 export const validateStockBeforeOrder = async (cartItems) => {
@@ -184,8 +198,8 @@ export const applyCouponToSession = async (userId, code, session) => {
 
   const { subtotal } = buildPriceSummary(cart, 0);
 
-  // ── FIX: pass (subtotal) only — not (userId, subtotal) ───────────────
-  const { valid, message } = coupon.validateFor(subtotal);
+  const userUsageCount     = coupon.getUserUsageCount(userId);
+  const { valid, message } = coupon.validateFor(subtotal, userUsageCount);
   if (!valid) {
     throw Object.assign(new Error(message), { status: 400 });
   }
@@ -199,7 +213,7 @@ export const applyCouponToSession = async (userId, code, session) => {
   return {
     message       : `Coupon "${coupon.code}" applied successfully.`,
     couponCode    : coupon.code,
-    couponDiscount: discount,
+    couponDiscount: pricing.couponDiscount,
     pricing,
   };
 };
@@ -223,11 +237,10 @@ const recordCouponUsage = async (couponCode, userId) => {
   const coupon = await Coupon.findOne({ code: couponCode });
   if (!coupon) return;
 
-  const existing = coupon.usedBy?.find(u => String(u.user) === String(userId));
+  const existing = coupon.usedBy.find(u => String(u.user) === String(userId));
   if (existing) {
     existing.count += 1;
   } else {
-    coupon.usedBy = coupon.usedBy || [];
     coupon.usedBy.push({ user: userId, count: 1 });
   }
   coupon.usedCount += 1;
@@ -350,6 +363,7 @@ export const placeOrder = async (userId, { addressId, session }) => {
   });
 
   if (couponCode) await recordCouponUsage(couponCode, userId);
+  await rewardReferralIfEligible(userId);
   await clearCartAndCoupon(cart, session);
 
   return { orderId: order._id, orderNumber: order.orderNumber };
@@ -416,6 +430,7 @@ export const placeOrderWithWallet = async (userId, { addressId, session }) => {
   );
 
   if (couponCode) await recordCouponUsage(couponCode, userId);
+  await rewardReferralIfEligible(userId);
   await clearCartAndCoupon(cart, session);
 
   return { orderId: order._id, orderNumber: order.orderNumber };
@@ -460,8 +475,8 @@ export const createRazorpayCheckoutOrder = async (userId, { addressId, session }
     orderStatus  : 'confirmed',
   });
 
-  const razorpayOrder       = await createRazorpayOrder(pricing.grandTotal, order.orderNumber);
-  order.razorpayOrderId     = razorpayOrder.id;
+  const razorpayOrder   = await createRazorpayOrder(pricing.grandTotal, order.orderNumber);
+  order.razorpayOrderId = razorpayOrder.id;
   await order.save();
 
   return {
@@ -504,6 +519,7 @@ export const verifyRazorpayCheckoutPayment = async (userId, {
   }
 
   if (order.couponCode) await recordCouponUsage(order.couponCode, userId);
+  await rewardReferralIfEligible(userId);
 
   return { orderId: order._id, orderNumber: order.orderNumber };
 };

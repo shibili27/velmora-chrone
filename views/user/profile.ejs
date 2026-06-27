@@ -153,6 +153,46 @@
     select.vc-input { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='rgba(201,169,110,0.45)' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-color: rgba(245,242,235,0.03); padding-right: 2.2rem; }
     select.vc-input option { background: #1a1a18; color: #f5f2eb; }
 
+    /* ── VALIDATION STATES ── */
+    .vc-input.input-error {
+      border-color: rgba(248,113,113,0.65) !important;
+      background: rgba(248,113,113,0.04) !important;
+      box-shadow: 0 0 0 3px rgba(248,113,113,0.08) !important;
+    }
+    .vc-input.input-error:focus {
+      border-color: rgba(248,113,113,0.8) !important;
+      box-shadow: 0 0 0 3px rgba(248,113,113,0.12) !important;
+    }
+    .vc-input.input-valid {
+      border-color: rgba(74,222,128,0.35) !important;
+      box-shadow: 0 0 0 3px rgba(74,222,128,0.05) !important;
+    }
+    .field-error-msg {
+      display: none;
+      font-family: 'Jost', sans-serif;
+      font-size: 0.48rem;
+      letter-spacing: 0.1em;
+      color: rgba(248,113,113,0.85);
+      margin-top: 5px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      animation: errSlide 0.22s ease;
+    }
+    .field-error-msg.hidden { display: none !important; }
+    .field-error-msg svg { flex-shrink: 0; }
+    @keyframes errSlide { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:translateY(0); } }
+    .form-group { display: flex; flex-direction: column; gap: 4px; }
+    /* shake on submit error */
+    @keyframes fieldShake {
+      0%,100% { transform: translateX(0); }
+      20%      { transform: translateX(-5px); }
+      40%      { transform: translateX(5px); }
+      60%      { transform: translateX(-4px); }
+      80%      { transform: translateX(4px); }
+    }
+    .shake { animation: fieldShake 0.38s cubic-bezier(.36,.07,.19,.97); }
+
     .btn-gold { font-family: 'Jost', sans-serif; font-size: 0.5rem; letter-spacing: 0.24em; text-transform: uppercase; color: #0d0b08; display: inline-flex; align-items: center; gap: 0.6rem; padding: 0.85rem 2rem; border-radius: 100px; text-decoration: none; cursor: pointer; position: relative; overflow: hidden; background: linear-gradient(135deg, #e0c47e 0%, #c9a96e 50%, #b8913d 100%); border: none; transition: transform 0.2s cubic-bezier(.34,1.56,.64,1), box-shadow 0.22s; box-shadow: 0 1px 0 rgba(255,255,255,0.35) inset, 0 4px 18px rgba(185,140,55,0.35), 0 1px 4px rgba(0,0,0,0.4); }
     .btn-gold::after { content: ''; position: absolute; top: 0; left: -75%; width: 50%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent); transform: skewX(-18deg); transition: left 0.55s ease; }
     .btn-gold:hover::after { left: 130%; }
@@ -167,10 +207,20 @@
     .btn-danger-sm { display: inline-flex; align-items: center; gap: 5px; font-family: 'Jost', sans-serif; font-size: 0.48rem; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(248,113,113,0.65); background: transparent; border: 1px solid rgba(248,113,113,0.18); border-radius: 100px; padding: 0.55rem 1.1rem; cursor: pointer; transition: color 0.22s, border-color 0.22s, background 0.22s, transform 0.18s; }
     .btn-danger-sm:hover { color: #f87171; border-color: rgba(248,113,113,0.45); background: rgba(248,113,113,0.06); transform: translateY(-1px); }
 
+    /* ── AVATAR ── */
     .avatar-wrap { position: relative; width: 90px; height: 90px; cursor: pointer; flex-shrink: 0; }
     .avatar-img { width: 90px; height: 90px; object-fit: cover; border: 1px solid rgba(201,169,110,0.2); display: block; border-radius: 12px; }
+    .avatar-default { width: 90px; height: 90px; border: 1px solid rgba(201,169,110,0.2); border-radius: 12px; background: #1a1a18; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 6px; }
+    .avatar-default svg { width: 100%; height: 100%; }
     .avatar-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.55); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; border-radius: 12px; }
     .avatar-wrap:hover .avatar-overlay { opacity: 1; }
+
+    .cam-sh { animation: camBlink 2.8s ease-in-out infinite; transform-origin: 37px 54px; }
+    .cam-lp { animation: camPulse 2.8s ease-in-out infinite; transform-origin: 37px 54px; }
+    .cam-fb { animation: camFlash 2.8s ease-in-out infinite; }
+    @keyframes camBlink { 0%,85%,100%{opacity:1;transform:scale(1)} 90%{opacity:0.3;transform:scale(0.92)} }
+    @keyframes camPulse { 0%,80%,100%{opacity:1} 90%{opacity:0.5} }
+    @keyframes camFlash { 0%,84%,100%{opacity:0.7;fill:#c9a96e} 88%{opacity:1;fill:#fff} 92%{opacity:0.7;fill:#c9a96e} }
 
     .stat-pill { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 0.9rem 1.4rem; border: 1px solid rgba(201,169,110,0.12); background: rgba(201,169,110,0.03); border-radius: 10px; transition: border-color 0.25s, background 0.25s, transform 0.18s; }
     .stat-pill:hover { border-color: rgba(201,169,110,0.3); background: rgba(201,169,110,0.06); transform: translateY(-2px); }
@@ -207,11 +257,8 @@
     .modal-backdrop.open .modal-box { transform: translateY(0); }
     .modal-title { font-family: 'DM Serif Display', serif; font-size: 1rem; font-style: italic; letter-spacing: 0.01em; color: rgba(201,169,110,0.65); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; }
     .modal-title::before { content: ''; width: 14px; height: 1px; background: rgba(201,169,110,0.3); }
-
-    /* ── FORM GRID FOR MODAL ── */
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem; }
     .form-row.full { grid-template-columns: 1fr; }
-    .form-group { display: flex; flex-direction: column; gap: 4px; }
 
     .toast { position: fixed; bottom: 2rem; right: 2rem; z-index: 999; background: #1a1a18; border: 1px solid rgba(201,169,110,0.25); border-radius: 10px; color: #f5f2eb; font-family: 'Jost', sans-serif; font-size: 0.58rem; letter-spacing: 0.08em; padding: 0.8rem 1.25rem; display: flex; align-items: center; gap: 10px; transform: translateY(80px); opacity: 0; transition: transform 0.35s, opacity 0.35s; pointer-events: none; min-width: 200px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
     .toast.show { transform: translateY(0); opacity: 1; }
@@ -259,7 +306,7 @@
     <div class="hidden md:flex items-center gap-8">
       <a href="/home" class="nav-link">Home</a>
       <a href="/products" class="nav-link">Collection</a>
-       <a href="/orders"   class="nav-link">Orders</a>
+      <a href="/orders" class="nav-link">Orders</a>
       <a href="/home" class="nav-link">About</a>
       <a href="/home" class="nav-link">Contact</a>
     </div>
@@ -377,10 +424,28 @@
       <div style="display:flex;align-items:flex-start;gap:1.5rem;flex-wrap:wrap;margin-bottom:2.5rem;">
         <div>
           <div class="avatar-wrap" onclick="document.getElementById('avatarInput').click()">
-            <img id="avatarPreview"
-              src="<%= user.profileImage && user.profileImage !== '/images/default-avatar.png' ? user.profileImage : 'https://res.cloudinary.com/dwb0hd0m6/image/upload/v1774530220/velmora_chrone_logo_bgyhmw.svg' %>"
-              onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 96 96%22%3E%3Crect fill=%22%231a1a18%22 width=%2296%22 height=%2296%22/%3E%3C/svg%3E'"
-              alt="Profile" class="avatar-img"/>
+            <% if (user.profileImage && user.profileImage !== '/images/default-avatar.png') { %>
+              <img id="avatarPreview" src="<%= user.profileImage %>"
+                onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 96 96%22%3E%3Crect fill=%22%231a1a18%22 width=%2296%22 height=%2296%22/%3E%3C/svg%3E'"
+                alt="Profile" class="avatar-img"/>
+            <% } else { %>
+              <div id="avatarPreview" class="avatar-default">
+                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="12" y="30" width="76" height="46" rx="6" fill="#2a2a28"/>
+                  <rect x="35" y="22" width="22" height="10" rx="3" fill="#222220"/>
+                  <rect x="16" y="26" width="8" height="5" rx="2" class="cam-fb"/>
+                  <circle cx="74" cy="30" r="4" fill="#c9a96e"/>
+                  <circle cx="37" cy="52" r="17" fill="#1a1a18" class="cam-sh"/>
+                  <circle cx="37" cy="52" r="13" fill="#222220" class="cam-sh"/>
+                  <circle cx="37" cy="52" r="8" fill="#0d0d0c" class="cam-sh cam-lp"/>
+                  <ellipse cx="33" cy="48" rx="3" ry="2" fill="#c9a96e" opacity="0.18" class="cam-sh"/>
+                  <circle cx="37" cy="52" r="14.5" fill="none" stroke="#c9a96e" stroke-width="0.8" class="cam-sh"/>
+                  <circle cx="66" cy="44" r="1.5" fill="#c9a96e" opacity="0.5"/>
+                  <circle cx="66" cy="52" r="1.5" fill="#c9a96e" opacity="0.3"/>
+                  <circle cx="66" cy="60" r="1.5" fill="#c9a96e" opacity="0.2"/>
+                </svg>
+              </div>
+            <% } %>
             <div class="avatar-overlay">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c9a96e" stroke-width="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
             </div>
@@ -430,20 +495,25 @@
       <p class="panel-title">Edit Profile</p>
       <% if (locals.editError) { %><div class="flash-error"><%= editError %></div><% } %>
       <% if (locals.editSuccess) { %><div class="flash-success"><%= editSuccess %></div><% } %>
-      <form action="/profile/update" method="POST" style="max-width:440px;">
+      <form action="/profile/update" method="POST" style="max-width:440px;" id="editProfileForm" novalidate>
         <div style="display:grid;gap:1.25rem;">
-          <div>
+          <div class="form-group">
             <label class="vc-label" for="edit-name">Full Name</label>
-            <input class="vc-input" id="edit-name" name="name" value="<%= user.name %>" placeholder="Your full name" required/>
+            <input class="vc-input" id="edit-name" name="name" value="<%= user.name %>" placeholder="Your full name" required
+              oninput="clearFieldError(this)" onblur="validateEditName()"/>
+            <span class="field-error-msg hidden" id="err-edit-name">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              Name cannot be empty.
+            </span>
           </div>
-          <div>
+          <div class="form-group">
             <label class="vc-label">Email Address</label>
             <input class="vc-input" value="<%= user.email %>" disabled/>
             <p style="font-size:0.48rem;color:rgba(245,242,235,0.18);margin-top:6px;letter-spacing:0.1em;">Use the Change Email tab to update your email.</p>
           </div>
         </div>
         <div style="margin-top:1.75rem;display:flex;gap:0.75rem;flex-wrap:wrap;">
-          <button type="submit" class="btn-gold">Save Changes<span class="btn-arrow"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span></button>
+          <button type="button" class="btn-gold" onclick="submitEditProfile()">Save Changes<span class="btn-arrow"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span></button>
           <button type="button" class="btn-dark" onclick="switchTab('details')">Cancel</button>
         </div>
       </form>
@@ -455,10 +525,14 @@
       <div id="email-step1" style="max-width:420px;">
         <p style="font-size:0.75rem;font-weight:300;color:rgba(245,242,235,0.35);line-height:1.85;margin-bottom:1.5rem;">Enter your new email. We'll send a 6-digit code to confirm the change.</p>
         <div style="margin-bottom:1.25rem;"><label class="vc-label">Current Email</label><input class="vc-input" value="<%= user.email %>" disabled/></div>
-        <div style="margin-bottom:1.5rem;">
+        <div class="form-group" style="margin-bottom:1.5rem;">
           <label class="vc-label" for="new-email">New Email Address</label>
-          <input class="vc-input" id="new-email" type="email" placeholder="new@email.com"/>
-          <p id="emailInputError" style="display:none;font-size:0.6rem;color:#f87171;margin-top:6px;"></p>
+          <input class="vc-input" id="new-email" type="email" placeholder="new@email.com"
+            oninput="clearFieldError(this)" onblur="validateNewEmail()"/>
+          <span class="field-error-msg hidden" id="err-new-email">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Enter a valid email address.
+          </span>
         </div>
         <button class="btn-gold" id="sendOtpBtn" onclick="sendEmailOTP()">Send Verification Code<span class="btn-arrow"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span></button>
       </div>
@@ -489,30 +563,46 @@
     <% if (user.password) { %>
     <div class="panel" id="panel-password">
       <p class="panel-title">Change Password</p>
-      <form action="/change-password" method="POST" style="max-width:400px;" id="pwForm">
-        <div style="margin-bottom:1.25rem;">
+      <form action="/change-password" method="POST" style="max-width:400px;" id="pwForm" novalidate>
+        <div class="form-group" style="margin-bottom:1.25rem;">
           <label class="vc-label" for="pw-current">Current Password</label>
           <div style="position:relative;">
-            <input class="vc-input" id="pw-current" name="oldPassword" type="password" placeholder="Current password" style="padding-right:2.75rem;" required/>
+            <input class="vc-input" id="pw-current" name="oldPassword" type="password" placeholder="Current password"
+              style="padding-right:2.75rem;" required
+              oninput="clearFieldError(this)" onblur="validateCurrentPw()"/>
             <button type="button" onclick="togglePw('pw-current')" style="position:absolute;right:0.85rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:rgba(245,242,235,0.25);transition:color 0.2s;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
             </button>
           </div>
+          <span class="field-error-msg hidden" id="err-pw-current">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Current password is required.
+          </span>
         </div>
-        <div style="margin-bottom:1.25rem;">
+        <div class="form-group" style="margin-bottom:1.25rem;">
           <label class="vc-label" for="pw-new">New Password</label>
           <div style="position:relative;">
-            <input class="vc-input" id="pw-new" name="newPassword" type="password" placeholder="Min. 8 characters" style="padding-right:2.75rem;" oninput="updateStrength(this.value)" required/>
+            <input class="vc-input" id="pw-new" name="newPassword" type="password" placeholder="Min. 8 characters"
+              style="padding-right:2.75rem;" oninput="updateStrength(this.value); clearFieldError(this);" onblur="validateNewPw()" required/>
             <button type="button" onclick="togglePw('pw-new')" style="position:absolute;right:0.85rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:rgba(245,242,235,0.25);transition:color 0.2s;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
             </button>
           </div>
           <div class="pw-bar-wrap"><div class="pw-bar" id="bar1"></div><div class="pw-bar" id="bar2"></div><div class="pw-bar" id="bar3"></div></div>
-          <p style="font-size:0.5rem;color:rgba(245,242,235,0.22);margin-top:5px;" id="pwStrengthLabel"></p>
+          <span class="field-error-msg hidden" id="err-pw-new">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Password must be at least 8 characters.
+          </span>
+          <p style="font-size:0.5rem;color:rgba(245,242,235,0.22);margin-top:4px;" id="pwStrengthLabel"></p>
         </div>
-        <div style="margin-bottom:1.75rem;">
+        <div class="form-group" style="margin-bottom:1.75rem;">
           <label class="vc-label" for="pw-confirm">Confirm New Password</label>
-          <input class="vc-input" id="pw-confirm" name="confirmPassword" type="password" placeholder="Re-enter new password" required/>
+          <input class="vc-input" id="pw-confirm" name="confirmPassword" type="password" placeholder="Re-enter new password" required
+            oninput="clearFieldError(this)" onblur="validateConfirmPw()"/>
+          <span class="field-error-msg hidden" id="err-pw-confirm">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Passwords do not match.
+          </span>
         </div>
         <button type="button" class="btn-gold" onclick="submitPassword()">Update Password<span class="btn-arrow"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span></button>
       </form>
@@ -583,7 +673,7 @@
   </div>
 </footer>
 
-<!-- ══ ADDRESS MODAL — UPDATED WITH ALL FIELDS ══ -->
+<!-- ══ ADDRESS MODAL ══ -->
 <div class="modal-backdrop" id="addrModal">
   <div class="modal-box">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
@@ -592,84 +682,83 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
-
-    <!-- Row 1: Full Name + Phone -->
     <div class="form-row">
       <div class="form-group">
         <label class="vc-label">Full Name *</label>
-        <input class="vc-input" id="addr-fullName" type="text" placeholder="Your full name"/>
+        <input class="vc-input" id="addr-fullName" type="text" placeholder="Your full name"
+          oninput="clearFieldError(this)" onblur="validateAddrField('addr-fullName','err-addr-fullName','Full name is required.')"/>
+        <span class="field-error-msg hidden" id="err-addr-fullName">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Full name is required.
+        </span>
       </div>
       <div class="form-group">
         <label class="vc-label">Phone *</label>
-        <input class="vc-input" id="addr-phone" type="tel" placeholder="10-digit number" maxlength="10"/>
+        <input class="vc-input" id="addr-phone" type="tel" placeholder="10-digit number" maxlength="10"
+          oninput="clearFieldError(this)" onblur="validatePhone()"/>
+        <span class="field-error-msg hidden" id="err-addr-phone">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Enter a valid 10-digit number.
+        </span>
       </div>
     </div>
-
-    <!-- Row 2: Address Line 1 -->
     <div class="form-row full">
       <div class="form-group">
         <label class="vc-label">Address Line 1 *</label>
-        <input class="vc-input" id="addr-line1" type="text" placeholder="House / Flat, Street, Area"/>
+        <input class="vc-input" id="addr-line1" type="text" placeholder="House / Flat, Street, Area"
+          oninput="clearFieldError(this)" onblur="validateAddrField('addr-line1','err-addr-line1','Address line 1 is required.')"/>
+        <span class="field-error-msg hidden" id="err-addr-line1">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Address line 1 is required.
+        </span>
       </div>
     </div>
-
-    <!-- Row 3: Address Line 2 -->
     <div class="form-row full">
       <div class="form-group">
         <label class="vc-label">Address Line 2</label>
         <input class="vc-input" id="addr-line2" type="text" placeholder="Landmark (optional)"/>
       </div>
     </div>
-
-    <!-- Row 4: City + State -->
     <div class="form-row">
       <div class="form-group">
         <label class="vc-label">City *</label>
-        <input class="vc-input" id="addr-city" type="text" placeholder="City"/>
+        <input class="vc-input" id="addr-city" type="text" placeholder="City"
+          oninput="clearFieldError(this)" onblur="validateAddrField('addr-city','err-addr-city','City is required.')"/>
+        <span class="field-error-msg hidden" id="err-addr-city">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          City is required.
+        </span>
       </div>
       <div class="form-group">
         <label class="vc-label">State *</label>
-        <select class="vc-input" id="addr-state">
+        <select class="vc-input" id="addr-state"
+          onchange="clearFieldError(this)" onblur="validateState()">
           <option value="">Select State</option>
-          <option>Andhra Pradesh</option><option>Arunachal Pradesh</option>
-          <option>Assam</option><option>Bihar</option><option>Chhattisgarh</option>
-          <option>Delhi</option><option>Goa</option><option>Gujarat</option>
-          <option>Haryana</option><option>Himachal Pradesh</option>
-          <option>Jharkhand</option><option>Karnataka</option><option>Kerala</option>
-          <option>Madhya Pradesh</option><option>Maharashtra</option>
-          <option>Manipur</option><option>Meghalaya</option><option>Mizoram</option>
-          <option>Nagaland</option><option>Odisha</option><option>Punjab</option>
-          <option>Rajasthan</option><option>Sikkim</option><option>Tamil Nadu</option>
-          <option>Telangana</option><option>Tripura</option><option>Uttar Pradesh</option>
-          <option>Uttarakhand</option><option>West Bengal</option>
+          <option>Andhra Pradesh</option><option>Arunachal Pradesh</option><option>Assam</option><option>Bihar</option><option>Chhattisgarh</option><option>Delhi</option><option>Goa</option><option>Gujarat</option><option>Haryana</option><option>Himachal Pradesh</option><option>Jharkhand</option><option>Karnataka</option><option>Kerala</option><option>Madhya Pradesh</option><option>Maharashtra</option><option>Manipur</option><option>Meghalaya</option><option>Mizoram</option><option>Nagaland</option><option>Odisha</option><option>Punjab</option><option>Rajasthan</option><option>Sikkim</option><option>Tamil Nadu</option><option>Telangana</option><option>Tripura</option><option>Uttar Pradesh</option><option>Uttarakhand</option><option>West Bengal</option>
         </select>
+        <span class="field-error-msg hidden" id="err-addr-state">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Please select a state.
+        </span>
       </div>
     </div>
-
-    <!-- Row 5: PIN Code + Address Type -->
     <div class="form-row">
       <div class="form-group">
         <label class="vc-label">PIN Code *</label>
-        <input class="vc-input" id="addr-pincode" type="text" placeholder="6-digit PIN" maxlength="6"/>
+        <input class="vc-input" id="addr-pincode" type="text" placeholder="6-digit PIN" maxlength="6"
+          oninput="clearFieldError(this)" onblur="validatePincode()"/>
+        <span class="field-error-msg hidden" id="err-addr-pincode">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Enter a valid 6-digit PIN code.
+        </span>
       </div>
       <div class="form-group">
         <label class="vc-label">Address Type</label>
-        <select class="vc-input" id="addr-type">
-          <option value="Home">Home</option>
-          <option value="Office">Office</option>
-          <option value="Other">Other</option>
-        </select>
+        <select class="vc-input" id="addr-type"><option value="Home">Home</option><option value="Office">Office</option><option value="Other">Other</option></select>
       </div>
     </div>
-
-    <!-- Error message -->
-    <p id="addrModalError" style="display:none;font-family:'Jost',sans-serif;font-size:0.5rem;color:rgba(248,113,113,0.8);margin-top:0.5rem;letter-spacing:0.05em;"></p>
-
     <div style="margin-top:1.5rem;display:flex;gap:0.75rem;flex-wrap:wrap;">
-      <button class="btn-gold" onclick="saveAddress()" id="saveAddrBtn">
-        Save Address
-        <span class="btn-arrow"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
-      </button>
+      <button class="btn-gold" onclick="saveAddress()" id="saveAddrBtn">Save Address<span class="btn-arrow"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span></button>
       <button class="btn-dark" onclick="closeAddressModal()">Cancel</button>
     </div>
   </div>
@@ -757,38 +846,166 @@
     toastTimer = setTimeout(() => t.classList.remove('show'), 3200);
   }
 
+  /* ════════════════════════════════
+     VALIDATION HELPERS
+  ════════════════════════════════ */
+  const ERR_ICON = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
+
+  function setFieldError(inputEl, errId, msg) {
+    inputEl.classList.add('input-error');
+    inputEl.classList.remove('input-valid');
+    const errEl = document.getElementById(errId);
+    if (errEl) {
+      errEl.innerHTML = ERR_ICON + ' ' + msg;
+      errEl.classList.remove('hidden');
+      // shake the input
+      inputEl.classList.remove('shake');
+      void inputEl.offsetWidth; // reflow
+      inputEl.classList.add('shake');
+    }
+    return false;
+  }
+
+  function setFieldValid(inputEl, errId) {
+    inputEl.classList.remove('input-error');
+    inputEl.classList.add('input-valid');
+    const errEl = document.getElementById(errId);
+    if (errEl) errEl.classList.add('hidden');
+    return true;
+  }
+
+  function clearFieldError(inputEl) {
+    inputEl.classList.remove('input-error', 'input-valid', 'shake');
+    // find sibling error
+    const parent = inputEl.closest('.form-group') || inputEl.parentElement;
+    if (parent) {
+      const err = parent.querySelector('.field-error-msg');
+      if (err) err.classList.add('hidden');
+    }
+  }
+
+  /* ── Generic required field validator ── */
+  function validateAddrField(inputId, errId, msg) {
+    const el = document.getElementById(inputId);
+    if (!el) return true;
+    return el.value.trim() ? setFieldValid(el, errId) : setFieldError(el, errId, msg);
+  }
+
+  /* ── Phone ── */
+  function validatePhone() {
+    const el = document.getElementById('addr-phone');
+    if (!/^\d{10}$/.test(el.value.trim())) return setFieldError(el, 'err-addr-phone', 'Enter a valid 10-digit number.');
+    return setFieldValid(el, 'err-addr-phone');
+  }
+
+  /* ── State ── */
+  function validateState() {
+    const el = document.getElementById('addr-state');
+    if (!el.value) return setFieldError(el, 'err-addr-state', 'Please select a state.');
+    return setFieldValid(el, 'err-addr-state');
+  }
+
+  /* ── Pincode ── */
+  function validatePincode() {
+    const el = document.getElementById('addr-pincode');
+    if (!/^\d{6}$/.test(el.value.trim())) return setFieldError(el, 'err-addr-pincode', 'Enter a valid 6-digit PIN code.');
+    return setFieldValid(el, 'err-addr-pincode');
+  }
+
+  /* ── Edit profile name ── */
+  function validateEditName() {
+    const el = document.getElementById('edit-name');
+    return el.value.trim() ? setFieldValid(el, 'err-edit-name') : setFieldError(el, 'err-edit-name', 'Name cannot be empty.');
+  }
+
+  /* ── New email ── */
+  function validateNewEmail() {
+    const el = document.getElementById('new-email');
+    if (!el.value.trim() || !/^\S+@\S+\.\S+$/.test(el.value.trim()))
+      return setFieldError(el, 'err-new-email', 'Enter a valid email address.');
+    return setFieldValid(el, 'err-new-email');
+  }
+
+  /* ── Password fields ── */
+  function validateCurrentPw() {
+    const el = document.getElementById('pw-current');
+    return el.value ? setFieldValid(el, 'err-pw-current') : setFieldError(el, 'err-pw-current', 'Current password is required.');
+  }
+  function validateNewPw() {
+    const el = document.getElementById('pw-new');
+    return el.value.length >= 8 ? setFieldValid(el, 'err-pw-new') : setFieldError(el, 'err-pw-new', 'Password must be at least 8 characters.');
+  }
+  function validateConfirmPw() {
+    const el = document.getElementById('pw-confirm');
+    const nw = document.getElementById('pw-new').value;
+    if (!el.value) return setFieldError(el, 'err-pw-confirm', 'Please confirm your new password.');
+    return el.value === nw ? setFieldValid(el, 'err-pw-confirm') : setFieldError(el, 'err-pw-confirm', 'Passwords do not match.');
+  }
+
+  /* ── Edit profile submit ── */
+  function submitEditProfile() {
+    const ok = validateEditName();
+    if (!ok) return;
+    document.getElementById('editProfileForm').submit();
+  }
+
   /* ── AVATAR UPLOAD ── */
   async function uploadAvatar(e) {
     const file = e.target.files[0]; if (!file) return;
-    const reader = new FileReader();
-    reader.onload = ev => document.getElementById('avatarPreview').src = ev.target.result;
-    reader.readAsDataURL(file);
     const statusEl = document.getElementById('avatarStatus');
     statusEl.textContent = 'Uploading…';
     const formData = new FormData();
     formData.append('profileImage', file);
     try {
-      const res = await fetch('/profile/upload-image', { method: 'POST', body: formData });
+      const res  = await fetch('/profile/upload-image', { method: 'POST', body: formData });
       const data = await res.json();
-      if (data.success) { document.getElementById('avatarPreview').src = data.imageUrl; statusEl.textContent = 'Click to change'; showToast('Profile photo updated!', 'success'); }
-      else { statusEl.textContent = 'Upload failed'; showToast(data.message || 'Upload failed', 'error'); }
-    } catch { statusEl.textContent = 'Click to change'; showToast('Network error. Try again.', 'error'); }
+      if (data.success) {
+        const wrap = document.querySelector('.avatar-wrap');
+        const old  = document.getElementById('avatarPreview');
+        const img  = document.createElement('img');
+        img.id        = 'avatarPreview';
+        img.src       = data.imageUrl;
+        img.alt       = 'Profile';
+        img.className = 'avatar-img';
+        wrap.replaceChild(img, old);
+        statusEl.textContent = 'Click to change';
+        showToast('Profile photo updated!', 'success');
+      } else {
+        statusEl.textContent = 'Upload failed';
+        showToast(data.message || 'Upload failed', 'error');
+      }
+    } catch {
+      statusEl.textContent = 'Click to change';
+      showToast('Network error. Try again.', 'error');
+    }
   }
 
   /* ── EMAIL OTP ── */
   let resendInterval = null;
   async function sendEmailOTP() {
+    if (!validateNewEmail()) return;
     const email = document.getElementById('new-email').value.trim();
-    const errEl = document.getElementById('emailInputError'), btn = document.getElementById('sendOtpBtn');
-    errEl.style.display = 'none';
-    if (!email || !/^\S+@\S+\.\S+$/.test(email)) { errEl.textContent = 'Please enter a valid email address.'; errEl.style.display = 'block'; return; }
+    const btn = document.getElementById('sendOtpBtn');
     btn.disabled = true; btn.textContent = 'Sending…';
     try {
       const res = await fetch('/profile/request-email-change', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ newEmail: email }) });
       const data = await res.json();
-      if (data.success) { document.getElementById('otp-sent-to').textContent = 'Sent to ' + email; document.getElementById('email-step1').style.display = 'none'; document.getElementById('email-step2').style.display = 'block'; document.querySelectorAll('.otp-cell')[0].focus(); startResendTimer(); showToast('OTP sent! Check your inbox.', 'success'); }
-      else { errEl.textContent = data.message || 'Failed to send OTP.'; errEl.style.display = 'block'; }
-    } catch { errEl.textContent = 'Network error. Please try again.'; errEl.style.display = 'block'; }
+      if (data.success) {
+        document.getElementById('otp-sent-to').textContent = 'Sent to ' + email;
+        document.getElementById('email-step1').style.display = 'none';
+        document.getElementById('email-step2').style.display = 'block';
+        document.querySelectorAll('.otp-cell')[0].focus();
+        startResendTimer();
+        showToast('OTP sent! Check your inbox.', 'success');
+      } else {
+        const errEl = document.getElementById('err-new-email');
+        const inputEl = document.getElementById('new-email');
+        setFieldError(inputEl, 'err-new-email', data.message || 'Failed to send OTP.');
+      }
+    } catch {
+      const inputEl = document.getElementById('new-email');
+      setFieldError(inputEl, 'err-new-email', 'Network error. Please try again.');
+    }
     btn.disabled = false; btn.textContent = 'Send Verification Code';
   }
   async function verifyEmailOTP() {
@@ -801,8 +1018,17 @@
     try {
       const res = await fetch('/profile/verify-email-change', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ otp }) });
       const data = await res.json();
-      if (data.success) { showToast('Email updated successfully!', 'success'); clearInterval(resendInterval); const newEmail = document.getElementById('new-email').value.trim(); const el = document.getElementById('displayEmail'); if (el) el.textContent = newEmail; resetEmailForm(); }
-      else { errEl.textContent = data.message || 'Invalid OTP. Try again.'; errEl.style.display = 'block'; cells.forEach(c => { c.style.borderColor = 'rgba(248,113,113,0.5)'; }); setTimeout(() => cells.forEach(c => { c.style.borderColor = ''; }), 1400); }
+      if (data.success) {
+        showToast('Email updated successfully!', 'success');
+        clearInterval(resendInterval);
+        const newEmail = document.getElementById('new-email').value.trim();
+        const el = document.getElementById('displayEmail'); if (el) el.textContent = newEmail;
+        resetEmailForm();
+      } else {
+        errEl.textContent = data.message || 'Invalid OTP. Try again.'; errEl.style.display = 'block';
+        cells.forEach(c => { c.style.borderColor = 'rgba(248,113,113,0.5)'; });
+        setTimeout(() => cells.forEach(c => { c.style.borderColor = ''; }), 1400);
+      }
     } catch { errEl.textContent = 'Network error.'; errEl.style.display = 'block'; }
     btn.disabled = false; btn.textContent = 'Verify & Update';
   }
@@ -836,7 +1062,15 @@
     clearInterval(resendInterval);
     resendInterval = setInterval(() => { secs--; timerEl.textContent = '(' + secs + 's)'; if (secs <= 0) { clearInterval(resendInterval); btn.disabled = false; timerEl.textContent = ''; } }, 1000);
   }
-  function resetEmailForm() { document.getElementById('email-step1').style.display = 'block'; document.getElementById('email-step2').style.display = 'none'; document.getElementById('new-email').value = ''; document.getElementById('emailInputError').style.display = 'none'; document.getElementById('otpError').style.display = 'none'; document.querySelectorAll('.otp-cell').forEach(c => c.value = ''); clearInterval(resendInterval); }
+  function resetEmailForm() {
+    document.getElementById('email-step1').style.display = 'block';
+    document.getElementById('email-step2').style.display = 'none';
+    document.getElementById('new-email').value = '';
+    document.getElementById('err-new-email').classList.add('hidden');
+    document.getElementById('otpError').style.display = 'none';
+    document.querySelectorAll('.otp-cell').forEach(c => c.value = '');
+    clearInterval(resendInterval);
+  }
 
   /* ── PASSWORD ── */
   function togglePw(id) { const el = document.getElementById(id); el.type = el.type === 'password' ? 'text' : 'password'; }
@@ -854,15 +1088,16 @@
     else { lb.textContent = ''; }
   }
   function submitPassword() {
-    const nw = document.getElementById('pw-new').value, conf = document.getElementById('pw-confirm').value;
-    if (nw.length < 8) { showToast('Password must be at least 8 characters', 'error'); return; }
-    if (nw !== conf) { showToast('Passwords do not match', 'error'); return; }
+    const a = validateCurrentPw();
+    const b = validateNewPw();
+    const c = validateConfirmPw();
+    if (!a || !b || !c) return;
     document.getElementById('pwForm').submit();
   }
 
-  /* ══════════════════════════════════════════
-     ADDRESSES — UPDATED TO MATCH NEW FIELDS
-  ══════════════════════════════════════════ */
+  /* ════════════════════════════════
+     ADDRESSES
+  ════════════════════════════════ */
   let editingAddrId = null, deleteAddrId = null;
 
   function renderAddresses() {
@@ -873,7 +1108,6 @@
     addresses.forEach(addr => {
       const card = document.createElement('div');
       card.className = 'addr-card' + (addr.isDefault ? ' default-addr' : '');
-      // Build address display lines using new fields
       const nameLine  = addr.fullName || '—';
       const phoneLine = addr.phone    ? `📞 ${addr.phone}` : '';
       const line1     = addr.line1    || addr.street || '';
@@ -881,16 +1115,13 @@
       const cityLine  = [addr.city, addr.state].filter(Boolean).join(', ');
       const pinLine   = addr.pincode  ? ` — ${addr.pincode}` : '';
       const typeBadge = addr.addressType ? `<span style="font-size:0.38rem;letter-spacing:0.14em;text-transform:uppercase;color:rgba(201,169,110,0.55);border:1px solid rgba(201,169,110,0.2);padding:2px 8px;border-radius:100px;margin-left:8px;">${addr.addressType}</span>` : '';
-
       card.innerHTML = `
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
           <div style="flex:1;min-width:160px;">
             ${addr.isDefault ? '<span style="font-size:0.44rem;letter-spacing:0.15em;text-transform:uppercase;color:#4ade80;border:1px solid rgba(74,222,128,0.22);padding:2px 10px;display:inline-block;margin-bottom:8px;border-radius:100px;background:rgba(74,222,128,0.05);">Default</span>' : ''}
             <p style="font-family:\'Cormorant Garamond\',serif;font-size:1rem;font-weight:400;color:#f5f2eb;margin-bottom:4px;">${nameLine}${typeBadge}</p>
             <p style="font-size:0.72rem;font-weight:300;line-height:1.85;color:rgba(245,242,235,0.45);">
-              ${line1}${line2}<br/>
-              ${cityLine}${pinLine}<br/>
-              ${phoneLine}
+              ${line1}${line2}<br/>${cityLine}${pinLine}<br/>${phoneLine}
             </p>
           </div>
           <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;flex-shrink:0;">
@@ -901,24 +1132,26 @@
         </div>`;
       list.appendChild(card);
     });
-
-    // Update the address count stat pill
     const statEl = document.getElementById('statAddresses');
     if (statEl) statEl.textContent = addresses.length;
   }
 
+  /* ── Address modal open / reset ── */
   function openAddressModal(id = null) {
     editingAddrId = id;
-    // Clear all fields
     ['addr-fullName','addr-phone','addr-line1','addr-line2','addr-city','addr-pincode'].forEach(fid => {
-      document.getElementById(fid).value = '';
+      const el = document.getElementById(fid);
+      el.value = '';
+      el.classList.remove('input-error','input-valid','shake');
     });
-    document.getElementById('addr-state').value = '';
-    document.getElementById('addr-type').value  = 'Home';
-    document.getElementById('addrModalError').style.display = 'none';
-    document.getElementById('addrModalTitle').textContent = id ? 'Edit Address' : 'Add New Address';
+    const stateEl = document.getElementById('addr-state');
+    stateEl.value = '';
+    stateEl.classList.remove('input-error','input-valid');
+    document.getElementById('addr-type').value = 'Home';
+    // hide all addr error msgs
+    document.querySelectorAll('#addrModal .field-error-msg').forEach(e => e.classList.add('hidden'));
 
-    // Pre-fill if editing
+    document.getElementById('addrModalTitle').textContent = id ? 'Edit Address' : 'Add New Address';
     if (id) {
       const a = addresses.find(x => x.id === id);
       if (a) {
@@ -929,23 +1162,27 @@
         document.getElementById('addr-city').value     = a.city     || '';
         document.getElementById('addr-pincode').value  = a.pincode  || '';
         document.getElementById('addr-type').value     = a.addressType || 'Home';
-        // Set state dropdown
         const sel = document.getElementById('addr-state');
-        for (const opt of sel.options) {
-          if (opt.value === a.state || opt.text === a.state) { sel.value = opt.value; break; }
-        }
+        for (const opt of sel.options) { if (opt.value === a.state || opt.text === a.state) { sel.value = opt.value; break; } }
       }
     }
     document.getElementById('addrModal').classList.add('open');
     setTimeout(() => document.getElementById('addr-fullName').focus(), 300);
   }
 
-  function closeAddressModal() {
-    document.getElementById('addrModal').classList.remove('open');
-    editingAddrId = null;
-  }
+  function closeAddressModal() { document.getElementById('addrModal').classList.remove('open'); editingAddrId = null; }
 
+  /* ── Save address with full inline validation ── */
   async function saveAddress() {
+    // Run all validations and collect results
+    const v1 = validateAddrField('addr-fullName', 'err-addr-fullName', 'Full name is required.');
+    const v2 = validatePhone();
+    const v3 = validateAddrField('addr-line1', 'err-addr-line1', 'Address line 1 is required.');
+    const v4 = validateAddrField('addr-city', 'err-addr-city', 'City is required.');
+    const v5 = validateState();
+    const v6 = validatePincode();
+    if (!v1 || !v2 || !v3 || !v4 || !v5 || !v6) return; // stop if any invalid
+
     const fullName    = document.getElementById('addr-fullName').value.trim();
     const phone       = document.getElementById('addr-phone').value.trim();
     const line1       = document.getElementById('addr-line1').value.trim();
@@ -954,24 +1191,12 @@
     const state       = document.getElementById('addr-state').value;
     const pincode     = document.getElementById('addr-pincode').value.trim();
     const addressType = document.getElementById('addr-type').value;
-    const errEl       = document.getElementById('addrModalError');
 
-    // Client-side validation
-    if (!fullName)                        { errEl.textContent = 'Full name is required.';             errEl.style.display = 'block'; return; }
-    if (!phone || !/^\d{10}$/.test(phone)) { errEl.textContent = 'Enter a valid 10-digit phone number.'; errEl.style.display = 'block'; return; }
-    if (!line1)                           { errEl.textContent = 'Address line 1 is required.';        errEl.style.display = 'block'; return; }
-    if (!city)                            { errEl.textContent = 'City is required.';                   errEl.style.display = 'block'; return; }
-    if (!state)                           { errEl.textContent = 'Please select a state.';              errEl.style.display = 'block'; return; }
-    if (!pincode || !/^\d{6}$/.test(pincode)) { errEl.textContent = 'Enter a valid 6-digit PIN code.'; errEl.style.display = 'block'; return; }
-
-    errEl.style.display = 'none';
     const btn = document.getElementById('saveAddrBtn');
     btn.disabled = true; btn.textContent = 'Saving…';
-
     const payload = { fullName, phone, line1, line2, city, state, pincode, addressType };
     const url    = editingAddrId ? `/profile/address/${editingAddrId}` : '/profile/address';
     const method = editingAddrId ? 'PUT' : 'POST';
-
     try {
       const res  = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
       const data = await res.json();
@@ -981,12 +1206,10 @@
         renderAddresses();
         showToast(editingAddrId ? 'Address updated.' : 'Address saved.', 'success');
       } else {
-        errEl.textContent = data.message || 'Failed to save address.';
-        errEl.style.display = 'block';
+        showToast(data.message || 'Failed to save address.', 'error');
       }
     } catch {
-      errEl.textContent = 'Network error. Please try again.';
-      errEl.style.display = 'block';
+      showToast('Network error. Please try again.', 'error');
     } finally {
       btn.disabled = false; btn.textContent = 'Save Address';
     }

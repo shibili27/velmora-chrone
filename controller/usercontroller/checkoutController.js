@@ -2,7 +2,7 @@ import * as checkoutService from '../../services/checkoutService.js';
 
 export async function getCheckout(req, res) {
   try {
-    const data = await checkoutService.buildCheckoutData(req.session.user, req.session);
+    const data = await checkoutService.buildCheckoutData(req.user._id, req.session);
     res.render('user/checkout', { ...data, paymentMethod: req.session.paymentMethod || 'COD' });
   } catch (err) {
     if (err.message === 'EMPTY_CART' || err.message === 'INVALID_CART') {
@@ -16,19 +16,24 @@ export async function getCheckout(req, res) {
 
 export async function placeOrder(req, res) {
   try {
-    const result = await checkoutService.placeOrder(req.session.user, { addressId: req.body.addressId, session: req.session });
+    const result = await checkoutService.placeOrder(req.user._id, {
+      addressId: req.body.addressId,
+      session  : req.session,
+    });
     return res.status(201).json({ success: true, ...result });
   } catch (err) {
     console.error('[Checkout] placeOrder error:', err);
-    return res.status(err.status || 500).json({ success: false, message: err.message || 'Failed to place order. Please try again.', stockErrors: err.stockErrors });
+    return res.status(err.status || 500).json({
+      success     : false,
+      message     : err.message || 'Failed to place order. Please try again.',
+      stockErrors : err.stockErrors,
+    });
   }
 }
 
-// --- Wallet ---------------------------------------------------------------
-
 export async function placeOrderWithWallet(req, res) {
   try {
-    const result = await checkoutService.placeOrderWithWallet(req.session.user, {
+    const result = await checkoutService.placeOrderWithWallet(req.user._id, {
       addressId: req.body.addressId,
       session  : req.session,
     });
@@ -36,73 +41,86 @@ export async function placeOrderWithWallet(req, res) {
   } catch (err) {
     console.error('[Checkout] placeOrderWithWallet error:', err);
     return res.status(err.status || 500).json({
-      success    : false,
-      message    : err.message || 'Failed to place order. Please try again.',
-      stockErrors: err.stockErrors,
+      success     : false,
+      message     : err.message || 'Failed to place order. Please try again.',
+      stockErrors : err.stockErrors,
     });
   }
 }
 
-// --- Razorpay -------------------------------------------------------------
-
 export async function createRazorpayOrder(req, res) {
   try {
-    const result = await checkoutService.createRazorpayCheckoutOrder(req.session.user, {
+    const result = await checkoutService.createRazorpayCheckoutOrder(req.user._id, {
       addressId: req.body.addressId,
       session  : req.session,
     });
     return res.status(201).json({ success: true, ...result });
   } catch (err) {
     console.error('[Checkout] createRazorpayOrder error:', err);
-    return res.status(err.status || 500).json({ success: false, message: err.message || 'Could not initiate payment. Please try again.', stockErrors: err.stockErrors });
+    return res.status(err.status || 500).json({
+      success     : false,
+      message     : err.message || 'Could not initiate payment. Please try again.',
+      stockErrors : err.stockErrors,
+    });
   }
 }
 
 export async function verifyRazorpayPayment(req, res) {
   try {
     const { orderId, razorpayOrderId, razorpayPaymentId, razorpaySignature } = req.body;
-    const result = await checkoutService.verifyRazorpayCheckoutPayment(req.session.user, {
-      orderId, razorpayOrderId, razorpayPaymentId, razorpaySignature, session: req.session,
+    const result = await checkoutService.verifyRazorpayCheckoutPayment(req.user._id, {
+      orderId,
+      razorpayOrderId,
+      razorpayPaymentId,
+      razorpaySignature,
+      session: req.session,
     });
     return res.status(200).json({ success: true, ...result });
   } catch (err) {
     console.error('[Checkout] verifyRazorpayPayment error:', err);
     return res.status(err.status || 500).json({
-      success: false,
-      message: err.message || 'Payment verification failed.',
-      orderId: err.orderId, orderNumber: err.orderNumber,
+      success     : false,
+      message     : err.message || 'Payment verification failed.',
+      orderId     : err.orderId,
+      orderNumber : err.orderNumber,
     });
   }
 }
 
 export async function markRazorpayFailed(req, res) {
   try {
-    const result = await checkoutService.markRazorpayPaymentFailed(req.session.user, {
+    const result = await checkoutService.markRazorpayPaymentFailed(req.user._id, {
       orderId: req.body.orderId,
       reason : req.body.reason,
     });
     return res.status(200).json({ success: true, ...result });
   } catch (err) {
     console.error('[Checkout] markRazorpayFailed error:', err);
-    return res.status(err.status || 500).json({ success: false, message: err.message || 'Server error.' });
+    return res.status(err.status || 500).json({
+      success: false,
+      message: err.message || 'Server error.',
+    });
   }
 }
 
 export async function retryRazorpayPayment(req, res) {
   try {
-    const result = await checkoutService.retryRazorpayPayment(req.session.user, {
+    const result = await checkoutService.retryRazorpayPayment(req.user._id, {
       orderId: req.params.orderId || req.body.orderId,
     });
     return res.status(200).json({ success: true, ...result });
   } catch (err) {
     console.error('[Checkout] retryRazorpayPayment error:', err);
-    return res.status(err.status || 500).json({ success: false, message: err.message || 'Server error.' });
+    return res.status(err.status || 500).json({
+      success: false,
+      message: err.message || 'Server error.',
+    });
   }
 }
 
 export async function getOrderSuccess(req, res) {
   try {
-    const order = await checkoutService.getOrderSuccess(req.query.orderId, req.session.user);
+    const order = await checkoutService.getOrderSuccess(req.query.orderId, req.user._id);
     return res.render('user/orderSuccess', { order });
   } catch (err) {
     res.redirect('/');
@@ -111,21 +129,19 @@ export async function getOrderSuccess(req, res) {
 
 export async function getOrderFailure(req, res) {
   try {
-    const order = await checkoutService.getOrderFailure(req.query.orderId, req.session.user);
+    const order = await checkoutService.getOrderFailure(req.query.orderId, req.user._id);
     return res.render('user/orderFailure', { order });
   } catch (err) {
     res.redirect('/checkout');
   }
 }
 
-// --- Coupons ---------------------------------------------------------------
-
 export async function applyCoupon(req, res) {
   try {
     const { code } = req.body;
     if (!code) return res.status(400).json({ success: false, message: 'Please enter a coupon code.' });
 
-    const result = await checkoutService.applyCouponToSession(req.session.user, code, req.session);
+    const result = await checkoutService.applyCouponToSession(req.user._id, code, req.session);
     return res.status(200).json({
       success       : true,
       message       : result.message,
@@ -136,13 +152,16 @@ export async function applyCoupon(req, res) {
     });
   } catch (err) {
     console.error('[Checkout] applyCoupon error:', err);
-    return res.status(err.status || 500).json({ success: false, message: err.message || 'Could not apply coupon.' });
+    return res.status(err.status || 500).json({
+      success: false,
+      message: err.message || 'Could not apply coupon.',
+    });
   }
 }
 
 export async function removeCoupon(req, res) {
   try {
-    const result = await checkoutService.removeCouponFromSession(req.session.user, req.session);
+    const result = await checkoutService.removeCouponFromSession(req.user._id, req.session);
     return res.status(200).json({
       success : true,
       message : result.message,
@@ -151,6 +170,9 @@ export async function removeCoupon(req, res) {
     });
   } catch (err) {
     console.error('[Checkout] removeCoupon error:', err);
-    return res.status(err.status || 500).json({ success: false, message: err.message || 'Could not remove coupon.' });
+    return res.status(err.status || 500).json({
+      success: false,
+      message: err.message || 'Could not remove coupon.',
+    });
   }
 }

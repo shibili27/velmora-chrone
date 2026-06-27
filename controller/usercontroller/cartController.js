@@ -1,4 +1,5 @@
 import * as cartService from '../../services/cartService.js';
+import { clearCouponIfCartChanged } from '../../services/checkoutService.js';
 
 export const getCart = async (req, res) => {
   try {
@@ -31,6 +32,10 @@ export const addToCart = async (req, res) => {
     if (!userId) return res.status(401).json({ success: false, message: 'Please login to continue', redirectUrl: '/login' });
 
     const cartCount = await cartService.addItemToCart(userId, req.body.productId, req.body.quantity, req.body.variantName || null);
+
+    // Cart changed — clear any applied coupon so it doesn't carry over to checkout
+    clearCouponIfCartChanged(req.session);
+
     res.json({ success: true, message: 'Added to cart', cartCount });
   } catch (err) {
     console.error('[addToCart]', err);
@@ -42,6 +47,10 @@ export const updateCartItem = async (req, res) => {
   try {
     const userId = req.session.user || req.user?._id;
     const result = await cartService.updateItem(userId, req.params.itemId, req.body.action);
+
+    // Cart quantity changed — clear any applied coupon
+    clearCouponIfCartChanged(req.session);
+
     res.json({ success: true, ...result });
   } catch (err) {
     console.error('[updateCartItem]', err);
@@ -53,6 +62,10 @@ export const removeFromCart = async (req, res) => {
   try {
     const userId = req.session.user || req.user?._id;
     const result = await cartService.removeItem(userId, req.params.itemId);
+
+    // Cart changed — clear any applied coupon
+    clearCouponIfCartChanged(req.session);
+
     res.json({ success: true, ...result });
   } catch (err) {
     console.error('[removeFromCart]', err);
@@ -64,6 +77,10 @@ export const clearCart = async (req, res) => {
   try {
     const userId = req.session.user || req.user?._id;
     await cartService.clearUserCart(userId);
+
+    // Cart cleared — clear any applied coupon
+    clearCouponIfCartChanged(req.session);
+
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Failed to clear cart' });

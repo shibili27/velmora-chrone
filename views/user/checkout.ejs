@@ -408,7 +408,6 @@
     <div class="section-block reveal">
       <div class="section-label">Payment Method</div>
 
-      <!-- COD -->
       <div class="payment-box" id="payCod" onclick="selectPaymentMethod('COD')" style="cursor:pointer">
         <div class="payment-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
@@ -422,7 +421,6 @@
         </div>
       </div>
 
-      <!-- RAZORPAY -->
       <div class="payment-box" id="payRazorpay" onclick="selectPaymentMethod('Razorpay')" style="cursor:pointer">
         <div class="payment-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
@@ -436,7 +434,6 @@
         </div>
       </div>
 
-      <!-- WALLET -->
       <%
         const walletSufficient = walletBalance >= pricing.grandTotal;
       %>
@@ -895,7 +892,7 @@
     }
   }
 
-  // ── Payment method selection ────────────────────────────────────────────
+  // ── Payment method selection ─────────────────────────────────────────────
   let selectedPaymentMethod = 'COD';
 
   function selectPaymentMethod(method) {
@@ -906,7 +903,7 @@
     const labels = { COD: 'COD', Razorpay: 'Online', Wallet: 'Wallet' };
     document.getElementById('placeOrderMethodLabel').textContent = labels[method] || method;
   }
-  selectPaymentMethod('COD'); // default
+  selectPaymentMethod('COD');
 
   function showStockError(message) {
     const banner = document.getElementById('stockErrorBanner');
@@ -938,7 +935,7 @@
       '</span>';
   }
 
-  // ── COD ─────────────────────────────────────────────────────────────────
+  // ── COD ──────────────────────────────────────────────────────────────────
   async function placeCodOrder(addressId) {
     const btn = document.getElementById('placeOrderBtn');
     btn.disabled = true; btn.textContent = 'Processing…';
@@ -965,7 +962,7 @@
     const btn = document.getElementById('placeOrderBtn');
     btn.disabled = true; btn.textContent = 'Processing…';
     try {
-      const res  = await fetch('/checkout/place-order-wallet', {
+      const res  = await fetch('/checkout/wallet/place-order', {  /* ← FIXED */
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ addressId }),
       });
@@ -982,7 +979,7 @@
     }
   }
 
-  // ── Razorpay ─────────────────────────────────────────────────────────────
+  // ── Razorpay ──────────────────────────────────────────────────────────────
   async function placeRazorpayOrder(addressId) {
     const btn = document.getElementById('placeOrderBtn');
     btn.disabled = true; btn.textContent = 'Initiating payment…';

@@ -308,7 +308,7 @@
                 <th>Type</th>
                 <th>Value</th>
                 <th>Min Order</th>
-                <th>Cap</th>
+                <th>Max Cap</th>
                 <th>Per User</th>
                 <th>Usage</th>
                 <th>Expires</th>
@@ -330,8 +330,10 @@
                   <td>
                     <% if (c.discountType === 'flat') { %>
                       <span class="badge badge--flat">Flat ₹</span>
-                    <% } else { %>
+                    <% } else if (c.discountType === 'percentage') { %>
                       <span class="badge badge--percent">Percent %</span>
+                    <% } else { %>
+                      <span class="badge badge--ship">Free Ship</span>
                     <% } %>
                   </td>
 
@@ -339,31 +341,33 @@
                   <td style="font-weight:500">
                     <% if (c.discountType === 'flat') { %>
                       ₹<%= c.discountValue.toLocaleString('en-IN') %>
-                    <% } else { %>
+                    <% } else if (c.discountType === 'percentage') { %>
                       <%= c.discountValue %>%
-                    <% } %>
-                  </td>
-
-                  <!-- Min order -->
-                  <td>
-                    <% if (c.minOrderAmount > 0) { %>
-                      ₹<%= c.minOrderAmount.toLocaleString('en-IN') %>
                     <% } else { %>
                       <span style="color:var(--text-light)">—</span>
                     <% } %>
                   </td>
 
-                  <!-- Max discount cap -->
+                  <!-- Min order — FIX: was c.minOrderAmount, schema field is minOrderValue -->
                   <td>
-                    <% if (c.maxDiscount) { %>
-                      ₹<%= c.maxDiscount.toLocaleString('en-IN') %>
+                    <% if (c.minOrderValue > 0) { %>
+                      ₹<%= c.minOrderValue.toLocaleString('en-IN') %>
+                    <% } else { %>
+                      <span style="color:var(--text-light)">—</span>
+                    <% } %>
+                  </td>
+
+                  <!-- Max discount cap — FIX: was c.maxDiscount, schema field is maxDiscountCap -->
+                  <td>
+                    <% if (c.discountType === 'percentage' && c.maxDiscountCap) { %>
+                      ₹<%= c.maxDiscountCap.toLocaleString('en-IN') %>
                     <% } else { %>
                       <span style="color:var(--text-light)">—</span>
                     <% } %>
                   </td>
 
                   <!-- Per user limit -->
-                  <td style="text-align:center"><%= c.perUserLimit %></td>
+                  <td style="text-align:center"><%= c.perUserLimit || '—' %></td>
 
                   <!-- Usage count -->
                   <td>
@@ -508,19 +512,24 @@
           <input class="form-input" type="number" name="discountValue" id="discountValue"
             placeholder="0" min="0" step="0.01"/>
         </div>
+        <!-- FIX: name was "maxDiscount" — controller reads "maxDiscountCap" -->
         <div class="form-group" id="capGroup" style="display:none">
           <label class="form-label">Max Discount Cap (₹)</label>
-          <input class="form-input" type="number" name="maxDiscount"
+          <input class="form-input" type="number" name="maxDiscountCap"
+            id="maxDiscountCap"
             placeholder="Leave blank for no cap" min="0" step="0.01"/>
           <p class="form-hint">Max rupee amount the % discount can reach.</p>
         </div>
       </div>
 
       <div class="form-row">
+        <!-- FIX: name was "minOrderAmount" — controller reads "minOrderValue" -->
         <div class="form-group">
-          <label class="form-label">Min Order Amount (₹)</label>
-          <input class="form-input" type="number" name="minOrderAmount"
-            placeholder="0" min="0" step="0.01" value="0"/>
+          <label class="form-label">Min Cart Value (₹)</label>
+          <input class="form-input" type="number" name="minOrderValue"
+            id="minOrderValue"
+            placeholder="0 — no minimum" min="0" step="0.01" value="0"/>
+          <p class="form-hint">Coupon won't apply below this cart total.</p>
         </div>
         <div class="form-group">
           <label class="form-label">Expiry Date *</label>
@@ -614,52 +623,58 @@
     const capGroup = document.getElementById('capGroup');
 
     if (type === 'flat') {
-      label.textContent = 'Discount Value (₹) *';
+      label.textContent    = 'Discount Value (₹) *';
       valInput.placeholder = '200';
-      valInput.max = '';
+      valInput.max         = '';
       capGroup.style.display = 'none';
     } else if (type === 'percentage') {
-      label.textContent = 'Discount Value (%) *';
+      label.textContent    = 'Discount Value (%) *';
       valInput.placeholder = '10';
-      valInput.max = '100';
+      valInput.max         = '100';
       capGroup.style.display = 'block';
     }
   }
 
   // ── Client-side validation ────────────────────────────────────────────────
   function validateCreate() {
-    const errEl   = document.getElementById('createModalError');
-    const code    = document.getElementById('couponCode').value.trim();
-    const type    = document.getElementById('discountType').value;
-    const val     = parseFloat(document.getElementById('discountValue').value);
-    const expiry  = document.getElementById('expiryDate').value;
+    const errEl  = document.getElementById('createModalError');
+    const code   = document.getElementById('couponCode').value.trim();
+    const type   = document.getElementById('discountType').value;
+    const val    = parseFloat(document.getElementById('discountValue').value);
+    const expiry = document.getElementById('expiryDate').value;
+    const minVal = parseFloat(document.getElementById('minOrderValue').value);
+    const capEl  = document.getElementById('maxDiscountCap');
+    const cap    = capEl.value !== '' ? parseFloat(capEl.value) : null;
 
     errEl.classList.remove('show');
 
     if (!code || !/^[A-Z0-9_-]{3,20}$/i.test(code)) {
       errEl.textContent = 'Enter a valid coupon code (3–20 chars, letters/numbers/_ /-).';
-      errEl.classList.add('show');
-      return false;
+      errEl.classList.add('show'); return false;
     }
     if (!type) {
       errEl.textContent = 'Please select a discount type.';
-      errEl.classList.add('show');
-      return false;
+      errEl.classList.add('show'); return false;
     }
     if (isNaN(val) || val <= 0) {
       errEl.textContent = 'Enter a positive discount value.';
-      errEl.classList.add('show');
-      return false;
+      errEl.classList.add('show'); return false;
     }
     if (type === 'percentage' && val > 100) {
       errEl.textContent = 'Percentage discount cannot exceed 100.';
-      errEl.classList.add('show');
-      return false;
+      errEl.classList.add('show'); return false;
+    }
+    if (!isNaN(minVal) && minVal < 0) {
+      errEl.textContent = 'Minimum cart value cannot be negative.';
+      errEl.classList.add('show'); return false;
+    }
+    if (type === 'percentage' && cap !== null && (isNaN(cap) || cap <= 0)) {
+      errEl.textContent = 'Max discount cap must be a positive number.';
+      errEl.classList.add('show'); return false;
     }
     if (!expiry || new Date(expiry) <= new Date()) {
       errEl.textContent = 'Expiry date must be a future date.';
-      errEl.classList.add('show');
-      return false;
+      errEl.classList.add('show'); return false;
     }
     return true;
   }
