@@ -9,33 +9,26 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --teal:       #2d8c84;
-      --teal-dark:  #1f6e67;
-      --teal-light: #e8f4f3;
-      --sidebar-w:  220px;
-      --bg:         #f2f4f3;
-      --white:      #ffffff;
-      --border:     #e2e6e4;
-      --text:       #1a1f1e;
-      --text-mid:   #5a6461;
-      --text-light: #9aa8a5;
-      --green:      #16a34a;
-      --green-bg:   #dcfce7;
-      --red:        #dc2626;
-      --red-bg:     #fee2e2;
+      --teal: #2d8c84; --teal-dark: #1f6e67; --teal-light: #e8f4f3;
+      --sidebar-w: 220px; --bg: #f2f4f3; --white: #ffffff;
+      --border: #e2e6e4; --text: #1a1f1e; --text-mid: #5a6461; --text-light: #9aa8a5;
+      --green: #16a34a; --green-bg: #dcfce7; --red: #dc2626; --red-bg: #fee2e2;
+      --blue: #2563eb; --blue-bg: #dbeafe; --orange: #d97706; --orange-bg: #fef3c7;
+      --purple: #7c3aed; --purple-bg: #ede9fe;
     }
     html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--bg); color: var(--text); }
     .layout { display: flex; min-height: 100vh; }
 
+    /* ── Sidebar ── */
     .sidebar { width: var(--sidebar-w); background: var(--white); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; }
     .sidebar__brand { padding: 24px 20px 18px; border-bottom: 1px solid var(--border); }
     .sidebar__brand-name { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 600; letter-spacing: 0.06em; color: var(--text); line-height: 1.2; }
-    .sidebar__brand-sub  { font-size: 9px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-light); margin-top: 3px; }
+    .sidebar__brand-sub { font-size: 9px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-light); margin-top: 3px; }
     .sidebar__nav { flex: 1; padding: 14px 0; overflow-y: auto; }
     .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 20px; font-size: 13px; font-weight: 500; color: var(--text-mid); text-decoration: none; transition: background 0.15s, color 0.15s; }
-    .nav-item:hover  { background: var(--teal-light); color: var(--teal); }
+    .nav-item:hover { background: var(--teal-light); color: var(--teal); }
     .nav-item.active { background: var(--teal-light); color: var(--teal); border-right: 3px solid var(--teal); }
-    .nav-item svg    { width: 16px; height: 16px; flex-shrink: 0; }
+    .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
     .sidebar__footer { padding: 16px 20px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
     .avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--teal); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 13px; font-weight: 600; flex-shrink: 0; }
     .sidebar__footer-info { overflow: hidden; flex: 1; }
@@ -45,47 +38,53 @@
     .btn-logout:hover { background: var(--red); color: #fff; border-color: var(--red); }
     .btn-logout svg { width: 14px; height: 14px; flex-shrink: 0; }
 
+    /* ── Main ── */
     .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
     .topbar { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 32px; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
     .topbar__title { font-size: 13px; font-weight: 500; color: var(--text-mid); letter-spacing: 0.04em; }
-    .content { padding: 28px 32px; flex: 1; max-width: 480px; }
+    .content { padding: 32px; flex: 1; max-width: 560px; }
+    .footer { text-align: center; padding: 20px; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); border-top: 1px solid var(--border); }
 
-    .page-header { margin-bottom: 18px; }
-    .page-header__title { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; color: var(--text); }
-    .page-header__sub   { font-size: 11.5px; color: var(--text-light); margin-top: 2px; }
+    /* ── Flash ── */
+    .flash { padding: 12px 16px; border-radius: 4px; font-size: 13px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+    .flash svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .flash--error   { background: #fdecea; color: #b00020; border: 1px solid #f5c6cb; }
+    .flash--success { background: #e8f5e9; color: #1b5e20; border: 1px solid #c8e6c9; }
+    .flash__close { margin-left: auto; background: none; border: none; cursor: pointer; color: inherit; font-size: 16px; padding: 0 4px; }
 
-    .flash { padding: 9px 14px; border-radius: 6px; font-size: 12px; font-weight: 500; margin-bottom: 16px; display: flex; align-items: center; gap: 7px; }
-    .flash svg { width: 13px; height: 13px; flex-shrink: 0; }
-    .flash--success { background: var(--green-bg); color: var(--green); border: 1px solid #bbf7d0; }
-    .flash--error   { background: var(--red-bg);   color: var(--red);   border: 1px solid #fecaca; }
+    /* ── Page header ── */
+    .page-header { margin-bottom: 24px; }
+    .page-header h1 { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; color: var(--text); }
+    .page-header p  { font-size: 13px; color: var(--text-mid); margin-top: 4px; }
 
+    /* ── Card ── */
     .card { background: var(--white); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
-    .card__header { padding: 12px 18px; border-bottom: 1px solid var(--border); }
-    .card__title  { font-size: 11px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text-mid); }
-    .card__body   { padding: 18px; display: flex; flex-direction: column; gap: 14px; }
+    .card__header { padding: 14px 24px; border-bottom: 1px solid var(--border); }
+    .card__title  { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-mid); }
+    .card__body   { padding: 24px; display: flex; flex-direction: column; gap: 18px; }
 
-    .field { display: flex; flex-direction: column; gap: 5px; }
-    .field label { font-size: 10.5px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-mid); }
-    .field-hint  { font-size: 10.5px; color: var(--text-light); line-height: 1.4; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-mid); }
+    .field-hint  { font-size: 11px; color: var(--text-light); line-height: 1.4; }
     .field-input-wrap { position: relative; }
     .field-input-wrap input {
-      width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 5px;
+      width: 100%; height: 38px; padding: 0 12px; border: 1px solid var(--border); border-radius: 4px;
       font-family: 'Jost', sans-serif; font-size: 13px; color: var(--text);
-      background: var(--bg); outline: none; transition: border-color 0.15s;
+      background: #fff; outline: none; transition: border-color 0.2s;
     }
-    .field-input-wrap input:focus { border-color: var(--teal); background: var(--white); }
-    .field-input-wrap .suffix, .field-input-wrap .prefix {
+    .field-input-wrap input:focus { border-color: var(--teal); }
+    .field-input-wrap .prefix {
       position: absolute; top: 50%; transform: translateY(-50%);
       font-size: 12.5px; color: var(--text-light); font-weight: 500; pointer-events: none;
+      left: 12px;
     }
-    .field-input-wrap .suffix { right: 12px; }
-    .field-input-wrap .prefix { left: 12px; }
     .field-input-wrap.has-prefix input { padding-left: 26px; }
-    .field-input-wrap.has-suffix input { padding-right: 28px; }
 
-    .toggle-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: #f8faf9; border: 1px solid var(--border); border-radius: 6px; padding: 11px 13px; }
-    .toggle-row__label { font-size: 12.5px; font-weight: 600; color: var(--text); }
-    .toggle-row__sub   { font-size: 10.5px; color: var(--text-light); margin-top: 1px; }
+    .toggle-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: #f8faf9; border: 1px solid var(--border); border-radius: 6px; padding: 13px 16px; }
+    .toggle-row__label { font-size: 13px; font-weight: 600; color: var(--text); }
+    .toggle-row__sub   { font-size: 11px; color: var(--text-light); margin-top: 1px; }
     .switch { position: relative; display: inline-block; width: 36px; height: 20px; flex-shrink: 0; }
     .switch input { opacity: 0; width: 0; height: 0; position: absolute; }
     .switch__slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: #cbd5d1; border-radius: 20px; transition: background 0.2s; }
@@ -93,35 +92,22 @@
     .switch input:checked + .switch__slider { background: var(--green); }
     .switch input:checked + .switch__slider::before { transform: translateX(16px); }
 
-    /* Button — explicit fixed sizing on every dimension that could stretch */
+    .divider { height: 1px; background: var(--border); }
+
     .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      align-self: flex-start;
-      width: auto;
-      height: 36px;
-      padding: 0 16px;
-      border-radius: 5px;
-      font-family: 'Jost', sans-serif;
-      font-size: 12.5px;
-      font-weight: 600;
-      line-height: 1;
-      cursor: pointer;
-      border: none;
-      transition: background 0.15s;
-      text-decoration: none;
-      flex: none;
+      display: inline-flex; align-items: center; gap: 6px;
+      align-self: flex-start; height: 38px; padding: 0 16px;
+      border-radius: 4px; font-family: 'Jost', sans-serif; font-size: 12px;
+      font-weight: 600; letter-spacing: 0.06em; cursor: pointer; border: none;
+      transition: background 0.15s; text-decoration: none; white-space: nowrap;
     }
     .btn--teal { background: var(--teal); color: #fff; }
     .btn--teal:hover { background: var(--teal-dark); }
-    .btn svg { width: 13px; height: 13px; flex: none; display: block; }
+    .btn svg { width: 14px; height: 14px; flex-shrink: 0; }
 
-    .preview-box { background: var(--teal-light); border: 1px solid #bfe3e0; border-radius: 6px; padding: 11px 13px; font-size: 11.5px; color: var(--teal-dark); line-height: 1.55; }
-    .preview-box strong { font-weight: 700; }
-
-    .page-footer { text-align: center; padding: 18px 32px; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); border-top: 1px solid var(--border); }
+    /* Preview box shows live values as fields change */
+    .preview-box { background: var(--teal-light); border: 1px solid #b2deda; border-radius: 6px; padding: 13px 16px; font-size: 12.5px; color: var(--teal-dark); line-height: 1.6; }
+    .preview-box strong { font-weight: 700; color: var(--teal-dark); }
   </style>
 </head>
 <body>
@@ -157,6 +143,10 @@
         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
         Coupons
       </a>
+      <a href="/admin/offers" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/></svg>
+        Offers
+      </a>
       <a href="/admin/categories" class="nav-item">
         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
         Categories
@@ -164,10 +154,6 @@
       <a href="/admin/brands" class="nav-item">
         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 4H7a2 2 0 01-2-2V6a2 2 0 012-2h5l2 2h3a2 2 0 012 2v12a2 2 0 01-2 2z"/></svg>
         Brands
-      </a>
-      <a href="/admin/offers" class="nav-item">
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
-        Offers
       </a>
       <a href="/admin/refunds" class="nav-item">
         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
@@ -180,6 +166,10 @@
       <a href="/admin/referrals" class="nav-item active">
         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
         Referral
+      </a>
+      <a href="/admin/sales-report" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+        Sales Report
       </a>
     </nav>
     <div class="sidebar__footer">
@@ -205,18 +195,20 @@
         <div class="flash flash--success">
           <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
           <%= success[0] %>
+          <button class="flash__close" onclick="this.parentElement.remove()">×</button>
         </div>
       <% } %>
       <% if (locals.error && error.length > 0) { %>
         <div class="flash flash--error">
-          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
           <%= error[0] %>
+          <button class="flash__close" onclick="this.parentElement.remove()">×</button>
         </div>
       <% } %>
 
       <div class="page-header">
-        <div class="page-header__title">Referral Program</div>
-        <div class="page-header__sub">Discount for new customers, and the reward existing customers earn</div>
+        <h1>Referral Program</h1>
+        <p>Set wallet rewards for both the referrer and the referred user.</p>
       </div>
 
       <form method="POST" action="/admin/referrals/update">
@@ -224,6 +216,7 @@
           <div class="card__header"><span class="card__title">Settings</span></div>
           <div class="card__body">
 
+            <!-- Toggle -->
             <div class="toggle-row">
               <div>
                 <div class="toggle-row__label">Referral program enabled</div>
@@ -235,42 +228,66 @@
               </label>
             </div>
 
-            <div class="field">
-              <label>Referee Discount</label>
-              <div class="field-input-wrap has-suffix">
-                <input type="number" name="refereeDiscountPercentage" min="0" max="100" step="0.1"
-                       value="<%= settings.refereeDiscountPercentage %>" required/>
-                <span class="suffix">%</span>
+            <div class="divider"></div>
+
+            <!-- Two reward fields side by side -->
+            <div class="two-col">
+              <div class="field">
+                <label>Referrer Reward</label>
+                <div class="field-input-wrap has-prefix">
+                  <span class="prefix">₹</span>
+                  <input type="number" name="referrerRewardAmount" id="referrerAmt"
+                         min="0" step="1"
+                         value="<%= settings.referrerRewardAmount %>" required
+                         oninput="updatePreview()"/>
+                </div>
+                <div class="field-hint">Credited to the person who shared their code.</div>
               </div>
-              <div class="field-hint">Applied to a referred customer's first order — stacks on top of any product/category offer.</div>
+
+              <div class="field">
+                <label>Referee Reward</label>
+                <div class="field-input-wrap has-prefix">
+                  <span class="prefix">₹</span>
+                  <input type="number" name="refereeRewardAmount" id="refereeAmt"
+                         min="0" step="1"
+                         value="<%= settings.refereeRewardAmount %>" required
+                         oninput="updatePreview()"/>
+                </div>
+                <div class="field-hint">Credited to the new user who signed up with a code.</div>
+              </div>
             </div>
 
-            <div class="field">
-              <label>Referrer Reward</label>
-              <div class="field-input-wrap has-prefix">
-                <span class="prefix">₹</span>
-                <input type="number" name="referrerRewardAmount" min="0" step="1"
-                       value="<%= settings.referrerRewardAmount %>" required/>
-              </div>
-              <div class="field-hint">Credited to the referrer's wallet once their friend's first order is placed.</div>
-            </div>
-
-            <div class="preview-box">
-              New signup with a code gets <strong><%= settings.refereeDiscountPercentage %>% off</strong> their first order.
-              The referrer then receives <strong>₹<%= settings.referrerRewardAmount.toLocaleString('en-IN') %></strong> in their wallet.
+            <!-- Live preview -->
+            <div class="preview-box" id="previewBox">
+              When a referred user places their first order —
+              the <strong>referrer</strong> receives
+              <strong id="previewReferrer">₹<%= settings.referrerRewardAmount.toLocaleString('en-IN') %></strong>
+              and the <strong>new user</strong> receives
+              <strong id="previewReferee">₹<%= settings.refereeRewardAmount.toLocaleString('en-IN') %></strong>
+              in their wallets.
             </div>
 
             <button type="submit" class="btn btn--teal">
               <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
               Save settings
             </button>
+
           </div>
         </div>
       </form>
 
     </div>
-    <footer class="page-footer">© 2026 Velmora Chroné. All Rights Reserved. Admin Panel.</footer>
+    <footer class="footer">© 2026 Velmora Chroné. Admin Panel.</footer>
   </div>
 </div>
+
+<script>
+  function updatePreview() {
+    const r1 = parseInt(document.getElementById('referrerAmt').value) || 0;
+    const r2 = parseInt(document.getElementById('refereeAmt').value)  || 0;
+    document.getElementById('previewReferrer').textContent = '₹' + r1.toLocaleString('en-IN');
+    document.getElementById('previewReferee').textContent  = '₹' + r2.toLocaleString('en-IN');
+  }
+</script>
 </body>
 </html>

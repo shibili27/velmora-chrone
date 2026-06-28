@@ -9,7 +9,7 @@
   <title>Velmora Chroné — Collection</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@200;300;400;500&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -121,18 +121,11 @@
 
     /* ── SIDEBAR ── */
     .filters-sidebar { width:210px; flex-shrink:0; position:sticky; top:70px; }
-    .filter-toggle-btn {
-      width: 100%; display: flex; align-items: center; justify-content: space-between;
-      padding: 0.72rem 0.95rem; background: rgba(14,13,11,0.7);
-      border: 1px solid rgba(201,169,110,0.14); border-radius: 8px;
-      cursor: pointer; margin-bottom: 8px;
-      transition: background 0.22s, border-color 0.22s, box-shadow 0.22s;
-      box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 2px 8px rgba(0,0,0,0.35);
-    }
-    .filter-toggle-btn:hover { background: rgba(201,169,110,0.06); border-color: rgba(201,169,110,0.28); box-shadow: 0 0 0 3px rgba(201,169,110,0.04), 0 1px 0 rgba(255,255,255,0.04) inset; }
+    .filter-toggle-btn { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 0.72rem 0.95rem; background: rgba(14,13,11,0.7); border: 1px solid rgba(201,169,110,0.14); border-radius: 8px; cursor: pointer; margin-bottom: 8px; transition: background 0.22s, border-color 0.22s, box-shadow 0.22s; box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 2px 8px rgba(0,0,0,0.35); }
+    .filter-toggle-btn:hover { background: rgba(201,169,110,0.06); border-color: rgba(201,169,110,0.28); }
     .filter-toggle-btn.active { background: rgba(201,169,110,0.07); border-color: rgba(201,169,110,0.32); }
     .filter-toggle-label { display: flex; align-items: center; gap: 7px; font-family: 'Jost', sans-serif; font-size: 0.44rem; font-weight: 400; letter-spacing: 0.26em; text-transform: uppercase; color: rgba(201,169,110,0.6); }
-    .filter-dot { width:4px; height:4px; border-radius:50%; background:#c9a96e; display:none; flex-shrink:0; box-shadow:0 0 5px rgba(201,169,110,0.55); }
+    .filter-dot { width:4px; height:4px; border-radius:50%; background:#c9a96e; display:none; flex-shrink:0; }
     .filter-dot.show { display:inline-block; }
     .filter-toggle-chevron { color:rgba(201,169,110,0.3); transition:transform 0.32s cubic-bezier(.4,0,.2,1); flex-shrink:0; }
     .filter-toggle-chevron.open { transform:rotate(180deg); }
@@ -155,19 +148,9 @@
     .brand-item { display:flex; align-items:center; gap:7px; font-family:'Jost',sans-serif; font-size:0.65rem; font-weight:300; color:rgba(245,242,235,0.35); cursor:pointer; transition:color 0.2s; padding:2px 0; }
     .brand-item:hover { color:rgba(245,242,235,0.75); }
     .brand-item input[type=radio] { accent-color:#c9a96e; flex-shrink:0; }
-    .btn-apply {
-      width: 100%; padding: 0.65rem 1rem; border: 1px solid rgba(201,169,110,0.35); border-radius: 6px; cursor: pointer;
-      font-family: 'Jost', sans-serif; font-size: 0.42rem; letter-spacing: 0.24em; text-transform: uppercase; font-weight: 400;
-      color: rgba(201,169,110,0.9); background: rgba(201,169,110,0.07);
-      position: relative; overflow: hidden;
-      transition: background 0.22s, border-color 0.22s, color 0.22s, box-shadow 0.22s, transform 0.18s;
-      box-shadow: 0 1px 0 rgba(255,255,255,0.06) inset, 0 3px 12px rgba(0,0,0,0.35); margin-top: 6px;
-    }
-    .btn-apply::before { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(255,255,255,0.06) 0%,transparent 55%); pointer-events:none; border-radius:6px; }
-    .btn-apply::after { content:''; position:absolute; top:0; left:-75%; width:50%; height:100%; background:linear-gradient(90deg,transparent,rgba(255,255,255,0.1),transparent); transform:skewX(-18deg); transition:left 0.5s ease; }
-    .btn-apply:hover { background:rgba(201,169,110,0.14); border-color:rgba(201,169,110,0.6); color:#c9a96e; box-shadow:0 0 0 3px rgba(201,169,110,0.08),0 1px 0 rgba(255,255,255,0.06) inset,0 4px 16px rgba(0,0,0,0.4); transform:translateY(-1px); }
-    .btn-apply:hover::after { left:130%; }
-    .btn-apply:active { transform:translateY(0); background:rgba(201,169,110,0.1); }
+    .btn-apply { width: 100%; padding: 0.65rem 1rem; border: 1px solid rgba(201,169,110,0.35); border-radius: 6px; cursor: pointer; font-family: 'Jost', sans-serif; font-size: 0.42rem; letter-spacing: 0.24em; text-transform: uppercase; font-weight: 400; color: rgba(201,169,110,0.9); background: rgba(201,169,110,0.07); position: relative; overflow: hidden; transition: background 0.22s, border-color 0.22s, color 0.22s, box-shadow 0.22s, transform 0.18s; box-shadow: 0 1px 0 rgba(255,255,255,0.06) inset, 0 3px 12px rgba(0,0,0,0.35); margin-top: 6px; }
+    .btn-apply:hover { background:rgba(201,169,110,0.14); border-color:rgba(201,169,110,0.6); color:#c9a96e; transform:translateY(-1px); }
+    .btn-apply:active { transform:translateY(0); }
     .btn-clear { display:block; text-align:center; font-family:'Jost',sans-serif; font-size:0.38rem; letter-spacing:0.18em; text-transform:uppercase; color:rgba(245,242,235,0.12); text-decoration:none; margin-top:9px; transition:color 0.2s; }
     .btn-clear:hover { color:rgba(201,169,110,0.4); }
 
@@ -193,13 +176,92 @@
     .prod-img { width:100%; height:100%; object-fit:cover; object-position:center; transition:transform 0.6s cubic-bezier(.25,.46,.45,.94); filter:brightness(.88) contrast(1.04) saturate(.8); display:block; }
     .oos-badge { position:absolute; top:8px; left:8px; z-index:10; background:rgba(17,17,16,0.82); border:1px solid rgba(201,169,110,0.35); color:rgba(201,169,110,0.9); font-family:'Jost',sans-serif; font-size:0.36rem; font-weight:400; letter-spacing:0.18em; text-transform:uppercase; padding:3px 7px; border-radius:4px; backdrop-filter:blur(4px); pointer-events:none; }
     .oos-badge.unavailable { border-color:rgba(200,80,60,0.35); color:rgba(220,100,80,0.9); }
-    .prod-body { padding:0.7rem 0.85rem 0.95rem; border-top:1px solid rgba(201,169,110,0.07); flex:1; display:flex; flex-direction:column; }
+
+    /* ── OFFER BADGE ── */
+    .offer-badge {
+      position: absolute; top: 8px; right: 8px; z-index: 10;
+      background: linear-gradient(135deg, rgba(201,169,110,0.18), rgba(201,169,110,0.1));
+      border: 1px solid rgba(201,169,110,0.45);
+      color: #c9a96e;
+      font-family: 'Jost', sans-serif; font-size: 0.34rem;
+      font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase;
+      padding: 3px 7px; border-radius: 4px;
+      backdrop-filter: blur(6px);
+      pointer-events: none;
+    }
+
+    .prod-body { padding:0.75rem 0.9rem 1rem; border-top:1px solid rgba(201,169,110,0.07); flex:1; display:flex; flex-direction:column; }
     .prod-brand { font-family:'Jost',sans-serif; font-size:0.34rem; letter-spacing:0.24em; text-transform:uppercase; color:rgba(201,169,110,0.55); margin-bottom:1px; }
     .prod-cat { font-family:'Jost',sans-serif; font-size:0.34rem; letter-spacing:0.16em; text-transform:uppercase; color:rgba(201,169,110,0.32); margin-bottom:4px; }
-    .prod-name { font-family:'Cormorant Garamond',serif; font-size:0.95rem; font-weight:300; color:#f5f2eb; line-height:1.2; flex:1; margin-bottom:3px; }
-    .prod-price { font-family:'Jost',sans-serif; font-size:0.56rem; color:rgba(201,169,110,0.65); letter-spacing:0.04em; margin-top:auto; padding-top:5px; }
+    .prod-name { font-family:'Cormorant Garamond',serif; font-size:0.95rem; font-weight:300; color:#f5f2eb; line-height:1.2; flex:1; margin-bottom:6px; }
+
+    /* ── PRICE BLOCK — BIG & BOLD ── */
+    .prod-price-wrap {
+      margin-top: auto;
+      padding-top: 8px;
+      border-top: 1px solid rgba(201,169,110,0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    /* discounted / effective price — the hero number */
+    .prod-price-effective {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 600;
+      font-size: 1.75rem;
+      color: #f0d9a8;
+      letter-spacing: 0.01em;
+      line-height: 1;
+    }
+
+    /* row that holds original + save tag side by side */
+    .prod-price-meta {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      flex-wrap: wrap;
+    }
+
+    .prod-price-original {
+      font-family: 'Jost', sans-serif;
+      font-size: 0.6rem;
+      font-weight: 300;
+      color: rgba(245,242,235,0.3);
+      letter-spacing: 0.03em;
+      text-decoration: line-through;
+    }
+
+    .prod-save-tag {
+      font-family: 'Jost', sans-serif;
+      font-size: 0.38rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #0d0b08;
+      background: linear-gradient(135deg, #e0c47e, #c9a96e);
+      padding: 2px 7px;
+      border-radius: 4px;
+      line-height: 1.5;
+    }
+
+    /* non-offer price — same big size so cards are visually consistent */
+    .prod-price {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 600;
+      font-size: 1.75rem;
+      color: rgba(201,169,110,0.85);
+      letter-spacing: 0.01em;
+      line-height: 1;
+      margin-top: auto;
+      padding-top: 8px;
+      border-top: 1px solid rgba(201,169,110,0.08);
+    }
+
     .prod-card.is-oos .prod-img { filter:brightness(.6) contrast(1) saturate(.4); }
-    .prod-card.is-oos .prod-name, .prod-card.is-oos .prod-price { opacity:0.5; }
+    .prod-card.is-oos .prod-name,
+    .prod-card.is-oos .prod-price-wrap,
+    .prod-card.is-oos .prod-price { opacity:0.45; }
 
     .empty-state { padding:5rem 2rem; text-align:center; }
     .empty-state-icon { width:48px; height:48px; margin:0 auto 1.25rem; opacity:0.1; display:block; }
@@ -265,12 +327,17 @@
       .sort-select { height:38px; font-size:0.42rem; padding:0 1.6rem 0 0.65rem; }
       .mob-filter-btn { height:38px; padding:0 0.65rem; font-size:0.44rem; }
       .collection-wrap { padding:1rem 0.85rem 3.5rem; gap:0; }
-      .product-grid { grid-template-columns:repeat(3,1fr); gap:6px; }
-      .prod-body { padding:0.38rem 0.48rem 0.55rem; }
-      .prod-name { font-size:0.72rem; }
-      .prod-price { font-size:0.48rem; padding-top:2px; }
+      .product-grid { grid-template-columns:repeat(2,1fr); gap:8px; }
+      .prod-body { padding:0.5rem 0.6rem 0.7rem; }
+      .prod-name { font-size:0.78rem; }
+      /* mobile price sizes — still large but scaled for narrow cards */
+      .prod-price-effective { font-size:1.35rem; }
+      .prod-price           { font-size:1.35rem; }
+      .prod-price-original  { font-size:0.5rem; }
+      .prod-save-tag        { font-size:0.32rem; padding:2px 5px; }
       .prod-brand,.prod-cat { font-size:0.28rem; letter-spacing:0.12em; }
-      .oos-badge { font-size:0.3rem; padding:2px 5px; top:5px; left:5px; }
+      .oos-badge  { font-size:0.3rem; padding:2px 5px; top:5px; left:5px; }
+      .offer-badge { font-size:0.3rem; padding:2px 5px; top:5px; right:5px; }
       .footer-top { grid-template-columns:1fr 1fr; gap:1.25rem; }
       .footer-bottom { flex-direction:column; align-items:center; text-align:center; }
       .footer-legal { justify-content:center; }
@@ -279,6 +346,8 @@
       .product-grid { gap:5px; }
       .prod-body { padding:0.32rem 0.4rem 0.48rem; }
       .prod-name { font-size:0.65rem; }
+      .prod-price-effective { font-size:1.15rem; }
+      .prod-price           { font-size:1.15rem; }
       .footer-top { grid-template-columns:1fr; }
     }
   </style>
@@ -302,6 +371,10 @@
       <a href="/profile" class="nav-icon-btn" aria-label="Profile">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       </a>
+      <div class="nav-mob-right">
+      <a href="/wallet" class="nav-icon-btn" aria-label="Wallet" >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12V8H6a2 2 0 0 1 0-4h14v4"/><path d="M4 6v12a2 2 0 0 0 2 2h14v-4"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg>
+      </a>
       <a href="/wishlist" class="nav-icon-btn" aria-label="Wishlist">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
         <span class="cart-badge" id="wishBadgeDesktop" style="display:none">0</span>
@@ -320,7 +393,7 @@
       <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
     </div>
     <a href="/home" class="nav-mob-center">Velmora<br/>Chroné</a>
-    <div class="nav-mob-right">
+    
       <a href="/wishlist" class="mob-icon-btn" aria-label="Wishlist">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
         <span class="cart-badge" id="wishBadgeMobile" style="display:none">0</span>
@@ -459,6 +532,8 @@
          const badgeText  = isUnavail ? 'Unavailable' : 'Out of Stock';
          const badgeClass = isUnavail ? 'oos-badge unavailable' : 'oos-badge';
          const cardClass  = showBadge ? 'prod-card is-oos' : 'prod-card';
+         const hasOffer   = p.hasOffer && !isOos && !isUnavail;
+         const saveAmount = hasOffer ? (p.price - p.effectivePrice) : 0;
       %>
       <a href="/products/<%= p._id %>" class="<%= cardClass %>" data-pid="<%= p._id %>">
         <div class="prod-img-wrap">
@@ -470,12 +545,25 @@
             </div>
           <% } %>
           <% if (showBadge) { %><span class="<%= badgeClass %>"><%= badgeText %></span><% } %>
+          <% if (hasOffer) { %><span class="offer-badge">−<%= p.discountPct %>%</span><% } %>
         </div>
         <div class="prod-body">
           <% if (p.brand && p.brand.name) { %><div class="prod-brand"><%= p.brand.name %></div><% } %>
           <% if (p.category) { %><div class="prod-cat"><%= p.category.name %></div><% } %>
           <div class="prod-name"><%= p.name %></div>
+
+          <% if (hasOffer) { %>
+          <div class="prod-price-wrap">
+            <span class="prod-price-effective">₹<%= p.effectivePrice.toLocaleString('en-IN') %></span>
+            <div class="prod-price-meta">
+              <span class="prod-price-original">₹<%= p.price.toLocaleString('en-IN') %></span>
+              <span class="prod-save-tag">Save ₹<%= saveAmount.toLocaleString('en-IN') %></span>
+            </div>
+          </div>
+          <% } else { %>
           <div class="prod-price">₹<%= p.price.toLocaleString('en-IN') %></div>
+          <% } %>
+
         </div>
       </a>
       <% }) %>
@@ -581,11 +669,9 @@
 </footer>
 
 <script>
-  // ── Nav scroll ──────────────────────────────────────────────────────────
   const navbar = document.getElementById('navbar');
   window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', scrollY > 30), { passive:true });
 
-  // ── Mobile menu ─────────────────────────────────────────────────────────
   const hamburger  = document.getElementById('hamburger');
   const mobileMenu = document.getElementById('mobileMenu');
   hamburger.addEventListener('click', () => {
@@ -597,7 +683,6 @@
     hamburger.classList.remove('open'); mobileMenu.classList.remove('open');
   }));
 
-  // ── Desktop filter toggle ────────────────────────────────────────────────
   const filterToggleDesktop = document.getElementById('filterToggleDesktop');
   const filterContent       = document.getElementById('filterContent');
   const filterChevron       = document.getElementById('filterChevron');
@@ -615,7 +700,6 @@
     filterChevron.classList.toggle('open', sidebarOpen);
   });
 
-  // ── Mobile filter drawer ─────────────────────────────────────────────────
   const mobFilterBtn  = document.getElementById('mobFilterBtn');
   const filterOverlay = document.getElementById('filterOverlay');
   const filterDrawer  = document.getElementById('filterDrawer');
@@ -626,13 +710,11 @@
   filterOverlay.addEventListener('click', closeDrawer);
   drawerClose.addEventListener('click', closeDrawer);
 
-  // ── Reveal on scroll ─────────────────────────────────────────────────────
   const obs = new IntersectionObserver(entries => {
     entries.forEach((e,i) => { if (e.isIntersecting) { setTimeout(()=>e.target.classList.add('visible'), i*55); obs.unobserve(e.target); } });
   }, { threshold:0.05 });
   document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 
-  // ── Badge helpers ────────────────────────────────────────────────────────
   function updateWishBadge(count) {
     ['wishBadgeDesktop','wishBadgeMobile'].forEach(id => {
       const el = document.getElementById(id);
@@ -648,24 +730,16 @@
     });
   }
 
-  // ── Fetch cart + wishlist counts on load ─────────────────────────────────
   fetch('/api/cart/count', { headers:{ 'Accept':'application/json' } })
-    .then(r => r.json())
-    .then(d => { if (d.count !== undefined) updateCartBadge(d.count); })
-    .catch(() => {});
-
+    .then(r => r.json()).then(d => { if (d.count !== undefined) updateCartBadge(d.count); }).catch(() => {});
   fetch('/api/wishlist/count', { headers:{ 'Accept':'application/json' } })
-    .then(r => r.json())
-    .then(d => updateWishBadge(d.count || 0))
-    .catch(() => {});
+    .then(r => r.json()).then(d => updateWishBadge(d.count || 0)).catch(() => {});
 
-  // ── Sort ─────────────────────────────────────────────────────────────────
   function applySort(val) {
     document.getElementById('sortInput').value = val;
     document.getElementById('filterFormTop').submit();
   }
 
-  // ── SSE: live stock updates ───────────────────────────────────────────────
   (function () {
     const es = new EventSource('/sse/products');
     es.addEventListener('productUpdate', function (e) {

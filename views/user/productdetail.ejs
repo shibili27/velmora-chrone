@@ -156,9 +156,13 @@
     .review-link { font-family: 'Jost', sans-serif; font-size: 0.5rem; color: rgba(245,242,235,0.25); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; transition: color 0.2s; }
     .review-link:hover { color: rgba(201,169,110,0.6); }
 
+    /* ── PRICE BLOCK (offer-aware) ── */
     .price-block { margin-bottom: 0.4rem; }
+    .price-row { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
     .prod-price { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 300; color: #f5f2eb; letter-spacing: 0.04em; }
-    .prod-price-label { font-family: 'Jost', sans-serif; font-size: 0.42rem; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(245,242,235,0.18); margin-top: 3px; margin-bottom: 1.1rem; }
+    .prod-price-original { font-family: 'Cormorant Garamond', serif; font-size: 1.15rem; font-weight: 300; color: rgba(245,242,235,0.28); letter-spacing: 0.02em; text-decoration: line-through; }
+    .offer-pill { font-family: 'Jost', sans-serif; font-size: 0.46rem; letter-spacing: 0.12em; text-transform: uppercase; color: #c9a96e; border: 1px solid rgba(201,169,110,0.4); background: rgba(201,169,110,0.1); padding: 3px 9px; border-radius: 100px; }
+    .prod-price-label { font-family: 'Jost', sans-serif; font-size: 0.42rem; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(245,242,235,0.18); margin-top: 5px; margin-bottom: 1.1rem; }
 
     .stock-badge { display: inline-flex; align-items: center; gap: 7px; font-family: 'Jost', sans-serif; font-size: 0.48rem; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1.5rem; }
     .stock-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
@@ -255,6 +259,8 @@
     .prod-cat { font-family: 'Jost', sans-serif; font-size: 0.38rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(201,169,110,0.38); margin-bottom: 3px; }
     .prod-name-sm { font-family: 'Cormorant Garamond', serif; font-size: 1rem; font-weight: 300; color: #f5f2eb; line-height: 1.2; margin-bottom: 4px; }
     .prod-price-sm { font-family: 'Jost', sans-serif; font-size: 0.58rem; color: rgba(201,169,110,0.6); }
+    .prod-price-sm-original { font-family: 'Jost', sans-serif; font-size: 0.5rem; color: rgba(245,242,235,0.2); text-decoration: line-through; margin-left: 5px; }
+    .related-offer-badge { position: absolute; top: 8px; right: 8px; z-index: 10; background: linear-gradient(135deg, rgba(201,169,110,0.18), rgba(201,169,110,0.1)); border: 1px solid rgba(201,169,110,0.45); color: #c9a96e; font-family: 'Jost', sans-serif; font-size: 0.34rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; padding: 3px 7px; border-radius: 4px; backdrop-filter: blur(6px); pointer-events: none; }
 
     .rule { height: 1px; background: linear-gradient(90deg, transparent, rgba(201,169,110,0.18), transparent); }
 
@@ -295,8 +301,16 @@
   const initialStock  = hasVariants ? variants[0].stock : product.stock;
   const isOOS         = initialStock === 0;
   const isLow         = initialStock > 0 && initialStock <= 5;
-  const hasDiscount   = product.originalPrice && product.originalPrice > product.price;
-  const discPct       = hasDiscount ? Math.round((1 - product.price / product.originalPrice) * 100) : 0;
+
+  /* ── OFFER-AWARE PRICING ──────────────────────────────────────────────────
+     product.hasOffer / product.effectivePrice / product.discountPct /
+     product.offerLabel are attached server-side by attachOffer()
+     (services/offerService.js). Fall back gracefully if absent so the page
+     never breaks even if offers aren't wired up for some reason. */
+  const hasDiscount   = !!product.hasOffer && product.effectivePrice < product.price;
+  const discPct       = hasDiscount ? product.discountPct : 0;
+  const displayPrice   = hasDiscount ? product.effectivePrice : product.price;
+
   const avgRating     = product.avgRating || 0;
   const reviewCount   = product.reviewCount || (product.reviews ? product.reviews.length : 0);
   const reviews       = product.reviews || [];
@@ -380,7 +394,7 @@
 
         <% if (isOOS) { %><span class="img-badge badge-oos">Out of Stock</span>
         <% } else if (isLow) { %><span class="img-badge badge-low" id="lowBadge">Only <%= initialStock %> Left</span>
-        <% } else if (hasDiscount) { %><span class="img-badge badge-discount">−<%= discPct %>%</span><% } %>
+        <% } else if (hasDiscount) { %><span class="img-badge badge-discount" id="offerImgBadge">−<%= discPct %>%</span><% } %>
 
         <div class="slide-overlay" id="slideOverlay"></div>
 
@@ -442,8 +456,15 @@
         <span class="review-link" onclick="openTab('reviews')">(<%= reviewCount %> review<%= reviewCount !== 1 ? 's' : '' %>)</span>
       </div>
 
+      <!-- ── PRICE BLOCK (offer-aware) ── -->
       <div class="price-block">
-        <div class="prod-price">₹<%= product.price.toLocaleString('en-IN') %></div>
+        <div class="price-row">
+          <div class="prod-price" id="prodPrice">₹<%= displayPrice.toLocaleString('en-IN') %></div>
+          <% if (hasDiscount) { %>
+            <span class="prod-price-original" id="prodPriceOriginal">₹<%= product.price.toLocaleString('en-IN') %></span>
+            <span class="offer-pill" id="offerPill"><%= product.offerLabel || (discPct + '% off') %></span>
+          <% } %>
+        </div>
         <div class="prod-price-label">Inclusive of all taxes</div>
       </div>
 
@@ -556,7 +577,11 @@
     </a>
   </div>
   <div class="related-grid">
-    <% related.forEach(p => { %>
+    <% related.forEach(p => {
+       const rHasDiscount = !!p.hasOffer && p.effectivePrice < p.price;
+       const rDiscPct      = rHasDiscount ? p.discountPct : 0;
+       const rDisplayPrice = rHasDiscount ? p.effectivePrice : p.price;
+    %>
     <a href="/products/<%= p._id %>" class="prod-card">
       <div class="prod-img-wrap">
         <% const rImg = (p.colorVariants && p.colorVariants.length > 0) ? p.colorVariants[0].images[0] : (p.images && p.images[0]); %>
@@ -565,11 +590,15 @@
         <% } else { %>
           <div class="watch-ph"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="rgba(245,242,235,0.05)" stroke-width="0.5"><circle cx="12" cy="12" r="10"/></svg></div>
         <% } %>
+        <% if (rHasDiscount) { %><span class="related-offer-badge">−<%= rDiscPct %>%</span><% } %>
       </div>
       <div class="prod-body">
         <div class="prod-cat"><%= p.category ? p.category.name : '' %></div>
         <div class="prod-name-sm"><%= p.name %></div>
-        <div class="prod-price-sm">₹<%= p.price.toLocaleString('en-IN') %></div>
+        <div class="prod-price-sm">
+          ₹<%= rDisplayPrice.toLocaleString('en-IN') %>
+          <% if (rHasDiscount) { %><span class="prod-price-sm-original">₹<%= p.price.toLocaleString('en-IN') %></span><% } %>
+        </div>
       </div>
     </a>
     <% }) %>
@@ -808,8 +837,10 @@
       else            text.textContent = `In Stock · ${stock} available`;
     }
 
+    // Only swap in the stock badge (out-of-stock / low-stock) on the image —
+    // never clobber an existing offer badge (#offerImgBadge) if stock is fine.
     const mainImgWrap = document.getElementById('mainImgWrap');
-    let imgBadge = mainImgWrap ? mainImgWrap.querySelector('.img-badge') : null;
+    let imgBadge = mainImgWrap ? mainImgWrap.querySelector('.img-badge:not(#offerImgBadge)') : null;
     if (isOOS || isLow) {
       if (!imgBadge && mainImgWrap) {
         imgBadge = document.createElement('span');
@@ -819,10 +850,15 @@
         imgBadge.className   = 'img-badge ' + (isOOS ? 'badge-oos' : 'badge-low');
         imgBadge.textContent = isOOS ? 'Out of Stock' : `Only ${stock} Left`;
       }
+      // hide offer badge while OOS/low badge is showing to avoid clutter
+      const offerBadge = document.getElementById('offerImgBadge');
+      if (offerBadge) offerBadge.style.display = 'none';
     } else {
       if (imgBadge && (imgBadge.classList.contains('badge-oos') || imgBadge.classList.contains('badge-low'))) {
         imgBadge.remove();
       }
+      const offerBadge = document.getElementById('offerImgBadge');
+      if (offerBadge) offerBadge.style.display = '';
     }
 
     if (qtyInput) {
@@ -1071,7 +1107,7 @@
         }
 
         if (data.price !== undefined) {
-          const el = document.querySelector('.prod-price');
+          const el = document.getElementById('prodPrice');
           if (el) el.textContent = '₹' + Number(data.price).toLocaleString('en-IN');
         }
 

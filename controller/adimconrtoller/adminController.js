@@ -920,9 +920,50 @@ export const toggleCouponStatus = async (req, res) => {
     res.status(500).json({ success: false, message: 'Server error.' });
   }
 };
+export const editCoupon = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      discountType,
+      discountValue,
+      minOrderValue,
+      maxDiscountCap,
+      usageLimit,
+      perUserLimit,
+      expiryDate,
+      description,
+    } = req.body;
 
-// ── Dashboard Chart Data ──────────────────────────────────────────────────────
+    const parsedValue = parseFloat(discountValue);
 
+    const expiry = new Date(expiryDate);
+
+    const updateData = {
+      discountType,
+      discountValue : discountType !== 'free_shipping' ? parsedValue : 0,
+      minOrderValue : parseFloat(minOrderValue) || 0,
+      expiryDate    : expiry,
+      perUserLimit  : parseInt(perUserLimit)  || 1,
+      description   : description?.trim() || '',
+      usageLimit    : usageLimit ? parseInt(usageLimit) : null,
+      maxDiscountCap: discountType === 'percentage' && maxDiscountCap
+       ? parseFloat(maxDiscountCap)
+       : null,
+    };
+
+    await Coupon.findByIdAndUpdate(id, updateData, { new: true, runValidators: true });
+
+    req.flash('success', 'Coupon updated successfully.');
+    res.redirect('/admin/coupons');
+
+  } catch (err) {
+    console.error('Edit coupon error:', err);
+    req.flash('error', 'Failed to update coupon. Please try again.');
+    res.redirect('/admin/coupons');
+  }
+};
+
+// dash
 export const getDashboardChartData = async (req, res) => {
   try {
     const period = req.query.period || 'monthly';
@@ -989,7 +1030,6 @@ export const getDashboardChartData = async (req, res) => {
   }
 };
 
-// ── Ledger Data ───────────────────────────────────────────────────────────────
 
 export const getLedgerData = async (req, res) => {
   try {
@@ -1057,7 +1097,7 @@ export const getLedgerData = async (req, res) => {
   }
 };
 
-// ── Ledger PDF ────────────────────────────────────────────────────────────────
+
 
 export const downloadLedgerPDF = async (req, res) => {
   try {
@@ -1099,7 +1139,6 @@ export const downloadLedgerPDF = async (req, res) => {
     const margin = 40;
     const colW   = pageW - margin * 2;
 
-    // Header band
     doc.rect(0, 0, pageW, 80).fill(DARK);
     doc.fontSize(20).font('Helvetica-Bold').fillColor(GOLD)
       .text('VELMORA CHRONÉ', margin, 20);
@@ -1112,7 +1151,6 @@ export const downloadLedgerPDF = async (req, res) => {
 
     doc.y = 96;
 
-    // Summary row
     const delivered    = orders.filter(o => o.orderStatus === 'delivered');
     const grossRevenue = delivered.reduce((s, o) => s + o.pricing.subtotal, 0);
     const totalDisc    = delivered.reduce((s, o) => s + (o.pricing.itemDiscount || 0) + (o.pricing.couponDiscount || 0), 0);
@@ -1141,7 +1179,6 @@ export const downloadLedgerPDF = async (req, res) => {
     });
     doc.y = summaryY + 64;
 
-    // Table header
     doc.rect(margin, doc.y, colW, 22).fill(TEAL);
     const cols = [
       { label: '#',           x: margin,       w: 28  },
@@ -1161,7 +1198,7 @@ export const downloadLedgerPDF = async (req, res) => {
     });
     doc.y += 22;
 
-    // Table rows
+    
     orders.forEach((o, idx) => {
       if (doc.y > doc.page.height - 80) {
         doc.addPage({ margin: 40, size: 'A4', layout: 'landscape' });
@@ -1209,7 +1246,7 @@ export const downloadLedgerPDF = async (req, res) => {
       doc.y += 18;
     });
 
-    // Footer
+    
     doc.y += 16;
     doc.fontSize(7).font('Helvetica').fillColor(LIGHT)
       .text(

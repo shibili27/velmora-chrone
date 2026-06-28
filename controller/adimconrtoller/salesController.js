@@ -2,7 +2,6 @@ import PDFDocument from 'pdfkit';
 import ExcelJS     from 'exceljs';
 import Order       from '../../models/order.js';
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
 
 const fmtINR  = n  => '₹' + (n || 0).toLocaleString('en-IN');
 const fmtDate = d  => new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -12,6 +11,7 @@ const getDateRange = (filter, customStart, customEnd) => {
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
   switch (filter) {
+    case 'today':
     case 'daily': {
       const start = new Date(today);
       const end   = new Date(today);
@@ -35,6 +35,10 @@ const getDateRange = (filter, customStart, customEnd) => {
       const end   = new Date(today.getFullYear() + 1, 0, 1);
       return { start, end };
     }
+    case 'alltime': {
+    
+      return { start: null, end: null };
+    }
     case 'custom': {
       if (!customStart || !customEnd)
         throw Object.assign(new Error('Please provide both start and end dates.'), { status: 400 });
@@ -52,63 +56,104 @@ const getDateRange = (filter, customStart, customEnd) => {
   }
 };
 
-const buildMatchStage = (start, end) => ({
-  createdAt    : { $gte: start, $lt: end },
-  orderStatus  : { $nin: ['cancelled', 'returned'] },
-  paymentStatus: { $nin: ['failed'] },
-});
+const buildMatchStage = (start, end) => {
+  const match = {
+    orderStatus  : 'delivered',
+    paymentStatus: { $nin: ['failed'] },
+  };
 
-// ── Shared aggregation (used by all three exports) ────────────────────────────
+  if (start && end) {
+    match.createdAt = { $gte: start, $lt: end };
+  }
+  return match;
+};
+
 
 async function fetchReportData(filter, startDate, endDate) {
   const { start, end } = getDateRange(filter, startDate, endDate);
   const matchStage     = buildMatchStage(start, end);
 
-  const [summary] = await Order.aggregate([
+
+  const summaryPipeline = [
     { $match: matchStage },
+    { $unwind: '$items' },
+    {
+      $group: {
+        _id           : '$_id',
+        grandTotal    : { $first: '$pricing.grandTotal'    },
+        subtotal      : { $first: '$pricing.subtotal'      },
+        tax           : { $first: '$pricing.tax'           },
+        shipping      : { $first: '$pricing.shipping'      },
+        couponDiscount: { $first: '$pricing.couponDiscount' },
+       
+        itemDiscount  : {
+          $sum: {
+            $cond: [
+              { $and: [
+                { $gt: ['$items.originalPrice', 0] },
+                { $gt: ['$items.originalPrice', '$items.price'] }
+              ]},
+              {
+                $multiply: [
+                  { $subtract: ['$items.originalPrice', '$items.price'] },
+                  '$items.quantity'
+                ]
+              },
+              0
+            ]
+          }
+        },
+      },
+    },
     {
       $group: {
         _id           : null,
         totalOrders   : { $sum: 1 },
-        totalRevenue  : { $sum: '$pricing.grandTotal' },
-        totalSubtotal : { $sum: '$pricing.subtotal' },
-        itemDiscount  : { $sum: '$pricing.itemDiscount' },
-        couponDiscount: { $sum: '$pricing.couponDiscount' },
-        totalTax      : { $sum: '$pricing.tax' },
-        totalShipping : { $sum: '$pricing.shipping' },
+        totalRevenue  : { $sum: '$grandTotal'     },
+        totalSubtotal : { $sum: '$subtotal'       },
+        itemDiscount  : { $sum: '$itemDiscount'   },
+        couponDiscount: { $sum: '$couponDiscount' },
+        totalTax      : { $sum: '$tax'            },
+        totalShipping : { $sum: '$shipping'       },
       },
     },
-  ]);
+  ];
+
+  const [summary] = await Order.aggregate(summaryPipeline);
 
   const s = summary || {};
+
+  const itemDiscount   = s.itemDiscount   || 0;
+  const couponDiscount = s.couponDiscount || 0;
+
   return {
     start,
     end,
     matchStage,
     summary: {
       totalOrders   : s.totalOrders    || 0,
+      
       totalRevenue  : s.totalRevenue   || 0,
-      totalSubtotal : s.totalSubtotal  || 0,
-      itemDiscount  : s.itemDiscount   || 0,
-      couponDiscount: s.couponDiscount || 0,
-      totalDiscount : (s.itemDiscount  || 0) + (s.couponDiscount || 0),
+      totalSubtotal : s.totalSubtotal  || 0,       
+      orderAmount   : s.totalRevenue   || 0,      
+      itemDiscount,
+      couponDiscount,
+      totalDiscount : itemDiscount + couponDiscount,
       totalTax      : s.totalTax       || 0,
       totalShipping : s.totalShipping  || 0,
     },
   };
 }
 
-// ── 1. Sales Report page ──────────────────────────────────────────────────────
 
 export async function getSalesReport(req, res) {
   try {
-    const { filter = 'daily', startDate, endDate } = req.query;
+    const { filter = 'today', startDate, endDate } = req.query;
     const page  = Math.max(1, parseInt(req.query.page) || 1);
     const limit = 20;
 
     const { start, end, matchStage, summary } = await fetchReportData(filter, startDate, endDate);
 
-    // Chart grouped by day
     const chartData = await Order.aggregate([
       { $match: matchStage },
       {
@@ -121,7 +166,6 @@ export async function getSalesReport(req, res) {
       { $sort: { _id: 1 } },
     ]);
 
-    // Paginated table
     const totalOrders = await Order.countDocuments(matchStage);
     const totalPages  = Math.ceil(totalOrders / limit);
 
@@ -133,6 +177,20 @@ export async function getSalesReport(req, res) {
       .limit(limit)
       .lean();
 
+    
+    const ordersWithDiscount = orders.map(o => {
+      let itemDiscount = o.pricing?.itemDiscount || 0;
+      if (!itemDiscount && o.items?.length) {
+        itemDiscount = o.items.reduce((acc, item) => {
+          if (item.originalPrice && item.originalPrice > item.price) {
+            return acc + (item.originalPrice - item.price) * (item.quantity || 1);
+          }
+          return acc;
+        }, 0);
+      }
+      return { ...o, computedItemDiscount: itemDiscount };
+    });
+
     return res.render('admin/salesReport', {
       title      : 'Sales Report — Velmora Chroné Admin',
       adminName  : req.session.adminName || 'Admin',
@@ -143,7 +201,7 @@ export async function getSalesReport(req, res) {
       endDate    : endDate   || '',
       summary,
       chartData,
-      orders,
+      orders     : ordersWithDiscount,
       page,
       totalPages,
       totalOrders,
@@ -156,11 +214,10 @@ export async function getSalesReport(req, res) {
   }
 }
 
-// ── 2. Export PDF ─────────────────────────────────────────────────────────────
 
 export async function exportSalesReportPDF(req, res) {
   try {
-    const { filter = 'daily', startDate, endDate } = req.query;
+    const { filter = 'today', startDate, endDate } = req.query;
     const { start, end, matchStage, summary } = await fetchReportData(filter, startDate, endDate);
 
     const orders = await Order.find(matchStage)
@@ -174,22 +231,24 @@ export async function exportSalesReportPDF(req, res) {
     res.setHeader('Content-Disposition', `attachment; filename="velmora-sales-${filter}-${Date.now()}.pdf"`);
     doc.pipe(res);
 
-    // ── Header ────────────────────────────────────────────────────────────
+    const periodLabel = start && end
+      ? `${fmtDate(start)} – ${fmtDate(new Date(end.getTime() - 86400000))}`
+      : 'All Time';
+
     doc
       .font('Helvetica-Bold').fontSize(18).fillColor('#1a1f1e')
       .text('VELMORA CHRONÉ', 40, 40)
       .font('Helvetica').fontSize(9).fillColor('#9aa8a5')
       .text('ADMIN · SALES REPORT', 40, 62)
-      .text(`Period: ${fmtDate(start)} – ${fmtDate(new Date(end.getTime() - 86400000))}`, 40, 74)
+      .text(`Period: ${periodLabel}`, 40, 74)
       .text(`Generated: ${fmtDate(new Date())}`, 40, 86);
 
     doc.moveTo(40, 102).lineTo(800, 102).strokeColor('#e2e6e4').lineWidth(1).stroke();
 
-    // ── Summary boxes ─────────────────────────────────────────────────────
     const boxes = [
       { label: 'Total Orders',      value: String(summary.totalOrders)     },
-      { label: 'Order Amount',      value: fmtINR(summary.totalSubtotal)   },
       { label: 'Total Revenue',     value: fmtINR(summary.totalRevenue)    },
+      { label: 'Order Amount',      value: fmtINR(summary.totalSubtotal)   },
       { label: 'Total Discount',    value: fmtINR(summary.totalDiscount)   },
       { label: 'Item Discounts',    value: fmtINR(summary.itemDiscount)    },
       { label: 'Coupon Deductions', value: fmtINR(summary.couponDiscount)  },
@@ -209,7 +268,6 @@ export async function exportSalesReportPDF(req, res) {
          .text(b.value, x + 8, by0 + 26, { width: boxW - 16 });
     });
 
-    // ── Table ─────────────────────────────────────────────────────────────
     const tableTop = by0 + boxH + 20;
     const cols = [
       { label: '#',           w: 24  },
@@ -256,6 +314,16 @@ export async function exportSalesReportPDF(req, res) {
         doc.rect(40, rowY, 760, rowH).fillColor('#fafcfb').fill();
       }
 
+      let rowItemDiscount = o.pricing?.itemDiscount || 0;
+      if (!rowItemDiscount && o.items?.length) {
+        rowItemDiscount = o.items.reduce((acc, item) => {
+          if (item.originalPrice && item.originalPrice > item.price) {
+            return acc + (item.originalPrice - item.price) * (item.quantity || 1);
+          }
+          return acc;
+        }, 0);
+      }
+
       const cells = [
         String(idx + 1),
         o.orderNumber || '—',
@@ -263,7 +331,7 @@ export async function exportSalesReportPDF(req, res) {
         o.user?.name || '—',
         String(o.items?.length || 0),
         fmtINR(o.pricing?.subtotal),
-        o.pricing?.itemDiscount   > 0 ? `-${fmtINR(o.pricing.itemDiscount)}`   : '—',
+        rowItemDiscount > 0 ? `-${fmtINR(rowItemDiscount)}` : '—',
         o.couponCode || '—',
         o.pricing?.couponDiscount > 0 ? `-${fmtINR(o.pricing.couponDiscount)}` : '—',
         fmtINR(o.pricing?.tax),
@@ -300,11 +368,10 @@ export async function exportSalesReportPDF(req, res) {
   }
 }
 
-// ── 3. Export Excel ───────────────────────────────────────────────────────────
 
 export async function exportSalesReportExcel(req, res) {
   try {
-    const { filter = 'daily', startDate, endDate } = req.query;
+    const { filter = 'today', startDate, endDate } = req.query;
     const { start, end, matchStage, summary } = await fetchReportData(filter, startDate, endDate);
 
     const orders = await Order.find(matchStage)
@@ -318,7 +385,10 @@ export async function exportSalesReportExcel(req, res) {
     wb.created    = new Date();
     const currFmt = '"₹"#,##0.00';
 
-    // ── Summary sheet ─────────────────────────────────────────────────────
+    const periodLabel = start && end
+      ? `${fmtDate(start)} – ${fmtDate(new Date(end.getTime() - 86400000))}`
+      : 'All Time';
+
     const ss = wb.addWorksheet('Summary', { views: [{ showGridLines: false }] });
 
     ss.mergeCells('A1:B1');
@@ -327,7 +397,7 @@ export async function exportSalesReportExcel(req, res) {
     ss.getCell('A1').alignment = { vertical: 'middle' };
     ss.getRow(1).height        = 28;
 
-    ss.getCell('A2').value = `Period: ${fmtDate(start)} – ${fmtDate(new Date(end.getTime() - 86400000))}`;
+    ss.getCell('A2').value = `Period: ${periodLabel}`;
     ss.getCell('A2').font  = { size: 10, color: { argb: 'FF9AA8A5' } };
     ss.getCell('A3').value = `Generated: ${fmtDate(new Date())}`;
     ss.getCell('A3').font  = { size: 10, color: { argb: 'FF9AA8A5' } };
@@ -336,8 +406,8 @@ export async function exportSalesReportExcel(req, res) {
     const summaryRows = [
       ['Metric',                  'Value'                   ],
       ['Total Orders',             summary.totalOrders       ],
-      ['Order Amount (Subtotal)',   summary.totalSubtotal    ],
       ['Total Revenue',            summary.totalRevenue      ],
+      ['Order Amount (Subtotal)',   summary.totalSubtotal    ],
       ['Total Discount',           summary.totalDiscount     ],
       ['Item Discounts',           summary.itemDiscount      ],
       ['Coupon Deductions',        summary.couponDiscount    ],
@@ -362,7 +432,6 @@ export async function exportSalesReportExcel(req, res) {
     ss.getColumn('A').width = 30;
     ss.getColumn('B').width = 22;
 
-    // ── Orders sheet ──────────────────────────────────────────────────────
     const os = wb.addWorksheet('Orders', {
       views: [{ showGridLines: false, state: 'frozen', ySplit: 1 }],
     });
@@ -401,22 +470,32 @@ export async function exportSalesReportExcel(req, res) {
     };
 
     orders.forEach((o, idx) => {
+      let rowItemDiscount = o.pricing?.itemDiscount || 0;
+      if (!rowItemDiscount && o.items?.length) {
+        rowItemDiscount = o.items.reduce((acc, item) => {
+          if (item.originalPrice && item.originalPrice > item.price) {
+            return acc + (item.originalPrice - item.price) * (item.quantity || 1);
+          }
+          return acc;
+        }, 0);
+      }
+
       const row = os.addRow({
         idx           : idx + 1,
-        orderNumber   : o.orderNumber           || '—',
+        orderNumber   : o.orderNumber            || '—',
         date          : fmtDate(o.createdAt),
-        customer      : o.user?.name            || '—',
-        email         : o.user?.email           || '—',
-        items         : o.items?.length          || 0,
-        subtotal      : o.pricing?.subtotal      || 0,
-        itemDiscount  : o.pricing?.itemDiscount  || 0,
-        couponCode    : o.couponCode             || '—',
-        couponDiscount: o.pricing?.couponDiscount|| 0,
-        tax           : o.pricing?.tax           || 0,
-        shipping      : o.pricing?.shipping      || 0,
-        grandTotal    : o.pricing?.grandTotal    || 0,
-        payment       : o.paymentMethod          || '—',
-        status        : o.orderStatus            || '—',
+        customer      : o.user?.name             || '—',
+        email         : o.user?.email            || '—',
+        items         : o.items?.length           || 0,
+        subtotal      : o.pricing?.subtotal       || 0,
+        itemDiscount  : rowItemDiscount,
+        couponCode    : o.couponCode              || '—',
+        couponDiscount: o.pricing?.couponDiscount || 0,
+        tax           : o.pricing?.tax            || 0,
+        shipping      : o.pricing?.shipping       || 0,
+        grandTotal    : o.pricing?.grandTotal     || 0,
+        payment       : o.paymentMethod           || '—',
+        status        : o.orderStatus             || '—',
       });
 
       row.height = 18;
@@ -431,8 +510,8 @@ export async function exportSalesReportExcel(req, res) {
         row.getCell(k).numFmt = currFmt;
       });
 
-      if (o.pricing?.itemDiscount   > 0) row.getCell('itemDiscount').font   = { color: { argb: 'FFDC2626' } };
-      if (o.pricing?.couponDiscount > 0) row.getCell('couponDiscount').font = { color: { argb: 'FFDC2626' } };
+      if (rowItemDiscount                 > 0) row.getCell('itemDiscount').font   = { color: { argb: 'FFDC2626' } };
+      if (o.pricing?.couponDiscount       > 0) row.getCell('couponDiscount').font = { color: { argb: 'FFDC2626' } };
 
       row.getCell('grandTotal').font = { bold: true };
 
@@ -442,7 +521,6 @@ export async function exportSalesReportExcel(req, res) {
 
     os.autoFilter = { from: { row: 1, column: 1 }, to: { row: 1, column: os.columns.length } };
 
-    // Totals row
     const tRow = os.addRow({
       customer      : 'TOTALS',
       subtotal      : summary.totalSubtotal,

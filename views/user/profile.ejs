@@ -25,40 +25,18 @@
       opacity: .016;
     }
 
-    .nav-root {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
-      background: rgba(17,17,16,0.92);
-      backdrop-filter: blur(18px) saturate(1.4);
-      -webkit-backdrop-filter: blur(18px) saturate(1.4);
-      border-bottom: 1px solid rgba(245,242,235,0.06);
-      transition: box-shadow 0.3s;
-    }
+    .nav-root { position: fixed; top: 0; left: 0; right: 0; z-index: 200; background: rgba(17,17,16,0.92); backdrop-filter: blur(18px) saturate(1.4); -webkit-backdrop-filter: blur(18px) saturate(1.4); border-bottom: 1px solid rgba(245,242,235,0.06); transition: box-shadow 0.3s; }
     .nav-root.scrolled { box-shadow: 0 2px 24px rgba(0,0,0,0.5); }
     .nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 1rem 2rem; }
     @media(min-width:768px) { .nav-inner { padding: 1rem 3rem; } }
-    .nav-logo {
-      font-family: 'Cormorant Garamond', serif; font-size: 0.85rem; font-weight: 300;
-      letter-spacing: 0.25em; text-transform: uppercase; color: #f5f2eb; text-decoration: none;
-    }
-    .nav-link {
-      font-family: 'Jost', sans-serif; font-size: 0.53rem; font-weight: 400;
-      letter-spacing: 0.2em; text-transform: uppercase;
-      color: rgba(245,242,235,0.45); text-decoration: none;
-      transition: color 0.2s; position: relative; padding-bottom: 2px;
-    }
+    .nav-logo { font-family: 'Cormorant Garamond', serif; font-size: 0.85rem; font-weight: 300; letter-spacing: 0.25em; text-transform: uppercase; color: #f5f2eb; text-decoration: none; }
+    .nav-link { font-family: 'Jost', sans-serif; font-size: 0.53rem; font-weight: 400; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(245,242,235,0.45); text-decoration: none; transition: color 0.2s; position: relative; padding-bottom: 2px; }
     .nav-link::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 0; height: 1px; background: #c9a96e; transition: width 0.3s; }
     .nav-link:hover { color: rgba(245,242,235,0.9); }
     .nav-link:hover::after { width: 100%; }
     .nav-link.active { color: #c9a96e; }
     .nav-link.active::after { width: 100%; }
-    .nav-icon-btn {
-      position: relative; width: 36px; height: 36px;
-      display: flex; align-items: center; justify-content: center;
-      color: rgba(245,242,235,0.5); background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(201,169,110,0.12); border-radius: 10px; cursor: pointer; text-decoration: none;
-      transition: color 0.22s, background 0.22s, border-color 0.22s, transform 0.18s cubic-bezier(.34,1.56,.64,1), box-shadow 0.22s;
-      box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 2px 6px rgba(0,0,0,0.35);
-    }
+    .nav-icon-btn { position: relative; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; color: rgba(245,242,235,0.5); background: rgba(255,255,255,0.03); border: 1px solid rgba(201,169,110,0.12); border-radius: 10px; cursor: pointer; text-decoration: none; transition: color 0.22s, background 0.22s, border-color 0.22s, transform 0.18s cubic-bezier(.34,1.56,.64,1), box-shadow 0.22s; box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 2px 6px rgba(0,0,0,0.35); }
     .nav-icon-btn::before { content: ''; position: absolute; inset: 0; border-radius: 10px; background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 55%); pointer-events: none; }
     .nav-icon-btn:hover { color: #c9a96e; background: rgba(201,169,110,0.08); border-color: rgba(201,169,110,0.35); transform: translateY(-2px) scale(1.06); box-shadow: 0 1px 0 rgba(255,255,255,0.06) inset, 0 6px 20px rgba(0,0,0,0.5), 0 0 14px rgba(201,169,110,0.15); }
     .nav-icon-btn.active-icon { color: #c9a96e; border-color: rgba(201,169,110,0.3); background: rgba(201,169,110,0.06); }
@@ -72,12 +50,7 @@
     .mobile-menu.open { display: flex; }
     .mobile-menu .nav-link { font-size: 0.68rem; padding: 0.45rem 0; border-bottom: 1px solid rgba(245,242,235,0.04); color: rgba(245,242,235,0.5); }
 
-    .page-hero {
-      padding: 5.5rem 2rem 2.5rem;
-      background: linear-gradient(180deg, #080807 0%, #111110 100%);
-      border-bottom: 1px solid rgba(201,169,110,0.08);
-      position: relative; overflow: hidden; text-align: center;
-    }
+    .page-hero { padding: 5.5rem 2rem 2.5rem; background: linear-gradient(180deg, #080807 0%, #111110 100%); border-bottom: 1px solid rgba(201,169,110,0.08); position: relative; overflow: hidden; text-align: center; }
     @media(min-width:768px) { .page-hero { padding: 5.5rem 3rem 2.5rem; } }
     .page-hero::before { content: ''; position: absolute; top: -60px; left: 50%; transform: translateX(-50%); width: 600px; height: 400px; border-radius: 50%; background: radial-gradient(ellipse, rgba(201,169,110,0.07) 0%, transparent 70%); pointer-events: none; }
     .page-hero::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(201,169,110,0.25), transparent); }
@@ -117,7 +90,7 @@
     @keyframes sweepSeconds { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     @keyframes sweepMinutes { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-    .profile-wrap { max-width: 1200px; margin: 0 auto; padding: 3rem 2rem 5rem; display: flex; gap: 0; position: relative; z-index: 1; background: transparent; }
+    .profile-wrap { max-width: 1200px; margin: 0 auto; padding: 3rem 2rem 5rem; display: flex; gap: 0; position: relative; z-index: 1; }
     @media(min-width:768px) { .profile-wrap { padding: 3rem 3rem 5rem; } }
     @media(max-width:767px) { .profile-wrap { flex-direction: column; padding: 2rem 1.25rem 4rem; } }
 
@@ -127,12 +100,12 @@
     @media(max-width:767px) { .sidebar-inner { flex-direction: row; overflow-x: auto; gap: 0; } }
     .sidebar-tab { display: flex; align-items: center; gap: 10px; padding: 0.75rem 1.1rem; font-family: 'Jost', sans-serif; font-size: 0.52rem; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(245,242,235,0.35); cursor: pointer; background: none; width: 100%; text-align: left; border-left: 2px solid transparent; border-top: none; border-right: none; border-bottom: none; transition: color 0.22s, border-color 0.22s, background 0.22s; white-space: nowrap; border-radius: 0 6px 6px 0; opacity: 0; animation: sidebarSlide 0.5s cubic-bezier(.25,.46,.45,.94) forwards; }
     @media(max-width:767px) { .sidebar-tab { border-left: none; border-bottom: 2px solid transparent; padding: 0.6rem 0.9rem; border-radius: 0; } }
-    .sidebar-tab:nth-child(1) { animation-delay: 0.1s; } .sidebar-tab:nth-child(2) { animation-delay: 0.18s; } .sidebar-tab:nth-child(3) { animation-delay: 0.26s; } .sidebar-tab:nth-child(4) { animation-delay: 0.34s; } .sidebar-tab:nth-child(5) { animation-delay: 0.42s; }
+    .sidebar-tab:nth-child(1){animation-delay:0.1s} .sidebar-tab:nth-child(2){animation-delay:0.18s} .sidebar-tab:nth-child(3){animation-delay:0.26s} .sidebar-tab:nth-child(4){animation-delay:0.34s} .sidebar-tab:nth-child(5){animation-delay:0.42s} .sidebar-tab:nth-child(6){animation-delay:0.5s}
     @keyframes sidebarSlide { from { opacity:0; transform:translateX(-12px); } to { opacity:1; transform:translateX(0); } }
     .sidebar-tab svg { width: 13px; height: 13px; flex-shrink: 0; }
     .sidebar-tab:hover { color: rgba(245,242,235,0.8); border-left-color: rgba(201,169,110,0.35); background: rgba(201,169,110,0.04); }
     .sidebar-tab.active { color: #c9a96e; border-left-color: #c9a96e; background: rgba(201,169,110,0.06); }
-    .sidebar-logout { display: flex; align-items: center; gap: 8px; font-family: 'Jost', sans-serif; font-size: 0.5rem; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(201,169,110,0.3); text-decoration: none; padding: 0.7rem 1.1rem; margin-top: 1.5rem; transition: color 0.2s; border-radius: 0 6px 6px 0; opacity: 0; animation: sidebarSlide 0.5s cubic-bezier(.25,.46,.45,.94) 0.52s forwards; }
+    .sidebar-logout { display: flex; align-items: center; gap: 8px; font-family: 'Jost', sans-serif; font-size: 0.5rem; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(201,169,110,0.3); text-decoration: none; padding: 0.7rem 1.1rem; margin-top: 1.5rem; transition: color 0.2s; border-radius: 0 6px 6px 0; opacity: 0; animation: sidebarSlide 0.5s cubic-bezier(.25,.46,.45,.94) 0.58s forwards; }
     .sidebar-logout:hover { color: rgba(201,169,110,0.65); }
     .sidebar-logout svg { width: 12px; height: 12px; }
     @media(max-width:767px) { .sidebar-logout { display: none; } }
@@ -153,44 +126,14 @@
     select.vc-input { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='rgba(201,169,110,0.45)' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-color: rgba(245,242,235,0.03); padding-right: 2.2rem; }
     select.vc-input option { background: #1a1a18; color: #f5f2eb; }
 
-    /* ── VALIDATION STATES ── */
-    .vc-input.input-error {
-      border-color: rgba(248,113,113,0.65) !important;
-      background: rgba(248,113,113,0.04) !important;
-      box-shadow: 0 0 0 3px rgba(248,113,113,0.08) !important;
-    }
-    .vc-input.input-error:focus {
-      border-color: rgba(248,113,113,0.8) !important;
-      box-shadow: 0 0 0 3px rgba(248,113,113,0.12) !important;
-    }
-    .vc-input.input-valid {
-      border-color: rgba(74,222,128,0.35) !important;
-      box-shadow: 0 0 0 3px rgba(74,222,128,0.05) !important;
-    }
-    .field-error-msg {
-      display: none;
-      font-family: 'Jost', sans-serif;
-      font-size: 0.48rem;
-      letter-spacing: 0.1em;
-      color: rgba(248,113,113,0.85);
-      margin-top: 5px;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      animation: errSlide 0.22s ease;
-    }
+    .vc-input.input-error { border-color: rgba(248,113,113,0.65) !important; background: rgba(248,113,113,0.04) !important; box-shadow: 0 0 0 3px rgba(248,113,113,0.08) !important; }
+    .vc-input.input-valid { border-color: rgba(74,222,128,0.35) !important; box-shadow: 0 0 0 3px rgba(74,222,128,0.05) !important; }
+    .field-error-msg { display: none; font-family: 'Jost', sans-serif; font-size: 0.48rem; letter-spacing: 0.1em; color: rgba(248,113,113,0.85); margin-top: 5px; display: flex; align-items: center; gap: 5px; animation: errSlide 0.22s ease; }
     .field-error-msg.hidden { display: none !important; }
     .field-error-msg svg { flex-shrink: 0; }
     @keyframes errSlide { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:translateY(0); } }
     .form-group { display: flex; flex-direction: column; gap: 4px; }
-    /* shake on submit error */
-    @keyframes fieldShake {
-      0%,100% { transform: translateX(0); }
-      20%      { transform: translateX(-5px); }
-      40%      { transform: translateX(5px); }
-      60%      { transform: translateX(-4px); }
-      80%      { transform: translateX(4px); }
-    }
+    @keyframes fieldShake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-5px)} 40%{transform:translateX(5px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
     .shake { animation: fieldShake 0.38s cubic-bezier(.36,.07,.19,.97); }
 
     .btn-gold { font-family: 'Jost', sans-serif; font-size: 0.5rem; letter-spacing: 0.24em; text-transform: uppercase; color: #0d0b08; display: inline-flex; align-items: center; gap: 0.6rem; padding: 0.85rem 2rem; border-radius: 100px; text-decoration: none; cursor: pointer; position: relative; overflow: hidden; background: linear-gradient(135deg, #e0c47e 0%, #c9a96e 50%, #b8913d 100%); border: none; transition: transform 0.2s cubic-bezier(.34,1.56,.64,1), box-shadow 0.22s; box-shadow: 0 1px 0 rgba(255,255,255,0.35) inset, 0 4px 18px rgba(185,140,55,0.35), 0 1px 4px rgba(0,0,0,0.4); }
@@ -207,7 +150,6 @@
     .btn-danger-sm { display: inline-flex; align-items: center; gap: 5px; font-family: 'Jost', sans-serif; font-size: 0.48rem; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(248,113,113,0.65); background: transparent; border: 1px solid rgba(248,113,113,0.18); border-radius: 100px; padding: 0.55rem 1.1rem; cursor: pointer; transition: color 0.22s, border-color 0.22s, background 0.22s, transform 0.18s; }
     .btn-danger-sm:hover { color: #f87171; border-color: rgba(248,113,113,0.45); background: rgba(248,113,113,0.06); transform: translateY(-1px); }
 
-    /* ── AVATAR ── */
     .avatar-wrap { position: relative; width: 90px; height: 90px; cursor: pointer; flex-shrink: 0; }
     .avatar-img { width: 90px; height: 90px; object-fit: cover; border: 1px solid rgba(201,169,110,0.2); display: block; border-radius: 12px; }
     .avatar-default { width: 90px; height: 90px; border: 1px solid rgba(201,169,110,0.2); border-radius: 12px; background: #1a1a18; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 6px; }
@@ -278,6 +220,96 @@
     .fade-up { animation: fadeUp .75s ease both; }
     .d1 { animation-delay: .1s; } .d2 { animation-delay: .22s; } .d3 { animation-delay: .38s; }
 
+    /* ── REFERRAL STYLES ── */
+    .ref-code-box {
+      background: rgba(201,169,110,0.04);
+      border: 1px solid rgba(201,169,110,0.18);
+      border-radius: 12px;
+      padding: 1.5rem 1.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.75rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .ref-code-box::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(201,169,110,0.4), transparent);
+    }
+    .ref-code-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      color: #f0d9a8;
+      line-height: 1;
+      user-select: all;
+    }
+    .ref-copy-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-family: 'Jost', sans-serif; font-size: 0.46rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: rgba(201,169,110,0.75); background: rgba(201,169,110,0.07);
+      border: 1px solid rgba(201,169,110,0.25); border-radius: 100px;
+      padding: 0.55rem 1.1rem; cursor: pointer;
+      transition: all 0.22s;
+    }
+    .ref-copy-btn:hover { color: #c9a96e; border-color: rgba(201,169,110,0.5); background: rgba(201,169,110,0.12); transform: translateY(-1px); }
+    .ref-copy-btn.copied { color: #4ade80; border-color: rgba(74,222,128,0.35); background: rgba(74,222,128,0.06); }
+    .ref-how-step {
+      display: flex; align-items: flex-start; gap: 1rem;
+      padding: 1rem 1.1rem;
+      border: 1px solid rgba(245,242,235,0.05);
+      border-radius: 10px;
+      background: rgba(245,242,235,0.02);
+      transition: border-color 0.25s, transform 0.18s;
+    }
+    .ref-how-step:hover { border-color: rgba(201,169,110,0.15); transform: translateY(-2px); }
+    .ref-step-num {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: rgba(201,169,110,0.08);
+      border: 1px solid rgba(201,169,110,0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Cormorant Garamond', serif; font-size: 1rem; font-weight: 300;
+      color: rgba(201,169,110,0.7); flex-shrink: 0;
+    }
+    .ref-friend-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid rgba(245,242,235,0.04);
+    }
+    .ref-friend-row:last-child { border-bottom: none; }
+    .ref-friend-avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: rgba(201,169,110,0.08);
+      border: 1px solid rgba(201,169,110,0.15);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Cormorant Garamond', serif; font-size: 0.9rem; font-weight: 400;
+      color: rgba(201,169,110,0.65); flex-shrink: 0;
+    }
+    .ref-status-pill {
+      font-family: 'Jost', sans-serif; font-size: 0.38rem; letter-spacing: 0.15em; text-transform: uppercase;
+      padding: 2px 9px; border-radius: 100px;
+    }
+    .ref-status-pill.joined { color: #4ade80; border: 1px solid rgba(74,222,128,0.25); background: rgba(74,222,128,0.05); }
+    .ref-status-pill.pending { color: rgba(201,169,110,0.7); border: 1px solid rgba(201,169,110,0.22); background: rgba(201,169,110,0.05); }
+    .ref-share-btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      font-family: 'Jost', sans-serif; font-size: 0.46rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: rgba(245,242,235,0.45); background: rgba(245,242,235,0.03);
+      border: 1px solid rgba(245,242,235,0.09); border-radius: 100px;
+      padding: 0.55rem 1.1rem; cursor: pointer;
+      transition: all 0.22s;
+    }
+    .ref-share-btn:hover { color: rgba(245,242,235,0.85); border-color: rgba(245,242,235,0.2); background: rgba(245,242,235,0.06); transform: translateY(-1px); }
+    @keyframes refPulse { 0%,100%{box-shadow:0 0 0 0 rgba(201,169,110,0.25)} 50%{box-shadow:0 0 0 8px rgba(201,169,110,0)} }
+    .ref-code-box { animation: refPulse 3s ease-in-out infinite; }
+
     .footer { background: #0a0a09; padding: 4rem 2rem 1.5rem; border-top: 1px solid rgba(245,242,235,0.05); position: relative; z-index: 1; }
     @media(min-width:768px) { .footer { padding: 4rem 3rem 1.5rem; } }
     .footer-top { display: grid; grid-template-columns: 1fr; gap: 2.5rem; padding-bottom: 2.5rem; border-bottom: 1px solid rgba(245,242,235,0.05); }
@@ -314,6 +346,9 @@
     <div class="flex items-center gap-2 md:gap-3 ml-auto md:ml-0">
       <a href="/profile" class="nav-icon-btn active-icon" aria-label="Profile">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </a>
+      <a href="/wallet" class="nav-icon-btn" aria-label="Wallet">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12V8H6a2 2 0 0 1 0-4h14v4"/><path d="M4 6v12a2 2 0 0 0 2 2h14v-4"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg>
       </a>
       <a href="/wishlist" class="nav-icon-btn" aria-label="Wishlist">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
@@ -408,6 +443,17 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
         Addresses
       </button>
+      <!-- ══ REFERRAL TAB ══ -->
+      <button class="sidebar-tab" onclick="switchTab('referral')" id="tab-referral">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 12 20 22 4 22 4 12"/>
+          <rect x="2" y="7" width="20" height="5"/>
+          <line x1="12" y1="22" x2="12" y2="7"/>
+          <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/>
+          <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
+        </svg>
+        Referrals
+      </button>
     </div>
     <a href="/logout" class="sidebar-logout">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -472,6 +518,10 @@
               <span class="stat-num" style="font-size:1.1rem;padding-top:4px;"><%= new Date(user.createdAt).getFullYear() %></span>
               <span class="stat-label">Since</span>
             </div>
+            <div class="stat-pill" onclick="switchTab('referral')" style="cursor:pointer;">
+              <span class="stat-num" style="font-size:1.1rem;padding-top:4px;"><%= (user.referrals && user.referrals.length) ? user.referrals.length : 0 %></span>
+              <span class="stat-label">Referrals</span>
+            </div>
           </div>
         </div>
       </div>
@@ -483,10 +533,24 @@
         <div class="info-item"><p class="info-item-label">Member Since</p><p class="info-item-value"><%= new Date(user.createdAt).toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' }) %></p></div>
         <div class="info-item"><p class="info-item-label">Last Login</p><p class="info-item-value"><%= user.lastLogin ? new Date(user.lastLogin).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) : '—' %></p></div>
         <div class="info-item"><p class="info-item-label">Role</p><p class="info-item-value" style="text-transform:capitalize;"><%= user.role %></p></div>
+        <div class="info-item"><p class="info-item-label">Referral Code</p>
+          <p class="info-item-value" style="display:flex;align-items:center;gap:8px;">
+            <span style="font-family:'Cormorant Garamond',serif;font-size:1rem;color:#f0d9a8;letter-spacing:0.14em;"><%= user.referralCode || '—' %></span>
+            <% if (user.referralCode) { %>
+            <button onclick="copyCode('<%= user.referralCode %>')" style="background:none;border:none;cursor:pointer;color:rgba(201,169,110,0.45);transition:color 0.2s;padding:0;" onmouseover="this.style.color='#c9a96e'" onmouseout="this.style.color='rgba(201,169,110,0.45)'">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            </button>
+            <% } %>
+          </p>
+        </div>
       </div>
       <div style="margin-top:2rem;display:flex;gap:0.75rem;flex-wrap:wrap;align-items:center;">
         <button class="btn-gold" onclick="switchTab('edit')">Edit Profile<span class="btn-arrow"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span></button>
         <button class="btn-dark" onclick="switchTab('addresses')">Manage Addresses</button>
+        <button class="btn-dark" onclick="switchTab('referral')" style="gap:6px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+          Refer &amp; Earn
+        </button>
       </div>
     </div>
 
@@ -626,6 +690,118 @@
       <p id="noAddresses" style="font-size:0.75rem;font-weight:300;color:rgba(245,242,235,0.22);display:none;">No saved addresses. Add one above.</p>
     </div>
 
+    <!-- ══════════════════════════════════════
+         ── REFERRAL PANEL ──
+    ══════════════════════════════════════ -->
+    <div class="panel" id="panel-referral">
+      <p class="panel-title">Refer &amp; Earn</p>
+
+      <!-- intro blurb -->
+      <p style="font-size:0.75rem;font-weight:300;color:rgba(245,242,235,0.35);line-height:1.9;margin-bottom:1.75rem;max-width:520px;">
+        Share your personal code with friends. When they sign up and place their first order, both of you receive a reward credited straight to your wallets.
+      </p>
+
+      <!-- BIG CODE BOX -->
+      <% if (user.referralCode) { %>
+      <div class="ref-code-box">
+        <div>
+          <p style="font-family:'Jost',sans-serif;font-size:0.42rem;letter-spacing:0.3em;text-transform:uppercase;color:rgba(201,169,110,0.4);margin-bottom:8px;">Your Referral Code</p>
+          <p class="ref-code-text" id="refCodeDisplay"><%= user.referralCode %></p>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;">
+          <button class="ref-copy-btn" id="copyCodeBtn" onclick="copyCode('<%= user.referralCode %>')">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copy Code
+          </button>
+          <button class="ref-copy-btn" onclick="copyLink()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            Copy Link
+          </button>
+        </div>
+      </div>
+
+      <!-- SHARE ROW -->
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:2rem;">
+        <button class="ref-share-btn" onclick="shareWhatsApp()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          WhatsApp
+        </button>
+        <button class="ref-share-btn" onclick="shareEmail()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          Email
+        </button>
+        <button class="ref-share-btn" onclick="shareNative()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          More
+        </button>
+      </div>
+      <% } else { %>
+      <div style="padding:1.5rem;border:1px solid rgba(245,242,235,0.06);border-radius:12px;text-align:center;margin-bottom:2rem;">
+        <p style="font-size:0.72rem;font-weight:300;color:rgba(245,242,235,0.25);">No referral code assigned yet. Contact support to enable referrals on your account.</p>
+      </div>
+      <% } %>
+
+      <!-- HOW IT WORKS -->
+      <p style="font-family:'Jost',sans-serif;font-size:0.44rem;letter-spacing:0.28em;text-transform:uppercase;color:rgba(201,169,110,0.38);margin-bottom:0.9rem;">How it works</p>
+      <div style="display:flex;flex-direction:column;gap:8px;max-width:540px;margin-bottom:2rem;">
+        <div class="ref-how-step">
+          <div class="ref-step-num">1</div>
+          <div>
+            <p style="font-size:0.75rem;font-weight:400;color:rgba(245,242,235,0.75);margin-bottom:3px;">Share your code</p>
+            <p style="font-size:0.65rem;font-weight:300;color:rgba(245,242,235,0.3);line-height:1.7;">Send your unique referral code or link to friends and family.</p>
+          </div>
+        </div>
+        <div class="ref-how-step">
+          <div class="ref-step-num">2</div>
+          <div>
+            <p style="font-size:0.75rem;font-weight:400;color:rgba(245,242,235,0.75);margin-bottom:3px;">They sign up &amp; order</p>
+            <p style="font-size:0.65rem;font-weight:300;color:rgba(245,242,235,0.3);line-height:1.7;">Your friend uses your code at signup and completes their first purchase.</p>
+          </div>
+        </div>
+        <div class="ref-how-step">
+          <div class="ref-step-num">3</div>
+          <div>
+            <p style="font-size:0.75rem;font-weight:400;color:rgba(245,242,235,0.75);margin-bottom:3px;">Both of you earn</p>
+            <p style="font-size:0.65rem;font-weight:300;color:rgba(245,242,235,0.3);line-height:1.7;">A wallet credit is added automatically for both you and your friend.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- REFERRED FRIENDS LIST -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.9rem;">
+        <p style="font-family:'Jost',sans-serif;font-size:0.44rem;letter-spacing:0.28em;text-transform:uppercase;color:rgba(201,169,110,0.38);">Referred Friends</p>
+        <span style="font-family:'Jost',sans-serif;font-size:0.44rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(245,242,235,0.18);"><%= (user.referrals && user.referrals.length) || 0 %> total</span>
+      </div>
+      <div style="border:1px solid rgba(245,242,235,0.05);border-radius:12px;overflow:hidden;background:rgba(245,242,235,0.015);max-width:560px;">
+        <% if (user.referrals && user.referrals.length > 0) { %>
+          <% user.referrals.forEach(function(ref) { %>
+          <div class="ref-friend-row">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div class="ref-friend-avatar"><%= (ref.name || ref.email || '?').charAt(0).toUpperCase() %></div>
+              <div>
+                <p style="font-size:0.72rem;font-weight:300;color:rgba(245,242,235,0.7);">
+                  <%= ref.name || ref.email || 'Anonymous' %>
+                </p>
+                <p style="font-size:0.55rem;color:rgba(245,242,235,0.22);margin-top:1px;letter-spacing:0.04em;">
+                  Joined <%= ref.joinedAt ? new Date(ref.joinedAt).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '—' %>
+                </p>
+              </div>
+            </div>
+            <span class="ref-status-pill <%= ref.hasOrdered ? 'joined' : 'pending' %>">
+              <%= ref.hasOrdered ? 'Rewarded' : 'Pending' %>
+            </span>
+          </div>
+          <% }) %>
+        <% } else { %>
+          <div style="padding:2rem;text-align:center;">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(245,242,235,0.08)" stroke-width="1" style="display:block;margin:0 auto 10px;"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+            <p style="font-size:0.65rem;font-weight:300;color:rgba(245,242,235,0.18);">No referrals yet. Share your code to get started!</p>
+          </div>
+        <% } %>
+      </div>
+    </div>
+    <!-- ══ END REFERRAL PANEL ══ -->
+
   </main>
 </div>
 
@@ -731,8 +907,7 @@
       </div>
       <div class="form-group">
         <label class="vc-label">State *</label>
-        <select class="vc-input" id="addr-state"
-          onchange="clearFieldError(this)" onblur="validateState()">
+        <select class="vc-input" id="addr-state" onchange="clearFieldError(this)" onblur="validateState()">
           <option value="">Select State</option>
           <option>Andhra Pradesh</option><option>Arunachal Pradesh</option><option>Assam</option><option>Bihar</option><option>Chhattisgarh</option><option>Delhi</option><option>Goa</option><option>Gujarat</option><option>Haryana</option><option>Himachal Pradesh</option><option>Jharkhand</option><option>Karnataka</option><option>Kerala</option><option>Madhya Pradesh</option><option>Maharashtra</option><option>Manipur</option><option>Meghalaya</option><option>Mizoram</option><option>Nagaland</option><option>Odisha</option><option>Punjab</option><option>Rajasthan</option><option>Sikkim</option><option>Tamil Nadu</option><option>Telangana</option><option>Tripura</option><option>Uttar Pradesh</option><option>Uttarakhand</option><option>West Bengal</option>
         </select>
@@ -846,146 +1021,59 @@
     toastTimer = setTimeout(() => t.classList.remove('show'), 3200);
   }
 
-  /* ════════════════════════════════
-     VALIDATION HELPERS
-  ════════════════════════════════ */
+  /* ════ VALIDATION ════ */
   const ERR_ICON = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
 
   function setFieldError(inputEl, errId, msg) {
-    inputEl.classList.add('input-error');
-    inputEl.classList.remove('input-valid');
+    inputEl.classList.add('input-error'); inputEl.classList.remove('input-valid');
     const errEl = document.getElementById(errId);
-    if (errEl) {
-      errEl.innerHTML = ERR_ICON + ' ' + msg;
-      errEl.classList.remove('hidden');
-      // shake the input
-      inputEl.classList.remove('shake');
-      void inputEl.offsetWidth; // reflow
-      inputEl.classList.add('shake');
-    }
+    if (errEl) { errEl.innerHTML = ERR_ICON + ' ' + msg; errEl.classList.remove('hidden'); inputEl.classList.remove('shake'); void inputEl.offsetWidth; inputEl.classList.add('shake'); }
     return false;
   }
-
   function setFieldValid(inputEl, errId) {
-    inputEl.classList.remove('input-error');
-    inputEl.classList.add('input-valid');
-    const errEl = document.getElementById(errId);
-    if (errEl) errEl.classList.add('hidden');
-    return true;
+    inputEl.classList.remove('input-error'); inputEl.classList.add('input-valid');
+    const errEl = document.getElementById(errId); if (errEl) errEl.classList.add('hidden'); return true;
   }
-
   function clearFieldError(inputEl) {
-    inputEl.classList.remove('input-error', 'input-valid', 'shake');
-    // find sibling error
+    inputEl.classList.remove('input-error','input-valid','shake');
     const parent = inputEl.closest('.form-group') || inputEl.parentElement;
-    if (parent) {
-      const err = parent.querySelector('.field-error-msg');
-      if (err) err.classList.add('hidden');
-    }
+    if (parent) { const err = parent.querySelector('.field-error-msg'); if (err) err.classList.add('hidden'); }
   }
-
-  /* ── Generic required field validator ── */
   function validateAddrField(inputId, errId, msg) {
-    const el = document.getElementById(inputId);
-    if (!el) return true;
+    const el = document.getElementById(inputId); if (!el) return true;
     return el.value.trim() ? setFieldValid(el, errId) : setFieldError(el, errId, msg);
   }
+  function validatePhone() { const el = document.getElementById('addr-phone'); if (!/^\d{10}$/.test(el.value.trim())) return setFieldError(el,'err-addr-phone','Enter a valid 10-digit number.'); return setFieldValid(el,'err-addr-phone'); }
+  function validateState() { const el = document.getElementById('addr-state'); if (!el.value) return setFieldError(el,'err-addr-state','Please select a state.'); return setFieldValid(el,'err-addr-state'); }
+  function validatePincode() { const el = document.getElementById('addr-pincode'); if (!/^\d{6}$/.test(el.value.trim())) return setFieldError(el,'err-addr-pincode','Enter a valid 6-digit PIN code.'); return setFieldValid(el,'err-addr-pincode'); }
+  function validateEditName() { const el = document.getElementById('edit-name'); return el.value.trim() ? setFieldValid(el,'err-edit-name') : setFieldError(el,'err-edit-name','Name cannot be empty.'); }
+  function validateNewEmail() { const el = document.getElementById('new-email'); if (!el.value.trim() || !/^\S+@\S+\.\S+$/.test(el.value.trim())) return setFieldError(el,'err-new-email','Enter a valid email address.'); return setFieldValid(el,'err-new-email'); }
+  function validateCurrentPw() { const el = document.getElementById('pw-current'); return el.value ? setFieldValid(el,'err-pw-current') : setFieldError(el,'err-pw-current','Current password is required.'); }
+  function validateNewPw() { const el = document.getElementById('pw-new'); return el.value.length >= 8 ? setFieldValid(el,'err-pw-new') : setFieldError(el,'err-pw-new','Password must be at least 8 characters.'); }
+  function validateConfirmPw() { const el = document.getElementById('pw-confirm'); const nw = document.getElementById('pw-new').value; if (!el.value) return setFieldError(el,'err-pw-confirm','Please confirm your new password.'); return el.value === nw ? setFieldValid(el,'err-pw-confirm') : setFieldError(el,'err-pw-confirm','Passwords do not match.'); }
+  function submitEditProfile() { if (!validateEditName()) return; document.getElementById('editProfileForm').submit(); }
 
-  /* ── Phone ── */
-  function validatePhone() {
-    const el = document.getElementById('addr-phone');
-    if (!/^\d{10}$/.test(el.value.trim())) return setFieldError(el, 'err-addr-phone', 'Enter a valid 10-digit number.');
-    return setFieldValid(el, 'err-addr-phone');
-  }
-
-  /* ── State ── */
-  function validateState() {
-    const el = document.getElementById('addr-state');
-    if (!el.value) return setFieldError(el, 'err-addr-state', 'Please select a state.');
-    return setFieldValid(el, 'err-addr-state');
-  }
-
-  /* ── Pincode ── */
-  function validatePincode() {
-    const el = document.getElementById('addr-pincode');
-    if (!/^\d{6}$/.test(el.value.trim())) return setFieldError(el, 'err-addr-pincode', 'Enter a valid 6-digit PIN code.');
-    return setFieldValid(el, 'err-addr-pincode');
-  }
-
-  /* ── Edit profile name ── */
-  function validateEditName() {
-    const el = document.getElementById('edit-name');
-    return el.value.trim() ? setFieldValid(el, 'err-edit-name') : setFieldError(el, 'err-edit-name', 'Name cannot be empty.');
-  }
-
-  /* ── New email ── */
-  function validateNewEmail() {
-    const el = document.getElementById('new-email');
-    if (!el.value.trim() || !/^\S+@\S+\.\S+$/.test(el.value.trim()))
-      return setFieldError(el, 'err-new-email', 'Enter a valid email address.');
-    return setFieldValid(el, 'err-new-email');
-  }
-
-  /* ── Password fields ── */
-  function validateCurrentPw() {
-    const el = document.getElementById('pw-current');
-    return el.value ? setFieldValid(el, 'err-pw-current') : setFieldError(el, 'err-pw-current', 'Current password is required.');
-  }
-  function validateNewPw() {
-    const el = document.getElementById('pw-new');
-    return el.value.length >= 8 ? setFieldValid(el, 'err-pw-new') : setFieldError(el, 'err-pw-new', 'Password must be at least 8 characters.');
-  }
-  function validateConfirmPw() {
-    const el = document.getElementById('pw-confirm');
-    const nw = document.getElementById('pw-new').value;
-    if (!el.value) return setFieldError(el, 'err-pw-confirm', 'Please confirm your new password.');
-    return el.value === nw ? setFieldValid(el, 'err-pw-confirm') : setFieldError(el, 'err-pw-confirm', 'Passwords do not match.');
-  }
-
-  /* ── Edit profile submit ── */
-  function submitEditProfile() {
-    const ok = validateEditName();
-    if (!ok) return;
-    document.getElementById('editProfileForm').submit();
-  }
-
-  /* ── AVATAR UPLOAD ── */
+  /* ── AVATAR ── */
   async function uploadAvatar(e) {
     const file = e.target.files[0]; if (!file) return;
-    const statusEl = document.getElementById('avatarStatus');
-    statusEl.textContent = 'Uploading…';
-    const formData = new FormData();
-    formData.append('profileImage', file);
+    const statusEl = document.getElementById('avatarStatus'); statusEl.textContent = 'Uploading…';
+    const formData = new FormData(); formData.append('profileImage', file);
     try {
-      const res  = await fetch('/profile/upload-image', { method: 'POST', body: formData });
+      const res = await fetch('/profile/upload-image', { method: 'POST', body: formData });
       const data = await res.json();
       if (data.success) {
-        const wrap = document.querySelector('.avatar-wrap');
-        const old  = document.getElementById('avatarPreview');
-        const img  = document.createElement('img');
-        img.id        = 'avatarPreview';
-        img.src       = data.imageUrl;
-        img.alt       = 'Profile';
-        img.className = 'avatar-img';
-        wrap.replaceChild(img, old);
-        statusEl.textContent = 'Click to change';
-        showToast('Profile photo updated!', 'success');
-      } else {
-        statusEl.textContent = 'Upload failed';
-        showToast(data.message || 'Upload failed', 'error');
-      }
-    } catch {
-      statusEl.textContent = 'Click to change';
-      showToast('Network error. Try again.', 'error');
-    }
+        const wrap = document.querySelector('.avatar-wrap'), old = document.getElementById('avatarPreview'), img = document.createElement('img');
+        img.id = 'avatarPreview'; img.src = data.imageUrl; img.alt = 'Profile'; img.className = 'avatar-img';
+        wrap.replaceChild(img, old); statusEl.textContent = 'Click to change'; showToast('Profile photo updated!','success');
+      } else { statusEl.textContent = 'Upload failed'; showToast(data.message || 'Upload failed','error'); }
+    } catch { statusEl.textContent = 'Click to change'; showToast('Network error. Try again.','error'); }
   }
 
   /* ── EMAIL OTP ── */
   let resendInterval = null;
   async function sendEmailOTP() {
     if (!validateNewEmail()) return;
-    const email = document.getElementById('new-email').value.trim();
-    const btn = document.getElementById('sendOtpBtn');
+    const email = document.getElementById('new-email').value.trim(), btn = document.getElementById('sendOtpBtn');
     btn.disabled = true; btn.textContent = 'Sending…';
     try {
       const res = await fetch('/profile/request-email-change', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ newEmail: email }) });
@@ -994,23 +1082,13 @@
         document.getElementById('otp-sent-to').textContent = 'Sent to ' + email;
         document.getElementById('email-step1').style.display = 'none';
         document.getElementById('email-step2').style.display = 'block';
-        document.querySelectorAll('.otp-cell')[0].focus();
-        startResendTimer();
-        showToast('OTP sent! Check your inbox.', 'success');
-      } else {
-        const errEl = document.getElementById('err-new-email');
-        const inputEl = document.getElementById('new-email');
-        setFieldError(inputEl, 'err-new-email', data.message || 'Failed to send OTP.');
-      }
-    } catch {
-      const inputEl = document.getElementById('new-email');
-      setFieldError(inputEl, 'err-new-email', 'Network error. Please try again.');
-    }
+        document.querySelectorAll('.otp-cell')[0].focus(); startResendTimer(); showToast('OTP sent! Check your inbox.','success');
+      } else { setFieldError(document.getElementById('new-email'),'err-new-email', data.message || 'Failed to send OTP.'); }
+    } catch { setFieldError(document.getElementById('new-email'),'err-new-email','Network error. Please try again.'); }
     btn.disabled = false; btn.textContent = 'Send Verification Code';
   }
   async function verifyEmailOTP() {
-    const cells = document.querySelectorAll('.otp-cell');
-    const otp = Array.from(cells).map(c => c.value).join('');
+    const cells = document.querySelectorAll('.otp-cell'), otp = Array.from(cells).map(c => c.value).join('');
     const errEl = document.getElementById('otpError'), btn = document.getElementById('verifyOtpBtn');
     errEl.style.display = 'none';
     if (otp.length < 6) { errEl.textContent = 'Enter the complete 6-digit code.'; errEl.style.display = 'block'; return; }
@@ -1019,16 +1097,10 @@
       const res = await fetch('/profile/verify-email-change', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ otp }) });
       const data = await res.json();
       if (data.success) {
-        showToast('Email updated successfully!', 'success');
-        clearInterval(resendInterval);
-        const newEmail = document.getElementById('new-email').value.trim();
-        const el = document.getElementById('displayEmail'); if (el) el.textContent = newEmail;
+        showToast('Email updated successfully!','success'); clearInterval(resendInterval);
+        const el = document.getElementById('displayEmail'); if (el) el.textContent = document.getElementById('new-email').value.trim();
         resetEmailForm();
-      } else {
-        errEl.textContent = data.message || 'Invalid OTP. Try again.'; errEl.style.display = 'block';
-        cells.forEach(c => { c.style.borderColor = 'rgba(248,113,113,0.5)'; });
-        setTimeout(() => cells.forEach(c => { c.style.borderColor = ''; }), 1400);
-      }
+      } else { errEl.textContent = data.message || 'Invalid OTP. Try again.'; errEl.style.display = 'block'; cells.forEach(c => { c.style.borderColor = 'rgba(248,113,113,0.5)'; }); setTimeout(() => cells.forEach(c => { c.style.borderColor = ''; }), 1400); }
     } catch { errEl.textContent = 'Network error.'; errEl.style.display = 'block'; }
     btn.disabled = false; btn.textContent = 'Verify & Update';
   }
@@ -1039,67 +1111,49 @@
       const email = document.getElementById('new-email').value.trim();
       const res = await fetch('/profile/request-email-change', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ newEmail: email }) });
       const data = await res.json();
-      if (data.success) { document.querySelectorAll('.otp-cell').forEach(c => c.value = ''); document.querySelectorAll('.otp-cell')[0].focus(); startResendTimer(); showToast('New OTP sent!', 'success'); }
+      if (data.success) { document.querySelectorAll('.otp-cell').forEach(c => c.value = ''); document.querySelectorAll('.otp-cell')[0].focus(); startResendTimer(); showToast('New OTP sent!','success'); }
       else { errEl.textContent = data.message || 'Failed to resend.'; errEl.style.display = 'block'; btn.disabled = false; }
     } catch { errEl.textContent = 'Network error.'; errEl.style.display = 'block'; btn.disabled = false; }
   }
-  function otpNext(input, idx) { input.value = input.value.replace(/[^0-9]/g, ''); const cells = document.querySelectorAll('.otp-cell'); if (input.value.length === 1 && idx < 5) cells[idx+1].focus(); if (idx === 5 && input.value.length === 1) { const otp = Array.from(cells).map(c => c.value).join(''); if (otp.length === 6) verifyEmailOTP(); } }
-  function otpBack(e, input, idx) { if (e.key === 'Backspace' && !input.value && idx > 0) document.querySelectorAll('.otp-cell')[idx-1].focus(); }
+  function otpNext(input, idx) { input.value = input.value.replace(/[^0-9]/g,''); const cells = document.querySelectorAll('.otp-cell'); if (input.value.length===1 && idx<5) cells[idx+1].focus(); if (idx===5 && input.value.length===1) { const otp = Array.from(cells).map(c=>c.value).join(''); if (otp.length===6) verifyEmailOTP(); } }
+  function otpBack(e, input, idx) { if (e.key==='Backspace' && !input.value && idx>0) document.querySelectorAll('.otp-cell')[idx-1].focus(); }
   document.querySelectorAll('.otp-cell').forEach(cell => {
     cell.addEventListener('paste', e => {
-      e.preventDefault();
-      const pasted = e.clipboardData.getData('text').replace(/[^0-9]/g,'').slice(0,6);
-      if (!pasted) return;
-      const cells = document.querySelectorAll('.otp-cell');
-      pasted.split('').forEach((char, i) => { if (cells[i]) cells[i].value = char; });
-      cells[Math.min(pasted.length-1, 5)].focus();
-      if (pasted.length === 6) verifyEmailOTP();
+      e.preventDefault(); const pasted = e.clipboardData.getData('text').replace(/[^0-9]/g,'').slice(0,6); if (!pasted) return;
+      const cells = document.querySelectorAll('.otp-cell'); pasted.split('').forEach((char,i) => { if (cells[i]) cells[i].value = char; });
+      cells[Math.min(pasted.length-1,5)].focus(); if (pasted.length===6) verifyEmailOTP();
     });
   });
   function startResendTimer() {
     const btn = document.getElementById('resendOtpBtn'), timerEl = document.getElementById('resendTimer');
-    btn.disabled = true; let secs = 30; timerEl.textContent = '(' + secs + 's)';
-    clearInterval(resendInterval);
-    resendInterval = setInterval(() => { secs--; timerEl.textContent = '(' + secs + 's)'; if (secs <= 0) { clearInterval(resendInterval); btn.disabled = false; timerEl.textContent = ''; } }, 1000);
+    btn.disabled = true; let secs = 30; timerEl.textContent = '('+secs+'s)'; clearInterval(resendInterval);
+    resendInterval = setInterval(() => { secs--; timerEl.textContent = '('+secs+'s)'; if (secs<=0) { clearInterval(resendInterval); btn.disabled = false; timerEl.textContent = ''; } }, 1000);
   }
   function resetEmailForm() {
-    document.getElementById('email-step1').style.display = 'block';
-    document.getElementById('email-step2').style.display = 'none';
-    document.getElementById('new-email').value = '';
-    document.getElementById('err-new-email').classList.add('hidden');
-    document.getElementById('otpError').style.display = 'none';
-    document.querySelectorAll('.otp-cell').forEach(c => c.value = '');
-    clearInterval(resendInterval);
+    document.getElementById('email-step1').style.display = 'block'; document.getElementById('email-step2').style.display = 'none';
+    document.getElementById('new-email').value = ''; document.getElementById('err-new-email').classList.add('hidden');
+    document.getElementById('otpError').style.display = 'none'; document.querySelectorAll('.otp-cell').forEach(c => c.value = ''); clearInterval(resendInterval);
   }
 
   /* ── PASSWORD ── */
-  function togglePw(id) { const el = document.getElementById(id); el.type = el.type === 'password' ? 'text' : 'password'; }
+  function togglePw(id) { const el = document.getElementById(id); el.type = el.type==='password'?'text':'password'; }
   function updateStrength(val) {
     let score = 0;
     if (val.length >= 8) score++;
     if (/[A-Z]/.test(val) && /[0-9]/.test(val)) score++;
     if (/[^A-Za-z0-9]/.test(val)) score++;
-    const b1 = document.getElementById('bar1'), b2 = document.getElementById('bar2'), b3 = document.getElementById('bar3'), lb = document.getElementById('pwStrengthLabel');
+    const b1=document.getElementById('bar1'),b2=document.getElementById('bar2'),b3=document.getElementById('bar3'),lb=document.getElementById('pwStrengthLabel');
     if (!b1) return;
-    b1.className = b2.className = b3.className = 'pw-bar';
-    if (score === 1) { b1.classList.add('weak'); lb.textContent = 'Weak'; lb.style.color = '#f87171'; }
-    else if (score === 2) { b1.classList.add('medium'); b2.classList.add('medium'); lb.textContent = 'Good'; lb.style.color = '#fbbf24'; }
-    else if (score === 3) { b1.classList.add('strong'); b2.classList.add('strong'); b3.classList.add('strong'); lb.textContent = 'Strong'; lb.style.color = '#4ade80'; }
-    else { lb.textContent = ''; }
+    b1.className=b2.className=b3.className='pw-bar';
+    if (score===1){b1.classList.add('weak');lb.textContent='Weak';lb.style.color='#f87171';}
+    else if (score===2){b1.classList.add('medium');b2.classList.add('medium');lb.textContent='Good';lb.style.color='#fbbf24';}
+    else if (score===3){b1.classList.add('strong');b2.classList.add('strong');b3.classList.add('strong');lb.textContent='Strong';lb.style.color='#4ade80';}
+    else{lb.textContent='';}
   }
-  function submitPassword() {
-    const a = validateCurrentPw();
-    const b = validateNewPw();
-    const c = validateConfirmPw();
-    if (!a || !b || !c) return;
-    document.getElementById('pwForm').submit();
-  }
+  function submitPassword() { if (!validateCurrentPw()||!validateNewPw()||!validateConfirmPw()) return; document.getElementById('pwForm').submit(); }
 
-  /* ════════════════════════════════
-     ADDRESSES
-  ════════════════════════════════ */
+  /* ════ ADDRESSES ════ */
   let editingAddrId = null, deleteAddrId = null;
-
   function renderAddresses() {
     const list = document.getElementById('addressList'), empty = document.getElementById('noAddresses');
     list.innerHTML = '';
@@ -1108,141 +1162,80 @@
     addresses.forEach(addr => {
       const card = document.createElement('div');
       card.className = 'addr-card' + (addr.isDefault ? ' default-addr' : '');
-      const nameLine  = addr.fullName || '—';
-      const phoneLine = addr.phone    ? `📞 ${addr.phone}` : '';
-      const line1     = addr.line1    || addr.street || '';
-      const line2     = addr.line2    ? `, ${addr.line2}` : '';
-      const cityLine  = [addr.city, addr.state].filter(Boolean).join(', ');
-      const pinLine   = addr.pincode  ? ` — ${addr.pincode}` : '';
-      const typeBadge = addr.addressType ? `<span style="font-size:0.38rem;letter-spacing:0.14em;text-transform:uppercase;color:rgba(201,169,110,0.55);border:1px solid rgba(201,169,110,0.2);padding:2px 8px;border-radius:100px;margin-left:8px;">${addr.addressType}</span>` : '';
-      card.innerHTML = `
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
-          <div style="flex:1;min-width:160px;">
-            ${addr.isDefault ? '<span style="font-size:0.44rem;letter-spacing:0.15em;text-transform:uppercase;color:#4ade80;border:1px solid rgba(74,222,128,0.22);padding:2px 10px;display:inline-block;margin-bottom:8px;border-radius:100px;background:rgba(74,222,128,0.05);">Default</span>' : ''}
-            <p style="font-family:\'Cormorant Garamond\',serif;font-size:1rem;font-weight:400;color:#f5f2eb;margin-bottom:4px;">${nameLine}${typeBadge}</p>
-            <p style="font-size:0.72rem;font-weight:300;line-height:1.85;color:rgba(245,242,235,0.45);">
-              ${line1}${line2}<br/>${cityLine}${pinLine}<br/>${phoneLine}
-            </p>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;flex-shrink:0;">
-            <button class="btn-dark" style="font-size:0.46rem;padding:0.5rem 1.1rem;" onclick="editAddress('${addr.id}')">Edit</button>
-            ${!addr.isDefault ? `<button class="btn-dark" style="font-size:0.46rem;padding:0.5rem 1.1rem;" onclick="setDefaultAddr('${addr.id}')">Set Default</button>` : ''}
-            <button class="btn-danger-sm" style="font-size:0.46rem;padding:0.5rem 1.1rem;" onclick="promptDelete('${addr.id}')">Delete</button>
-          </div>
-        </div>`;
+      const nameLine = addr.fullName||'—', phoneLine = addr.phone?`📞 ${addr.phone}`:'', line1 = addr.line1||addr.street||'', line2 = addr.line2?`, ${addr.line2}`:'', cityLine = [addr.city,addr.state].filter(Boolean).join(', '), pinLine = addr.pincode?` — ${addr.pincode}`:'', typeBadge = addr.addressType?`<span style="font-size:0.38rem;letter-spacing:0.14em;text-transform:uppercase;color:rgba(201,169,110,0.55);border:1px solid rgba(201,169,110,0.2);padding:2px 8px;border-radius:100px;margin-left:8px;">${addr.addressType}</span>`:'';
+      card.innerHTML = `<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;"><div style="flex:1;min-width:160px;">${addr.isDefault?'<span style="font-size:0.44rem;letter-spacing:0.15em;text-transform:uppercase;color:#4ade80;border:1px solid rgba(74,222,128,0.22);padding:2px 10px;display:inline-block;margin-bottom:8px;border-radius:100px;background:rgba(74,222,128,0.05);">Default</span>':''}<p style="font-family:\'Cormorant Garamond\',serif;font-size:1rem;font-weight:400;color:#f5f2eb;margin-bottom:4px;">${nameLine}${typeBadge}</p><p style="font-size:0.72rem;font-weight:300;line-height:1.85;color:rgba(245,242,235,0.45);">${line1}${line2}<br/>${cityLine}${pinLine}<br/>${phoneLine}</p></div><div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;flex-shrink:0;"><button class="btn-dark" style="font-size:0.46rem;padding:0.5rem 1.1rem;" onclick="editAddress('${addr.id}')">Edit</button>${!addr.isDefault?`<button class="btn-dark" style="font-size:0.46rem;padding:0.5rem 1.1rem;" onclick="setDefaultAddr('${addr.id}')">Set Default</button>`:''}<button class="btn-danger-sm" style="font-size:0.46rem;padding:0.5rem 1.1rem;" onclick="promptDelete('${addr.id}')">Delete</button></div></div>`;
       list.appendChild(card);
     });
-    const statEl = document.getElementById('statAddresses');
-    if (statEl) statEl.textContent = addresses.length;
+    const statEl = document.getElementById('statAddresses'); if (statEl) statEl.textContent = addresses.length;
   }
-
-  /* ── Address modal open / reset ── */
   function openAddressModal(id = null) {
     editingAddrId = id;
-    ['addr-fullName','addr-phone','addr-line1','addr-line2','addr-city','addr-pincode'].forEach(fid => {
-      const el = document.getElementById(fid);
-      el.value = '';
-      el.classList.remove('input-error','input-valid','shake');
-    });
-    const stateEl = document.getElementById('addr-state');
-    stateEl.value = '';
-    stateEl.classList.remove('input-error','input-valid');
+    ['addr-fullName','addr-phone','addr-line1','addr-line2','addr-city','addr-pincode'].forEach(fid => { const el=document.getElementById(fid); el.value=''; el.classList.remove('input-error','input-valid','shake'); });
+    const stateEl = document.getElementById('addr-state'); stateEl.value=''; stateEl.classList.remove('input-error','input-valid');
     document.getElementById('addr-type').value = 'Home';
-    // hide all addr error msgs
     document.querySelectorAll('#addrModal .field-error-msg').forEach(e => e.classList.add('hidden'));
-
     document.getElementById('addrModalTitle').textContent = id ? 'Edit Address' : 'Add New Address';
-    if (id) {
-      const a = addresses.find(x => x.id === id);
-      if (a) {
-        document.getElementById('addr-fullName').value = a.fullName || '';
-        document.getElementById('addr-phone').value    = a.phone    || '';
-        document.getElementById('addr-line1').value    = a.line1    || a.street || '';
-        document.getElementById('addr-line2').value    = a.line2    || '';
-        document.getElementById('addr-city').value     = a.city     || '';
-        document.getElementById('addr-pincode').value  = a.pincode  || '';
-        document.getElementById('addr-type').value     = a.addressType || 'Home';
-        const sel = document.getElementById('addr-state');
-        for (const opt of sel.options) { if (opt.value === a.state || opt.text === a.state) { sel.value = opt.value; break; } }
-      }
-    }
+    if (id) { const a = addresses.find(x=>x.id===id); if (a) { document.getElementById('addr-fullName').value=a.fullName||''; document.getElementById('addr-phone').value=a.phone||''; document.getElementById('addr-line1').value=a.line1||a.street||''; document.getElementById('addr-line2').value=a.line2||''; document.getElementById('addr-city').value=a.city||''; document.getElementById('addr-pincode').value=a.pincode||''; document.getElementById('addr-type').value=a.addressType||'Home'; const sel=document.getElementById('addr-state'); for (const opt of sel.options){if(opt.value===a.state||opt.text===a.state){sel.value=opt.value;break;}} } }
     document.getElementById('addrModal').classList.add('open');
     setTimeout(() => document.getElementById('addr-fullName').focus(), 300);
   }
-
   function closeAddressModal() { document.getElementById('addrModal').classList.remove('open'); editingAddrId = null; }
-
-  /* ── Save address with full inline validation ── */
   async function saveAddress() {
-    // Run all validations and collect results
-    const v1 = validateAddrField('addr-fullName', 'err-addr-fullName', 'Full name is required.');
-    const v2 = validatePhone();
-    const v3 = validateAddrField('addr-line1', 'err-addr-line1', 'Address line 1 is required.');
-    const v4 = validateAddrField('addr-city', 'err-addr-city', 'City is required.');
-    const v5 = validateState();
-    const v6 = validatePincode();
-    if (!v1 || !v2 || !v3 || !v4 || !v5 || !v6) return; // stop if any invalid
-
-    const fullName    = document.getElementById('addr-fullName').value.trim();
-    const phone       = document.getElementById('addr-phone').value.trim();
-    const line1       = document.getElementById('addr-line1').value.trim();
-    const line2       = document.getElementById('addr-line2').value.trim();
-    const city        = document.getElementById('addr-city').value.trim();
-    const state       = document.getElementById('addr-state').value;
-    const pincode     = document.getElementById('addr-pincode').value.trim();
-    const addressType = document.getElementById('addr-type').value;
-
-    const btn = document.getElementById('saveAddrBtn');
-    btn.disabled = true; btn.textContent = 'Saving…';
-    const payload = { fullName, phone, line1, line2, city, state, pincode, addressType };
-    const url    = editingAddrId ? `/profile/address/${editingAddrId}` : '/profile/address';
-    const method = editingAddrId ? 'PUT' : 'POST';
+    const v1=validateAddrField('addr-fullName','err-addr-fullName','Full name is required.'), v2=validatePhone(), v3=validateAddrField('addr-line1','err-addr-line1','Address line 1 is required.'), v4=validateAddrField('addr-city','err-addr-city','City is required.'), v5=validateState(), v6=validatePincode();
+    if (!v1||!v2||!v3||!v4||!v5||!v6) return;
+    const fullName=document.getElementById('addr-fullName').value.trim(), phone=document.getElementById('addr-phone').value.trim(), line1=document.getElementById('addr-line1').value.trim(), line2=document.getElementById('addr-line2').value.trim(), city=document.getElementById('addr-city').value.trim(), state=document.getElementById('addr-state').value, pincode=document.getElementById('addr-pincode').value.trim(), addressType=document.getElementById('addr-type').value;
+    const btn = document.getElementById('saveAddrBtn'); btn.disabled=true; btn.textContent='Saving…';
     try {
-      const res  = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      const res = await fetch(editingAddrId?`/profile/address/${editingAddrId}`:'/profile/address', { method:editingAddrId?'PUT':'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({fullName,phone,line1,line2,city,state,pincode,addressType}) });
       const data = await res.json();
-      if (data.success) {
-        addresses = data.addresses.map(a => ({ ...a, id: a._id.toString() }));
-        closeAddressModal();
-        renderAddresses();
-        showToast(editingAddrId ? 'Address updated.' : 'Address saved.', 'success');
-      } else {
-        showToast(data.message || 'Failed to save address.', 'error');
-      }
-    } catch {
-      showToast('Network error. Please try again.', 'error');
-    } finally {
-      btn.disabled = false; btn.textContent = 'Save Address';
-    }
+      if (data.success) { addresses=data.addresses.map(a=>({...a,id:a._id.toString()})); closeAddressModal(); renderAddresses(); showToast(editingAddrId?'Address updated.':'Address saved.','success'); }
+      else showToast(data.message||'Failed to save address.','error');
+    } catch { showToast('Network error. Please try again.','error'); }
+    finally { btn.disabled=false; btn.textContent='Save Address'; }
   }
-
-  function setDefaultAddr(id) {
-    fetch(`/profile/address/${id}/default`, { method: 'PATCH' })
-      .then(r => r.json()).then(data => {
-        if (data.success) { addresses = data.addresses.map(a => ({ ...a, id: a._id.toString() })); renderAddresses(); showToast('Default address updated.', 'success'); }
-        else showToast(data.message || 'Failed.', 'error');
-      }).catch(() => showToast('Network error.', 'error'));
-  }
-
+  function setDefaultAddr(id) { fetch(`/profile/address/${id}/default`,{method:'PATCH'}).then(r=>r.json()).then(data=>{if(data.success){addresses=data.addresses.map(a=>({...a,id:a._id.toString()}));renderAddresses();showToast('Default address updated.','success');}else showToast(data.message||'Failed.','error');}).catch(()=>showToast('Network error.','error')); }
   function editAddress(id) { openAddressModal(id); }
-  function promptDelete(id) { deleteAddrId = id; document.getElementById('deleteModal').classList.add('open'); }
-  function closeDeleteModal() { document.getElementById('deleteModal').classList.remove('open'); deleteAddrId = null; }
-  function confirmDelete() {
-    if (!deleteAddrId) return;
-    fetch(`/profile/address/${deleteAddrId}`, { method: 'DELETE' })
-      .then(r => r.json()).then(data => {
-        if (data.success) { addresses = data.addresses.map(a => ({ ...a, id: a._id.toString() })); closeDeleteModal(); renderAddresses(); showToast('Address removed.', 'info'); }
-        else showToast(data.message || 'Delete failed.', 'error');
-      }).catch(() => showToast('Network error.', 'error'));
-  }
+  function promptDelete(id) { deleteAddrId=id; document.getElementById('deleteModal').classList.add('open'); }
+  function closeDeleteModal() { document.getElementById('deleteModal').classList.remove('open'); deleteAddrId=null; }
+  function confirmDelete() { if (!deleteAddrId) return; fetch(`/profile/address/${deleteAddrId}`,{method:'DELETE'}).then(r=>r.json()).then(data=>{if(data.success){addresses=data.addresses.map(a=>({...a,id:a._id.toString()}));closeDeleteModal();renderAddresses();showToast('Address removed.','info');}else showToast(data.message||'Delete failed.','error');}).catch(()=>showToast('Network error.','error')); }
+  document.getElementById('addrModal').addEventListener('click', e=>{if(e.target===document.getElementById('addrModal'))closeAddressModal();});
+  document.getElementById('deleteModal').addEventListener('click', e=>{if(e.target===document.getElementById('deleteModal'))closeDeleteModal();});
 
-  /* ── MODAL BACKDROP DISMISS ── */
-  document.getElementById('addrModal').addEventListener('click', e => { if (e.target === document.getElementById('addrModal')) closeAddressModal(); });
-  document.getElementById('deleteModal').addEventListener('click', e => { if (e.target === document.getElementById('deleteModal')) closeDeleteModal(); });
+  /* ════ REFERRAL ════ */
+  function copyCode(code) {
+    navigator.clipboard.writeText(code).then(() => {
+      const btn = document.getElementById('copyCodeBtn');
+      if (btn) { btn.classList.add('copied'); btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> Copied!'; setTimeout(()=>{ btn.classList.remove('copied'); btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy Code'; }, 2000); }
+      showToast('Referral code copied!', 'success');
+    }).catch(() => showToast('Copy failed — please copy manually.', 'error'));
+  }
+  function copyLink() {
+    const code = document.getElementById('refCodeDisplay') ? document.getElementById('refCodeDisplay').textContent.trim() : '';
+    const link = window.location.origin + '/signup?ref=' + code;
+    navigator.clipboard.writeText(link).then(() => showToast('Referral link copied!', 'success')).catch(() => showToast('Copy failed.', 'error'));
+  }
+  function shareWhatsApp() {
+    const code = document.getElementById('refCodeDisplay') ? document.getElementById('refCodeDisplay').textContent.trim() : '';
+    const text = encodeURIComponent('Hey! Use my referral code ' + code + ' when you sign up on Velmora Chroné and we both get a reward: ' + window.location.origin + '/signup?ref=' + code);
+    window.open('https://wa.me/?text=' + text, '_blank');
+  }
+  function shareEmail() {
+    const code = document.getElementById('refCodeDisplay') ? document.getElementById('refCodeDisplay').textContent.trim() : '';
+    const subject = encodeURIComponent('Join Velmora Chroné — use my referral code');
+    const body = encodeURIComponent('Hey,\n\nI\'ve been shopping on Velmora Chroné and thought you\'d love it too. Use my referral code ' + code + ' when you sign up and we both earn a wallet credit!\n\nSign up here: ' + window.location.origin + '/signup?ref=' + code + '\n\nCheers!');
+    window.location.href = 'mailto:?subject=' + subject + '&body=' + body;
+  }
+  function shareNative() {
+    const code = document.getElementById('refCodeDisplay') ? document.getElementById('refCodeDisplay').textContent.trim() : '';
+    if (navigator.share) {
+      navigator.share({ title: 'Velmora Chroné — Join with my referral', text: 'Use code ' + code + ' when you sign up!', url: window.location.origin + '/signup?ref=' + code }).catch(()=>{});
+    } else { copyLink(); }
+  }
 
   /* ── INIT ── */
   renderAddresses();
-  const hash = window.location.hash.replace('#', '');
-  if (['details','edit','email','password','addresses'].includes(hash)) switchTab(hash);
+  const hash = window.location.hash.replace('#','');
+  if (['details','edit','email','password','addresses','referral'].includes(hash)) switchTab(hash);
   history.pushState(null, null, window.location.href);
   window.addEventListener('popstate', () => history.pushState(null, null, window.location.href));
 </script>

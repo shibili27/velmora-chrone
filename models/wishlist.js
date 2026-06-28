@@ -1,4 +1,3 @@
-// models/wishlist.js
 import mongoose from 'mongoose';
 
 const wishlistItemSchema = new mongoose.Schema(

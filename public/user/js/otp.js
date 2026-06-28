@@ -1,4 +1,3 @@
-// ─── Toast (inlined to avoid module import failure) ───────────────────────────
 function showToast(type = "default", message = "") {
   const containerId = "toast-container";
   let container = document.getElementById(containerId);
@@ -32,7 +31,6 @@ function showToast(type = "default", message = "") {
   }, 3000);
 }
 
-// ─── DOM refs ─────────────────────────────────────────────────────────────────
 const inputs      = document.querySelectorAll(".otp-boxes input");
 const verifyBtn   = document.getElementById("verifyBtn");
 const resendBtn   = document.getElementById("resendBtn");
@@ -43,7 +41,6 @@ let isExpired    = false;
 let isSubmitting = false;
 let countdown;
 
-// ─── Input behaviour ──────────────────────────────────────────────────────────
 inputs.forEach((input, i) => {
   input.addEventListener("input", () => {
     input.value = input.value.replace(/[^0-9]/g, "");
@@ -78,7 +75,6 @@ function autoSubmitIfComplete() {
   }
 }
 
-// ─── Verify button ────────────────────────────────────────────────────────────
 verifyBtn.addEventListener("click", () => {
   if (isSubmitting) return;
   const otp = getOTP();
@@ -87,7 +83,6 @@ verifyBtn.addEventListener("click", () => {
   submitOTP(otp);
 });
 
-// ─── Submit ───────────────────────────────────────────────────────────────────
 async function submitOTP(otp) {
   if (isSubmitting) return;
   isSubmitting    = true;
@@ -112,7 +107,6 @@ async function submitOTP(otp) {
         window.location.href = isReset ? "/reset-password" : "/login";
       }, 1000);
 
-      // keep button disabled — we're navigating away
     } else {
       showError(res.data.message || "Invalid OTP");
       isSubmitting = false;
@@ -126,7 +120,6 @@ async function submitOTP(otp) {
   }
 }
 
-// ─── Timer ────────────────────────────────────────────────────────────────────
 function setExpiry() {
   localStorage.setItem("otpExpiry", Date.now() + 59000);
 }
@@ -151,7 +144,6 @@ function startTimer() {
   }, 1000);
 }
 
-// ─── Resend ───────────────────────────────────────────────────────────────────
 resendBtn.addEventListener("click", async (e) => {
   e.preventDefault();
   if (!isExpired) return;
@@ -181,7 +173,6 @@ resendBtn.addEventListener("click", async (e) => {
   }
 });
 
-// ─── Error helpers ────────────────────────────────────────────────────────────
 function showError(msg) {
   errorEl.style.display = "block";
   errorEl.textContent   = msg;
@@ -191,7 +182,6 @@ function clearError() {
   errorEl.textContent   = "";
 }
 
-// ─── Init ─────────────────────────────────────────────────────────────────────
 if (!localStorage.getItem("otpExpiry") || Date.now() > parseInt(localStorage.getItem("otpExpiry"), 10)) {
   setExpiry();
 }

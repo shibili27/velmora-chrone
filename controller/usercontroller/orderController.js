@@ -49,10 +49,15 @@ export const getOrderDetail = async (req, res) => {
 
 export const cancelOrder = async (req, res) => {
   try {
+    const reason = (req.body.reason || '').trim();
+    if (!reason) {
+      return res.status(400).json({ success: false, message: 'A cancellation reason is required.' });
+    }
+
     await orderService.cancelEntireOrder({
       orderNumber : req.params.orderNumber,
       userId      : req.user._id,
-      reason      : req.body.reason,
+      reason,
     });
 
     return res.json({ success: true, message: 'Order cancelled successfully.' });
@@ -64,11 +69,16 @@ export const cancelOrder = async (req, res) => {
 
 export const cancelItem = async (req, res) => {
   try {
+    const reason = (req.body.reason || '').trim();
+    if (!reason) {
+      return res.status(400).json({ success: false, message: 'A cancellation reason is required.' });
+    }
+
     const { allCancelled } = await orderService.cancelSingleItem({
       orderNumber : req.params.orderNumber,
       userId      : req.user._id,
       itemId      : req.body.itemId,
-      reason      : req.body.reason,
+      reason,
     });
 
     return res.json({ success: true, message: 'Item cancelled.', allCancelled });

@@ -13,20 +13,16 @@ const offerSchema = new mongoose.Schema(
       default: '',
     },
 
-    // What this offer discounts
     appliesTo: {
       type:     String,
       enum:     ['product', 'category'],
       required: [true, 'Offer must apply to either a product or a category'],
     },
-    // Points to a Product._id when appliesTo === 'product',
-    // or a Category._id when appliesTo === 'category'.
     targetId: {
       type:     mongoose.Schema.Types.ObjectId,
       required: [true, 'Offer must target a product or category'],
     },
 
-    // How much it discounts
     discountType: {
       type:     String,
       enum:     ['percentage', 'flat'],
@@ -38,7 +34,6 @@ const offerSchema = new mongoose.Schema(
       min:      [0, 'Discount value cannot be negative'],
     },
 
-    // Validity window
     startDate: {
       type:     Date,
       required: [true, 'Start date is required'],
@@ -60,22 +55,17 @@ const offerSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// A product can only have one ACTIVE, non-deleted offer at a time, and
-// likewise for a category — keeps "find the offer for this target" unambiguous.
 offerSchema.index({ appliesTo: 1, targetId: 1, isActive: 1, isDeleted: 1 });
 
-// ── Validation: percentage discounts must be 0-100 ─────────────────────────
-offerSchema.pre('validate', function (next) {
+offerSchema.pre('validate', function () {
   if (this.discountType === 'percentage' && this.discountValue > 100) {
-    return next(new Error('Percentage discount cannot exceed 100.'));
+    throw new Error('Percentage discount cannot exceed 100.');
   }
   if (this.endDate && this.startDate && this.endDate < this.startDate) {
-    return next(new Error('End date cannot be before start date.'));
+    throw new Error('End date cannot be before start date.');
   }
-  next();
 });
 
-// ── Instance helper: is this offer currently live? ──────────────────────────
 offerSchema.methods.isLiveNow = function (at = new Date()) {
   return (
     this.isActive &&
@@ -85,12 +75,11 @@ offerSchema.methods.isLiveNow = function (at = new Date()) {
   );
 };
 
-// ── Instance helper: compute the discount amount for a given base price ────
 offerSchema.methods.calculateDiscount = function (basePrice) {
   if (this.discountType === 'percentage') {
     return Math.round((basePrice * this.discountValue) / 100);
   }
-  return Math.min(this.discountValue, basePrice); // flat discount never exceeds the price itself
+  return Math.min(this.discountValue, basePrice); 
 };
 
 const Offer = mongoose.models.Offer || mongoose.model('Offer', offerSchema);

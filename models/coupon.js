@@ -28,8 +28,7 @@ const couponSchema = new mongoose.Schema(
       min:     0,
     },
 
-    // FIX: renamed back-and-forth mismatch — this is the single source of truth.
-    // Admin controller must write to THIS field name (see adminController patch below).
+  
     minOrderValue: {
       type:    Number,
       default: 0,
@@ -65,9 +64,7 @@ const couponSchema = new mongoose.Schema(
       min:     1,
     },
 
-    // FIX: this was referenced in checkoutService.recordCouponUsage() but never
-    // declared in the schema, so per-user usage was never actually persisted
-    // and perUserLimit could never be enforced.
+    
     usedBy: {
       type: [
         {
@@ -91,7 +88,6 @@ const couponSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// ─── Virtuals ────────────────────────────────────────────────────────────────
 
 couponSchema.virtual('isValid').get(function () {
   if (!this.isActive || this.isDeleted)                                  return false;
@@ -100,12 +96,11 @@ couponSchema.virtual('isValid').get(function () {
   return true;
 });
 
-// ─── Instance Methods ─────────────────────────────────────────────────────────
 
 /**
  * Validate a coupon for a specific order.
- * @param {number} orderSubtotal   - Cart subtotal (before GST / discount)
- * @param {number} userUsageCount  - How many times this user has already used this coupon
+ * @param {number} orderSubtotal  
+ * @param {number} userUsageCount  
  * @returns {{ valid: boolean, message: string }}
  */
 couponSchema.methods.validateFor = function (orderSubtotal, userUsageCount = 0) {
@@ -146,9 +141,9 @@ couponSchema.methods.getUserUsageCount = function (userId) {
 };
 
 /**
- * Calculate the discount amount for a given subtotal.
+ 
  * @param {number} subtotal
- * @returns {number} discount amount (never exceeds subtotal)
+ * @returns {number} 
  */
 couponSchema.methods.calculateDiscount = function (subtotal) {
   let discount = 0;
@@ -161,10 +156,10 @@ couponSchema.methods.calculateDiscount = function (subtotal) {
       discount = Math.min(discount, this.maxDiscountCap);
     }
   } else if (this.discountType === 'free_shipping') {
-    discount = 0; // shipping waiver handled separately in checkout
+    discount = 0; 
   }
 
-  return Math.min(discount, subtotal); // discount can never exceed subtotal
+  return Math.min(discount, subtotal); 
 };
 
 export default mongoose.model('Coupon', couponSchema);

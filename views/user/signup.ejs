@@ -26,8 +26,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="/user/css/signup.css" />
-  
-  <!-- Axios CDN for AJAX requests -->
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 
@@ -59,7 +57,7 @@
     </div>
   </div>
 
-  <!-- Toast Notification Container -->
+  <!-- Toast Container -->
   <div id="toast-container" class="fixed top-4 right-4 z-50"></div>
 
   <!-- MAIN CARD -->
@@ -83,12 +81,10 @@
             Secure an exclusive invitation to the manufacture estate.
           </p>
 
-          <!-- Server error placeholder (hidden) -->
           <% if (locals.authError) { %>
           <div id="server-auth-error" data-message="<%= authError %>" style="display:none;"></div>
           <% } %>
 
-          <!-- Form with AJAX submission -->
           <form id="signupForm" class="space-y-5 fade-up delay-3" novalidate>
 
             <% if (typeof csrfToken !== 'undefined') { %>
@@ -155,7 +151,26 @@
                 <div class="field-hint" id="hint-confirm">Passwords do not match.</div>
               </div>
             </div>
-          
+
+            <!-- ══ REFERRAL CODE (optional) ══ -->
+            <div class="fade-up delay-4">
+              <label for="referralCode" class="field-label block">
+                Referral Code
+                <span style="opacity:0.4;text-transform:none;font-size:0.6rem;margin-left:4px;">(optional)</span>
+              </label>
+              <div class="relative flex items-center">
+                <input id="referralCode" name="referralCode" type="text"
+                  class="input-vault" placeholder="e.g. 3F9A12BC"
+                  autocomplete="off" maxlength="8"
+                  style="letter-spacing:0.15em;text-transform:uppercase;"
+                  oninput="this.value = this.value.toUpperCase(); clearReferralHint();" />
+                <!-- tick icon — shown when code looks valid -->
+                <span id="ref-tick" style="display:none;position:absolute;right:0;
+                  color:#0d9488;font-size:0.75rem;pointer-events:none;">✓</span>
+              </div>
+              <div class="field-hint" id="hint-referral"></div>
+            </div>
+            <!-- ══ END REFERRAL CODE ══ -->
 
             <!-- Terms -->
             <div class="fade-up delay-4">
@@ -175,17 +190,16 @@
             <div class="pt-1 fade-up delay-5">
               <button type="submit" class="btn-vault" id="submitBtn">Create Account</button>
             </div>
-             <a href="/auth/google" class="btn-google fade-up delay-6">
-            <!-- Official Google G icon -->
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
-              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-            </svg>
-            Continue with Google
-          </a>
 
+            <a href="/auth/google" class="btn-google fade-up delay-6">
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+              </svg>
+              Continue with Google
+            </a>
 
           </form>
 
@@ -258,26 +272,19 @@
   </footer>
 
   <script>
-    /* ── Toast Notification System ── */
+    /* ── Toast ── */
     function showToast(type, message) {
       const container = document.getElementById('toast-container');
       const toast = document.createElement('div');
       toast.className = `toast-notification ${type}`;
-      toast.innerHTML = `
-        <div class="flex items-center gap-2">
-          <span>${type === 'success' ? '✓' : type === 'error' ? '✗' : '⚠'}</span>
-          <span>${message}</span>
-        </div>
-      `;
+      toast.innerHTML = `<div class="flex items-center gap-2"><span>${type === 'success' ? '✓' : type === 'error' ? '✗' : '⚠'}</span><span>${message}</span></div>`;
       container.appendChild(toast);
       setTimeout(() => toast.remove(), 4000);
     }
 
+    /* ── Eye toggle ── */
     const EYE_OPEN = `<circle cx="12" cy="12" r="3"/><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/>`;
-    const EYE_SHUT = `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
-                      <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
-                      <line x1="1" y1="1" x2="23" y2="23"/>`;
-
+    const EYE_SHUT = `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>`;
     function toggleField(inputId, iconId) {
       const inp = document.getElementById(inputId);
       const icon = document.getElementById(iconId);
@@ -285,6 +292,7 @@
       else { inp.type = 'password'; icon.innerHTML = EYE_OPEN; }
     }
 
+    /* ── Password strength ── */
     function updateStrength(val) {
       const fill = document.getElementById('strength-fill');
       let score = 0;
@@ -298,16 +306,28 @@
       fill.style.background = col[score];
     }
 
+    /* ── Referral code hint ── */
+    function clearReferralHint() {
+      hideHint('hint-referral');
+      const tick = document.getElementById('ref-tick');
+      const inp  = document.getElementById('referralCode');
+      if (inp.value.length === 8) {
+        tick.style.display = 'block';
+      } else {
+        tick.style.display = 'none';
+      }
+    }
+
+    /* ── Seal ── */
     const ICONS = {
       lock:   `<rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>`,
       key:    `<path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>`,
       warn:   `<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>`,
       shield: `<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>`,
       user:   `<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>`,
+      gift:   `<polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>`,
     };
-
     let sealTimer = null;
-
     function showSeal(label, message, iconKey = 'lock') {
       const seal  = document.getElementById('vault-seal');
       const drain = document.getElementById('seal-drain');
@@ -323,15 +343,14 @@
       if (sealTimer) clearTimeout(sealTimer);
       sealTimer = setTimeout(hideSeal, 4200);
     }
-
     function hideSeal() {
       const seal = document.getElementById('vault-seal');
       if (seal) seal.classList.remove('seal-visible');
       if (sealTimer) { clearTimeout(sealTimer); sealTimer = null; }
     }
-
     document.addEventListener('keydown', e => { if (e.key === 'Escape') hideSeal(); });
 
+    /* ── Field helpers ── */
     function markError(el) {
       if (!el) return;
       el.classList.add('input-error');
@@ -344,24 +363,52 @@
     }
     function showHint(id, msg) {
       const h = document.getElementById(id);
-      if (h) {
-        h.innerHTML = msg;
-        h.classList.add('hint-show');
-      }
+      if (h) { h.innerHTML = msg; h.classList.add('hint-show'); }
     }
-    function hideHint(id) { 
+    function hideHint(id) {
       const h = document.getElementById(id);
-      if (h) h.classList.remove('hint-show'); 
+      if (h) h.classList.remove('hint-show');
     }
 
+    /* ── Pre-fill referral code from URL ?ref=XXXX ── */
+    window.addEventListener('DOMContentLoaded', () => {
+      const params = new URLSearchParams(window.location.search);
+      const refCode = params.get('ref');
+      if (refCode) {
+        const inp = document.getElementById('referralCode');
+        if (inp) {
+          inp.value = refCode.toUpperCase();
+          clearReferralHint();
+          showSeal('Referral Code Applied', `Code "${refCode.toUpperCase()}" has been pre-filled for you.`, 'gift');
+        }
+      }
+
+      /* Server-side error display */
+      const errEl = document.getElementById('server-auth-error');
+      if (!errEl) return;
+      const msg = errEl.dataset.message;
+      if (!msg) return;
+      const emailEl = document.getElementById('email');
+      const nameEl  = document.getElementById('name');
+      if (msg.toLowerCase().includes('name')) {
+        markError(nameEl); shakeEl(nameEl); showHint('hint-name', msg);
+      } else {
+        markError(emailEl); shakeEl(emailEl); showHint('hint-email', msg);
+      }
+      showToast('error', msg);
+      setTimeout(() => showSeal('Registration Blocked', msg, 'warn'), 400);
+    });
+
+    /* ── Form submit ── */
     document.getElementById('signupForm').addEventListener('submit', async function(e) {
       e.preventDefault();
 
-      const nameEl  = document.getElementById('name');
-      const emailEl = document.getElementById('email');
-      const passEl  = document.getElementById('password');
-      const confEl  = document.getElementById('confirmPassword');
-      const termsEl = document.getElementById('terms');
+      const nameEl    = document.getElementById('name');
+      const emailEl   = document.getElementById('email');
+      const passEl    = document.getElementById('password');
+      const confEl    = document.getElementById('confirmPassword');
+      const termsEl   = document.getElementById('terms');
+      const refEl     = document.getElementById('referralCode');
       const submitBtn = document.getElementById('submitBtn');
       const csrfToken = document.querySelector('input[name="_csrf"]')?.value;
 
@@ -369,108 +416,92 @@
       const emailVal = emailEl.value.trim();
       const passVal  = passEl.value;
       const confVal  = confEl.value;
+      const refVal   = refEl.value.trim().toUpperCase();
 
       const emailRx = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       const nameRx  = /^[a-zA-Z\s]+$/;
 
+      ['hint-name','hint-email','hint-password','hint-confirm','hint-terms','hint-referral'].forEach(hideHint);
 
-
-
-      
-      ['hint-name','hint-email','hint-password','hint-confirm','hint-terms'].forEach(hideHint);
-
-     
+      /* Validation */
       if (!nameVal) {
         markError(nameEl); shakeEl(nameEl);
         showHint('hint-name', 'Full name is required.');
         showSeal('Registration Blocked', 'Please enter your full name to continue.', 'user');
-        nameEl.focus();
-        return;
+        nameEl.focus(); return;
       }
       if (!nameRx.test(nameVal)) {
         markError(nameEl); shakeEl(nameEl);
         showHint('hint-name', 'Name must contain only letters and spaces.');
         showSeal('Invalid Name', 'Numbers and symbols are not allowed in your name.', 'warn');
-        nameEl.focus();
-        return;
+        nameEl.focus(); return;
       }
       if (nameVal.length < 3) {
         markError(nameEl); shakeEl(nameEl);
         showHint('hint-name', 'Name must be at least 3 characters long.');
         showSeal('Name Too Short', 'Please enter your full name (min. 3 characters).', 'warn');
-        nameEl.focus();
-        return;
+        nameEl.focus(); return;
       }
       if (nameVal.length > 50) {
         markError(nameEl); shakeEl(nameEl);
         showHint('hint-name', 'Name cannot exceed 50 characters.');
         showSeal('Name Too Long', 'Please shorten your name to 50 characters or less.', 'warn');
-        nameEl.focus();
-        return;
+        nameEl.focus(); return;
       }
       if (!emailVal) {
         markError(emailEl); shakeEl(emailEl);
         showHint('hint-email', 'Email address cannot be empty.');
         showSeal('Registration Blocked', 'A preferred email address is required.', 'lock');
-        emailEl.focus();
-        return;
+        emailEl.focus(); return;
       }
       if (!emailRx.test(emailVal)) {
         markError(emailEl); shakeEl(emailEl);
         showHint('hint-email', 'Enter a valid email address.');
         showSeal('Invalid Format', 'Please provide a valid email address.', 'key');
-        emailEl.focus();
-        return;
+        emailEl.focus(); return;
       }
       if (!passVal) {
         markError(passEl); shakeEl(passEl);
         showHint('hint-password', 'A password is required.');
         showSeal('Passcode Missing', 'Please choose a password for your account.', 'lock');
-        passEl.focus();
-        return;
+        passEl.focus(); return;
       }
       if (passVal.length < 8) {
         markError(passEl); shakeEl(passEl);
         showHint('hint-password', 'Password must be at least 8 characters.');
         showSeal('Passcode Too Short', 'Your password must be at least 8 characters long.', 'warn');
-        passEl.focus();
-        return;
+        passEl.focus(); return;
       }
       if (!/[A-Z]/.test(passVal)) {
         markError(passEl); shakeEl(passEl);
         showHint('hint-password', 'Include at least one uppercase letter (A–Z).');
         showSeal('Weak Passcode', 'Password must contain at least one uppercase letter.', 'warn');
-        passEl.focus();
-        return;
+        passEl.focus(); return;
       }
       if (!/[0-9]/.test(passVal)) {
         markError(passEl); shakeEl(passEl);
         showHint('hint-password', 'Include at least one number (0–9).');
         showSeal('Weak Passcode', 'Password must contain at least one number.', 'warn');
-        passEl.focus();
-        return;
+        passEl.focus(); return;
       }
       if (!/[^A-Za-z0-9]/.test(passVal)) {
         markError(passEl); shakeEl(passEl);
         showHint('hint-password', 'Include at least one special character (e.g. @, #, !).');
         showSeal('Weak Passcode', 'Password must contain at least one special character.', 'warn');
-        passEl.focus();
-        return;
+        passEl.focus(); return;
       }
       if (!confVal) {
         markError(confEl); shakeEl(confEl);
         showHint('hint-confirm', 'Please confirm your password.');
         showSeal('Confirmation Required', 'Please confirm your chosen passcode.', 'lock');
-        confEl.focus();
-        return;
+        confEl.focus(); return;
       }
       if (passVal !== confVal) {
         markError(passEl); markError(confEl);
         shakeEl(passEl); setTimeout(() => shakeEl(confEl), 100);
         showHint('hint-confirm', 'Passwords do not match.');
         showSeal('Passcode Mismatch', 'The passwords you entered do not match.', 'warn');
-        confEl.focus();
-        return;
+        confEl.focus(); return;
       }
       if (!termsEl.checked) {
         termsEl.classList.add('input-error');
@@ -480,100 +511,78 @@
         return;
       }
 
-      
+      /* Submit */
       submitBtn.disabled = true;
       const originalText = submitBtn.textContent;
-      submitBtn.textContent = "Creating Account...";
+      submitBtn.textContent = 'Creating Account…';
 
       try {
-        
-const response = await axios.post('/sendSignupOtp', {
-  name: nameVal,
-  email: emailVal,
-  password: passVal,
-  confirmPassword: confVal,   
-  _csrf: csrfToken
-});
+        const response = await axios.post('/sendSignupOtp', {
+          name:            nameVal,
+          email:           emailVal,
+          password:        passVal,
+          confirmPassword: confVal,
+          referralCode:    refVal,   // ← referral code sent to backend
+          _csrf:           csrfToken,
+        });
 
-        
         if (response.data && response.data.success === true) {
-           localStorage.setItem('verifyEmail', emailVal);
-  localStorage.removeItem('resetFlow');        
-  localStorage.setItem('signupFlow', 'true');
+          localStorage.setItem('verifyEmail', emailVal);
+          localStorage.removeItem('resetFlow');
+          localStorage.setItem('signupFlow', 'true');
 
           showToast('success', response.data.message || 'OTP sent successfully!');
-          showSeal('Verification Required', 'OTP sent! Redirecting to verification...', 'key');
-          localStorage.setItem('verifyEmail', emailVal);
-          
-          setTimeout(() => {
-            window.location.href = '/otp';
-          }, 1500);
+          showSeal('Verification Required', 'OTP sent! Redirecting to verification…', 'key');
+
+          setTimeout(() => { window.location.href = '/otp'; }, 1500);
         } else {
           const errorMsg = response.data?.message || 'Registration failed.';
           showToast('error', errorMsg);
           showSeal('Registration Failed', errorMsg, 'warn');
-          
-          if (response.data?.field === 'email' || errorMsg.toLowerCase().includes('email')) {
-            markError(emailEl);
-            shakeEl(emailEl);
+
+          /* Highlight the right field based on what the server reported */
+          if (response.data?.field === 'referralCode') {
+            markError(refEl); shakeEl(refEl);
+            showHint('hint-referral', errorMsg);
+            refEl.focus();
+          } else if (response.data?.field === 'email' || errorMsg.toLowerCase().includes('email')) {
+            markError(emailEl); shakeEl(emailEl);
             showHint('hint-email', errorMsg);
             emailEl.focus();
           }
-          
+
           submitBtn.disabled = false;
           submitBtn.textContent = originalText;
         }
       } catch (error) {
         console.error('Signup error:', error);
-        
         let errorMsg = 'Unable to create account. Please try again.';
-        
+
         if (error.response) {
           errorMsg = error.response.data?.message || error.response.data?.msg || errorMsg;
-          
-          if (error.response.status === 409 || errorMsg.toLowerCase().includes('already registered')) {
+          const field = error.response.data?.field;
+
+          if (field === 'referralCode') {
+            markError(refEl); shakeEl(refEl);
+            showHint('hint-referral', errorMsg);
+            refEl.focus();
+          } else if (error.response.status === 409 || errorMsg.toLowerCase().includes('already registered')) {
             errorMsg = 'This email is already registered. Please use a different email or login.';
-            markError(emailEl);
-            shakeEl(emailEl);
+            markError(emailEl); shakeEl(emailEl);
             showHint('hint-email', `${errorMsg} <a href="/login" style="color:#0d9488;text-decoration:underline;">Login here</a>`);
             emailEl.focus();
           } else if (errorMsg.toLowerCase().includes('email')) {
-            markError(emailEl);
-            shakeEl(emailEl);
+            markError(emailEl); shakeEl(emailEl);
             showHint('hint-email', errorMsg);
             emailEl.focus();
           }
         }
-        
+
         showToast('error', errorMsg);
         showSeal('Registration Error', errorMsg, 'warn');
         submitBtn.disabled = false;
         submitBtn.textContent = originalText;
       }
-    });
-
-    window.addEventListener('DOMContentLoaded', () => {
-      const errEl = document.getElementById('server-auth-error');
-      if (!errEl) return;
-
-      const msg = errEl.dataset.message;
-      if (!msg) return;
-
-      const emailEl = document.getElementById('email');
-      const nameEl = document.getElementById('name');
-
-      if (msg.toLowerCase().includes('name')) {
-        markError(nameEl);
-        shakeEl(nameEl);
-        showHint('hint-name', msg);
-      } else {
-        markError(emailEl);
-        shakeEl(emailEl);
-        showHint('hint-email', msg);
-      }
-
-      showToast('error', msg);
-      setTimeout(() => showSeal('Registration Blocked', msg, 'warn'), 400);
     });
 
     window.addEventListener('pageshow', function(event) {
@@ -583,18 +592,12 @@ const response = await axios.post('/sendSignupOtp', {
 
   <style>
     .toast-notification {
-      background: white;
-      border-radius: 8px;
-      padding: 12px 20px;
-      margin-bottom: 10px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      animation: slideIn 0.3s ease;
-      font-family: 'Jost', sans-serif;
-      font-size: 14px;
-      border-left: 4px solid;
+      background: white; border-radius: 8px; padding: 12px 20px;
+      margin-bottom: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      animation: slideIn 0.3s ease; font-family: 'Jost', sans-serif;
+      font-size: 14px; border-left: 4px solid;
     }
-
-      .btn-google {
+    .btn-google {
       display: flex; align-items: center; justify-content: center; gap: 10px;
       width: 100%; padding: 0.7rem 1rem;
       background: #fff; border: 1px solid #ddd; border-radius: 2px;
@@ -603,18 +606,14 @@ const response = await axios.post('/sendSignupOtp', {
       cursor: pointer; text-decoration: none;
       transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
     }
-    .btn-google:hover {
-      background: #f7f7f7; border-color: #bbb;
-      box-shadow: 0 1px 6px rgba(0,0,0,0.08);
-    }
+    .btn-google:hover { background: #f7f7f7; border-color: #bbb; box-shadow: 0 1px 6px rgba(0,0,0,0.08); }
     .btn-google svg { flex-shrink: 0; width: 16px; height: 16px; }
-
     .toast-notification.success { border-left-color: #0d9488; background: #f0fdf9; }
-    .toast-notification.error { border-left-color: #dc2626; background: #fef2f2; }
+    .toast-notification.error   { border-left-color: #dc2626; background: #fef2f2; }
     .toast-notification.warning { border-left-color: #f59e0b; background: #fffbeb; }
     @keyframes slideIn {
       from { transform: translateX(100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
+      to   { transform: translateX(0);    opacity: 1; }
     }
   </style>
 

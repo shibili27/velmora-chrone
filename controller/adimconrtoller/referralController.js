@@ -1,6 +1,5 @@
 import ReferralSettings from '../../models/referral.js';
 
-// ── View settings ────────────────────────────────────────────────────────
 export const getReferralSettings = async (req, res) => {
   try {
     const settings = await ReferralSettings.getOrCreate();
@@ -20,26 +19,25 @@ export const getReferralSettings = async (req, res) => {
   }
 };
 
-// ── Update settings ──────────────────────────────────────────────────────
 export const updateReferralSettings = async (req, res) => {
   try {
-    const { refereeDiscountPercentage, referrerRewardAmount, isEnabled } = req.body;
+    const { referrerRewardAmount, refereeRewardAmount, isEnabled } = req.body;
 
-    const discountPct = parseFloat(refereeDiscountPercentage);
-    const rewardAmt    = parseFloat(referrerRewardAmount);
+    const referrerAmt = parseFloat(referrerRewardAmount);
+    const refereeAmt  = parseFloat(refereeRewardAmount);
 
-    if (isNaN(discountPct) || discountPct < 0 || discountPct > 100) {
-      req.flash('error', 'Referee discount must be a percentage between 0 and 100.');
+    if (isNaN(referrerAmt) || referrerAmt < 0) {
+      req.flash('error', 'Referrer reward amount must be a positive number.');
       return res.redirect('/admin/referrals');
     }
-    if (isNaN(rewardAmt) || rewardAmt < 0) {
-      req.flash('error', 'Referrer reward amount must be a positive number.');
+    if (isNaN(refereeAmt) || refereeAmt < 0) {
+      req.flash('error', 'Referee reward amount must be a positive number.');
       return res.redirect('/admin/referrals');
     }
 
     const settings = await ReferralSettings.getOrCreate();
-    settings.refereeDiscountPercentage = discountPct;
-    settings.referrerRewardAmount      = rewardAmt;
+    settings.referrerRewardAmount = referrerAmt;
+    settings.refereeRewardAmount  = refereeAmt;
     settings.isEnabled = isEnabled === 'on' || isEnabled === 'true' || isEnabled === true;
     await settings.save();
 

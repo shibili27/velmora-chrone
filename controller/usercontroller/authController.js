@@ -40,7 +40,7 @@ const sendSignupOtp = async (req, res) => {
     req.session.signupName      = name;
     req.session.signupPassword  = password;
     req.session.signupOTPExpiry = expiry;
-    req.session.signupReferrerId = referrerId; // FIX: carry referrer through OTP step
+    req.session.signupReferrerId = referrerId; 
 
     await new Promise((resolve, reject) =>
       req.session.save(err => (err ? reject(err) : resolve()))
@@ -64,7 +64,7 @@ const verifySignupOTP = async (req, res) => {
     req.session.signupName       = null;
     req.session.signupPassword   = null;
     req.session.signupOTPExpiry  = null;
-    req.session.signupReferrerId = null; // FIX: clean up referrer session key too
+    req.session.signupReferrerId = null;
 
     await new Promise((resolve, reject) =>
       req.session.save(err => (err ? reject(err) : resolve()))

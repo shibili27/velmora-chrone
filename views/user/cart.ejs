@@ -103,6 +103,9 @@
     .oos-banner{background:rgba(248,113,113,.04);border:1px solid rgba(248,113,113,.15);border-radius:12px;padding:.85rem 1.1rem;margin-bottom:1.25rem;display:flex;gap:10px;align-items:flex-start}
     .oos-banner-text{font-family:'Jost',sans-serif;font-size:.5rem;color:rgba(245,242,235,.4);line-height:1.7}
 
+    .shipping-nudge{font-family:'Jost',sans-serif;font-size:.48rem;letter-spacing:.08em;color:rgba(201,169,110,.55);background:rgba(201,169,110,.04);border:1px solid rgba(201,169,110,.1);border-radius:8px;padding:.55rem .85rem;margin:.65rem 0 0;text-align:center;line-height:1.6}
+    .shipping-nudge strong{color:#c9a96e}
+
     .summary-box{background:rgba(245,242,235,.02);border:1px solid rgba(245,242,235,.06);border-radius:16px;padding:1.5rem;position:sticky;top:84px;transition:border-color .25s}
     .summary-box:hover{border-color:rgba(201,169,110,.1)}
     .summary-title{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:300;color:#f5f2eb;margin-bottom:1.25rem;padding-bottom:.75rem;border-bottom:1px solid rgba(245,242,235,.06)}
@@ -187,8 +190,7 @@
     <div class="hidden md:flex items-center gap-8">
       <a href="/home" class="nav-link">Home</a>
       <a href="/products" class="nav-link">Collection</a>
-            <a href="/orders"   class="nav-link">Orders</a>
-
+      <a href="/orders" class="nav-link">Orders</a>
       <a href="/home" class="nav-link">About</a>
       <a href="/home" class="nav-link">Contact</a>
     </div>
@@ -197,7 +199,9 @@
       <a href="/profile" class="nav-icon-btn" aria-label="Profile">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       </a>
-      
+      <a href="/wallet" class="nav-icon-btn" aria-label="Wallet">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12V8H6a2 2 0 0 1 0-4h14v4"/><path d="M4 6v12a2 2 0 0 0 2 2h14v-4"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg>
+      </a>
       <a href="/wishlist" class="nav-icon-btn wish-active" aria-label="Wishlist">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
       </a>
@@ -244,6 +248,14 @@
 <!-- MAIN -->
 <div class="cart-wrap">
   <% if (cart.items && cart.items.length > 0) { %>
+
+  <%
+    /* ── server-side shipping values passed from controller ── */
+    const cartSubtotal   = cart.items.reduce((s, i) => s + i.price * i.quantity, 0);
+    const grandTotal     = isFreeShipping ? cartSubtotal : cartSubtotal + shipping;
+    const amountToFree   = SHIPPING_THRESHOLD - cartSubtotal;
+  %>
+
   <div class="cart-grid">
 
     <!-- LEFT: ITEMS -->
@@ -259,7 +271,6 @@
           const brandName  = p.brand ? (typeof p.brand === 'object' ? p.brand.name : p.brand) : null;
           const isBlocked  = p.isDeleted || !p.isListed || p.category?.isBlocked;
 
-          /* ── variant-aware stock ── */
           const variantStock = item.variantName
             ? (p.colorVariants?.find(v => v.name === item.variantName)?.stock ?? p.stock)
             : p.stock;
@@ -339,20 +350,31 @@
 
         <div class="summary-row">
           <span class="summary-label">Subtotal (<%= cart.totalItems %> items)</span>
-          <span class="summary-val" id="summarySubtotal">₹<%= cart.subtotal?.toLocaleString('en-IN') || '0' %></span>
+          <span class="summary-val" id="summarySubtotal">₹<%= cartSubtotal.toLocaleString('en-IN') %></span>
         </div>
+
         <div class="summary-row">
           <span class="summary-label">Shipping</span>
-          <span class="summary-val" style="color:rgba(74,222,128,.7)">Complimentary</span>
+          <% if (isFreeShipping) { %>
+            <span class="summary-val" style="color:rgba(74,222,128,.7)" id="summaryShipping">Complimentary</span>
+          <% } else { %>
+            <span class="summary-val" id="summaryShipping">₹<%= shipping %></span>
+          <% } %>
         </div>
+
+        <% if (!isFreeShipping && amountToFree > 0) { %>
+          <div class="shipping-nudge">
+            Add <strong>₹<%= amountToFree.toLocaleString('en-IN') %></strong> more for free shipping
+          </div>
+        <% } %>
 
         <div class="summary-divider"></div>
 
         <div class="summary-total-row">
           <span class="summary-total-label">Total</span>
-          <span class="summary-total-val" id="summaryTotal">₹<%= cart.subtotal?.toLocaleString('en-IN') || '0' %></span>
+          <span class="summary-total-val" id="summaryTotal">₹<%= grandTotal.toLocaleString('en-IN') %></span>
         </div>
-        <div class="tax-note">Inclusive of all taxes</div>
+        <div class="tax-note">Exclusive of taxes · calculated at checkout</div>
 
         <% if (canCheckout) { %>
           <a href="/checkout" class="checkout-btn">Proceed to Checkout</a>
@@ -456,7 +478,10 @@
 <div class="toast" id="toast"></div>
 
 <script>
-  const MAX_QTY = <%= MAX_QTY %>;
+  const MAX_QTY          = <%= MAX_QTY %>;
+  const SHIPPING_FEE     = <%= shipping %>;
+  const IS_FREE_SHIPPING = <%= isFreeShipping %>;
+  const SHIPPING_THRESHOLD = <%= SHIPPING_THRESHOLD %>;
 
   /* ── NAV ── */
   const navbar = document.getElementById('navbar');
@@ -516,10 +541,7 @@
   });
 
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') {
-      _pendingClearCallback = null;
-      closeClearDialog();
-    }
+    if (e.key === 'Escape') { _pendingClearCallback = null; closeClearDialog(); }
   });
 
   /* ── CLEAR ALL ── */
@@ -538,9 +560,7 @@
         } else {
           showToast('Could not clear cart', 'err');
         }
-      } catch (_) {
-        showToast('Something went wrong', 'err');
-      }
+      } catch (_) { showToast('Something went wrong', 'err'); }
     });
   }
 
@@ -591,16 +611,32 @@
     } catch (_) { if (row) row.classList.remove('removing'); showToast('Something went wrong', 'err'); }
   }
 
-  /* ── SUMMARY UPDATE ── */
+  /* ── SUMMARY UPDATE (called after qty/remove AJAX) ── */
   function updateSummary(subtotal, cartCount) {
-    const subEl   = document.getElementById('summarySubtotal');
-    const totEl   = document.getElementById('summaryTotal');
-    const badgeEl = document.getElementById('cartBadge');
-    const heroEl  = document.getElementById('heroItemCount');
+    const subEl      = document.getElementById('summarySubtotal');
+    const totEl      = document.getElementById('summaryTotal');
+    const shippingEl = document.getElementById('summaryShipping');
+    const badgeEl    = document.getElementById('cartBadge');
+    const heroEl     = document.getElementById('heroItemCount');
+
+    const freeShipping = subtotal >= SHIPPING_THRESHOLD;
+    const shippingCost = freeShipping ? 0 : SHIPPING_FEE;
+    const grandTotal   = subtotal + shippingCost;
+
     if (subEl)   subEl.textContent   = fmt(subtotal);
-    if (totEl)   totEl.textContent   = fmt(subtotal);
+    if (totEl)   totEl.textContent   = fmt(grandTotal);
     if (badgeEl) badgeEl.textContent = cartCount;
     if (heroEl)  heroEl.textContent  = `${cartCount} item${cartCount !== 1 ? 's' : ''} selected`;
+
+    if (shippingEl) {
+      if (freeShipping) {
+        shippingEl.textContent = 'Complimentary';
+        shippingEl.style.color = 'rgba(74,222,128,.7)';
+      } else {
+        shippingEl.textContent = fmt(SHIPPING_FEE);
+        shippingEl.style.color = 'rgba(245,242,235,.65)';
+      }
+    }
   }
 
   /* ── EMPTY STATE CHECK ── */

@@ -12,7 +12,6 @@ export const hasOtpSession = (req, res, next) => {
   const hasResetOtp  = req.session.resetOTP  && req.session.resetEmail;
 
   if (!hasSignupOtp && !hasResetOtp) {
-    // AJAX request (axios) — return JSON, don't redirect
     if (req.xhr || req.headers['accept']?.includes('application/json') || req.headers['content-type']?.includes('application/json')) {
       return res.status(400).json({ success: false, message: 'Session expired. Please signup again.' });
     }
@@ -89,7 +88,7 @@ export const isAuth = async (req, res, next) => {
     const user = req.user || await User.findById(userId);
 
     if (!user) {
-      console.log('  ❌ User not found in DB');
+      console.log(' User not found in DB');
       await clearUserSession(req);
       if (isAjax(req)) {
         return res.status(401).json({
@@ -103,7 +102,7 @@ export const isAuth = async (req, res, next) => {
     }
 
     if (user.isBlocked) {
-      console.log('  ❌ User is blocked');
+      console.log(' User is blocked');
       await clearUserSession(req);
       if (isAjax(req)) {
         return res.status(403).json({

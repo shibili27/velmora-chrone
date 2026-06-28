@@ -44,12 +44,10 @@ const orderSchema = new mongoose.Schema({
   shippingAddress : { type: addressSchema, required: true },
   pricing         : { type: pricingSchema, required: true },
 
-  // Coupon tracking — locked onto the order at the time of purchase
   couponCode      : { type: String, default: null },
 
   paymentMethod   : { type: String, enum: ['COD', 'Razorpay', 'Wallet'], default: 'COD' },
 
-  // Payment lifecycle — relevant when paymentMethod is 'Razorpay'
   paymentStatus      : { type: String, enum: ['pending', 'paid', 'failed'], default: 'pending' },
   razorpayOrderId     : { type: String, default: null },
   razorpayPaymentId   : { type: String, default: null },

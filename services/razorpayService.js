@@ -6,10 +6,7 @@ const razorpay = new Razorpay({
   key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
-/**
- * Creates a Razorpay order for the given amount (in rupees).
- * Razorpay expects amount in paise (smallest currency unit), hence * 100.
- */
+
 export const createRazorpayOrder = async (amountInRupees, receipt) => {
   const options = {
     amount  : Math.round(amountInRupees * 100),
@@ -20,10 +17,7 @@ export const createRazorpayOrder = async (amountInRupees, receipt) => {
   return order;
 };
 
-/**
- * Verifies the payment signature sent back by Razorpay checkout.js after payment.
- * This MUST be done server-side — never trust the client's "payment succeeded" claim alone.
- */
+
 export const verifyPaymentSignature = ({ razorpayOrderId, razorpayPaymentId, razorpaySignature }) => {
   const body = `${razorpayOrderId}|${razorpayPaymentId}`;
   const expectedSignature = crypto
@@ -34,10 +28,7 @@ export const verifyPaymentSignature = ({ razorpayOrderId, razorpayPaymentId, raz
   return expectedSignature === razorpaySignature;
 };
 
-/**
- * Fetches a payment's details from Razorpay (useful for double-checking status,
- * e.g. on the failure-page "retry" flow or for refund handling later).
- */
+
 export const fetchPayment = async (paymentId) => {
   return razorpay.payments.fetch(paymentId);
 };

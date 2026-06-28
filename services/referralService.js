@@ -1,86 +1,119 @@
-import User   from '../models/user.js';
-import Wallet from '../models/wallet.js';
+import User             from '../models/user.js';
+import Wallet           from '../models/wallet.js';
+import ReferralSettings from '../models/referral.js';
 
-export const REFERRAL_REWARD_AMOUNT = 100; // ₹100 each, fixed amount
 
-/**
- * Validates a referral code typed in at signup.
- * Returns the referrer's User document if valid, or null if the code field
- * was left empty. Throws if a code was entered but doesn't match any user.
- *
- * @param {string} code
- * @returns {Promise<import('mongoose').Document|null>}
- */
+export const getReferralSettings = async () => {
+  return ReferralSettings.getOrCreate();
+};
+
+export const getReferralRewardAmount = async () => {
+  const settings = await getReferralSettings();
+  if (!settings.isEnabled) return 0;
+  return settings.referrerRewardAmount || 0;
+};
+
+export const getRefereeRewardAmount = async () => {
+  const settings = await getReferralSettings();
+  if (!settings.isEnabled) return 0;
+  return settings.refereeRewardAmount || 0;
+};
+
+
 export const validateReferralCode = async (code) => {
   const trimmed = (code || '').trim().toUpperCase();
-  if (!trimmed) return null; // referral code is optional
+  if (!trimmed) return null;
 
   const referrer = await User.findOne({ referralCode: trimmed });
   if (!referrer) {
-    throw Object.assign(new Error('Invalid referral code.'), { field: 'referralCode', status: 400 });
+    throw Object.assign(
+      new Error('Invalid referral code.'),
+      { field: 'referralCode', status: 400 }
+    );
   }
-
   return referrer;
 };
 
-/**
- * Credits both the referrer and the newly-referred user once the referred
- * user's first order is successfully placed (COD confirmed or online
- * payment verified). Safe to call on every order — it only pays out once,
- * guarded by `hasUsedReferralDiscount`.
- *
- * @param {string|ObjectId} userId - the user who just placed an order
- */
+
+
 export const rewardReferralIfEligible = async (userId) => {
-  const user = await User.findById(userId).select('referredBy hasUsedReferralDiscount name');
+  const user = await User.findById(userId).select(
+    'referredBy hasUsedReferralDiscount name'
+  );
+
   if (!user || !user.referredBy || user.hasUsedReferralDiscount) return;
 
-  const referrer = await User.findById(user.referredBy).select('name');
-  if (!referrer) return;
+  const settings = await getReferralSettings();
 
-  const [referrerWallet, referredWallet] = await Promise.all([
+  if (!settings.isEnabled) {
+    user.hasUsedReferralDiscount = true;
+    await user.save();
+    return;
+  }
+
+  const referrerReward = settings.referrerRewardAmount || 0;
+  const refereeReward  = settings.refereeRewardAmount  || 0;
+
+  if (referrerReward <= 0 && refereeReward <= 0) {
+    user.hasUsedReferralDiscount = true;
+    await user.save();
+    return;
+  }
+
+  const referrer = await User.findById(user.referredBy).select('name');
+  if (!referrer) {
+    user.hasUsedReferralDiscount = true;
+    await user.save();
+    return;
+  }
+
+  const [referrerWallet, refereeWallet] = await Promise.all([
     Wallet.getOrCreate(referrer._id),
     Wallet.getOrCreate(user._id),
   ]);
 
-  await referrerWallet.credit(
-    REFERRAL_REWARD_AMOUNT,
-    `Referral bonus — ${user.name} placed their first order`,
-    'referral_bonus'
-  );
+  if (referrerReward > 0) {
+    await referrerWallet.credit(
+      referrerReward,
+      `Referral bonus — ${user.name} placed their first order`,
+      'referral_bonus'
+    );
+  }
 
-  await referredWallet.credit(
-    REFERRAL_REWARD_AMOUNT,
-    `Referral bonus — welcome reward for using ${referrer.name}'s code`,
-    'referral_bonus'
-  );
+  if (refereeReward > 0) {
+    await refereeWallet.credit(
+      refereeReward,
+      `Referral bonus — welcome reward for joining via ${referrer.name}'s code`,
+      'referral_bonus'
+    );
+  }
 
   user.hasUsedReferralDiscount = true;
   await user.save();
 };
 
-/**
- * Returns referral stats for a user's profile page: their own code, a
- * shareable link, and how many people they've successfully referred
- * (i.e. referred users who've placed their first order and triggered payout).
- *
- * @param {string|ObjectId} userId
- */
+
 export const getReferralStats = async (userId) => {
-  const user = await User.findById(userId).select('referralCode');
-  const successfulReferrals = await User.countDocuments({
-    referredBy: userId,
-    hasUsedReferralDiscount: true,
-  });
-  const pendingReferrals = await User.countDocuments({
-    referredBy: userId,
-    hasUsedReferralDiscount: false,
-  });
+  const [user, referredUsers, settings] = await Promise.all([
+    User.findById(userId).select('referralCode').lean(),
+    User.find({ referredBy: userId })
+        .select('name email createdAt hasUsedReferralDiscount')
+        .sort({ createdAt: -1 })
+        .lean(),
+    getReferralSettings(),
+  ]);
+
+  const referrals = referredUsers.map(u => ({
+    name      : u.name  || 'Anonymous',
+    email     : u.email || '',
+    joinedAt  : u.createdAt,
+    hasOrdered: u.hasUsedReferralDiscount,
+  }));
 
   return {
-    referralCode: user?.referralCode || null,
-    successfulReferrals,
-    pendingReferrals,
-    rewardAmount: REFERRAL_REWARD_AMOUNT,
+    referralCode        : user?.referralCode || null,
+    referrerRewardAmount: settings.isEnabled ? settings.referrerRewardAmount : 0,
+    refereeRewardAmount : settings.isEnabled ? settings.refereeRewardAmount  : 0,
+    referrals,
   };
 };

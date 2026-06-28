@@ -1,5 +1,5 @@
 import * as cartService from '../../services/cartService.js';
-import { clearCouponIfCartChanged } from '../../services/checkoutService.js';
+import { clearCouponIfCartChanged, SHIPPING_THRESHOLD } from '../../services/checkoutService.js';
 
 export const getCart = async (req, res) => {
   try {
@@ -8,6 +8,10 @@ export const getCart = async (req, res) => {
     const empty  = { items: [], totalItems: 0, subtotal: 0 };
 
     const finalCart = cart || empty;
+
+    const subtotal = finalCart.items?.reduce((s, i) => s + i.price * i.quantity, 0) || 0;
+    const isFreeShipping = subtotal >= SHIPPING_THRESHOLD;
+    const shipping       = isFreeShipping ? 0 : 99;
 
     const canCheckout = finalCart.items?.length > 0 &&
       finalCart.items.every(i => {
@@ -19,7 +23,14 @@ export const getCart = async (req, res) => {
                variantStock > 0 && i.quantity <= variantStock;
       });
 
-    res.render('user/cart', { cart: finalCart, canCheckout, MAX_QTY: cartService.MAX_QTY });
+    res.render('user/cart', {
+      cart: finalCart,
+      canCheckout,
+      MAX_QTY: cartService.MAX_QTY,
+      isFreeShipping,
+      shipping,
+      SHIPPING_THRESHOLD,
+    });
   } catch (err) {
     console.error('[getCart]', err);
     res.status(500).render('error', { message: 'Failed to load cart.' });
@@ -33,7 +44,6 @@ export const addToCart = async (req, res) => {
 
     const cartCount = await cartService.addItemToCart(userId, req.body.productId, req.body.quantity, req.body.variantName || null);
 
-    // Cart changed — clear any applied coupon so it doesn't carry over to checkout
     clearCouponIfCartChanged(req.session);
 
     res.json({ success: true, message: 'Added to cart', cartCount });
@@ -48,7 +58,6 @@ export const updateCartItem = async (req, res) => {
     const userId = req.session.user || req.user?._id;
     const result = await cartService.updateItem(userId, req.params.itemId, req.body.action);
 
-    // Cart quantity changed — clear any applied coupon
     clearCouponIfCartChanged(req.session);
 
     res.json({ success: true, ...result });
@@ -63,7 +72,6 @@ export const removeFromCart = async (req, res) => {
     const userId = req.session.user || req.user?._id;
     const result = await cartService.removeItem(userId, req.params.itemId);
 
-    // Cart changed — clear any applied coupon
     clearCouponIfCartChanged(req.session);
 
     res.json({ success: true, ...result });
@@ -78,7 +86,6 @@ export const clearCart = async (req, res) => {
     const userId = req.session.user || req.user?._id;
     await cartService.clearUserCart(userId);
 
-    // Cart cleared — clear any applied coupon
     clearCouponIfCartChanged(req.session);
 
     res.json({ success: true });

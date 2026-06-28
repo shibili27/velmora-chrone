@@ -8,8 +8,8 @@ import { broadcast } from '../public/utils/ssemanager.js';
 import { createRazorpayOrder, verifyPaymentSignature } from './razorpayService.js';
 import { rewardReferralIfEligible } from './referralService.js';
 
-const TAX_RATE           = 0.18;
-const SHIPPING_THRESHOLD = 50000;
+const TAX_RATE            = 0.18;
+export const SHIPPING_THRESHOLD = 50000; 
 
 export const getPopulatedCart = async (userId) => {
   return Cart.findOne({ user: userId }).populate({
@@ -47,7 +47,6 @@ export const buildPriceSummary = (cart, couponDiscount = 0) => {
     if (mrp > item.price) totalDiscount += (mrp - item.price) * item.quantity;
   }
 
-  // Coupon discount must never exceed subtotal — prevents negative grandTotal
   const cappedCouponDiscount = Math.min(Math.round(couponDiscount), Math.round(subtotal));
 
   const afterDiscount = subtotal - cappedCouponDiscount;
@@ -68,9 +67,6 @@ export const buildPriceSummary = (cart, couponDiscount = 0) => {
   };
 };
 
-// ── ✅ FIX: Export this and call it in your cart controller on add/remove ─
-// Clears coupon from session whenever cart composition changes, preventing
-// stale coupons from a different product carrying over to checkout.
 export const clearCouponIfCartChanged = (session) => {
   if (session.couponCode) {
     delete session.couponCode;
@@ -171,7 +167,6 @@ export const restoreStockAndBroadcast = async (productId, qty, variantName = nul
   });
 };
 
-// ── Coupons ───────────────────────────────────────────────────────────────
 
 export const applyCouponToSession = async (userId, code, session) => {
   if (session.couponCode) {
@@ -247,7 +242,6 @@ const recordCouponUsage = async (couponCode, userId) => {
   await coupon.save();
 };
 
-// ── Checkout page data ────────────────────────────────────────────────────
 
 export const buildCheckoutData = async (userId, session) => {
   const cart = await getPopulatedCart(userId);
@@ -285,7 +279,6 @@ export const buildCheckoutData = async (userId, session) => {
   return { user, addresses: user.addresses || [], items, pricing, couponCode, walletBalance };
 };
 
-// ── Shared order-building helpers ─────────────────────────────────────────
 
 const buildOrderItemsAndValidate = async (cart) => {
   const stockErrors = await validateStockBeforeOrder(cart.items);
@@ -321,7 +314,6 @@ const clearCartAndCoupon = async (cart, session) => {
   delete session.couponCode;
 };
 
-// ── COD ───────────────────────────────────────────────────────────────────
 
 export const placeOrder = async (userId, { addressId, session }) => {
   const cart = await getPopulatedCart(userId);
@@ -369,7 +361,6 @@ export const placeOrder = async (userId, { addressId, session }) => {
   return { orderId: order._id, orderNumber: order.orderNumber };
 };
 
-// ── Wallet payment ────────────────────────────────────────────────────────
 
 export const placeOrderWithWallet = async (userId, { addressId, session }) => {
   const cart = await getPopulatedCart(userId);
@@ -436,7 +427,6 @@ export const placeOrderWithWallet = async (userId, { addressId, session }) => {
   return { orderId: order._id, orderNumber: order.orderNumber };
 };
 
-// ── Razorpay ──────────────────────────────────────────────────────────────
 
 export const createRazorpayCheckoutOrder = async (userId, { addressId, session }) => {
   const cart = await getPopulatedCart(userId);
@@ -562,7 +552,6 @@ export const retryRazorpayPayment = async (userId, { orderId }) => {
   };
 };
 
-// ── Success / Failure page data ───────────────────────────────────────────
 
 export const getOrderSuccess = async (orderId, userId) => {
   const order = await Order.findById(orderId)

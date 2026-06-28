@@ -112,8 +112,8 @@ export const listOrders = async (req, res) => {
     const totalPages = Math.ceil(totalOrders / LIMIT);
 
     res.render('admin/orders', {
-      adminName          : req.session.adminName || 'Admin',
-      adminRole          : req.session.adminRole || 'Administrator',
+      adminName: req.session.adminName || 'Admin',
+      adminRole: req.session.adminRole || 'Administrator',
       orders,
       totalOrders,
       counts,
@@ -144,10 +144,6 @@ export const getOrderDetail = async (req, res) => {
       req.flash('error', 'Order not found.');
       return res.redirect('/admin/orders');
     }
-
-    // ── Pre-compute the refund amount the admin will see in the confirm modal.
-    // Whole-order returns: deduct shipping from what the customer actually paid.
-    // If grandTotal <= shipping (edge case like the ₹99 scenario), refund is ₹0.
     const shippingCharge  = order.pricing.shipping || 0;
     const refundAmount    = Math.max(0, order.pricing.grandTotal - shippingCharge);
 
@@ -155,7 +151,7 @@ export const getOrderDetail = async (req, res) => {
       adminName    : req.session.adminName || 'Admin',
       adminRole    : req.session.adminRole || 'Administrator',
       order,
-      refundAmount,   // passed to EJS so the confirm modal shows the correct figure
+      refundAmount,   
       shippingCharge,
     });
   } catch (err) {
@@ -206,9 +202,7 @@ export const updateOrderStatus = async (req, res) => {
   }
 };
 
-/**
- * Restock a single order item's product (and matching colour variant if present).
- */
+
 async function restockOrderItem(item) {
   if (item.restocked) {
     return { skipped: true, reason: 'already-restocked' };
@@ -242,14 +236,7 @@ async function restockOrderItem(item) {
   return { skipped: false, fallbackUsed, product };
 }
 
-/**
- * ── Order-level return verification ──────────────────────────────────────
- * On acceptance the refund = grandTotal − shippingCharge.
- * Shipping is a non-refundable fulfilment cost the business already incurred.
- * If grandTotal ≤ shippingCharge the refund is ₹0 (never goes negative).
- *
- * Free-shipping orders (shipping = 0): full grandTotal is refunded as before.
- */
+
 export const handleReturnRequest = async (req, res) => {
   try {
     const { decision, rejectionReason, restock = true } = req.body;
@@ -271,11 +258,7 @@ export const handleReturnRequest = async (req, res) => {
     let restockedCount = 0;
 
     if (decision === 'accepted') {
-      // ── FIX: deduct shipping before refunding ──────────────────────────
-      // The shipping charge is a fulfilment cost the business already paid
-      // (courier fee). It is non-refundable regardless of why the item was
-      // returned. grandTotal already includes tax + shipping, so we strip
-      // only the shipping portion before crediting the wallet.
+    
       const shippingCharge = order.pricing.shipping || 0;
       const refundAmount   = Math.max(0, order.pricing.grandTotal - shippingCharge);
 
@@ -289,9 +272,7 @@ export const handleReturnRequest = async (req, res) => {
           order
         );
       }
-      // If refundAmount === 0 (edge case: customer paid only shipping),
-      // we still mark the return as accepted — no wallet credit needed.
-
+    
       order.returnStatus = 'accepted';
       order.orderStatus  = 'returned';
       order.items.forEach(item => {
@@ -346,17 +327,7 @@ export const handleReturnRequest = async (req, res) => {
   }
 };
 
-/**
- * ── Item-level return verification ───────────────────────────────────────
- * Shipping is an ORDER-level charge, not per-item. So when a single item
- * is returned (not the whole order), NO shipping deduction is applied —
- * the customer paid one shipping fee for the whole order and only one item
- * is coming back. The refund is the item's totalPrice in full.
- *
- * If the LAST remaining item is returned (allResolved), the order cascades
- * to 'returned' but shipping was already non-refundable from the original
- * order-level charge — no further deduction needed here.
- */
+
 export const handleItemReturnRequest = async (req, res) => {
   try {
     const { decision, rejectionReason, restock = true } = req.body;
@@ -381,8 +352,7 @@ export const handleItemReturnRequest = async (req, res) => {
     }
 
     if (decision === 'accepted') {
-      // Item-level returns refund the item price in full —
-      // shipping is an order-level charge, not split per item.
+      
       const wallet = await Wallet.getOrCreate(order.user);
       await wallet.credit(
         item.totalPrice,

@@ -470,6 +470,9 @@
   const isReturned     = s === 'returned';
   const isDelivered    = s === 'delivered';
 
+  /* Invoice is only available once the order has actually been delivered */
+  const canDownloadInvoice = isDelivered;
+
   /* Progress steps */
   const STEPS  = ['confirmed','processing','dispatched','delivered'];
   const stepIdx = STEPS.indexOf(s);
@@ -775,11 +778,13 @@
           <div class="section-body">
             <div class="actions-panel">
 
-              <!-- Invoice — always available -->
-              <a href="/orders/<%= order.orderNumber %>/invoice" class="btn-primary">
-                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                Download Invoice
-              </a>
+              <!-- Invoice — only available once the order has been delivered -->
+              <% if (canDownloadInvoice) { %>
+                <a href="/orders/<%= order.orderNumber %>/invoice" class="btn-primary">
+                  <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  Download Invoice
+                </a>
+              <% } %>
 
               <!-- Cancel whole order -->
               <% if (isCancellable) { %>
@@ -871,6 +876,9 @@
               <% if (isReturnable) { %>
                 <p class="action-note">Return items individually using the Return button next to each item, or return the entire order at once.</p>
               <% } %>
+              <% if (!canDownloadInvoice && !isCancelled && !isReturned) { %>
+                <p class="action-note">The invoice will be available for download once this order is delivered.</p>
+              <% } %>
 
             </div>
           </div>
@@ -902,7 +910,7 @@
         <% } %>
       </p>
       <div class="modal-field">
-        <label class="modal-label" for="cancelOrderReason">Reason <span style="color:var(--text-dim);font-size:0.38rem;">(optional)</span></label>
+        <label class="modal-label" for="cancelOrderReason">Reason <span>*</span></label>
         <textarea class="modal-textarea" id="cancelOrderReason" placeholder="Let us know why you're cancelling…"></textarea>
       </div>
       <div class="modal-error" id="cancelOrderErr"></div>
@@ -923,7 +931,7 @@
       <h3>Cancel Item</h3>
       <p>Cancel <strong id="cancelItemNameDisplay" style="color:var(--text)"></strong> from this order? The item's stock will be restored.<% if (paidOnline) { %> A proportional refund will be added to your wallet immediately.<% } %></p>
       <div class="modal-field">
-        <label class="modal-label" for="cancelItemReason">Reason <span style="color:var(--text-dim);font-size:0.38rem;">(optional)</span></label>
+        <label class="modal-label" for="cancelItemReason">Reason <span>*</span></label>
         <textarea class="modal-textarea" id="cancelItemReason" placeholder="Reason for cancelling this item…"></textarea>
       </div>
       <div class="modal-error" id="cancelItemErr"></div>
@@ -1011,12 +1019,23 @@
       if (e.key === 'Escape') document.querySelectorAll('.modal-backdrop.open').forEach(bd => closeModal(bd.id));
     });
 
-    function openCancelOrder() { openModal('modalCancelOrder'); }
+    function openCancelOrder() {
+      document.getElementById('cancelOrderReason').value = '';
+      document.getElementById('cancelOrderErr').classList.remove('show');
+      openModal('modalCancelOrder');
+    }
     async function confirmCancelOrder() {
       const reason = document.getElementById('cancelOrderReason').value.trim();
       const btn    = document.getElementById('cancelOrderConfirmBtn');
       const errEl  = document.getElementById('cancelOrderErr');
       errEl.classList.remove('show');
+
+      if (!reason) {
+        errEl.textContent = 'A cancellation reason is required.';
+        errEl.classList.add('show');
+        return;
+      }
+
       btn.disabled = true; btn.textContent = 'Cancelling…';
       try {
         const res  = await fetch(`/orders/${ORDER_ID}/cancel`, {
@@ -1047,6 +1066,13 @@
       const btn    = document.getElementById('cancelItemConfirmBtn');
       const errEl  = document.getElementById('cancelItemErr');
       errEl.classList.remove('show');
+
+      if (!reason) {
+        errEl.textContent = 'A cancellation reason is required.';
+        errEl.classList.add('show');
+        return;
+      }
+
       btn.disabled = true; btn.textContent = 'Cancelling…';
       try {
         const res  = await fetch(`/orders/${ORDER_ID}/cancel-item`, {

@@ -4,12 +4,41 @@ import Wallet     from '../models/wallet.js';
 import PDFDocument from 'pdfkit';
 import { restoreStockAndBroadcast } from './checkoutService.js';
 
-// ── Helpers ───────────────────────────────────────────────────────────────
 
-/**
- * Refund amount for an entire order.
- * Shipping is NEVER refunded. If the user paid nothing beyond shipping, refund = 0.
- */
+const GST_RATE = 0.18;
+
+
+const recalculateOrderPricing = (order) => {
+  const p = order.pricing;
+
+  const originalSubtotal = p.subtotal || 0;
+  const activeItems      = order.items.filter(i => i.status === 'active');
+  const activeSubtotal   = activeItems.reduce((sum, i) => sum + (i.totalPrice || 0), 0);
+
+  const activeRatio = originalSubtotal > 0 ? activeSubtotal / originalSubtotal : 0;
+
+  const originalItemDiscount   = p.itemDiscount   || 0;
+  const originalCouponDiscount = p.couponDiscount || 0;
+
+  const newItemDiscount   = Math.round(originalItemDiscount   * activeRatio);
+  const newCouponDiscount = Math.round(originalCouponDiscount * activeRatio);
+
+  const discountedSubtotal = Math.max(activeSubtotal - newItemDiscount - newCouponDiscount, 0);
+  const newTax             = Math.round(discountedSubtotal * GST_RATE);
+  const shipping           = p.shipping || 0;
+
+  const newGrandTotal = discountedSubtotal + newTax + shipping;
+
+  p.subtotal        = activeSubtotal;
+  p.itemDiscount     = newItemDiscount;
+  p.couponDiscount   = newCouponDiscount;
+  p.tax              = newTax;
+  p.grandTotal       = newGrandTotal;
+
+  return p;
+};
+
+
 const getRefundAmount = (order) => {
   if (order.paymentMethod === 'COD') return 0;
   if (order.paymentMethod === 'Razorpay' && order.paymentStatus !== 'paid') return 0;
@@ -17,14 +46,10 @@ const getRefundAmount = (order) => {
   const shippingCharge = order.pricing.shipping || 0;
   const refund         = order.pricing.grandTotal - shippingCharge;
 
-  // Safety: never refund a negative or zero amount
   return Math.max(refund, 0);
 };
 
-/**
- * Refund amount for a single cancelled/returned item (proportional).
- * Shipping is excluded from the refundable pool entirely.
- */
+
 const getItemRefundAmount = (order, item) => {
   if (order.paymentMethod === 'COD') return 0;
   if (order.paymentMethod === 'Razorpay' && order.paymentStatus !== 'paid') return 0;
@@ -32,7 +57,6 @@ const getItemRefundAmount = (order, item) => {
   const shippingCharge  = order.pricing.shipping || 0;
   const refundableTotal = Math.max(order.pricing.grandTotal - shippingCharge, 0);
 
-  // Nothing to refund (e.g. product was fully covered by coupon, user only paid shipping)
   if (refundableTotal === 0) return 0;
 
   const activeItems = order.items.filter(i => i.status === 'active');
@@ -43,7 +67,6 @@ const getItemRefundAmount = (order, item) => {
   return Math.round(refundableTotal * itemShare);
 };
 
-// ── Read operations ───────────────────────────────────────────────────────
 
 export const fetchOrders = async ({ userId, search, page }) => {
   const limit     = 8;
@@ -87,9 +110,13 @@ export const fetchOrderForSSE = async ({ orderNumber, userId }) => {
   return order;
 };
 
-// ── Cancellation ──────────────────────────────────────────────────────────
 
 export const cancelEntireOrder = async ({ orderNumber, userId, reason }) => {
+  const trimmedReason = (reason || '').trim();
+  if (!trimmedReason) {
+    throw Object.assign(new Error('A cancellation reason is required.'), { status: 400 });
+  }
+
   const order = await Order.findOne({ orderNumber, user: userId });
   if (!order) throw Object.assign(new Error('Order not found.'), { status: 404 });
 
@@ -107,13 +134,17 @@ export const cancelEntireOrder = async ({ orderNumber, userId, reason }) => {
       .map(i => restoreStockAndBroadcast(i.product, i.quantity, i.variantName || null))
   );
 
-  order.items.forEach(i => { if (i.status === 'active') i.status = 'cancelled'; });
-  order.orderStatus      = 'cancelled';
-  order.cancellationNote = (reason || '').trim();
-  await order.save();
-
   const refundAmount = getRefundAmount(order);
   console.log(`[cancelEntireOrder] ${order.orderNumber} | grandTotal=${order.pricing.grandTotal} shipping=${order.pricing.shipping} refund=${refundAmount}`);
+
+  order.items.forEach(i => { if (i.status === 'active') i.status = 'cancelled'; });
+  order.orderStatus      = 'cancelled';
+  order.cancellationNote = trimmedReason;
+
+  
+  recalculateOrderPricing(order);
+
+  await order.save();
 
   if (refundAmount > 0) {
     const wallet = await Wallet.getOrCreate(userId);
@@ -126,6 +157,11 @@ export const cancelEntireOrder = async ({ orderNumber, userId, reason }) => {
 
 export const cancelSingleItem = async ({ orderNumber, userId, itemId, reason }) => {
   if (!itemId) throw Object.assign(new Error('itemId is required.'), { status: 400 });
+
+  const trimmedReason = (reason || '').trim();
+  if (!trimmedReason) {
+    throw Object.assign(new Error('A cancellation reason is required.'), { status: 400 });
+  }
 
   const order = await Order.findOne({ orderNumber, user: userId });
   if (!order) throw Object.assign(new Error('Order not found.'), { status: 404 });
@@ -148,13 +184,15 @@ export const cancelSingleItem = async ({ orderNumber, userId, itemId, reason }) 
   await restoreStockAndBroadcast(item.product, item.quantity, item.variantName || null);
 
   item.status           = 'cancelled';
-  item.cancellationNote = (reason || '').trim();
+  item.cancellationNote = trimmedReason;
 
   const allCancelled = order.items.every(i => i.status === 'cancelled');
   if (allCancelled) {
     order.orderStatus      = 'cancelled';
     order.cancellationNote = 'All items cancelled individually.';
   }
+
+  recalculateOrderPricing(order);
 
   await order.save();
 
@@ -168,7 +206,6 @@ export const cancelSingleItem = async ({ orderNumber, userId, itemId, reason }) 
   return { order, allCancelled, refunded, refundAmount };
 };
 
-// ── Return requests ───────────────────────────────────────────────────────
 
 export const requestReturn = async ({ orderNumber, userId, reason }) => {
   if (!reason) throw Object.assign(new Error('Return reason is required.'), { status: 400 });
@@ -232,11 +269,11 @@ export const requestItemReturn = async ({ orderNumber, userId, itemId, reason })
     order.orderStatus       = 'returned';
   }
 
+  
   await order.save();
   return order;
 };
 
-// ── Admin: accept / reject returns ───────────────────────────────────────
 
 export const acceptOrderReturn = async ({ orderNumber }) => {
   const order = await Order.findOne({ orderNumber });
@@ -252,14 +289,20 @@ export const acceptOrderReturn = async ({ orderNumber }) => {
       .map(i => restoreStockAndBroadcast(i.product, i.quantity, i.variantName || null))
   );
 
-  order.returnStatus = 'accepted';
-  order.items.forEach(i => {
-    if (i.status === 'active' && i.returnStatus === 'pending') i.returnStatus = 'accepted';
-  });
-  await order.save();
-
   const refundAmount = getRefundAmount(order);
   console.log(`[acceptOrderReturn] ${order.orderNumber} | grandTotal=${order.pricing.grandTotal} shipping=${order.pricing.shipping} refund=${refundAmount}`);
+
+  order.returnStatus = 'accepted';
+  order.items.forEach(i => {
+    if (i.status === 'active' && i.returnStatus === 'pending') {
+      i.returnStatus = 'accepted';
+      i.status       = 'cancelled';
+    }
+  });
+
+  recalculateOrderPricing(order);
+
+  await order.save();
 
   if (refundAmount > 0) {
     const wallet = await Wallet.getOrCreate(order.user);
@@ -307,10 +350,13 @@ export const acceptItemReturn = async ({ orderNumber, itemId }) => {
   await restoreStockAndBroadcast(item.product, item.quantity, item.variantName || null);
 
   item.returnStatus = 'accepted';
+  item.status        = 'cancelled'; 
 
   const activeItems = order.items.filter(i => i.status === 'active');
-  const allAccepted = activeItems.every(i => i.returnStatus === 'accepted');
+  const allAccepted = activeItems.length === 0 || activeItems.every(i => i.returnStatus === 'accepted');
   if (allAccepted) order.returnStatus = 'accepted';
+
+  recalculateOrderPricing(order);
 
   await order.save();
 
@@ -355,7 +401,6 @@ export const rejectItemReturn = async ({ orderNumber, itemId, rejectionReason })
   return order;
 };
 
-// ── Wallet read ───────────────────────────────────────────────────────────
 
 export const fetchWallet = async (userId) => {
   const wallet = await Wallet.getOrCreate(userId);
@@ -365,11 +410,14 @@ export const fetchWallet = async (userId) => {
   return { balance: wallet.balance, transactions };
 };
 
-// ── Invoice PDF ───────────────────────────────────────────────────────────
 
 export const generateInvoicePDF = async ({ orderNumber, userId, res }) => {
   const order = await Order.findOne({ orderNumber, user: userId }).lean();
   if (!order) throw Object.assign(new Error('Order not found.'), { status: 404 });
+
+  if (order.orderStatus !== 'delivered') {
+    throw Object.assign(new Error('Invoice is only available once the order has been delivered.'), { status: 400 });
+  }
 
   const doc  = new PDFDocument({ margin: 50, size: 'A4' });
   const GOLD  = '#c9a96e';
@@ -437,6 +485,7 @@ export const generateInvoicePDF = async ({ orderNumber, userId, res }) => {
 
   doc.moveTo(50, y).lineTo(545, y).strokeColor('#dddddd').lineWidth(0.5).stroke();
   y += 14;
+
 
   const p = order.pricing;
   const addRow = (label, value, bold = false, color = DARK) => {

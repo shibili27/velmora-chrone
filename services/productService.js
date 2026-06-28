@@ -1,6 +1,7 @@
 import Product  from '../models/product.js';
 import Category from '../models/category.js';
 import Brand    from '../models/brand.js';
+import { attachOffers, attachOffer } from './offerService.js';
 
 export const getFeaturedProducts = async () => {
   const products = await Product.find({
@@ -15,7 +16,9 @@ export const getFeaturedProducts = async () => {
     .skip(1)
     .lean();
 
-  return products.filter(p => p.category !== null);
+  const visible = products.filter(p => p.category !== null);
+  await attachOffers(visible);
+  return visible;
 };
 
 export const getFilteredProducts = async ({ search, sort, category, brand, minPrice, maxPrice, page }) => {
@@ -60,8 +63,8 @@ export const getFilteredProducts = async ({ search, sort, category, brand, minPr
 
   const [categories, brands, total, products] = await Promise.all([
     Category.find(categoryFilter).sort({ name: 1 }).lean(),
-    Product.distinct('brand',query)
-    .then(brandIds => Brand.find({_id:{$in: brandIds}, isDeleted:false}).sort({name:1}).lean()),
+    Product.distinct('brand', query)
+      .then(brandIds => Brand.find({ _id: { $in: brandIds }, isDeleted: false }).sort({ name: 1 }).lean()),
 
     brandNotFound ? 0 : Product.aggregate([
       { $match: query },
@@ -85,6 +88,8 @@ export const getFilteredProducts = async ({ search, sort, category, brand, minPr
     ]),
   ]);
 
+  await attachOffers(products);
+
   return {
     products,
     categories,
@@ -107,8 +112,8 @@ export const getProductById = async (productId) => {
   if (!product.category || product.category.isDeleted || product.category.isListed === false)
     throw Object.assign(new Error('category'), { status: 410, product });
 
-  // brand sp
   const brand = await Brand.findById(product.brand).lean();
+  product.brand = brand;
 
   const related = await Product.find({
     _id      : { $ne: product._id },
@@ -121,7 +126,10 @@ export const getProductById = async (productId) => {
     .limit(4)
     .lean();
 
-  product.brand = brand;
+  await Promise.all([
+    attachOffer(product),
+    attachOffers(related),
+  ]);
 
   return { product, related };
 };

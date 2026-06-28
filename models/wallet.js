@@ -23,7 +23,7 @@ const transactionSchema = new mongoose.Schema({
       'return_refund',
       'order_payment',
       'manual_credit',
-      'referral_bonus', // FIX: added so referral wallet credits have a proper source label
+      'referral_bonus', 
     ],
     required: true,
   },
@@ -48,7 +48,7 @@ const walletSchema = new mongoose.Schema({
     type    : mongoose.Schema.Types.ObjectId,
     ref     : 'User',
     required: true,
-    unique  : true,   // ← this already creates the index, no need for walletSchema.index()
+    unique  : true,   
   },
   balance: {
     type   : Number,
@@ -61,7 +61,6 @@ const walletSchema = new mongoose.Schema({
   },
 }, { timestamps: true });
 
-// ← REMOVED: walletSchema.index({ user: 1 });  was causing the duplicate warning
 
 walletSchema.methods.credit = async function (amount, description, source, order = null) {
   if (amount <= 0) throw new Error('Credit amount must be positive.');

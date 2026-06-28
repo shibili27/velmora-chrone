@@ -2,7 +2,6 @@ import Offer    from '../../models/offer.js';
 import Product  from '../../models/product.js';
 import Category from '../../models/category.js';
 
-// ── List + search + paginate ────────────────────────────────────────────────
 export const getOffers = async (req, res) => {
   try {
     const search = req.query.search?.trim() || '';
@@ -20,8 +19,8 @@ export const getOffers = async (req, res) => {
       Category.find({ isDeleted: false }).select('name').sort({ name: 1 }).lean(),
     ]);
 
-    // Resolve each offer's target name (product or category) for display,
-    // since targetId is a bare ObjectId with no built-in populate path.
+
+
     const productMap  = new Map(products.map(p => [String(p._id), p.name]));
     const categoryMap = new Map(categories.map(c => [String(c._id), c.name]));
 
@@ -53,7 +52,6 @@ export const getOffers = async (req, res) => {
   }
 };
 
-// ── Shared validation for add/edit ──────────────────────────────────────────
 function validateOfferInput(body) {
   const { title, appliesTo, targetId, discountType, discountValue, startDate, endDate } = body;
 
@@ -72,7 +70,7 @@ function validateOfferInput(body) {
   return null;
 }
 
-// ── Add ──────────────────────────────────────────────────────────────────-
+
 export const addOffer = async (req, res) => {
   try {
     const validationError = validateOfferInput(req.body);
@@ -83,7 +81,7 @@ export const addOffer = async (req, res) => {
 
     const { title, description, appliesTo, targetId, discountType, discountValue, startDate, endDate, isActive } = req.body;
 
-    // Confirm the target actually exists, to avoid dangling offers.
+    
     const targetExists = appliesTo === 'product'
       ? await Product.exists({ _id: targetId, isDeleted: false })
       : await Category.exists({ _id: targetId, isDeleted: false });
@@ -93,8 +91,7 @@ export const addOffer = async (req, res) => {
       return res.redirect('/admin/offers');
     }
 
-    // Enforce "one active offer per target" — if an active, non-deleted
-    // offer already exists for this exact target, block creating another.
+
     const duplicate = await Offer.findOne({
       appliesTo, targetId, isDeleted: false, isActive: true,
     });
@@ -124,7 +121,7 @@ export const addOffer = async (req, res) => {
   }
 };
 
-// ── Edit ─────────────────────────────────────────────────────────────────-
+
 export const editOffer = async (req, res) => {
   try {
     const validationError = validateOfferInput(req.body);
@@ -146,8 +143,7 @@ export const editOffer = async (req, res) => {
 
     const wantsActive = isActive === 'on' || isActive === 'true' || isActive === true;
 
-    // Only block on duplicate-active-offer if THIS edit would make it active
-    // for a target that already has a different active offer.
+  
     if (wantsActive) {
       const duplicate = await Offer.findOne({
         appliesTo, targetId, isDeleted: false, isActive: true,
@@ -180,7 +176,6 @@ export const editOffer = async (req, res) => {
   }
 };
 
-// ── Toggle active/inactive (quick switch from the list, no full edit) ──────
 export const toggleOfferActive = async (req, res) => {
   try {
     const offer = await Offer.findById(req.params.id);
@@ -217,7 +212,7 @@ export const toggleOfferActive = async (req, res) => {
   }
 };
 
-// ── Delete (soft) ────────────────────────────────────────────────────────-
+
 export const deleteOffer = async (req, res) => {
   try {
     await Offer.findByIdAndUpdate(req.params.id, { isDeleted: true, isActive: false });

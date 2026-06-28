@@ -77,8 +77,7 @@ const userSchema = new mongoose.Schema({
 
 userSchema.index({ role: 1 });
 
-// ✅ async pre-save hooks must NOT accept next as a parameter —
-// Mongoose treats async hooks as promise-based; calling next() throws.
+
 userSchema.pre('save', async function () {
   if (this.isNew && !this.referralCode) {
     try {

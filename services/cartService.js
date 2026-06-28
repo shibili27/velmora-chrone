@@ -28,14 +28,12 @@ export const getCleanCart = async (userId) => {
 
   if (!cart) return null;
 
-  // Only remove items whose product was hard-deleted (no document at all)
-  // Keep OOS / unlisted items so the cart page can show warnings
+  
   const existingItems = cart.items.filter(item => item.product);
 
   let modified = existingItems.length !== cart.items.length;
   cart.items   = existingItems;
 
-  // Cap quantities — but keep the item visible even if OOS
   for (const item of cart.items) {
     const p            = item.product;
     const variantStock = item.variantName
