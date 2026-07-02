@@ -9,7 +9,7 @@ import Coupon from '../../models/coupon.js';
 import PDFDocument from 'pdfkit';
 
 
-// ── Dashboard ─────────────────────────────────────────────────────────────────
+
 
 export const getDashboard = async (req, res) => {
   try {
@@ -94,7 +94,7 @@ export const getDashboard = async (req, res) => {
         { $limit: 12 },
       ]),
 
-      // ── Top 10 Products ─────────────────────────────────────────────────────
+      
       Order.aggregate([
         { $match: { orderStatus: 'delivered' } },
         { $unwind: '$items' },
@@ -113,7 +113,7 @@ export const getDashboard = async (req, res) => {
         { $limit: 10 },
       ]),
 
-      // ── Top 10 Categories ───────────────────────────────────────────────────
+      
       Order.aggregate([
         { $match: { orderStatus: 'delivered' } },
         { $unwind: '$items' },
@@ -158,7 +158,7 @@ export const getDashboard = async (req, res) => {
         { $limit: 10 },
       ]),
 
-      // ── Top 10 Brands ───────────────────────────────────────────────────────
+      
       Order.aggregate([
         { $match: { orderStatus: 'delivered' } },
         { $unwind: '$items' },
@@ -335,7 +335,7 @@ export const getDashboard = async (req, res) => {
   }
 };
 
-// ── Categories ────────────────────────────────────────────────────────────────
+
 
 export const getCategories = async (req, res) => {
   try {
@@ -432,7 +432,7 @@ export const deleteCategory = async (req, res) => {
   }
 };
 
-// ── Products ──────────────────────────────────────────────────────────────────
+
 
 export const getProducts = async (req, res) => {
   try {
@@ -651,7 +651,6 @@ export const deleteProduct = async (req, res) => {
   }
 };
 
-// ── Brands ────────────────────────────────────────────────────────────────────
 
 export const getBrands = async (req, res) => {
   try {
@@ -744,21 +743,7 @@ export const deleteBrand = async (req, res) => {
   }
 };
 
-// ── Coupons ───────────────────────────────────────────────────────────────────
-// FIX: validateCouponBody / createCoupon previously validated and wrote
-// `minOrderAmount` / `maxDiscount`, but the Coupon schema defines
-// `minOrderValue` / `maxDiscountCap`. Mongoose silently dropped the
-// mismatched fields, so every coupon created via the admin panel had NO
-// minimum order value or max discount cap enforced. Renamed to match the
-// schema. Also added 'free_shipping' as a valid discountType (the schema
-// already allowed it; the validator previously rejected it), and made
-// discountValue optional for free_shipping coupons since they don't need one.
-//
-// FIX 2: added a server-side rule that a flat discount must be lower than
-// the minimum cart value. This mirrors the client-side check added to the
-// admin coupon modal — without it, a direct POST to /coupons/create or
-// /coupons/:id/edit could bypass the browser and create a flat coupon
-// worth more than (or equal to) its own minimum order value.
+
 
 function escapeRegex(str) {
   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -788,8 +773,7 @@ function validateCouponBody(body) {
   if (!isNaN(min) && min < 0)
     errors.push('Minimum order amount cannot be negative.');
 
-  // Flat discount must be lower than the minimum cart value
-  // (prevents a coupon from discounting more than — or exactly as much as — the order is worth)
+ 
   if (discountType === 'flat') {
     const flatVal = parseFloat(discountValue);
     if (!isNaN(flatVal) && !isNaN(min) && min > 0 && flatVal >= min) {
