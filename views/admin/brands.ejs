@@ -101,11 +101,37 @@
     .modal-error svg { width: 15px; height: 15px; flex-shrink: 0; }
     .form-group { margin-bottom: 16px; }
     .form-label { display: block; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text); margin-bottom: 6px; }
-    .form-input { width: 100%; height: 40px; border: 1px solid var(--border); border-radius: 4px; padding: 0 14px; font-family: 'Jost', sans-serif; font-size: 13px; color: var(--text); outline: none; transition: border-color 0.2s; }
+    .form-input { width: 100%; height: 40px; border: 1px solid var(--border); border-radius: 4px; padding: 0 14px; font-family: 'Jost', sans-serif; font-size: 13px; color: var(--text); outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
     .form-input:focus { border-color: var(--teal); }
-    .form-input--error { border-color: var(--red) !important; background: #fff8f8; }
+    .form-input--error { border-color: var(--red) !important; background: #fff8f8 !important; box-shadow: 0 0 0 3px rgba(220,38,38,0.12); }
+    .form-input--valid { border-color: var(--green); }
     textarea.form-input { height: 80px; padding: 10px 14px; resize: vertical; }
     .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
+
+    /* Field-level error text */
+    .field-error-text {
+      display: none;
+      align-items: center;
+      gap: 5px;
+      font-size: 10.5px;
+      font-weight: 500;
+      color: var(--red);
+      margin-top: 6px;
+    }
+    .field-error-text.show { display: flex; }
+    .field-error-text svg { width: 11px; height: 11px; flex-shrink: 0; }
+    .char-count { font-size: 10px; color: var(--text-light); text-align: right; margin-top: 4px; }
+    .char-count.over { color: var(--red); font-weight: 600; }
+
+    /* Shake animation */
+    @keyframes shake {
+      10%, 90% { transform: translateX(-1px); }
+      20%, 80% { transform: translateX(2px); }
+      30%, 50%, 70% { transform: translateX(-4px); }
+      40%, 60% { transform: translateX(4px); }
+    }
+    .form-group.shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+    .modal.shake { animation: shake 0.45s cubic-bezier(.36,.07,.19,.97) both; }
 
     /* Confirm */
     .confirm-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 400; align-items: center; justify-content: center; }
@@ -328,14 +354,23 @@
       <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
       <span id="addModalErrorText"></span>
     </div>
-    <form action="/admin/brands/add" method="POST">
-      <div class="form-group">
+    <form action="/admin/brands/add" method="POST" id="addForm" novalidate>
+      <div class="form-group" id="addNameGroup">
         <label class="form-label">Name *</label>
-        <input class="form-input" type="text" name="name" id="addName" required placeholder="e.g. Rolex"/>
+        <input class="form-input" type="text" name="name" id="addName" maxlength="60" placeholder="e.g. Rolex"/>
+        <span class="field-error-text" id="addNameError">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>
+          <span class="err-text"></span>
+        </span>
       </div>
-      <div class="form-group">
+      <div class="form-group" id="addDescGroup">
         <label class="form-label">Description</label>
-        <textarea class="form-input" name="description" placeholder="Optional description…"></textarea>
+        <textarea class="form-input" name="description" id="addDesc" maxlength="250" placeholder="Optional description…"></textarea>
+        <div class="char-count" id="addDescCount">0 / 250</div>
+        <span class="field-error-text" id="addDescError">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>
+          <span class="err-text"></span>
+        </span>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn--outline" onclick="closeModal('addModal')">Cancel</button>
@@ -353,14 +388,23 @@
       <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
       <span id="editModalErrorText"></span>
     </div>
-    <form id="editForm" method="POST">
-      <div class="form-group">
+    <form id="editForm" method="POST" novalidate>
+      <div class="form-group" id="editNameGroup">
         <label class="form-label">Name *</label>
-        <input class="form-input" type="text" name="name" id="editName" required/>
+        <input class="form-input" type="text" name="name" id="editName" maxlength="60"/>
+        <span class="field-error-text" id="editNameError">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>
+          <span class="err-text"></span>
+        </span>
       </div>
-      <div class="form-group">
+      <div class="form-group" id="editDescGroup">
         <label class="form-label">Description</label>
-        <textarea class="form-input" name="description" id="editDesc"></textarea>
+        <textarea class="form-input" name="description" id="editDesc" maxlength="250"></textarea>
+        <div class="char-count" id="editDescCount">0 / 250</div>
+        <span class="field-error-text" id="editDescError">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>
+          <span class="err-text"></span>
+        </span>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn--outline" onclick="closeModal('editModal')">Cancel</button>
@@ -398,6 +442,11 @@
     return DUPLICATE_KEYWORDS.some(k => (msg || '').toLowerCase().includes(k));
   }
 
+  // ── Validation constants ──────────────────────────────────────────────────
+  const NAME_MIN = 2;
+  const NAME_MAX = 60;
+  const DESC_MAX = 250;
+
   window.addEventListener('DOMContentLoaded', () => {
     // Auto-dismiss success flash after 4s
     const successEl = document.getElementById('pageFlashSuccess');
@@ -412,13 +461,22 @@
         showPageBanner(serverError);
       }
     }
+
+    updateCharCount('addDesc', 'addDescCount');
+    updateCharCount('editDesc', 'editDescCount');
   });
 
-  // ── Open Add modal (optionally with an error message) ────────────────────
+  // ── Open Add modal (optionally with a server error message) ──────────────
   function openAddModal(errorMsg) {
     const errBox = document.getElementById('addModalError');
     errBox.classList.remove('show');
-    document.getElementById('addName').classList.remove('form-input--error');
+
+    document.getElementById('addForm').reset();
+    clearFieldError('add', 'name');
+    clearFieldError('add', 'desc');
+    document.getElementById('addName').classList.remove('form-input--valid', 'form-input--error');
+    document.getElementById('addDesc').classList.remove('form-input--valid', 'form-input--error');
+    updateCharCount('addDesc', 'addDescCount');
 
     if (errorMsg) {
       document.getElementById('addModalErrorText').textContent = errorMsg;
@@ -439,14 +497,153 @@
     el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); });
   });
 
-  // ── Clear error highlight when user starts retyping ───────────────────────
+  // ── Char counter ─────────────────────────────────────────────────────────
+  function updateCharCount(inputId, counterId) {
+    const el = document.getElementById(inputId);
+    const counter = document.getElementById(counterId);
+    if (!el || !counter) return;
+    const len = el.value.length;
+    counter.textContent = `${len} / ${DESC_MAX}`;
+    counter.classList.toggle('over', len > DESC_MAX);
+  }
+  document.getElementById('addDesc').addEventListener('input', () => {
+    updateCharCount('addDesc', 'addDescCount');
+    validateField('add', 'desc');
+  });
+  document.getElementById('editDesc').addEventListener('input', () => {
+    updateCharCount('editDesc', 'editDescCount');
+    validateField('edit', 'desc');
+  });
+
+  // ── Field-level error helpers ────────────────────────────────────────────
+  function cap(str) { return str.charAt(0).toUpperCase() + str.slice(1); }
+
+  function showFieldError(prefix, field, message) {
+    const input = document.getElementById(`${prefix}${cap(field)}`);
+    const err = document.getElementById(`${prefix}${cap(field)}Error`);
+    if (!input || !err) return;
+    input.classList.add('form-input--error');
+    input.classList.remove('form-input--valid');
+    err.querySelector('.err-text').textContent = message;
+    err.classList.add('show');
+  }
+
+  function clearFieldError(prefix, field) {
+    const input = document.getElementById(`${prefix}${cap(field)}`);
+    const err = document.getElementById(`${prefix}${cap(field)}Error`);
+    if (!input || !err) return;
+    input.classList.remove('form-input--error');
+    err.classList.remove('show');
+    err.querySelector('.err-text').textContent = '';
+  }
+
+  function markFieldValid(prefix, field) {
+    const input = document.getElementById(`${prefix}${cap(field)}`);
+    if (!input) return;
+    input.classList.add('form-input--valid');
+    input.classList.remove('form-input--error');
+  }
+
+  function shakeGroup(prefix, field) {
+    const group = document.getElementById(`${prefix}${cap(field)}Group`);
+    if (!group) return;
+    group.classList.remove('shake');
+    void group.offsetWidth;
+    group.classList.add('shake');
+    group.addEventListener('animationend', () => group.classList.remove('shake'), { once: true });
+  }
+
+  function shakeModal(modalId) {
+    const modal = document.querySelector(`#${modalId} .modal`);
+    if (!modal) return;
+    modal.classList.remove('shake');
+    void modal.offsetWidth;
+    modal.classList.add('shake');
+    modal.addEventListener('animationend', () => modal.classList.remove('shake'), { once: true });
+  }
+
+  // ── Core validators (shared by Add + Edit) ───────────────────────────────
+  function validateField(prefix, field) {
+    const input = document.getElementById(`${prefix}${cap(field)}`);
+    if (!input) return true;
+    const v = input.value.trim();
+
+    if (field === 'name') {
+      if (!v) { showFieldError(prefix, field, 'Brand name is required.'); return false; }
+      if (v.length < NAME_MIN) { showFieldError(prefix, field, `Name must be at least ${NAME_MIN} characters.`); return false; }
+      if (v.length > NAME_MAX) { showFieldError(prefix, field, `Name cannot exceed ${NAME_MAX} characters.`); return false; }
+
+      const letterCount = (v.match(/[a-zA-Z]/g) || []).length;
+      if (letterCount < 2) {
+        showFieldError(prefix, field, 'Name must contain real words, not just symbols or numbers.');
+        return false;
+      }
+      // Blocks junk like "________", "--------", "........", "aaaaaaaa"
+      if (/^(.)\1+$/.test(v)) {
+        showFieldError(prefix, field, 'Name cannot be a single character repeated.');
+        return false;
+      }
+      // Blocks names made only of underscores/dashes/dots/symbols
+      if (/^[\s_\-.,!@#$%^&*()+=~`|\\/<>[\]{}:;'"?]+$/.test(v)) {
+        showFieldError(prefix, field, 'Name cannot consist only of symbols.');
+        return false;
+      }
+      clearFieldError(prefix, field); markFieldValid(prefix, field); return true;
+    }
+
+    if (field === 'desc') {
+      if (v.length > DESC_MAX) { showFieldError(prefix, field, `Description cannot exceed ${DESC_MAX} characters.`); return false; }
+      clearFieldError(prefix, field);
+      if (v.length > 0) markFieldValid(prefix, field);
+      return true;
+    }
+
+    return true;
+  }
+
+  function validateForm(prefix) {
+    const fields = ['name', 'desc'];
+    let allValid = true;
+    const invalidFields = [];
+    fields.forEach(f => {
+      const ok = validateField(prefix, f);
+      if (!ok) { allValid = false; invalidFields.push(f); }
+    });
+
+    if (!allValid) {
+      invalidFields.forEach(f => shakeGroup(prefix, f));
+      shakeModal(prefix === 'add' ? 'addModal' : 'editModal');
+    }
+
+    return allValid;
+  }
+
+  // ── Live validation while typing ─────────────────────────────────────────
+  document.getElementById('addName').addEventListener('input', () => validateField('add', 'name'));
+  document.getElementById('addName').addEventListener('blur',  () => validateField('add', 'name'));
+  document.getElementById('editName').addEventListener('input', () => validateField('edit', 'name'));
+  document.getElementById('editName').addEventListener('blur',  () => validateField('edit', 'name'));
+
+  // ── Clear server-error highlight when user starts retyping ───────────────
   document.getElementById('addName').addEventListener('input', function () {
-    this.classList.remove('form-input--error');
     document.getElementById('addModalError').classList.remove('show');
   });
   document.getElementById('editName').addEventListener('input', function () {
-    this.classList.remove('form-input--error');
     document.getElementById('editModalError').classList.remove('show');
+  });
+
+  // ── Submit-time validation (blocks bad submissions) ──────────────────────
+  document.getElementById('addForm').addEventListener('submit', function (e) {
+    if (!validateForm('add')) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  });
+  document.getElementById('editForm').addEventListener('submit', function (e) {
+    if (!validateForm('edit')) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
   });
 
   // ── Edit modal — open via data-* attributes ───────────────────────────────
@@ -462,9 +659,13 @@
     document.getElementById('editName').value  = name;
     document.getElementById('editDesc').value  = desc;
 
-    // Clear any previous error
+    // Clear any previous error state
     document.getElementById('editModalError').classList.remove('show');
-    document.getElementById('editName').classList.remove('form-input--error');
+    clearFieldError('edit', 'name');
+    clearFieldError('edit', 'desc');
+    document.getElementById('editName').classList.remove('form-input--valid');
+    document.getElementById('editDesc').classList.remove('form-input--valid');
+    updateCharCount('editDesc', 'editDescCount');
 
     document.getElementById('editModal').classList.add('open');
   });

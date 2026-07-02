@@ -121,7 +121,7 @@
     .field input, .field select, .field textarea {
       padding: 9px 12px; border: 1px solid var(--border); border-radius: 5px;
       font-family: 'Jost', sans-serif; font-size: 13px; color: var(--text);
-      background: var(--bg); outline: none; transition: border-color 0.15s;
+      background: var(--bg); outline: none; transition: border-color 0.15s, box-shadow 0.15s;
     }
     .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--teal); background: var(--white); }
     .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -129,8 +129,41 @@
     .field-checkbox input { width: 16px; height: 16px; accent-color: var(--teal); cursor: pointer; }
     .field-hint { font-size: 10.5px; color: var(--text-light); }
 
+    /* ── Validation states ── */
+    .field input.invalid, .field select.invalid, .field textarea.invalid {
+      border-color: var(--red);
+      background: var(--red-bg);
+      box-shadow: 0 0 0 3px rgba(220,38,38,0.12);
+    }
+    .field input.valid, .field select.valid, .field textarea.valid {
+      border-color: var(--green);
+    }
+
+    /* ── Shake animation ── */
+    @keyframes shake {
+      10%, 90% { transform: translateX(-1px); }
+      20%, 80% { transform: translateX(2px); }
+      30%, 50%, 70% { transform: translateX(-4px); }
+      40%, 60% { transform: translateX(4px); }
+    }
+    .field.shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+    .modal.shake { animation: shake 0.45s cubic-bezier(.36,.07,.19,.97) both; }
+    .field-error {
+      display: none;
+      font-size: 10.5px;
+      font-weight: 500;
+      color: var(--red);
+      align-items: center;
+      gap: 5px;
+    }
+    .field-error.show { display: flex; }
+    .field-error svg { width: 11px; height: 11px; flex-shrink: 0; }
+    .char-count { font-size: 10px; color: var(--text-light); text-align: right; }
+    .char-count.over { color: var(--red); font-weight: 600; }
+
     .toast { position: fixed; bottom: 24px; right: 24px; background: var(--text); color: #fff; padding: 12px 18px; border-radius: 6px; font-size: 12.5px; font-weight: 500; z-index: 9999; transform: translateY(80px); opacity: 0; transition: transform 0.25s, opacity 0.25s; pointer-events: none; }
     .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.toast--error { background: var(--red); }
   </style>
 </head>
 <body>
@@ -360,53 +393,90 @@
         <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
       </button>
     </div>
-    <form method="POST" id="offerForm" action="/admin/offers/add">
+    <form method="POST" id="offerForm" action="/admin/offers/add" novalidate>
       <div class="modal__body">
+
         <div class="field">
           <label>Title</label>
-          <input type="text" name="title" id="f_title" required placeholder="e.g. Summer Sale — Watches"/>
+          <input type="text" name="title" id="f_title" placeholder="e.g. Summer Sale — Watches" maxlength="100"/>
+          <span class="field-error" id="err_title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>
+            <span class="err-text"></span>
+          </span>
         </div>
+
         <div class="field">
           <label>Description (optional)</label>
-          <textarea name="description" id="f_description" rows="2" placeholder="Internal note about this offer"></textarea>
+          <textarea name="description" id="f_description" rows="2" maxlength="300" placeholder="Internal note about this offer"></textarea>
+          <div class="char-count" id="count_description">0 / 300</div>
+          <span class="field-error" id="err_description">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>
+            <span class="err-text"></span>
+          </span>
         </div>
 
         <div class="field-row">
           <div class="field">
             <label>Applies To</label>
-            <select name="appliesTo" id="f_appliesTo" required onchange="updateTargetOptions()">
+            <select name="appliesTo" id="f_appliesTo" onchange="updateTargetOptions(); clearError('appliesTo');">
+              <option value="">Select…</option>
               <option value="product">Product</option>
               <option value="category">Category</option>
             </select>
+            <span class="field-error" id="err_appliesTo">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>
+              <span class="err-text"></span>
+            </span>
           </div>
           <div class="field">
             <label>Target</label>
-            <select name="targetId" id="f_targetId" required></select>
+            <select name="targetId" id="f_targetId"></select>
+            <span class="field-error" id="err_targetId">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>
+              <span class="err-text"></span>
+            </span>
           </div>
         </div>
 
         <div class="field-row">
           <div class="field">
             <label>Discount Type</label>
-            <select name="discountType" id="f_discountType" required>
+            <select name="discountType" id="f_discountType" onchange="onDiscountTypeChange()">
+              <option value="">Select…</option>
               <option value="percentage">Percentage (%)</option>
               <option value="flat">Flat Amount (₹)</option>
             </select>
+            <span class="field-error" id="err_discountType">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>
+              <span class="err-text"></span>
+            </span>
           </div>
           <div class="field">
             <label>Discount Value</label>
-            <input type="number" name="discountValue" id="f_discountValue" required min="0" step="0.01" placeholder="e.g. 20"/>
+            <input type="number" name="discountValue" id="f_discountValue" min="0" step="0.01" placeholder="e.g. 20"/>
+            <span class="field-error" id="err_discountValue">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>
+              <span class="err-text"></span>
+            </span>
           </div>
         </div>
 
         <div class="field-row">
           <div class="field">
             <label>Start Date</label>
-            <input type="date" name="startDate" id="f_startDate" required/>
+            <input type="date" name="startDate" id="f_startDate"/>
+            <span class="field-error" id="err_startDate">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>
+              <span class="err-text"></span>
+            </span>
           </div>
           <div class="field">
             <label>End Date</label>
-            <input type="date" name="endDate" id="f_endDate" required/>
+            <input type="date" name="endDate" id="f_endDate"/>
+            <span class="field-error" id="err_endDate">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>
+              <span class="err-text"></span>
+            </span>
           </div>
         </div>
 
@@ -431,18 +501,49 @@
   const PRODUCTS   = <%- JSON.stringify((products || []).map(p => ({ id: p._id, name: p.name }))) %>;
   const CATEGORIES = <%- JSON.stringify((categories || []).map(c => ({ id: c._id, name: c.name }))) %>;
 
+  const MAX_PERCENTAGE   = 90;      // sane upper cap for percentage offers
+  const MAX_FLAT_AMOUNT  = 500000;  // sane upper cap for flat ₹ offers (adjust as needed)
+  const TITLE_MIN        = 3;
+  const TITLE_MAX        = 100;
+  const DESCRIPTION_MAX  = 300;
+
+  // ── Target dropdown population ──
   function updateTargetOptions(selectedTargetId) {
     const appliesTo = document.getElementById('f_appliesTo').value;
     const targetSel = document.getElementById('f_targetId');
-    const list = appliesTo === 'product' ? PRODUCTS : CATEGORIES;
+    const list = appliesTo === 'product' ? PRODUCTS : appliesTo === 'category' ? CATEGORIES : [];
 
-    targetSel.innerHTML = list.map(item =>
-      `<option value="${item.id}">${item.name}</option>`
+    targetSel.innerHTML = '<option value="">Select…</option>' + list.map(item =>
+      `<option value="${item.id}">${escapeHtml(item.name)}</option>`
     ).join('');
 
     if (selectedTargetId) targetSel.value = selectedTargetId;
   }
 
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str == null ? '' : String(str);
+    return div.innerHTML;
+  }
+
+  function onDiscountTypeChange() {
+    clearError('discountType');
+    const type = document.getElementById('f_discountType').value;
+    const valueInput = document.getElementById('f_discountValue');
+    if (type === 'percentage') {
+      valueInput.setAttribute('max', MAX_PERCENTAGE);
+      valueInput.placeholder = `e.g. 20 (max ${MAX_PERCENTAGE}%)`;
+    } else if (type === 'flat') {
+      valueInput.setAttribute('max', MAX_FLAT_AMOUNT);
+      valueInput.placeholder = `e.g. 500 (max ₹${MAX_FLAT_AMOUNT.toLocaleString('en-IN')})`;
+    } else {
+      valueInput.removeAttribute('max');
+      valueInput.placeholder = 'e.g. 20';
+    }
+    validateField('discountValue');
+  }
+
+  // ── Modal open/close ──
   function openAddModal() {
     document.getElementById('modalTitle').textContent = 'New Offer';
     document.getElementById('submitBtn').textContent   = 'Create Offer';
@@ -450,14 +551,16 @@
 
     document.getElementById('f_title').value         = '';
     document.getElementById('f_description').value   = '';
-    document.getElementById('f_appliesTo').value      = 'product';
-    document.getElementById('f_discountType').value   = 'percentage';
+    document.getElementById('f_appliesTo').value      = '';
+    document.getElementById('f_discountType').value   = '';
     document.getElementById('f_discountValue').value  = '';
     document.getElementById('f_startDate').value      = '';
     document.getElementById('f_endDate').value        = '';
     document.getElementById('f_isActive').checked     = true;
 
     updateTargetOptions();
+    updateCharCount();
+    clearAllErrors();
     document.getElementById('offerModalBackdrop').classList.add('open');
   }
 
@@ -468,14 +571,17 @@
 
     document.getElementById('f_title').value         = offer.title || '';
     document.getElementById('f_description').value   = offer.description || '';
-    document.getElementById('f_appliesTo').value      = offer.appliesTo;
-    document.getElementById('f_discountType').value   = offer.discountType;
+    document.getElementById('f_appliesTo').value      = offer.appliesTo || '';
+    document.getElementById('f_discountType').value   = offer.discountType || '';
     document.getElementById('f_discountValue').value  = offer.discountValue;
     document.getElementById('f_startDate').value      = toDateInputValue(offer.startDate);
     document.getElementById('f_endDate').value        = toDateInputValue(offer.endDate);
     document.getElementById('f_isActive').checked     = !!offer.isActive;
 
     updateTargetOptions(offer.targetId);
+    onDiscountTypeChange();
+    updateCharCount();
+    clearAllErrors();
     document.getElementById('offerModalBackdrop').classList.add('open');
   }
 
@@ -492,6 +598,220 @@
     if (e.target.id === 'offerModalBackdrop') closeModal();
   });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+  // ── Character counter for description ──
+  function updateCharCount() {
+    const desc = document.getElementById('f_description');
+    const counter = document.getElementById('count_description');
+    const len = desc.value.length;
+    counter.textContent = `${len} / ${DESCRIPTION_MAX}`;
+    counter.classList.toggle('over', len > DESCRIPTION_MAX);
+  }
+  document.getElementById('f_description').addEventListener('input', () => {
+    updateCharCount();
+    validateField('description');
+  });
+
+  // ── Error helpers ──
+  function showError(field, message) {
+    const input = document.getElementById(`f_${field}`);
+    const err = document.getElementById(`err_${field}`);
+    if (!input || !err) return;
+    input.classList.add('invalid');
+    input.classList.remove('valid');
+    err.querySelector('.err-text').textContent = message;
+    err.classList.add('show');
+  }
+
+  // Shake a single field's wrapper (the .field div containing label/input/error)
+  function shakeField(field) {
+    const input = document.getElementById(`f_${field}`);
+    if (!input) return;
+    const wrapper = input.closest('.field');
+    if (!wrapper) return;
+    wrapper.classList.remove('shake');
+    // force reflow so the animation can retrigger even if already applied
+    void wrapper.offsetWidth;
+    wrapper.classList.add('shake');
+    wrapper.addEventListener('animationend', () => wrapper.classList.remove('shake'), { once: true });
+  }
+
+  // Shake the whole modal box (used once on a failed submit for extra emphasis)
+  function shakeModal() {
+    const modal = document.querySelector('.modal');
+    if (!modal) return;
+    modal.classList.remove('shake');
+    void modal.offsetWidth;
+    modal.classList.add('shake');
+    modal.addEventListener('animationend', () => modal.classList.remove('shake'), { once: true });
+  }
+
+  function clearError(field) {
+    const input = document.getElementById(`f_${field}`);
+    const err = document.getElementById(`err_${field}`);
+    if (!input || !err) return;
+    input.classList.remove('invalid');
+    err.classList.remove('show');
+    err.querySelector('.err-text').textContent = '';
+  }
+
+  function markValid(field) {
+    const input = document.getElementById(`f_${field}`);
+    if (!input) return;
+    input.classList.add('valid');
+    input.classList.remove('invalid');
+  }
+
+  function clearAllErrors() {
+    ['title', 'description', 'appliesTo', 'targetId', 'discountType', 'discountValue', 'startDate', 'endDate']
+      .forEach(f => {
+        clearError(f);
+        const input = document.getElementById(`f_${f}`);
+        if (input) input.classList.remove('valid');
+      });
+  }
+
+  // ── Per-field validators ──
+  function validateField(field) {
+    const val = (id) => document.getElementById(`f_${id}`).value;
+
+    switch (field) {
+      case 'title': {
+        const v = val('title').trim();
+        if (!v) { showError('title', 'Title is required.'); return false; }
+        if (v.length < TITLE_MIN) { showError('title', `Title must be at least ${TITLE_MIN} characters.`); return false; }
+        if (v.length > TITLE_MAX) { showError('title', `Title cannot exceed ${TITLE_MAX} characters.`); return false; }
+        // Must contain at least a couple of real letters — blocks junk like "____", "----", "....", "1111"
+        const letterCount = (v.match(/[a-zA-Z]/g) || []).length;
+        if (letterCount < 2) {
+          showError('title', 'Title must contain real words, not just symbols or numbers.');
+          return false;
+        }
+        // Reject titles made up of a single character repeated (e.g. "________", "aaaaaaaa")
+        if (/^(.)\1+$/.test(v)) {
+          showError('title', 'Title cannot be a single character repeated.');
+          return false;
+        }
+        // Block titles that are only underscores/dashes/dots/symbols with no meaningful text
+        if (/^[\s_\-.,!@#$%^&*()+=~`|\\/<>[\]{}:;'"?]+$/.test(v)) {
+          showError('title', 'Title cannot consist only of symbols.');
+          return false;
+        }
+        clearError('title'); markValid('title'); return true;
+      }
+      case 'description': {
+        const v = val('description');
+        if (v.length > DESCRIPTION_MAX) { showError('description', `Description cannot exceed ${DESCRIPTION_MAX} characters.`); return false; }
+        clearError('description');
+        if (v.trim().length > 0) markValid('description');
+        return true;
+      }
+      case 'appliesTo': {
+        const v = val('appliesTo');
+        if (!v) { showError('appliesTo', 'Please select what this offer applies to.'); return false; }
+        clearError('appliesTo'); markValid('appliesTo'); return true;
+      }
+      case 'targetId': {
+        const v = val('targetId');
+        const appliesTo = val('appliesTo');
+        if (!appliesTo) { showError('targetId', 'Select "Applies To" first.'); return false; }
+        if (!v) { showError('targetId', `Please select a ${appliesTo === 'product' ? 'product' : 'category'}.`); return false; }
+        clearError('targetId'); markValid('targetId'); return true;
+      }
+      case 'discountType': {
+        const v = val('discountType');
+        if (!v) { showError('discountType', 'Please select a discount type.'); return false; }
+        clearError('discountType'); markValid('discountType'); return true;
+      }
+      case 'discountValue': {
+        const raw = val('discountValue');
+        const type = val('discountType');
+        if (raw === '') { showError('discountValue', 'Discount value is required.'); return false; }
+        const num = Number(raw);
+        if (isNaN(num)) { showError('discountValue', 'Discount value must be a number.'); return false; }
+        if (num <= 0) { showError('discountValue', 'Discount value must be greater than 0.'); return false; }
+        if (type === 'percentage' && num > MAX_PERCENTAGE) {
+          showError('discountValue', `Percentage discount cannot exceed ${MAX_PERCENTAGE}%.`); return false;
+        }
+        if (type === 'flat' && num > MAX_FLAT_AMOUNT) {
+          showError('discountValue', `Flat discount cannot exceed ₹${MAX_FLAT_AMOUNT.toLocaleString('en-IN')}.`); return false;
+        }
+        clearError('discountValue'); markValid('discountValue'); return true;
+      }
+      case 'startDate': {
+        const v = val('startDate');
+        if (!v) { showError('startDate', 'Start date is required.'); return false; }
+        clearError('startDate'); markValid('startDate');
+        // Re-check end date relationship whenever start date changes
+        if (val('endDate')) validateField('endDate');
+        return true;
+      }
+      case 'endDate': {
+        const v = val('endDate');
+        const start = val('startDate');
+        if (!v) { showError('endDate', 'End date is required.'); return false; }
+        if (start) {
+          const startD = new Date(start);
+          const endD = new Date(v);
+          if (endD <= startD) { showError('endDate', 'End date must be after the start date.'); return false; }
+        }
+        clearError('endDate'); markValid('endDate'); return true;
+      }
+      default:
+        return true;
+    }
+  }
+
+  function validateWholeForm() {
+    const fields = ['title', 'description', 'appliesTo', 'targetId', 'discountType', 'discountValue', 'startDate', 'endDate'];
+    let allValid = true;
+    const invalidFields = [];
+    fields.forEach(f => {
+      const ok = validateField(f);
+      if (!ok) { allValid = false; invalidFields.push(f); }
+    });
+
+    if (!allValid) {
+      invalidFields.forEach(f => shakeField(f));
+      shakeModal();
+    }
+
+    return allValid;
+  }
+
+  // ── Live validation as user interacts ──
+  ['title'].forEach(f => {
+    document.getElementById(`f_${f}`).addEventListener('input', () => validateField(f));
+    document.getElementById(`f_${f}`).addEventListener('blur', () => validateField(f));
+  });
+  ['appliesTo', 'discountType'].forEach(f => {
+    document.getElementById(`f_${f}`).addEventListener('change', () => validateField(f));
+  });
+  document.getElementById('f_targetId').addEventListener('change', () => validateField('targetId'));
+  document.getElementById('f_discountValue').addEventListener('input', () => validateField('discountValue'));
+  document.getElementById('f_startDate').addEventListener('change', () => validateField('startDate'));
+  document.getElementById('f_endDate').addEventListener('change', () => validateField('endDate'));
+
+  // ── Submit-time validation (blocks bad submissions) ──
+  document.getElementById('offerForm').addEventListener('submit', function (e) {
+    if (!validateWholeForm()) {
+      e.preventDefault();
+      e.stopPropagation();
+      showToast('Please fix the highlighted fields before submitting.', true);
+      const firstInvalid = document.querySelector('.field input.invalid, .field select.invalid, .field textarea.invalid');
+      if (firstInvalid) firstInvalid.focus();
+    }
+  });
+
+  // ── Toast ──
+  function showToast(message, isError) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.classList.toggle('toast--error', !!isError);
+    toast.classList.add('show');
+    clearTimeout(window.__toastTimer);
+    window.__toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
+  }
 
   // Initialize target dropdown on first load
   updateTargetOptions();

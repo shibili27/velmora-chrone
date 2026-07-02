@@ -5,6 +5,7 @@ import Product from '../models/product.js';
 import Coupon  from '../models/coupon.js';
 import Wallet  from '../models/wallet.js';
 import { broadcast } from '../public/utils/ssemanager.js';
+import { getIO } from '../utils/socket.js';
 import { createRazorpayOrder, verifyPaymentSignature } from './razorpayService.js';
 import { rewardReferralIfEligible } from './referralService.js';
 
@@ -227,17 +228,6 @@ export const removeCouponFromSession = async (userId, session) => {
   return { message: 'Coupon removed.', pricing };
 };
 
-/**
- * Get the list of coupons a user could actually apply right now, given the
- * current cart subtotal. Reuses the same Coupon#validateFor logic that
- * applyCouponToSession uses, so a coupon shown here is guaranteed to
- * succeed if the user clicks "Apply" on it (assuming subtotal doesn't
- * change in between).
- *
- * @param {string|ObjectId} userId
- * @param {number} subtotal  cart subtotal (pre-coupon), same value passed to validateFor elsewhere
- * @returns {Promise<Array>} plain objects safe to pass straight into res.render
- */
 export const getAvailableCoupons = async (userId, subtotal) => {
   const now = new Date();
 
@@ -490,30 +480,56 @@ export const createRazorpayCheckoutOrder = async (userId, { addressId, session }
   const couponCode      = session.couponCode     || null;
   const pricing         = buildPriceSummary(cart, couponDiscount);
 
-  const order = await Order.create({
-    user           : userId,
-    items          : orderItems,
-    shippingAddress: {
-      fullName: shippingAddress.fullName || user.name,
-      phone   : shippingAddress.phone    || user.phone || '',
-      line1   : shippingAddress.line1    || 'N/A',
-      city    : shippingAddress.city     || '',
-      state   : shippingAddress.state    || '',
-      pincode : shippingAddress.pincode  || '',
-    },
-    pricing: {
-      subtotal      : pricing.subtotal,
-      itemDiscount  : pricing.itemDiscount,
-      couponDiscount: pricing.couponDiscount,
-      tax           : pricing.tax,
-      shipping      : pricing.shipping,
-      grandTotal    : pricing.grandTotal,
-    },
-    couponCode,
+  const shippingAddressPayload = {
+    fullName: shippingAddress.fullName || user.name,
+    phone   : shippingAddress.phone    || user.phone || '',
+    line1   : shippingAddress.line1    || 'N/A',
+    city    : shippingAddress.city     || '',
+    state   : shippingAddress.state    || '',
+    pincode : shippingAddress.pincode  || '',
+  };
+
+  const pricingPayload = {
+    subtotal      : pricing.subtotal,
+    itemDiscount  : pricing.itemDiscount,
+    couponDiscount: pricing.couponDiscount,
+    tax           : pricing.tax,
+    shipping      : pricing.shipping,
+    grandTotal    : pricing.grandTotal,
+  };
+
+  // Reuse an existing unpaid Razorpay order for this user instead of creating
+  // a brand new Order document every time checkout/pay is retried, the page
+  // is reloaded, or the popup is reopened. Without this, every retry spawns
+  // a duplicate order — and each one gets marked 'confirmed' at creation.
+  let order = await Order.findOne({
+    user         : userId,
     paymentMethod: 'Razorpay',
+    orderStatus  : 'payment_pending',
     paymentStatus: 'pending',
-    orderStatus  : 'confirmed',
-  });
+  }).sort({ createdAt: -1 });
+
+  if (order) {
+    order.items           = orderItems;
+    order.shippingAddress = shippingAddressPayload;
+    order.pricing         = pricingPayload;
+    order.couponCode      = couponCode;
+  } else {
+    order = new Order({
+      user           : userId,
+      items          : orderItems,
+      shippingAddress: shippingAddressPayload,
+      pricing        : pricingPayload,
+      couponCode,
+      paymentMethod: 'Razorpay',
+      paymentStatus: 'pending',
+      orderStatus  : 'payment_pending', // not 'confirmed' until payment is verified
+    });
+  }
+
+  // Save first so a new order gets its orderNumber assigned (pre-save hook),
+  // which we then use as the Razorpay receipt.
+  await order.save();
 
   const razorpayOrder   = await createRazorpayOrder(pricing.grandTotal, order.orderNumber);
   order.razorpayOrderId = razorpayOrder.id;
@@ -540,6 +556,7 @@ export const verifyRazorpayCheckoutPayment = async (userId, {
 
   if (!isValid) {
     order.paymentStatus        = 'failed';
+    order.orderStatus          = 'payment_failed';
     order.paymentFailureReason = 'Signature verification failed.';
     await order.save();
     throw Object.assign(new Error('Payment verification failed.'), {
@@ -548,9 +565,25 @@ export const verifyRazorpayCheckoutPayment = async (userId, {
   }
 
   order.paymentStatus     = 'paid';
+  order.orderStatus       = 'confirmed'; // only confirmed now, after real verification
   order.razorpayPaymentId = razorpayPaymentId;
   order.razorpaySignature = razorpaySignature;
   await order.save();
+
+  // Notify admin dashboard now that the order is genuinely confirmed, since
+  // the model's post('save') hook intentionally skips this for Razorpay
+  // orders created as 'payment_pending'.
+  const io = getIO();
+  if (io) {
+    io.to('admin-room').emit('new-order', {
+      _id          : order._id,
+      orderNumber  : order.orderNumber,
+      grandTotal   : order.pricing.grandTotal,
+      itemCount    : order.items.length,
+      paymentMethod: order.paymentMethod,
+      createdAt    : order.createdAt,
+    });
+  }
 
   const cart = await getPopulatedCart(userId);
   if (cart && cart.items.length) {
@@ -569,6 +602,7 @@ export const markRazorpayPaymentFailed = async (userId, { orderId, reason }) => 
   if (!order) throw Object.assign(new Error('Order not found.'), { status: 404 });
 
   order.paymentStatus        = 'failed';
+  order.orderStatus          = 'payment_failed';
   order.paymentFailureReason = reason || 'Payment was not completed.';
   await order.save();
 
@@ -588,6 +622,7 @@ export const retryRazorpayPayment = async (userId, { orderId }) => {
 
   order.razorpayOrderId      = razorpayOrder.id;
   order.paymentStatus        = 'pending';
+  order.orderStatus          = 'payment_pending';
   order.paymentFailureReason = '';
   await order.save();
 
