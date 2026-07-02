@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Velmora Chroné — Contact Us</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{font-family:'Jost',sans-serif;background:#111110;color:#f5f2eb;overflow-x:hidden;}
+  ::-webkit-scrollbar{width:2px;}
+  ::-webkit-scrollbar-track{background:#111110;}
+  ::-webkit-scrollbar-thumb{background:#c9a96e;}
+
+  body::before{
+    content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+    opacity:.016;
+  }
+
+  /* ═══ GUILLOCHÉ ENGRAVING MOTIF ═══ */
+  .guilloche{position:absolute;pointer-events:none;opacity:.5;}
+  .guilloche svg{display:block;}
+  @keyframes slowspin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+  .guilloche.spin{animation:slowspin 140s linear infinite;}
+
+  /* ═══ NAV ═══ */
+  .nav-root{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(17,17,16,.92);backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);border-bottom:1px solid rgba(245,242,235,.06);transition:box-shadow .3s;}
+  .nav-root.scrolled{box-shadow:0 2px 24px rgba(0,0,0,.5);}
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;position:relative;}
+  @media(min-width:768px){.nav-inner{padding:1rem 3rem;}}
+  .nav-logo{font-family:'Cormorant Garamond',serif;font-size:.85rem;font-weight:300;letter-spacing:.25em;text-transform:uppercase;color:#f5f2eb;text-decoration:none;}
+  .nav-links{display:none;align-items:center;gap:2rem;}
+  @media(min-width:768px){.nav-links{display:flex;}}
+  .nav-link{font-family:'Jost',sans-serif;font-size:.53rem;font-weight:400;letter-spacing:.2em;text-transform:uppercase;color:rgba(245,242,235,.45);text-decoration:none;transition:color .2s;position:relative;padding-bottom:2px;}
+  .nav-link::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:1px;background:#c9a96e;transition:width .3s;}
+  .nav-link:hover{color:rgba(245,242,235,.9);}
+  .nav-link:hover::after{width:100%;}
+  .nav-link.active{color:#c9a96e;}
+  .nav-link.active::after{width:100%;}
+  .nav-icon-btn{position:relative;width:36px;height:36px;display:flex;align-items:center;justify-content:center;color:rgba(245,242,235,.5);background:rgba(255,255,255,.03);border:1px solid rgba(201,169,110,.12);border-radius:10px;cursor:pointer;text-decoration:none;transition:color .22s,background .22s,border-color .22s,transform .18s cubic-bezier(.34,1.56,.64,1),box-shadow .22s;box-shadow:0 1px 0 rgba(255,255,255,.04) inset,0 2px 6px rgba(0,0,0,.35);}
+  .nav-icon-btn:hover{color:#c9a96e;background:rgba(201,169,110,.08);border-color:rgba(201,169,110,.35);transform:translateY(-2px) scale(1.06);}
+  .cart-badge{position:absolute;top:-5px;right:-5px;width:14px;height:14px;border-radius:50%;background:linear-gradient(135deg,#d4b97e,#c9a96e);font-size:.38rem;font-weight:600;color:#111110;display:flex;align-items:center;justify-content:center;}
+  .hamburger{display:flex;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:3px;}
+  .hamburger span{display:block;width:20px;height:1px;background:rgba(245,242,235,.6);transition:transform .3s,opacity .3s;}
+  .hamburger.open span:nth-child(1){transform:translateY(6px) rotate(45deg);}
+  .hamburger.open span:nth-child(2){opacity:0;}
+  .hamburger.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg);}
+  .mobile-menu{display:none;flex-direction:column;background:#0d0d0c;padding:1.5rem 2rem;gap:1rem;border-top:1px solid rgba(245,242,235,.05);}
+  .mobile-menu.open{display:flex;}
+  .mobile-menu .nav-link{font-size:.68rem;padding:.45rem 0;border-bottom:1px solid rgba(245,242,235,.04);color:rgba(245,242,235,.5);}
+  @media(min-width:768px){.hamburger{display:none;}}
+
+  /* ═══ HERO ═══ */
+  .page-hero{padding-top:5.5rem;background:radial-gradient(ellipse 900px 500px at 50% -10%,rgba(201,169,110,.1),transparent 65%),linear-gradient(180deg,#0a0a09 0%,#111110 100%);border-bottom:1px solid rgba(201,169,110,.08);position:relative;overflow:hidden;}
+  .hero-guilloche{width:640px;height:640px;top:-260px;left:50%;transform:translateX(-50%);}
+  .page-hero-inner{max-width:640px;margin:0 auto;padding:4.5rem 2rem 5rem;position:relative;z-index:1;text-align:center;}
+  .page-hero-tag{font-family:'Jost',sans-serif;font-size:.44rem;letter-spacing:.4em;text-transform:uppercase;color:rgba(201,169,110,.6);margin-bottom:1.1rem;display:flex;align-items:center;justify-content:center;gap:.7rem;}
+  .page-hero-tag::before{content:'';width:28px;height:1px;background:#c9a96e;opacity:.45;}
+  .page-hero-tag::after{content:'';width:28px;height:1px;background:#c9a96e;opacity:.45;}
+  .page-hero-title{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:clamp(2.6rem,6.5vw,4rem);line-height:1.03;color:#f5f2eb;letter-spacing:-.01em;}
+  .page-hero-title em{font-style:italic;display:block;background:linear-gradient(125deg,#edd99e 0%,#c9a96e 45%,#a8873d 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+  .page-hero-sub{font-family:'Jost',sans-serif;font-size:.75rem;font-weight:300;color:rgba(245,242,235,.42);line-height:1.95;max-width:440px;margin:1.7rem auto 0;}
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(26px);}to{opacity:1;transform:translateY(0);}}
+  .fade-up{animation:fadeUp .95s ease both;}
+  .d1{animation-delay:.1s;} .d2{animation-delay:.25s;} .d3{animation-delay:.42s;} .d4{animation-delay:.58s;}
+  .reveal{opacity:0;transform:translateY(28px);transition:opacity .75s ease,transform .75s ease;}
+  .reveal.visible{opacity:1;transform:translateY(0);}
+  @media(prefers-reduced-motion:reduce){.fade-up,.reveal,.guilloche.spin{animation:none!important;transition:none!important;opacity:1!important;transform:none!important;}}
+
+  .accent-line{height:1px;background:linear-gradient(90deg,transparent,rgba(201,169,110,.18),transparent);}
+  .section{padding:5.5rem 2rem;position:relative;}
+  @media(min-width:768px){.section{padding:6.5rem 3rem;}}
+  .section-eyebrow{display:inline-flex;align-items:center;gap:.5rem;font-family:'Jost',sans-serif;font-size:.46rem;letter-spacing:.3em;text-transform:uppercase;color:rgba(201,169,110,.5);margin-bottom:.6rem;}
+  .section-eyebrow::before{content:'';width:14px;height:1px;background:rgba(201,169,110,.3);}
+  .section-h2{font-family:'Cormorant Garamond',serif;font-size:clamp(1.9rem,3.6vw,2.7rem);font-weight:300;color:#f5f2eb;letter-spacing:.02em;}
+  .section-h2 em{font-style:italic;color:#c9a96e;}
+
+  /* ═══ CONTACT INFO CARDS ═══ */
+  .info-grid{display:grid;grid-template-columns:1fr;gap:1.25rem;max-width:1100px;margin:0 auto;}
+  @media(min-width:640px){.info-grid{grid-template-columns:repeat(2,1fr);}}
+  @media(min-width:1024px){.info-grid{grid-template-columns:repeat(4,1fr);}}
+  .info-card{padding:2rem 1.75rem;border:1px solid rgba(245,242,235,.06);border-radius:14px;background:rgba(245,242,235,.02);transition:border-color .3s,background .3s,transform .25s;text-align:left;}
+  .info-card:hover{border-color:rgba(201,169,110,.25);background:rgba(201,169,110,.03);transform:translateY(-4px);}
+  .info-icon{width:42px;height:42px;border-radius:12px;background:rgba(201,169,110,.07);border:1px solid rgba(201,169,110,.18);display:flex;align-items:center;justify-content:center;color:#c9a96e;margin-bottom:1.25rem;}
+  .info-title{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:400;color:#f5f2eb;margin-bottom:8px;}
+  .info-body{font-family:'Jost',sans-serif;font-size:.68rem;font-weight:300;color:rgba(245,242,235,.4);line-height:1.9;}
+  .info-body a{color:rgba(245,242,235,.4);text-decoration:none;transition:color .2s;}
+  .info-body a:hover{color:#c9a96e;}
+
+  /* ═══ FORM + MAP SPLIT ═══ */
+  .contact-split{background:#0d0d0c;display:flex;flex-direction:column;}
+  @media(min-width:960px){.contact-split{flex-direction:row;}}
+  .contact-form-wrap{width:100%;padding:5.5rem 2rem;}
+  @media(min-width:960px){.contact-form-wrap{width:56%;padding:6rem 4.5rem;}}
+  .contact-map-wrap{width:100%;min-height:420px;position:relative;overflow:hidden;background:#1a1a18;}
+  @media(min-width:960px){.contact-map-wrap{width:44%;min-height:auto;}}
+  .contact-map-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.55;filter:saturate(.6) grayscale(.3);}
+  .contact-map-overlay{position:absolute;inset:0;background:linear-gradient(0deg,rgba(10,10,9,.55) 0%,transparent 45%),linear-gradient(180deg,rgba(10,10,9,.35) 0%,transparent 30%);}
+  .contact-map-pin{position:absolute;bottom:2rem;left:2rem;right:2rem;z-index:2;}
+  .contact-map-label{font-family:'Jost',sans-serif;font-size:.44rem;letter-spacing:.28em;text-transform:uppercase;color:rgba(201,169,110,.7);margin-bottom:.4rem;}
+  .contact-map-address{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.05rem;color:#f5f2eb;}
+
+  .form-tag{font-family:'Jost',sans-serif;font-size:.46rem;letter-spacing:.3em;text-transform:uppercase;color:rgba(201,169,110,.4);margin-bottom:1.1rem;display:block;}
+  .form-title{font-family:'Cormorant Garamond',serif;font-size:clamp(1.9rem,3.6vw,2.7rem);font-weight:300;color:#f5f2eb;line-height:1.15;margin-bottom:1rem;}
+  .form-title em{font-style:italic;color:#c9a96e;}
+  .form-sub{font-family:'Jost',sans-serif;font-size:.7rem;font-weight:300;color:rgba(245,242,235,.36);line-height:1.9;max-width:420px;margin-bottom:2.5rem;}
+
+  .form-grid{display:grid;grid-template-columns:1fr;gap:1.4rem;max-width:520px;}
+  @media(min-width:560px){.form-row-2{grid-template-columns:1fr 1fr;}}
+  .field{display:flex;flex-direction:column;gap:.5rem;}
+  .field label{font-family:'Jost',sans-serif;font-size:.46rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(245,242,235,.4);}
+
+  .field input,.field select,.field textarea{
+    background:rgba(245,242,235,.03);border:1px solid rgba(245,242,235,.1);border-radius:8px;
+    padding:.85rem 1rem;font-family:'Jost',sans-serif;font-size:.72rem;font-weight:300;color:#f5f2eb;
+    outline:none;transition:border-color .2s,background .2s,box-shadow .2s;
+  }
+  .field input::placeholder,.field textarea::placeholder{color:rgba(245,242,235,.22);}
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:rgba(201,169,110,.5);background:rgba(201,169,110,.03);}
+  .field textarea{resize:vertical;min-height:120px;font-family:'Jost',sans-serif;}
+  .field select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23c9a96e' stroke-width='1.3' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 1rem center;}
+  .field select option{background:#111110;color:#f5f2eb;}
+
+  /* ── VALIDATION STATES ── */
+  @keyframes shake{
+    10%,90%{transform:translateX(-1px);}
+    20%,80%{transform:translateX(2px);}
+    30%,50%,70%{transform:translateX(-4px);}
+    40%,60%{transform:translateX(4px);}
+  }
+  .field.error input,
+  .field.error select,
+  .field.error textarea{
+    border-color:#d97373;
+    background:rgba(217,115,115,.06);
+    box-shadow:0 0 0 3px rgba(217,115,115,.12);
+  }
+  .field.shake input,
+  .field.shake select,
+  .field.shake textarea{
+    animation:shake .4s cubic-bezier(.36,.07,.19,.97) both;
+  }
+  .field.valid input,
+  .field.valid select,
+  .field.valid textarea{
+    border-color:rgba(160,201,110,.45);
+  }
+  .field-error-msg{
+    font-family:'Jost',sans-serif;font-size:.58rem;font-weight:300;color:#e0a8a8;
+    letter-spacing:.02em;display:none;align-items:center;gap:.4rem;margin-top:-.15rem;
+  }
+  .field.error .field-error-msg{display:flex;}
+  .field-error-msg svg{flex-shrink:0;}
+
+  .form-note{font-family:'Jost',sans-serif;font-size:.6rem;font-weight:300;color:rgba(245,242,235,.24);margin-top:1.5rem;line-height:1.8;}
+
+  .btn-gold{font-family:'Jost',sans-serif;font-size:.5rem;letter-spacing:.24em;text-transform:uppercase;color:#0d0b08;display:inline-flex;align-items:center;justify-content:center;gap:.6rem;padding:.9rem 2.2rem;border-radius:100px;text-decoration:none;position:relative;overflow:hidden;background:linear-gradient(135deg,#e0c47e 0%,#c9a96e 50%,#b8913d 100%);border:none;cursor:pointer;transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .22s;box-shadow:0 1px 0 rgba(255,255,255,.35) inset,0 4px 18px rgba(185,140,55,.35),0 1px 4px rgba(0,0,0,.4);z-index:1;margin-top:.75rem;}
+  .btn-gold::after{content:'';position:absolute;top:0;left:-75%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.28),transparent);transform:skewX(-18deg);transition:left .55s ease;}
+  .btn-gold:hover::after{left:130%;}
+  .btn-gold:hover{transform:translateY(-2px) scale(1.04);}
+  .btn-gold:focus-visible{outline:2px solid #f5f2eb;outline-offset:3px;}
+  .btn-gold:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+  .btn-gold .btn-arrow{width:16px;height:16px;border-radius:50%;background:rgba(0,0,0,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .2s;}
+  .btn-gold:hover .btn-arrow{transform:translateX(3px);}
+
+  .form-status{font-family:'Jost',sans-serif;font-size:.62rem;font-weight:300;margin-top:1rem;display:none;padding:.7rem 1rem;border-radius:8px;}
+  .form-status.success{display:block;color:#c9e0a8;background:rgba(160,201,110,.08);border:1px solid rgba(160,201,110,.2);}
+  .form-status.error{display:block;color:#e0a8a8;background:rgba(201,110,110,.08);border:1px solid rgba(201,110,110,.2);}
+
+  /* ═══ FAQ ═══ */
+  .faq-wrap{max-width:760px;margin:0 auto;}
+  .faq-item{border-bottom:1px solid rgba(245,242,235,.07);}
+  .faq-q{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1.5rem 0;cursor:pointer;background:none;border:none;width:100%;text-align:left;}
+  .faq-q-text{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:400;color:#f5f2eb;}
+  .faq-icon{width:22px;height:22px;flex-shrink:0;border-radius:50%;border:1px solid rgba(201,169,110,.3);display:flex;align-items:center;justify-content:center;color:#c9a96e;transition:transform .3s;}
+  .faq-item.open .faq-icon{transform:rotate(45deg);}
+  .faq-a{max-height:0;overflow:hidden;transition:max-height .35s ease,padding .35s ease;}
+  .faq-item.open .faq-a{max-height:200px;padding-bottom:1.5rem;}
+  .faq-a p{font-family:'Jost',sans-serif;font-size:.68rem;font-weight:300;color:rgba(245,242,235,.4);line-height:1.9;max-width:640px;}
+
+  /* ═══ CTA ═══ */
+  .cta-section{background:#0d0d0c;padding:6.5rem 2rem;text-align:center;position:relative;overflow:hidden;border-top:1px solid rgba(201,169,110,.08);}
+  .cta-title{font-family:'Cormorant Garamond',serif;font-size:clamp(1.9rem,4vw,2.9rem);font-weight:300;color:#f5f2eb;margin-bottom:.75rem;position:relative;z-index:1;}
+  .cta-title em{font-style:italic;color:#c9a96e;}
+  .cta-sub{font-family:'Jost',sans-serif;font-size:.7rem;font-weight:300;color:rgba(245,242,235,.36);max-width:420px;margin:0 auto 2.3rem;line-height:1.9;position:relative;z-index:1;}
+
+  /* ═══ FOOTER ═══ */
+  .footer{background:#0a0a09;padding:4rem 2rem 1.5rem;border-top:1px solid rgba(245,242,235,.05);}
+  @media(min-width:768px){.footer{padding:4rem 3rem 1.5rem;}}
+  .footer-top{display:grid;grid-template-columns:1fr;gap:2.5rem;padding-bottom:2.5rem;border-bottom:1px solid rgba(245,242,235,.05);}
+  @media(min-width:768px){.footer-top{grid-template-columns:1.2fr 1fr 1fr 1.2fr;gap:3rem;}}
+  .footer-logo{font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:300;letter-spacing:.2em;text-transform:uppercase;color:#f5f2eb;margin-bottom:.75rem;}
+  .footer-desc{font-family:'Jost',sans-serif;font-size:.6rem;font-weight:300;color:rgba(245,242,235,.24);line-height:1.9;}
+  .footer-socials{display:flex;gap:.9rem;margin-top:1.25rem;}
+  .footer-social-btn{width:32px;height:32px;border:1px solid rgba(201,169,110,.15);border-radius:8px;display:flex;align-items:center;justify-content:center;color:rgba(245,242,235,.3);text-decoration:none;transition:border-color .25s,color .25s,transform .18s;}
+  .footer-social-btn:hover{border-color:rgba(201,169,110,.4);color:#c9a96e;transform:scale(1.1);}
+  .footer-col-title{font-family:'Jost',sans-serif;font-size:.46rem;letter-spacing:.28em;text-transform:uppercase;color:rgba(201,169,110,.36);margin-bottom:1rem;display:block;}
+  .footer-link{display:block;font-family:'Jost',sans-serif;font-size:.58rem;letter-spacing:.08em;color:rgba(245,242,235,.26);text-decoration:none;transition:color .2s;margin-bottom:.5rem;}
+  .footer-link:hover{color:rgba(245,242,235,.6);}
+  .footer-bottom{display:flex;flex-direction:column;gap:.75rem;padding-top:1.5rem;align-items:center;text-align:center;}
+  @media(min-width:768px){.footer-bottom{flex-direction:row;justify-content:space-between;}}
+  .footer-copy{font-family:'Jost',sans-serif;font-size:.46rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(245,242,235,.14);}
+  .footer-legal{display:flex;gap:1.25rem;}
+  .footer-legal a{font-family:'Jost',sans-serif;font-size:.46rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(245,242,235,.2);text-decoration:none;transition:color .2s;}
+  .footer-legal a:hover{color:rgba(245,242,235,.5);}
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav class="nav-root" id="navbar">
+  <div class="nav-inner">
+    <div class="nav-links">
+      <a href="/products" class="nav-link">Collection</a>
+      <a href="/orders" class="nav-link">Orders</a>
+      <a href="/about" class="nav-link">About</a>
+      <a href="/contact" class="nav-link active">Contact</a>
+    </div>
+    <a href="/home" class="nav-logo" style="position:absolute;left:50%;transform:translateX(-50%);">Velmora Chroné</a>
+    <div style="display:flex;align-items:center;gap:.6rem;margin-left:auto;">
+      <a href="/profile" class="nav-icon-btn" aria-label="Profile"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></a>
+      <a href="/wishlist" class="nav-icon-btn" aria-label="Wishlist"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></a>
+      <a href="/cart" class="nav-icon-btn" aria-label="Cart" style="position:relative"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg><span class="cart-badge" id="cartBadge">0</span></a>
+      <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="/products" class="nav-link">Collection</a>
+    <a href="/orders" class="nav-link">Orders</a>
+    <a href="/about" class="nav-link">About</a>
+    <a href="/contact" class="nav-link active">Contact</a>
+    <a href="/profile" class="nav-link">My Profile</a>
+    <a href="/cart" class="nav-link">Cart</a>
+  </div>
+</nav>
+
+<!-- ══ HERO ══ -->
+<section class="page-hero">
+  <div class="guilloche hero-guilloche spin" aria-hidden="true">
+    <svg viewBox="0 0 640 640" width="640" height="640">
+      <g fill="none" stroke="#c9a96e">
+        <circle cx="320" cy="320" r="300" stroke-width="0.4" opacity="0.35"/>
+        <circle cx="320" cy="320" r="260" stroke-width="0.4" opacity="0.3"/>
+        <circle cx="320" cy="320" r="220" stroke-width="0.4" opacity="0.28"/>
+        <g opacity="0.4">
+          <path d="M320 20 A300 300 0 0 1 573 170" stroke-width="0.6"/>
+          <path d="M573 170 A300 300 0 0 1 573 470" stroke-width="0.6"/>
+          <path d="M573 470 A300 300 0 0 1 320 620" stroke-width="0.6"/>
+          <path d="M320 620 A300 300 0 0 1 67 470" stroke-width="0.6"/>
+          <path d="M67 470 A300 300 0 0 1 67 170" stroke-width="0.6"/>
+          <path d="M67 170 A300 300 0 0 1 320 20" stroke-width="0.6"/>
+        </g>
+      </g>
+    </svg>
+  </div>
+  <div class="page-hero-inner">
+    <p class="page-hero-tag fade-up d1">Get In Touch</p>
+    <h1 class="page-hero-title fade-up d2">We'd Love To<br/><em>Hear From You</em></h1>
+    <p class="page-hero-sub fade-up d3">Whether it's a question about a timepiece, a repair, or simply a conversation about craft — our atelier is always listening.</p>
+  </div>
+</section>
+
+<!-- ══ CONTACT INFO CARDS ══ -->
+<section class="section">
+  <div style="max-width:1200px;margin:0 auto">
+    <div class="info-grid reveal">
+      <div class="info-card">
+        <div class="info-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+        <p class="info-title">Visit the Atelier</p>
+        <p class="info-body">14 Rue du Rhône<br/>1204 Geneva, Switzerland</p>
+      </div>
+      <div class="info-card">
+        <div class="info-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z" opacity="0"/><path d="M22 6l-10 7L2 6"/><path d="M2 6h20v12H2z"/></svg></div>
+        <p class="info-title">Email Us</p>
+        <p class="info-body"><a href="mailto:contact@velmorachrone.com">contact@velmorachrone.com</a><br/><a href="mailto:support@velmorachrone.com">support@velmorachrone.com</a></p>
+      </div>
+      <div class="info-card">
+        <div class="info-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
+        <p class="info-title">Call Us</p>
+        <p class="info-body"><a href="tel:+41220000000">+41 22 000 0000</a><br/>Mon – Fri, 9am – 6pm CET</p>
+      </div>
+      <div class="info-card">
+        <div class="info-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <p class="info-title">Atelier Hours</p>
+        <p class="info-body">Monday – Friday: 9am – 6pm<br/>Saturday: 10am – 4pm</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="accent-line"></div>
+
+<!-- ══ FORM + MAP ══ -->
+<section class="contact-split reveal">
+  <div class="contact-form-wrap">
+    <span class="form-tag">Send A Message</span>
+    <h2 class="form-title">Let's Start A<br/><em>Conversation</em></h2>
+    <p class="form-sub">Fill in the form below and a member of our concierge team will respond within one business day.</p>
+
+    <form class="form-grid" id="contactForm" novalidate>
+      <div class="form-grid form-row-2" style="display:grid;gap:1.4rem;grid-template-columns:1fr;">
+        <div class="field" id="fullNameField">
+          <label for="fullName">Full Name</label>
+          <input type="text" id="fullName" name="fullName" placeholder="Your full name" autocomplete="name"/>
+          <span class="field-error-msg">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span id="fullNameErrorText">Name can only contain letters and spaces.</span>
+          </span>
+        </div>
+        <div class="field" id="emailField">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email" placeholder="you@example.com" autocomplete="email"/>
+          <span class="field-error-msg">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span id="emailErrorText">Please enter a valid email address.</span>
+          </span>
+        </div>
+      </div>
+
+      <div class="field" id="subjectField">
+        <label for="subject">Subject</label>
+        <select id="subject" name="subject">
+          <option value="" selected>Select a topic</option>
+          <option value="general">General Inquiry</option>
+          <option value="order">Order Support</option>
+          <option value="repair">Repairs &amp; Warranty</option>
+          <option value="press">Press &amp; Partnerships</option>
+          <option value="other">Other</option>
+        </select>
+        <span class="field-error-msg">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span>Please select a subject.</span>
+        </span>
+      </div>
+
+      <div class="field" id="messageField">
+        <label for="message">Message</label>
+        <textarea id="message" name="message" placeholder="Tell us how we can help..."></textarea>
+        <span class="field-error-msg">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span id="messageErrorText">Message must be at least 10 characters.</span>
+        </span>
+      </div>
+
+      <button type="submit" class="btn-gold" id="submitBtn" style="width:fit-content;">
+        <span id="submitLabel">Send Message</span>
+        <span class="btn-arrow"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+      </button>
+
+      <div class="form-status" id="formStatus"></div>
+      <p class="form-note">By submitting this form, you agree to be contacted regarding your inquiry. We never share your information with third parties.</p>
+    </form>
+  </div>
+
+  <div class="contact-map-wrap">
+    <img class="contact-map-img" src="https://res.cloudinary.com/dwb0hd0m6/image/upload/v1774607517/Titan_premium_watch_photography_umihbi.jpg" alt="Velmora Chroné atelier location" onerror="this.style.display='none'"/>
+    <div class="contact-map-overlay"></div>
+    <div class="contact-map-pin">
+      <p class="contact-map-label">Geneva Atelier</p>
+      <p class="contact-map-address">14 Rue du Rhône, 1204 Geneva</p>
+    </div>
+  </div>
+</section>
+
+<div class="accent-line"></div>
+
+<!-- ══ FAQ ══ -->
+<section class="section">
+  <div style="max-width:1200px;margin:0 auto">
+    <div style="text-align:center;margin-bottom:3rem" class="reveal">
+      <p class="section-eyebrow" style="justify-content:center">Common Questions</p>
+      <h2 class="section-h2">Before You <em>Write In</em></h2>
+    </div>
+    <div class="faq-wrap reveal">
+      <div class="faq-item">
+        <button class="faq-q">
+          <span class="faq-q-text">How long does a repair typically take?</span>
+          <span class="faq-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+        </button>
+        <div class="faq-a"><p>Most repairs are completed within 2–4 weeks, depending on complexity. You'll receive tracking updates at every stage of the process.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">
+          <span class="faq-q-text">Do you offer international shipping?</span>
+          <span class="faq-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+        </button>
+        <div class="faq-a"><p>Yes — we ship to over 40 countries with fully insured, signature-required delivery. Shipping options appear at checkout.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">
+          <span class="faq-q-text">Can I visit the atelier in person?</span>
+          <span class="faq-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+        </button>
+        <div class="faq-a"><p>Absolutely. Private atelier visits can be arranged by appointment — just mention it in your message and we'll coordinate a time.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">
+          <span class="faq-q-text">What does the 5-year warranty cover?</span>
+          <span class="faq-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+        </button>
+        <div class="faq-a"><p>Every Velmora Chroné timepiece is covered against manufacturing and craftsmanship defects for five years from the date of purchase.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ CTA ══ -->
+<section class="cta-section reveal">
+  <div class="guilloche" style="width:600px;height:300px;top:-100px;left:50%;transform:translateX(-50%);opacity:.2;" aria-hidden="true">
+    <svg viewBox="0 0 600 300" width="600" height="300"><circle cx="300" cy="150" r="180" fill="none" stroke="#c9a96e" stroke-width="0.4"/></svg>
+  </div>
+  <h2 class="cta-title">Explore The <em>Collection</em></h2>
+  <p class="cta-sub">While you wait for our reply, discover timepieces built to be inherited, not replaced.</p>
+  <a href="/products" class="btn-gold">Shop Now<span class="btn-arrow"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span></a>
+</section>
+
+<!-- ══ FOOTER ══ -->
+<footer class="footer">
+  <div style="max-width:1200px;margin:0 auto">
+    <div class="footer-top">
+      <div>
+        <p class="footer-logo">Velmora<br/>Chroné</p>
+        <p class="footer-desc">Geneva-made timepieces for those who understand that true luxury is measured not in price, but in permanence.</p>
+        <div class="footer-socials">
+          <a href="#" class="footer-social-btn" aria-label="Instagram"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/></svg></a>
+          <a href="#" class="footer-social-btn" aria-label="Facebook"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
+        </div>
+      </div>
+      <div>
+        <span class="footer-col-title">Customer Service</span>
+        <a href="/about" class="footer-link">Our Story</a>
+        <a href="#" class="footer-link">Shipping &amp; Returns</a>
+        <a href="#" class="footer-link">Watch Care Guide</a>
+        <a href="/contact" class="footer-link">Contact Us</a>
+      </div>
+      <div>
+        <span class="footer-col-title">About Us</span>
+        <a href="#" class="footer-link">Craftsmanship</a>
+        <a href="#" class="footer-link">Sustainability</a>
+        <a href="#" class="footer-link">Store Blog</a>
+        <a href="#" class="footer-link">Warranty</a>
+      </div>
+      <div>
+        <span class="footer-col-title">Newsletter</span>
+        <p style="font-family:'Jost',sans-serif;font-size:.6rem;color:rgba(245,242,235,.24);line-height:1.8;margin-bottom:.75rem;font-weight:300">Subscribe for exclusive deals &amp; new arrivals.</p>
+        <div style="display:flex;align-items:center;border-bottom:1px solid rgba(201,169,110,0.2);padding-bottom:.3rem">
+          <input type="email" placeholder="Enter your email address" style="flex:1;background:transparent;border:none;outline:none;font-family:'Jost',sans-serif;font-size:.63rem;color:#f5f2eb;min-width:0"/>
+          <button style="background:none;border:none;cursor:pointer;color:rgba(201,169,110,0.5);transition:color .2s" onmouseover="this.style.color='#c9a96e'" onmouseout="this.style.color='rgba(201,169,110,0.5)'" aria-label="Subscribe">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span class="footer-copy">&copy; <span id="year"></span> Velmora Chroné. All rights reserved.</span>
+      <div class="footer-legal">
+        <a href="#">Privacy Policy</a><a href="#">Terms of Service</a><a href="#">Accessibility</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+document.getElementById('year').textContent = new Date().getFullYear();
+
+const navbar = document.getElementById('navbar');
+window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', scrollY > 30), { passive: true });
+
+const hamburger  = document.getElementById('hamburger');
+const mobileMenu = document.getElementById('mobileMenu');
+hamburger.addEventListener('click', () => { hamburger.classList.toggle('open'); mobileMenu.classList.toggle('open'); });
+mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => { hamburger.classList.remove('open'); mobileMenu.classList.remove('open'); }));
+
+const revealEls = document.querySelectorAll('.reveal');
+const observer  = new IntersectionObserver(entries => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) { setTimeout(() => entry.target.classList.add('visible'), i * 80); observer.unobserve(entry.target); }
+  });
+}, { threshold: 0.08 });
+revealEls.forEach(el => observer.observe(el));
+
+// FAQ accordion
+document.querySelectorAll('.faq-item').forEach(item => {
+  item.querySelector('.faq-q').addEventListener('click', () => {
+    const wasOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+    if (!wasOpen) item.classList.add('open');
+  });
+});
+
+/* ══════════════════════ CONTACT FORM VALIDATION ══════════════════════ */
+const contactForm  = document.getElementById('contactForm');
+const submitBtn     = document.getElementById('submitBtn');
+const submitLabel   = document.getElementById('submitLabel');
+const formStatus    = document.getElementById('formStatus');
+
+// Letters + spaces + common name characters (accents, hyphen, apostrophe). No digits/symbols.
+const NAME_REGEX    = /^[A-Za-zÀ-ÖØ-öø-ÿ]+(?:[\s'-][A-Za-zÀ-ÖØ-öø-ÿ]+)*$/;
+const EMAIL_REGEX   = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const validators = {
+  fullName: (val) => {
+    const v = val.trim();
+    if (!v) return 'Please enter your full name.';
+    if (!NAME_REGEX.test(v)) return 'Name can only contain letters and spaces.';
+    if (v.length < 2) return 'Name must be at least 2 characters.';
+    return null;
+  },
+  email: (val) => {
+    const v = val.trim();
+    if (!v) return 'Please enter your email address.';
+    if (!EMAIL_REGEX.test(v)) return 'Please enter a valid email address.';
+    return null;
+  },
+  subject: (val) => {
+    if (!val) return 'Please select a subject.';
+    return null;
+  },
+  message: (val) => {
+    const v = val.trim();
+    if (!v) return 'Please enter a message.';
+    if (v.length < 10) return 'Message must be at least 10 characters.';
+    return null;
+  }
+};
+
+const fieldMap = {
+  fullName: document.getElementById('fullNameField'),
+  email:    document.getElementById('emailField'),
+  subject:  document.getElementById('subjectField'),
+  message:  document.getElementById('messageField'),
+};
+
+function showError(name, message) {
+  const fieldEl = fieldMap[name];
+  fieldEl.classList.add('error');
+  fieldEl.classList.remove('valid');
+  const msgEl = fieldEl.querySelector('.field-error-msg span:last-child');
+  if (msgEl && message) msgEl.textContent = message;
+
+  // trigger shake (retriggerable)
+  fieldEl.classList.remove('shake');
+  void fieldEl.offsetWidth; // force reflow so animation restarts
+  fieldEl.classList.add('shake');
+  fieldEl.addEventListener('animationend', () => fieldEl.classList.remove('shake'), { once: true });
+}
+
+function clearError(name) {
+  const fieldEl = fieldMap[name];
+  fieldEl.classList.remove('error');
+  fieldEl.classList.add('valid');
+}
+
+function validateField(name, value) {
+  const error = validators[name](value);
+  if (error) {
+    showError(name, error);
+    return false;
+  }
+  clearError(name);
+  return true;
+}
+
+// Live validation as the user types / selects
+document.getElementById('fullName').addEventListener('input', (e) => {
+  // Block digits/symbols from ever registering as valid typing feedback in real time
+  validateField('fullName', e.target.value);
+});
+document.getElementById('email').addEventListener('input', (e) => validateField('email', e.target.value));
+document.getElementById('subject').addEventListener('change', (e) => validateField('subject', e.target.value));
+document.getElementById('message').addEventListener('input', (e) => validateField('message', e.target.value));
+
+// Re-validate on blur too, so leaving a field empty still shows the error
+['fullName', 'email', 'subject', 'message'].forEach((name) => {
+  const el = document.getElementById(name);
+  el.addEventListener('blur', () => validateField(name, el.value));
+});
+
+function validateAll() {
+  const values = {
+    fullName: document.getElementById('fullName').value,
+    email: document.getElementById('email').value,
+    subject: document.getElementById('subject').value,
+    message: document.getElementById('message').value,
+  };
+  let firstInvalid = null;
+  let allValid = true;
+
+  Object.keys(validators).forEach((name) => {
+    const ok = validateField(name, values[name]);
+    if (!ok) {
+      allValid = false;
+      if (!firstInvalid) firstInvalid = name;
+    }
+  });
+
+  if (firstInvalid) {
+    fieldMap[firstInvalid].scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  return { allValid, values };
+}
+
+contactForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  formStatus.className = 'form-status';
+  formStatus.textContent = '';
+
+  const { allValid, values } = validateAll();
+  if (!allValid) return;
+
+  submitBtn.disabled = true;
+  submitLabel.textContent = 'Sending...';
+
+  try {
+    const res = await fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(values)
+    });
+    const data = await res.json().catch(() => ({}));
+
+    if (res.ok) {
+      formStatus.textContent = "Thank you — your message has been sent. We'll be in touch within one business day.";
+      formStatus.classList.add('success');
+      contactForm.reset();
+      Object.keys(fieldMap).forEach((name) => fieldMap[name].classList.remove('valid', 'error'));
+    } else {
+      formStatus.textContent = data.message || 'Something went wrong. Please try again.';
+      formStatus.classList.add('error');
+    }
+  } catch (err) {
+    formStatus.textContent = 'Unable to send message right now. Please try again shortly.';
+    formStatus.classList.add('error');
+  } finally {
+    submitBtn.disabled = false;
+    submitLabel.textContent = 'Send Message';
+  }
+});
+
+fetch('/api/cart/count', { headers: { 'Accept': 'application/json' } })
+  .then(r => r.json())
+  .then(d => { if (d.count !== undefined) document.getElementById('cartBadge').textContent = d.count; })
+  .catch(() => {});
+</script>
+</body>
+</html>

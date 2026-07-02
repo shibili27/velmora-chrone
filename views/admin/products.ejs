@@ -187,6 +187,21 @@
     .variant-img-count.warn { color: var(--red); font-weight: 600; }
     .variant-stock-input { width: 120px; height: 38px; border: 1px solid var(--border); border-radius: 4px; padding: 0 12px; font-family: 'Jost', sans-serif; font-size: 13px; outline: none; }
     .variant-stock-input:focus { border-color: var(--teal); }
+    .variant-stock-input.invalid { border-color: var(--red); background: #fff5f5; }
+
+    /* ── Field-level invalid state (add-row + native color swatch) ── */
+    .form-input.invalid { border-color: var(--red) !important; background: #fff5f5; }
+    .form-input.invalid::placeholder { color: #f3a8a8; }
+    .color-native-btn.invalid { border-color: var(--red); box-shadow: 0 0 0 2px #fecaca; }
+    .field-error-text { font-size: 11px; color: var(--red); font-weight: 500; margin-top: 4px; display: none; }
+    .field-error-text.show { display: block; }
+    @keyframes fieldShake {
+      10%, 90% { transform: translateX(-1px); }
+      20%, 80% { transform: translateX(2px); }
+      30%, 50%, 70% { transform: translateX(-4px); }
+      40%, 60% { transform: translateX(4px); }
+    }
+    .shake { animation: fieldShake 0.45s cubic-bezier(.36,.07,.19,.97) both; }
     .variant-empty { padding: 24px; text-align: center; font-size: 12px; color: var(--text-light); }
     .variant-hint { font-size: 11px; color: var(--text-light); padding: 10px 16px; background: #fff; }
 
@@ -501,36 +516,41 @@
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Product Name *</label>
-          <input class="form-input" type="text" name="name" required placeholder="e.g. Chronograph Watch"/>
+          <input class="form-input" type="text" name="name" id="addName" placeholder="e.g. Chronograph Watch"/>
+          <div class="field-error-text" id="addNameErr"></div>
         </div>
         <div class="form-group">
           <label class="form-label">Category *</label>
-          <select class="form-input" name="category" required>
+          <select class="form-input" name="category" id="addCategory">
             <option value="">— Select —</option>
             <% categories.forEach(c => { %>
               <option value="<%= c._id %>"><%= c.name %></option>
             <% }) %>
           </select>
+          <div class="field-error-text" id="addCategoryErr"></div>
         </div>
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label">Brand</label>
-          <select class="form-input" name="brand" id="addBrandInput">
+          <label class="form-label">Brand *</label>
+          <select class="form-input" name="brand" id="addBrand">
             <option value="">— Select Brand —</option>
             <% if (locals.brands) { brands.forEach(b => { %>
               <option value="<%= b._id %>"><%= b.name %></option>
             <% }) } %>
           </select>
+          <div class="field-error-text" id="addBrandErr"></div>
         </div>
         <div class="form-group">
           <label class="form-label">Price (₹) *</label>
-          <input class="form-input" type="number" name="price" required min="0" placeholder="0"/>
+          <input class="form-input" type="number" name="price" id="addPrice" min="0" placeholder="0"/>
+          <div class="field-error-text" id="addPriceErr"></div>
         </div>
       </div>
       <div class="form-group">
-        <label class="form-label">Description</label>
-        <textarea class="form-input" name="description" placeholder="Product description…"></textarea>
+        <label class="form-label">Description *</label>
+        <textarea class="form-input" name="description" id="addDescription" placeholder="Product description…"></textarea>
+        <div class="field-error-text" id="addDescriptionErr"></div>
       </div>
 
       <div class="section-divider">
@@ -553,14 +573,17 @@
           <div class="form-group" style="min-width:100px;max-width:120px">
             <label class="form-label">Hex</label>
             <input class="form-input" type="text" id="addVHex" placeholder="#000000" maxlength="7"/>
+            <div class="field-error-text" id="addVHexErr"></div>
           </div>
           <div class="form-group" style="min-width:130px">
             <label class="form-label">Label *</label>
             <input class="form-input" type="text" id="addVName" placeholder="e.g. Midnight Black"/>
+            <div class="field-error-text" id="addVNameErr"></div>
           </div>
           <div class="form-group" style="min-width:80px;max-width:100px">
             <label class="form-label">Stock *</label>
-            <input class="form-input" type="number" id="addVStock" placeholder="0" min="0"/>
+            <input class="form-input" type="number" id="addVStock" placeholder="0" step="1"/>
+            <div class="field-error-text" id="addVStockErr"></div>
           </div>
           <button type="button" class="variant-btn-add" onclick="addVariant('add')">+ Add Variant</button>
         </div>
@@ -588,36 +611,41 @@
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Product Name *</label>
-          <input class="form-input" type="text" name="name" id="editName" required/>
+          <input class="form-input" type="text" name="name" id="editName" />
+          <div class="field-error-text" id="editNameErr"></div>
         </div>
         <div class="form-group">
           <label class="form-label">Category *</label>
-          <select class="form-input" name="category" id="editCategory" required>
+          <select class="form-input" name="category" id="editCategory" >
             <option value="">— Select —</option>
             <% categories.forEach(c => { %>
               <option value="<%= c._id %>"><%= c.name %></option>
             <% }) %>
           </select>
+          <div class="field-error-text" id="editCategoryErr"></div>
         </div>
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label">Brand</label>
+          <label class="form-label">Brand *</label>
           <select class="form-input" name="brand" id="editBrand">
             <option value="">— Select Brand —</option>
             <% if (locals.brands) { brands.forEach(b => { %>
               <option value="<%= b._id %>"><%= b.name %></option>
             <% }) } %>
           </select>
+          <div class="field-error-text" id="editBrandErr"></div>
         </div>
         <div class="form-group">
           <label class="form-label">Price (₹) *</label>
-          <input class="form-input" type="number" name="price" id="editPrice" required min="0"/>
+          <input class="form-input" type="number" name="price" id="editPrice" min="0"/>
+          <div class="field-error-text" id="editPriceErr"></div>
         </div>
       </div>
       <div class="form-group">
-        <label class="form-label">Description</label>
-        <textarea class="form-input" name="description" id="editDesc"></textarea>
+        <label class="form-label">Description *</label>
+        <textarea class="form-input" name="description" id="editDescription"></textarea>
+        <div class="field-error-text" id="editDescriptionErr"></div>
       </div>
 
       <div class="section-divider">
@@ -640,14 +668,17 @@
           <div class="form-group" style="min-width:100px;max-width:120px">
             <label class="form-label">Hex</label>
             <input class="form-input" type="text" id="editVHex" placeholder="#000000" maxlength="7"/>
+            <div class="field-error-text" id="editVHexErr"></div>
           </div>
           <div class="form-group" style="min-width:130px">
             <label class="form-label">Label *</label>
             <input class="form-input" type="text" id="editVName" placeholder="e.g. Midnight Black"/>
+            <div class="field-error-text" id="editVNameErr"></div>
           </div>
           <div class="form-group" style="min-width:80px;max-width:100px">
             <label class="form-label">Stock *</label>
-            <input class="form-input" type="number" id="editVStock" placeholder="0" min="0"/>
+            <input class="form-input" type="number" id="editVStock" placeholder="0" step="1"/>
+            <div class="field-error-text" id="editVStockErr"></div>
           </div>
           <button type="button" class="variant-btn-add" onclick="addVariant('edit')">+ Add Variant</button>
         </div>
@@ -833,19 +864,175 @@ function normaliseHex(raw) {
   return h.toLowerCase();
 }
 
-function addVariant(prefix) {
-  let rawHex = document.getElementById(prefix + 'VHex').value.trim()
-            || document.getElementById(prefix + 'VNative').value;
-  const name  = document.getElementById(prefix + 'VName').value.trim();
-  const stock = parseInt(document.getElementById(prefix + 'VStock').value) || 0;
+// Label rule: letters, numbers, and spaces only; must NOT start with a digit.
+function isValidVariantName(name) {
+  return /^[A-Za-z][A-Za-z0-9 ]*$/.test(name);
+}
 
-  if (!/^#?([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(rawHex.replace('#',''))) {
-    showModalError(prefix, 'Enter a valid hex colour (e.g. #c9a96e).');
+function triggerShake(el) {
+  if (!el) return;
+  el.classList.remove('shake');
+  // force reflow so the animation can restart even if it was just shaking
+  void el.offsetWidth;
+  el.classList.add('shake');
+  el.addEventListener('animationend', () => el.classList.remove('shake'), { once: true });
+}
+
+function setFieldInvalid(prefix, field, isInvalid, message) {
+  const inputId = prefix + 'V' + field; // e.g. addVHex, addVName, addVStock
+  const errId   = inputId + 'Err';
+  const input   = document.getElementById(inputId);
+  const errEl   = document.getElementById(errId);
+  if (input) {
+    input.classList.toggle('invalid', !!isInvalid);
+    if (isInvalid) triggerShake(input);
+  }
+  if (errEl) {
+    errEl.textContent = isInvalid ? (message || '') : '';
+    errEl.classList.toggle('show', !!isInvalid);
+  }
+}
+
+// ── Main product form (Name / Category / Price) field validation ──────────────
+function setMainFieldInvalid(prefix, field, isInvalid, message) {
+  const inputId = prefix + field; // e.g. addName, addCategory, addPrice
+  const errId   = inputId + 'Err';
+  const input   = document.getElementById(inputId);
+  const errEl   = document.getElementById(errId);
+  if (input) {
+    input.classList.toggle('invalid', !!isInvalid);
+    if (isInvalid) triggerShake(input);
+  }
+  if (errEl) {
+    errEl.textContent = isInvalid ? (message || '') : '';
+    errEl.classList.toggle('show', !!isInvalid);
+  }
+}
+
+function clearMainFieldErrors(prefix) {
+  ['Name', 'Category', 'Brand', 'Price', 'Description'].forEach(f => setMainFieldInvalid(prefix, f, false));
+}
+
+// Validates the top-level product fields (Name, Category, Price).
+// Returns true if everything is OK; otherwise marks every bad field red+shaking
+// and returns false.
+function validateMainFields(prefix) {
+  clearMainFieldErrors(prefix);
+  let ok = true;
+
+  const nameEl = document.getElementById(prefix + 'Name');
+  const name   = nameEl ? nameEl.value.trim() : '';
+  if (!name) {
+    setMainFieldInvalid(prefix, 'Name', true, 'Product name is required.');
+    ok = false;
+  } else if (!isValidVariantName(name)) {
+    setMainFieldInvalid(prefix, 'Name', true, 'Only letters and numbers are allowed, and it can\u2019t start with a number.');
+    ok = false;
+  }
+
+  const catEl = document.getElementById(prefix + 'Category');
+  const catVal = catEl ? catEl.value : '';
+  if (!catVal) {
+    setMainFieldInvalid(prefix, 'Category', true, 'Please select a category.');
+    ok = false;
+  }
+
+  const brandEl = document.getElementById(prefix + 'Brand');
+  const brandVal = brandEl ? brandEl.value : '';
+  if (!brandVal) {
+    setMainFieldInvalid(prefix, 'Brand', true, 'Please select a brand.');
+    ok = false;
+  }
+
+  const priceEl  = document.getElementById(prefix + 'Price');
+  const priceRaw = priceEl ? priceEl.value.trim() : '';
+  if (priceRaw === '') {
+    setMainFieldInvalid(prefix, 'Price', true, 'Price is required.');
+    ok = false;
+  } else if (!/^\d+(\.\d+)?$/.test(priceRaw)) {
+    setMainFieldInvalid(prefix, 'Price', true, 'Enter a valid price.');
+    ok = false;
+  } else if (parseFloat(priceRaw) <= 0) {
+    setMainFieldInvalid(prefix, 'Price', true, 'Price must be greater than 0.');
+    ok = false;
+  }
+
+  const descEl  = document.getElementById(prefix + 'Description');
+  const descVal = descEl ? descEl.value.trim() : '';
+  if (!descVal) {
+    setMainFieldInvalid(prefix, 'Description', true, 'Description is required.');
+    ok = false;
+  } else if (descVal.length < 10) {
+    setMainFieldInvalid(prefix, 'Description', true, 'Description should be at least 10 characters.');
+    ok = false;
+  }
+
+  return ok;
+}
+
+function clearVariantFieldErrors(prefix) {
+  ['Hex','Name','Stock'].forEach(f => setFieldInvalid(prefix, f, false));
+  const nativeEl = document.getElementById(prefix + 'VNative');
+  if (nativeEl) nativeEl.classList.remove('invalid');
+}
+
+// ── addVariant: validates colour, label format, AND stock as required fields,
+// highlighting every blank/invalid field in red with its own message ──────────
+function addVariant(prefix) {
+  clearVariantFieldErrors(prefix);
+  clearModalError(prefix);
+
+  const hexInput   = document.getElementById(prefix + 'VHex').value.trim();
+  const nativeHex  = document.getElementById(prefix + 'VNative').value;
+  let rawHex       = hexInput || nativeHex;
+  const name       = document.getElementById(prefix + 'VName').value.trim();
+  const stockRaw   = document.getElementById(prefix + 'VStock').value.trim();
+
+  let hasError = false;
+
+  // Colour
+  if (!rawHex || !/^#?([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(rawHex.replace('#',''))) {
+    setFieldInvalid(prefix, 'Hex', true, 'Enter a valid hex colour (e.g. #c9a96e).');
+    const nativeEl = document.getElementById(prefix + 'VNative');
+    nativeEl.classList.add('invalid');
+    triggerShake(nativeEl);
+    hasError = true;
+  }
+
+  // Label
+  if (!name) {
+    setFieldInvalid(prefix, 'Name', true, 'Label is required.');
+    hasError = true;
+  } else if (!isValidVariantName(name)) {
+    setFieldInvalid(
+      prefix, 'Name', true,
+      'Only letters and numbers are allowed, and it can\u2019t start with a number.'
+    );
+    hasError = true;
+  }
+
+  // Stock
+  if (stockRaw === '') {
+    setFieldInvalid(prefix, 'Stock', true, 'Stock is required.');
+    hasError = true;
+  } else if (!/^-?\d+$/.test(stockRaw)) {
+    setFieldInvalid(prefix, 'Stock', true, 'Stock must be a whole number.');
+    hasError = true;
+  } else if (parseInt(stockRaw, 10) < 0) {
+    setFieldInvalid(prefix, 'Stock', true, 'Stock cannot be negative. Enter 0 or more.');
+    hasError = true;
+  }
+
+  if (hasError) {
+    showModalError(prefix, 'Please fix the highlighted field(s) below.');
     return;
   }
-  const hex = normaliseHex(rawHex);
-  if (!name) { showModalError(prefix, 'Enter a colour label.'); return; }
+
+  const hex   = normaliseHex(rawHex);
+  const stock = parseInt(stockRaw, 10);
+
   if (variantState[prefix].some(v => normaliseHex(v.hex) === hex)) {
+    setFieldInvalid(prefix, 'Hex', true, 'A variant with that colour already exists.');
     showModalError(prefix, 'A variant with that colour already exists.');
     return;
   }
@@ -858,6 +1045,7 @@ function addVariant(prefix) {
   document.getElementById(prefix + 'VName').value  = '';
   document.getElementById(prefix + 'VStock').value = '';
   document.querySelectorAll('#' + prefix + 'VPresets .color-preset').forEach(b => b.classList.remove('selected'));
+  clearVariantFieldErrors(prefix);
 
   renderVariantUI(prefix);
 }
@@ -901,19 +1089,28 @@ function renderVariantUI(prefix) {
     </button>
   `).join('');
 
-  panels.innerHTML = state.map((v, i) => `
+  panels.innerHTML = state.map((v, i) => {
+    const stockMissing  = v.stock === null || v.stock === undefined || isNaN(v.stock);
+    const stockNegative = !stockMissing && v.stock < 0;
+    const stockInvalid  = stockMissing || stockNegative;
+    let stockMsg = '';
+    if (stockMissing) stockMsg = 'Stock is required for this variant.';
+    else if (stockNegative) stockMsg = 'Stock cannot be negative. Enter 0 or more.';
+    return `
     <div class="variant-panel ${i === activeTab[prefix] ? 'active' : ''}">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
         <span style="width:20px;height:20px;border-radius:50%;background:${v.hex};border:1.5px solid rgba(0,0,0,0.12);display:inline-block;flex-shrink:0"></span>
         <span style="font-size:13px;font-weight:600;color:var(--text)">${escHtml(v.name)}</span>
         <span style="font-size:11px;color:var(--text-light)">${v.hex}</span>
         <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
-          <label style="font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--text)">Stock</label>
-          <input type="number" class="variant-stock-input" value="${v.stock}" min="0"
-            onchange="updateVariantStock('${prefix}',${i},this.value)"
-            oninput="updateVariantStock('${prefix}',${i},this.value)"/>
+          <label style="font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--text)">Stock *</label>
+          <input type="number" class="variant-stock-input ${stockInvalid ? 'invalid' : ''}"
+            value="${stockMissing ? '' : v.stock}" step="1"
+            onblur="updateVariantStock('${prefix}',${i},this.value,true)"
+            oninput="updateVariantStock('${prefix}',${i},this.value,false)"/>
         </div>
       </div>
+      ${stockInvalid ? `<p style="font-size:11px;color:var(--red);font-weight:500;margin:-6px 0 10px">${stockMsg}</p>` : ''}
       <div class="variant-upload-zone" onclick="triggerVariantUpload('${prefix}',${i})">
         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
           <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
@@ -935,11 +1132,24 @@ function renderVariantUI(prefix) {
         ${v.images.length} image${v.images.length !== 1 ? 's' : ''} ${v.images.length < 3 ? '— need at least 3' : '✓'}
       </p>
     </div>
-  `).join('');
+  `;
+  }).join('');
 }
 
-function updateVariantStock(prefix, idx, val) {
-  variantState[prefix][idx].stock = parseInt(val) || 0;
+// ── updateVariantStock: empty/invalid input now marks stock as invalid (null)
+// instead of silently coercing to 0 ────────────────────────────────────────────
+// ── updateVariantStock: empty/non-numeric input marks stock as missing (null);
+// a parsable negative number is kept as-is so the panel can show a specific
+// "cannot be negative" message. `rerender=true` is passed on blur so the
+// message/red-border refresh without disrupting the user mid-keystroke.
+function updateVariantStock(prefix, idx, val, rerender) {
+  const v = String(val).trim();
+  if (v === '' || !/^-?\d+$/.test(v)) {
+    variantState[prefix][idx].stock = null;
+  } else {
+    variantState[prefix][idx].stock = parseInt(v, 10);
+  }
+  if (rerender) renderVariantUI(prefix);
 }
 
 function removeVariantImage(prefix, varIdx, imgIdx) {
@@ -1008,10 +1218,19 @@ function pushVariantImage(src, isExisting) {
   renderVariantUI(prefix);
 }
 
-// ── Replace alert() with modal error messages ─────────────────────────────────
+// ── submitForm: re-validates label, stock, AND image count for every variant
+// right before building the payload, so nothing slips through even if state
+// was mutated after the initial addVariant() check ─────────────────────────────
 function submitForm(e, prefix) {
   e.preventDefault();
   clearModalError(prefix);
+
+  const mainOk = validateMainFields(prefix);
+  if (!mainOk) {
+    showModalError(prefix, 'Please fix the highlighted field(s) above.');
+    return;
+  }
+
   const state = variantState[prefix];
 
   if (state.length === 0) {
@@ -1020,6 +1239,26 @@ function submitForm(e, prefix) {
   }
 
   for (const v of state) {
+    if (!v.name || !v.name.trim()) {
+      showModalError(prefix, 'Every colour variant needs a label.');
+      renderVariantUI(prefix);
+      return;
+    }
+    if (!isValidVariantName(v.name.trim())) {
+      showModalError(prefix, `"${v.name}" is not a valid label. Only letters and numbers are allowed, and it can\u2019t start with a number.`);
+      renderVariantUI(prefix);
+      return;
+    }
+    if (v.stock === null || v.stock === undefined || isNaN(v.stock)) {
+      showModalError(prefix, `"${v.name}" needs a stock quantity.`);
+      renderVariantUI(prefix);
+      return;
+    }
+    if (v.stock < 0) {
+      showModalError(prefix, `"${v.name}" has a negative stock value. Stock cannot be negative.`);
+      renderVariantUI(prefix);
+      return;
+    }
     if (v.images.length < 3) {
       showModalError(prefix, `"${v.name}" only has ${v.images.length} image(s). Each variant needs at least 3 images.`);
       return;
@@ -1049,8 +1288,10 @@ function openAddModal() {
   variantState.add = [];
   activeTab.add    = 0;
   document.getElementById('addForm').reset();
-  document.getElementById('addBrandInput').value = '';
+  document.getElementById('addBrand').value = '';
   clearModalError('add');
+  clearVariantFieldErrors('add');
+  clearMainFieldErrors('add');
   renderVariantUI('add');
   document.getElementById('addModal').classList.add('open');
 }
@@ -1074,16 +1315,18 @@ function openEditFromBtn(btn) {
 function openEditModal(id, name, desc, price, catId, brand, variants) {
   document.getElementById('editForm').action = '/admin/products/' + id + '/edit';
   document.getElementById('editName').value  = name;
-  document.getElementById('editDesc').value  = desc;
+  document.getElementById('editDescription').value  = desc;
   document.getElementById('editPrice').value = price;
   document.getElementById('editBrand').value = brand;
   clearModalError('edit');
+  clearVariantFieldErrors('edit');
+  clearMainFieldErrors('edit');
   setTimeout(() => { document.getElementById('editCategory').value = catId; }, 0);
 
   variantState.edit = variants.map(v => ({
     name:     v.name,
     hex:      normaliseHex(v.hex),
-    stock:    v.stock || 0,
+    stock:    (v.stock !== undefined && v.stock !== null && !isNaN(v.stock)) ? v.stock : null,
     images:   [...(v.images || [])],
     existing: (v.images || []).map(() => true),
   }));
@@ -1106,10 +1349,21 @@ function escHtml(str) {
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
+function initMainFieldLiveClear(prefix) {
+  ['Name', 'Category', 'Brand', 'Price', 'Description'].forEach(field => {
+    const el = document.getElementById(prefix + field);
+    if (!el) return;
+    const evt = (el.tagName === 'SELECT') ? 'change' : 'input';
+    el.addEventListener(evt, () => setMainFieldInvalid(prefix, field, false));
+  });
+}
+
 initPresets('add');
 initPresets('edit');
 renderVariantUI('add');
 renderVariantUI('edit');
+initMainFieldLiveClear('add');
+initMainFieldLiveClear('edit');
 </script>
 </body>
 

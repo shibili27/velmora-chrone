@@ -753,6 +753,12 @@ export const deleteBrand = async (req, res) => {
 // schema. Also added 'free_shipping' as a valid discountType (the schema
 // already allowed it; the validator previously rejected it), and made
 // discountValue optional for free_shipping coupons since they don't need one.
+//
+// FIX 2: added a server-side rule that a flat discount must be lower than
+// the minimum cart value. This mirrors the client-side check added to the
+// admin coupon modal — without it, a direct POST to /coupons/create or
+// /coupons/:id/edit could bypass the browser and create a flat coupon
+// worth more than (or equal to) its own minimum order value.
 
 function escapeRegex(str) {
   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -781,6 +787,15 @@ function validateCouponBody(body) {
   const min = parseFloat(minOrderValue);
   if (!isNaN(min) && min < 0)
     errors.push('Minimum order amount cannot be negative.');
+
+  // Flat discount must be lower than the minimum cart value
+  // (prevents a coupon from discounting more than — or exactly as much as — the order is worth)
+  if (discountType === 'flat') {
+    const flatVal = parseFloat(discountValue);
+    if (!isNaN(flatVal) && !isNaN(min) && min > 0 && flatVal >= min) {
+      errors.push('Flat discount must be lower than the minimum cart value.');
+    }
+  }
 
   if (maxDiscountCap !== '' && maxDiscountCap != null) {
     const cap = parseFloat(maxDiscountCap);
@@ -920,6 +935,7 @@ export const toggleCouponStatus = async (req, res) => {
     res.status(500).json({ success: false, message: 'Server error.' });
   }
 };
+
 export const editCoupon = async (req, res) => {
   try {
     const { id } = req.params;
@@ -934,9 +950,14 @@ export const editCoupon = async (req, res) => {
       description,
     } = req.body;
 
-    const parsedValue = parseFloat(discountValue);
+    const errors = validateCouponBody(req.body);
+    if (errors.length) {
+      errors.forEach(e => req.flash('error', e));
+      return res.redirect('/admin/coupons');
+    }
 
-    const expiry = new Date(expiryDate);
+    const parsedValue = parseFloat(discountValue);
+    const expiry       = new Date(expiryDate);
 
     const updateData = {
       discountType,
@@ -1198,7 +1219,7 @@ export const downloadLedgerPDF = async (req, res) => {
     });
     doc.y += 22;
 
-    
+
     orders.forEach((o, idx) => {
       if (doc.y > doc.page.height - 80) {
         doc.addPage({ margin: 40, size: 'A4', layout: 'landscape' });
@@ -1246,7 +1267,7 @@ export const downloadLedgerPDF = async (req, res) => {
       doc.y += 18;
     });
 
-    
+
     doc.y += 16;
     doc.fontSize(7).font('Helvetica').fillColor(LIGHT)
       .text(

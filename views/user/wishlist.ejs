@@ -246,8 +246,9 @@
   <div class="wishlist-list reveal" id="wishlistGrid">
     <% wishlistItems.forEach(item => {
       const p         = item.product;
-      const isOOS     = p.stock === 0;
-      const isLow     = p.stock > 0 && p.stock <= 5;
+      const isBlocked = p.isDeleted || p.isListed === false;
+      const isOOS     = isBlocked || p.stock === 0;
+      const isLow     = !isOOS && p.stock > 0 && p.stock <= 5;
       const inCart    = cartProductIds.includes(p._id.toString());
       const mainImg   = p.images?.[0] || (p.colorVariants?.[0]?.images?.[0]) || null;
       const brandName = p.brand?.name || null;

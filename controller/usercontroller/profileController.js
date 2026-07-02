@@ -88,24 +88,45 @@ const uploadProfileImage = async (req, res) => {
   }
 };
 
+
 const requestEmailChange = async (req, res) => {
   try {
     const { newEmail } = req.body;
     if (!newEmail || !/^\S+@\S+\.\S+$/.test(newEmail.trim())) {
       return res.json({ success: false, message: 'Enter a valid email address.' });
     }
+
     const existing = await User.findOne({ email: newEmail.trim().toLowerCase() });
     if (existing) {
       return res.json({ success: false, message: 'That email is already in use.' });
     }
+
     const otp    = crypto.randomInt(100000, 999999).toString();
     const expiry = new Date(Date.now() + 10 * 60 * 1000);
-    await User.findByIdAndUpdate(req.session.user, {
-      pendingEmail:      newEmail.trim().toLowerCase(),
-      emailChangeOtp:    otp,
-      emailChangeOtpExp: expiry,
-    });
-    await sendOtpEmail(newEmail.trim(), otp);
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.session.user,
+      {
+        pendingEmail:      newEmail.trim().toLowerCase(),
+        emailChangeOtp:    otp,
+        emailChangeOtpExp: expiry,
+      },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      console.error('requestEmailChange: no user found for session id', req.session.user);
+      return res.json({ success: false, message: 'Session expired. Please log in again.' });
+    }
+
+   
+
+    console.log(`[OTP] Email change code for ${newEmail.trim()} → ${otp}`);
+
+    if (process.env.NODE_ENV === 'production') {
+      await sendOtpEmail(newEmail.trim(), otp);
+    }
+
     res.json({ success: true });
   } catch (err) {
     console.error('requestEmailChange error:', err);
@@ -114,12 +135,22 @@ const requestEmailChange = async (req, res) => {
 };
 
 
+
 const verifyEmailChange = async (req, res) => {
   try {
     const { otp } = req.body;
     const user = await User.findById(req.session.user).select(
       'pendingEmail emailChangeOtp emailChangeOtpExp'
     );
+
+    console.log('[DEBUG] verifyEmailChange read:', {
+      userId:            req.session.user,
+      pendingEmail:      user?.pendingEmail,
+      emailChangeOtp:    user?.emailChangeOtp,
+      emailChangeOtpExp: user?.emailChangeOtpExp,
+      submittedOtp:      otp,
+    });
+
     if (!user || !user.emailChangeOtp) {
       return res.json({ success: false, message: 'No pending email change. Please start again.' });
     }

@@ -157,6 +157,34 @@
     .coupon-msg{font-family:'Jost',sans-serif;font-size:.46rem;margin-top:.3rem;letter-spacing:.05em}
     .coupon-msg.ok{color:rgba(74,222,128,.7)}.coupon-msg.err{color:rgba(248,113,113,.7)}
 
+    /* ── COUPON — SINGLE UNIFIED BLOCK ── */
+    .coupon-block{margin:.85rem 0}
+    .coupon-applied-row{display:flex;align-items:center;justify-content:space-between;gap:.6rem;background:rgba(74,222,128,.05);border:1px solid rgba(74,222,128,.18);border-radius:10px;padding:.6rem .75rem}
+    .coupon-applied-left{display:flex;align-items:center;gap:.4rem;min-width:0;color:rgba(74,222,128,.85)}
+    .coupon-applied-left svg{flex-shrink:0}
+    .coupon-applied-code{font-family:'Jost',sans-serif;font-size:.6rem;font-weight:500;letter-spacing:.06em;color:#c9a96e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .coupon-applied-amount{font-family:'Jost',sans-serif;font-size:.56rem;color:rgba(74,222,128,.85);white-space:nowrap}
+    .coupon-remove-btn{font-family:'Jost',sans-serif;font-size:.42rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(248,113,113,.75);background:none;border:1px solid rgba(248,113,113,.25);border-radius:100px;padding:4px 10px;cursor:pointer;transition:all .2s;flex-shrink:0}
+    .coupon-remove-btn:hover{background:rgba(248,113,113,.08);border-color:rgba(248,113,113,.5)}
+
+    .coupon-list-toggle{display:flex;align-items:center;justify-content:space-between;width:100%;background:none;border:none;cursor:pointer;padding:0;margin-top:.85rem}
+    .coupon-list-toggle-label{font-family:'Jost',sans-serif;font-size:.42rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(201,169,110,.5);display:flex;align-items:center;gap:.4rem}
+    .coupon-list-toggle-label svg{width:9px;height:9px;color:rgba(201,169,110,.5)}
+    .coupon-list-chevron{width:9px;height:9px;color:rgba(245,242,235,.25);transition:transform .25s}
+    .coupon-list-chevron.open{transform:rotate(180deg)}
+    .coupon-list{display:flex;flex-direction:column;gap:.5rem;max-height:0;overflow:hidden;transition:max-height .35s ease,margin-top .35s ease;margin-top:0}
+    .coupon-list.open{max-height:600px;margin-top:.65rem}
+    .coupon-card{display:flex;align-items:center;gap:.7rem;background:rgba(201,169,110,.03);border:1px dashed rgba(201,169,110,.2);border-radius:10px;padding:.7rem .8rem;cursor:pointer;transition:border-color .2s,background .2s}
+    .coupon-card:hover{border-color:rgba(201,169,110,.45);background:rgba(201,169,110,.06)}
+    .coupon-card.applying{opacity:.5;pointer-events:none}
+    .coupon-card-icon{width:26px;height:26px;border-radius:7px;background:rgba(201,169,110,.1);border:1px solid rgba(201,169,110,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#c9a96e}
+    .coupon-card-icon svg{width:12px;height:12px}
+    .coupon-card-body{flex:1;min-width:0}
+    .coupon-card-code{font-family:'Jost',sans-serif;font-size:.6rem;font-weight:500;letter-spacing:.08em;color:#e0c47e}
+    .coupon-card-desc{font-family:'Jost',sans-serif;font-size:.46rem;font-weight:300;color:rgba(245,242,235,.32);line-height:1.5;margin-top:1px}
+    .coupon-card-apply{font-family:'Jost',sans-serif;font-size:.4rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(201,169,110,.6);flex-shrink:0;white-space:nowrap}
+    .coupon-list-empty{font-family:'Jost',sans-serif;font-size:.55rem;font-weight:300;color:rgba(245,242,235,.2);text-align:center;padding:.75rem 0}
+
     .btn-place{display:block;width:100%;padding:.9rem;border:none;border-radius:100px;cursor:pointer;font-family:'Jost',sans-serif;font-size:.52rem;letter-spacing:.25em;text-transform:uppercase;color:#0d0b08;background:linear-gradient(135deg,#e0c47e 0%,#c9a96e 50%,#b8913d 100%);position:relative;overflow:hidden;transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .22s;box-shadow:0 1px 0 rgba(255,255,255,.35) inset,0 4px 18px rgba(185,140,55,.3),0 1px 4px rgba(0,0,0,.4);margin-top:1.25rem;text-align:center}
     .btn-place::after{content:'';position:absolute;top:0;left:-75%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);transform:skewX(-18deg);transition:left .55s ease}
     .btn-place:hover::after{left:130%}
@@ -496,13 +524,6 @@
       </div>
       <% } %>
 
-      <% if (pricing.couponDiscount > 0) { %>
-      <div class="summary-row">
-        <span class="summary-key">Coupon (<%= couponCode %>)</span>
-        <span class="summary-val green">− ₹<%= pricing.couponDiscount.toLocaleString('en-IN') %></span>
-      </div>
-      <% } %>
-
       <div class="summary-row">
         <span class="summary-key">GST (<%= pricing.taxRate %>%)</span>
         <span class="summary-val">₹<%= pricing.tax.toLocaleString('en-IN') %></span>
@@ -517,28 +538,52 @@
         <% } %>
       </div>
 
-      <% if (couponCode) { %>
-      <div class="coupon-row" id="couponAppliedRow" style="justify-content:space-between;align-items:center">
-        <span style="font-family:'Jost',sans-serif;font-size:.58rem;color:#c9a96e;letter-spacing:.06em">
-          ✓ <%= couponCode %> applied
+      <!-- ══ COUPON — SINGLE UNIFIED BLOCK ══ -->
+      <div class="coupon-block">
+        <% if (couponCode) { %>
+          <div class="coupon-applied-row">
+            <div class="coupon-applied-left">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <span class="coupon-applied-code"><%= couponCode %></span>
+              <% if (pricing.couponDiscount > 0) { %>
+                <span class="coupon-applied-amount">− ₹<%= pricing.couponDiscount.toLocaleString('en-IN') %></span>
+              <% } %>
+            </div>
+            <button class="coupon-remove-btn" onclick="removeCoupon()">Remove</button>
+          </div>
+        <% } else { %>
+          <div class="coupon-row" id="couponInputRow">
+            <input class="coupon-input" type="text" id="couponInput" placeholder="Promo / coupon code"/>
+            <button class="coupon-apply-btn" onclick="applyCoupon()">Apply</button>
+          </div>
+        <% } %>
+        <div class="coupon-msg" id="couponMsg"></div>
+      </div>
+
+      <% if (availableCoupons && availableCoupons.length > 0) { %>
+      <button class="coupon-list-toggle" type="button" onclick="toggleCouponList()" id="couponListToggleBtn">
+        <span class="coupon-list-toggle-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41 13.42 20.58a2 2 0 0 1-2.83 0L2.99 13H2V2h11v.99l7.59 7.59a2 2 0 0 1 0 2.83Z"/><circle cx="6.5" cy="6.5" r="1.5" fill="currentColor"/></svg>
+          <%= availableCoupons.length %> Coupon<%= availableCoupons.length !== 1 ? 's' : '' %> Available
         </span>
-        <button class="coupon-apply-btn" onclick="removeCoupon()" style="color:rgba(248,113,113,.75);border-color:rgba(248,113,113,.25)">Remove</button>
-      </div>
-      <div class="coupon-row" id="couponInputRow" style="display:none">
-        <input class="coupon-input" type="text" id="couponInput" placeholder="Promo / coupon code"/>
-        <button class="coupon-apply-btn" onclick="applyCoupon()">Apply</button>
-      </div>
-      <% } else { %>
-      <div class="coupon-row" id="couponInputRow">
-        <input class="coupon-input" type="text" id="couponInput" placeholder="Promo / coupon code"/>
-        <button class="coupon-apply-btn" onclick="applyCoupon()">Apply</button>
-      </div>
-      <div class="coupon-row" id="couponAppliedRow" style="display:none;justify-content:space-between;align-items:center">
-        <span style="font-family:'Jost',sans-serif;font-size:.58rem;color:#c9a96e;letter-spacing:.06em" id="couponAppliedLabel"></span>
-        <button class="coupon-apply-btn" onclick="removeCoupon()" style="color:rgba(248,113,113,.75);border-color:rgba(248,113,113,.25)">Remove</button>
+        <svg class="coupon-list-chevron" id="couponListChevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+
+      <div class="coupon-list" id="couponList">
+        <% availableCoupons.forEach(c => { %>
+        <div class="coupon-card" onclick="applyListedCoupon(this, '<%= c.code %>')">
+          <div class="coupon-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41 13.42 20.58a2 2 0 0 1-2.83 0L2.99 13H2V2h11v.99l7.59 7.59a2 2 0 0 1 0 2.83Z"/><circle cx="6.5" cy="6.5" r="1.5" fill="currentColor"/></svg>
+          </div>
+          <div class="coupon-card-body">
+            <div class="coupon-card-code"><%= c.code %></div>
+            <div class="coupon-card-desc"><%= c.description %></div>
+          </div>
+          <div class="coupon-card-apply">Apply</div>
+        </div>
+        <% }) %>
       </div>
       <% } %>
-      <div class="coupon-msg" id="couponMsg"></div>
 
       <div class="summary-divider"></div>
 
@@ -752,6 +797,16 @@
 
   let modalMode = 'add';
 
+  // Default error copy shown when no specific message is passed to setFieldError.
+  const DEFAULT_FIELD_ERRORS = {
+    mName:  'Full name is required.',
+    mPhone: 'Enter a valid 10-digit phone number.',
+    mLine1: 'Address line is required.',
+    mCity:  'City is required.',
+    mState: 'Please select a state.',
+    mPin:   'Enter a valid 6-digit PIN code.',
+  };
+
   function clearFieldErrors() {
     ['mName','mPhone','mLine1','mCity','mState','mPin'].forEach(id => {
       const el = document.getElementById(id);
@@ -761,11 +816,15 @@
     });
   }
 
-  function setFieldError(id, show) {
+  // message is optional — falls back to the field's default copy.
+  function setFieldError(id, show, message) {
     const el    = document.getElementById(id);
     const errEl = document.getElementById('err-' + id);
     if (el)    el.classList.toggle('error', show);
-    if (errEl) errEl.style.display = show ? 'block' : 'none';
+    if (errEl) {
+      if (show) errEl.textContent = message || DEFAULT_FIELD_ERRORS[id] || 'Invalid value.';
+      errEl.style.display = show ? 'block' : 'none';
+    }
   }
 
   function openAddModal() {
@@ -823,12 +882,47 @@
 
     clearFieldErrors();
     let hasError = false;
-    if (!name)                             { setFieldError('mName',  true); hasError = true; }
-    if (!phone || !/^\d{10}$/.test(phone)) { setFieldError('mPhone', true); hasError = true; }
-    if (!line1)                            { setFieldError('mLine1', true); hasError = true; }
-    if (!city)                             { setFieldError('mCity',  true); hasError = true; }
-    if (!state)                            { setFieldError('mState', true); hasError = true; }
-    if (!pin || !/^\d{6}$/.test(pin))      { setFieldError('mPin',   true); hasError = true; }
+
+    // Name: required, must start with a letter and contain only letters,
+    // spaces, apostrophes, hyphens, and dots — rejects "___", "123", "...", etc.
+    const NAME_RE = /^[A-Za-z][A-Za-z\s.'-]{1,49}$/;
+    if (!name) {
+      setFieldError('mName', true, 'Full name is required.');
+      hasError = true;
+    } else if (!NAME_RE.test(name)) {
+      setFieldError('mName', true, 'Enter a valid name using letters only (2–50 characters).');
+      hasError = true;
+    }
+
+    if (!phone || !/^\d{10}$/.test(phone)) {
+      setFieldError('mPhone', true, 'Enter a valid 10-digit phone number.');
+      hasError = true;
+    }
+
+    if (!line1) {
+      setFieldError('mLine1', true, 'Address line is required.');
+      hasError = true;
+    }
+
+    // City: same letters-only rule as name, so "___" / "123" can't pass here either.
+    if (!city) {
+      setFieldError('mCity', true, 'City is required.');
+      hasError = true;
+    } else if (!/^[A-Za-z][A-Za-z\s.'-]{1,49}$/.test(city)) {
+      setFieldError('mCity', true, 'Enter a valid city name using letters only.');
+      hasError = true;
+    }
+
+    if (!state) {
+      setFieldError('mState', true, 'Please select a state.');
+      hasError = true;
+    }
+
+    if (!pin || !/^\d{6}$/.test(pin)) {
+      setFieldError('mPin', true, 'Enter a valid 6-digit PIN code.');
+      hasError = true;
+    }
+
     if (hasError) { document.querySelector('.vc-input.error')?.focus(); return; }
 
     const payload = { fullName: name, phone, line1, city, state, pincode: pin, addressType: type };
@@ -862,8 +956,8 @@
       '₹' + Number(pricing.grandTotal).toLocaleString('en-IN');
   }
 
-  async function applyCoupon() {
-    const code = document.getElementById('couponInput').value.trim().toUpperCase();
+  async function applyCoupon(codeOverride) {
+    const code = (codeOverride || document.getElementById('couponInput').value.trim()).toUpperCase();
     const msg  = document.getElementById('couponMsg');
     if (!code) { msg.textContent = 'Please enter a coupon code.'; msg.className = 'coupon-msg err'; return; }
     try {
@@ -894,6 +988,21 @@
     } catch (_) {
       msg.textContent = 'Could not remove coupon.'; msg.className = 'coupon-msg err';
     }
+  }
+
+  // ── Available coupons list ──────────────────────────────────────────────
+  function toggleCouponList() {
+    const list     = document.getElementById('couponList');
+    const chevron  = document.getElementById('couponListChevron');
+    const isOpen   = list.classList.toggle('open');
+    chevron.classList.toggle('open', isOpen);
+  }
+
+  function applyListedCoupon(cardEl, code) {
+    cardEl.classList.add('applying');
+    const applyLabel = cardEl.querySelector('.coupon-card-apply');
+    if (applyLabel) applyLabel.textContent = 'Applying…';
+    applyCoupon(code);
   }
 
   // ── Payment method selection ─────────────────────────────────────────────

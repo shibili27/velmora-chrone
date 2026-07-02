@@ -49,10 +49,10 @@ app.use(session({
   rolling          : true,
   store            : MongoStore.create({
     mongoUrl   : process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/velmora',
-    ttl        : 60 * 60 * 24,
+    ttl        : 6000 * 60 * 24,
     autoRemove : 'native',
    
-    touchAfter : 15 * 60,
+    touchAfter : 1500 * 60,
   }),
   cookie: {
     maxAge  : 1000 * 60 * 60 * 24,

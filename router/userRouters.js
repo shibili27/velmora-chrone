@@ -13,6 +13,7 @@ import {
 
 import authController from '../controller/usercontroller/authController.js';
 import profileController, { upload } from '../controller/usercontroller/profileController.js';
+import contactController from '../controller/usercontroller/contactController.js';
 import {
   getHomePage,
   getProducts,
@@ -126,6 +127,9 @@ router.post('/reset-password', authController.resetPassword);
 
 router.get('/',isOptionalAuth, getHomePage);
 router.get('/home',isOptionalAuth, getHomePage);
+router.get('/about', isOptionalAuth, (req, res) => res.render('user/about'));
+router.get('/contact', isOptionalAuth, contactController.getContactPage);
+router.post('/api/contact', isOptionalAuth, contactController.submitContactMessage);
 router.get('/products',isOptionalAuth, getProducts);
 router.get('/products/:id/status',isOptionalAuth, getProductStatus);
 router.get('/products/:id/stock',isOptionalAuth, getProductStock);

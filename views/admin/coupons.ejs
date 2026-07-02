@@ -170,6 +170,19 @@
     .modal-error { background: #fdecea; color: #b00020; border: 1px solid #f5c6cb; border-radius: 4px; padding: 10px 14px; font-size: 13px; margin-bottom: 16px; display: none; }
     .modal-error.show { display: block; }
 
+    /* ── Field-level invalid state + shake (red box on every required/blank field) ── */
+    .form-input.invalid { border-color: var(--red) !important; background: #fff5f5; }
+    .form-input.invalid::placeholder { color: #f3a8a8; }
+    .field-error-text { font-size: 11px; color: var(--red); font-weight: 500; margin-top: 4px; display: none; }
+    .field-error-text.show { display: block; }
+    @keyframes fieldShake {
+      10%, 90% { transform: translateX(-1px); }
+      20%, 80% { transform: translateX(2px); }
+      30%, 50%, 70% { transform: translateX(-4px); }
+      40%, 60% { transform: translateX(4px); }
+    }
+    .shake { animation: fieldShake 0.45s cubic-bezier(.36,.07,.19,.97) both; }
+
     /* ── Toast ── */
     .toast-container { position: fixed; top: 20px; right: 20px; z-index: 500; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
     .toast { background: var(--white); border: 1px solid var(--border); border-radius: 6px; padding: 12px 16px; font-size: 13px; font-weight: 500; box-shadow: 0 4px 16px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 10px; pointer-events: all; min-width: 260px; max-width: 380px; animation: slideIn 0.25s ease; }
@@ -511,23 +524,26 @@
   <div class="modal">
     <h2 class="modal__title">Add Coupon</h2>
     <div class="modal-error" id="createModalError"></div>
-    <form id="createForm" action="/admin/coupons/create" method="POST" onsubmit="return validateCouponForm('create')">
+    <form id="createForm" action="/admin/coupons/create" method="POST" onsubmit="return validateCouponForm(event,'create')">
 
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Coupon Code *</label>
           <input class="form-input" type="text" name="code" id="createCode"
             placeholder="e.g. WELCOME20" maxlength="20"
-            style="text-transform:uppercase" autocomplete="off" required/>
+            style="text-transform:uppercase" autocomplete="off" />
           <p class="form-hint">3–20 chars — letters, numbers, _ and - only.</p>
+          <div class="field-error-text" id="createCodeErr"></div>
         </div>
         <div class="form-group">
           <label class="form-label">Discount Type *</label>
-          <select class="form-input" name="discountType" id="createDiscountType" onchange="onTypeChange('create')" required>
+          <select class="form-input" name="discountType" id="createDiscountType" onchange="onTypeChange('create')" >
             <option value="">— Select —</option>
             <option value="flat">Flat amount (₹)</option>
             <option value="percentage">Percentage (%)</option>
+            <option value="free_shipping">Free Shipping</option>
           </select>
+          <div class="field-error-text" id="createDiscountTypeErr"></div>
         </div>
       </div>
 
@@ -536,12 +552,14 @@
           <label class="form-label" id="createValueLabel">Discount Value *</label>
           <input class="form-input" type="number" name="discountValue" id="createDiscountValue"
             placeholder="0" min="0" step="0.01"/>
+          <div class="field-error-text" id="createDiscountValueErr"></div>
         </div>
         <div class="form-group" id="createCapGroup" style="display:none">
           <label class="form-label">Max Discount Cap (₹)</label>
           <input class="form-input" type="number" name="maxDiscountCap" id="createMaxDiscountCap"
             placeholder="Leave blank for no cap" min="0" step="0.01"/>
           <p class="form-hint">Max rupee amount the % discount can reach.</p>
+          <div class="field-error-text" id="createMaxDiscountCapErr"></div>
         </div>
       </div>
 
@@ -551,10 +569,12 @@
           <input class="form-input" type="number" name="minOrderValue" id="createMinOrderValue"
             placeholder="0 — no minimum" min="0" step="0.01" value="0"/>
           <p class="form-hint">Coupon won't apply below this cart total.</p>
+          <div class="field-error-text" id="createMinOrderValueErr"></div>
         </div>
         <div class="form-group">
           <label class="form-label">Expiry Date *</label>
-          <input class="form-input" type="date" name="expiryDate" id="createExpiryDate" required/>
+          <input class="form-input" type="date" name="expiryDate" id="createExpiryDate" />
+          <div class="field-error-text" id="createExpiryDateErr"></div>
         </div>
       </div>
 
@@ -564,12 +584,14 @@
           <input class="form-input" type="number" name="usageLimit" id="createUsageLimit"
             placeholder="Leave blank for unlimited" min="1" step="1"/>
           <p class="form-hint">Max total uses across all customers.</p>
+          <div class="field-error-text" id="createUsageLimitErr"></div>
         </div>
         <div class="form-group">
           <label class="form-label">Per-User Limit</label>
           <input class="form-input" type="number" name="perUserLimit" id="createPerUserLimit"
             placeholder="1" min="1" step="1" value="1"/>
           <p class="form-hint">Max uses per individual customer.</p>
+          <div class="field-error-text" id="createPerUserLimitErr"></div>
         </div>
       </div>
 
@@ -577,6 +599,7 @@
         <label class="form-label">Description <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
         <input class="form-input" type="text" name="description" id="createDescription"
           placeholder="e.g. Welcome discount for new customers"/>
+        <div class="field-error-text" id="createDescriptionErr"></div>
       </div>
 
       <div class="modal-footer">
@@ -595,7 +618,7 @@
   <div class="modal">
     <h2 class="modal__title">Edit Coupon</h2>
     <div class="modal-error" id="editModalError"></div>
-    <form id="editForm" method="POST" onsubmit="return validateCouponForm('edit')">
+    <form id="editForm" method="POST" onsubmit="return validateCouponForm(event,'edit')">
 
       <div class="form-row">
         <div class="form-group">
@@ -606,11 +629,13 @@
         </div>
         <div class="form-group">
           <label class="form-label">Discount Type *</label>
-          <select class="form-input" name="discountType" id="editDiscountType" onchange="onTypeChange('edit')" required>
+          <select class="form-input" name="discountType" id="editDiscountType" onchange="onTypeChange('edit')" >
             <option value="">— Select —</option>
             <option value="flat">Flat amount (₹)</option>
             <option value="percentage">Percentage (%)</option>
+            <option value="free_shipping">Free Shipping</option>
           </select>
+          <div class="field-error-text" id="editDiscountTypeErr"></div>
         </div>
       </div>
 
@@ -618,13 +643,15 @@
         <div class="form-group">
           <label class="form-label" id="editValueLabel">Discount Value *</label>
           <input class="form-input" type="number" name="discountValue" id="editDiscountValue"
-            placeholder="0" min="0" step="0.01" required/>
+            placeholder="0" min="0" step="0.01" />
+          <div class="field-error-text" id="editDiscountValueErr"></div>
         </div>
         <div class="form-group" id="editCapGroup" style="display:none">
           <label class="form-label">Max Discount Cap (₹)</label>
           <input class="form-input" type="number" name="maxDiscountCap" id="editMaxDiscountCap"
             placeholder="Leave blank for no cap" min="0" step="0.01"/>
           <p class="form-hint">Max rupee amount the % discount can reach.</p>
+          <div class="field-error-text" id="editMaxDiscountCapErr"></div>
         </div>
       </div>
 
@@ -634,10 +661,12 @@
           <input class="form-input" type="number" name="minOrderValue" id="editMinOrderValue"
             placeholder="0 — no minimum" min="0" step="0.01" value="0"/>
           <p class="form-hint">Coupon won't apply below this cart total.</p>
+          <div class="field-error-text" id="editMinOrderValueErr"></div>
         </div>
         <div class="form-group">
           <label class="form-label">Expiry Date *</label>
-          <input class="form-input" type="date" name="expiryDate" id="editExpiryDate" required/>
+          <input class="form-input" type="date" name="expiryDate" id="editExpiryDate"/>
+          <div class="field-error-text" id="editExpiryDateErr"></div>
         </div>
       </div>
 
@@ -647,12 +676,14 @@
           <input class="form-input" type="number" name="usageLimit" id="editUsageLimit"
             placeholder="Leave blank for unlimited" min="1" step="1"/>
           <p class="form-hint">Max total uses across all customers.</p>
+          <div class="field-error-text" id="editUsageLimitErr"></div>
         </div>
         <div class="form-group">
           <label class="form-label">Per-User Limit</label>
           <input class="form-input" type="number" name="perUserLimit" id="editPerUserLimit"
             placeholder="1" min="1" step="1" value="1"/>
           <p class="form-hint">Max uses per individual customer.</p>
+          <div class="field-error-text" id="editPerUserLimitErr"></div>
         </div>
       </div>
 
@@ -660,6 +691,7 @@
         <label class="form-label">Description <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
         <input class="form-input" type="text" name="description" id="editDescription"
           placeholder="e.g. Welcome discount for new customers"/>
+        <div class="field-error-text" id="editDescriptionErr"></div>
       </div>
 
       <div class="modal-footer">
@@ -707,6 +739,51 @@
     el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); });
   });
 
+  // ── Field-level invalid + shake helpers (shared by create & edit) ─────────
+  function triggerShake(el) {
+    if (!el) return;
+    el.classList.remove('shake');
+    void el.offsetWidth; // restart animation even if mid-shake
+    el.classList.add('shake');
+    el.addEventListener('animationend', () => el.classList.remove('shake'), { once: true });
+  }
+
+  // field = 'Code' | 'DiscountType' | 'DiscountValue' | 'MaxDiscountCap' |
+  //         'MinOrderValue' | 'ExpiryDate' | 'UsageLimit' | 'PerUserLimit' | 'Description'
+  function setFieldInvalid(prefix, field, isInvalid, message) {
+    const inputId = prefix + field;
+    const errId   = inputId + 'Err';
+    const input   = document.getElementById(inputId);
+    const errEl   = document.getElementById(errId);
+    if (input) {
+      input.classList.toggle('invalid', !!isInvalid);
+      if (isInvalid) triggerShake(input);
+    }
+    if (errEl) {
+      errEl.textContent = isInvalid ? (message || '') : '';
+      errEl.classList.toggle('show', !!isInvalid);
+    }
+  }
+
+  const COUPON_FIELDS = [
+    'Code', 'DiscountType', 'DiscountValue', 'MaxDiscountCap',
+    'MinOrderValue', 'ExpiryDate', 'UsageLimit', 'PerUserLimit', 'Description'
+  ];
+
+  function clearFieldErrors(prefix) {
+    COUPON_FIELDS.forEach(f => setFieldInvalid(prefix, f, false));
+  }
+
+  // Live-clear: as soon as the user edits a field, drop its red/shake state.
+  function initLiveClear(prefix) {
+    COUPON_FIELDS.forEach(field => {
+      const el = document.getElementById(prefix + field);
+      if (!el) return;
+      const evt = el.tagName === 'SELECT' ? 'change' : 'input';
+      el.addEventListener(evt, () => setFieldInvalid(prefix, field, false));
+    });
+  }
+
   // ── Discount type change (shared for create & edit) ───────────────────────
   function onTypeChange(prefix) {
     const type     = document.getElementById(prefix + 'DiscountType').value;
@@ -730,49 +807,129 @@
     }
   }
 
-  // ── Shared validation ─────────────────────────────────────────────────────
-  function validateCouponForm(prefix) {
-    const errEl  = document.getElementById(prefix + 'ModalError');
-    const type   = document.getElementById(prefix + 'DiscountType').value;
-    const val    = parseFloat(document.getElementById(prefix + 'DiscountValue').value);
-    const expiry = document.getElementById(prefix + 'ExpiryDate').value;
-    const minVal = parseFloat(document.getElementById(prefix + 'MinOrderValue').value);
-    const capEl  = document.getElementById(prefix + 'MaxDiscountCap');
-    const cap    = capEl && capEl.value !== '' ? parseFloat(capEl.value) : null;
+  // ── Shared validation: marks every blank/invalid field red + shaking ──────
+  function validateCouponForm(e, prefix) {
+    clearFieldErrors(prefix);
+    const errEl = document.getElementById(prefix + 'ModalError');
+    errEl.classList.remove('show');
+    errEl.textContent = '';
 
-    // Code validation only for create
+    let ok = true;
+
+    // Coupon code — required, format-checked, only on create (edit is read-only)
     if (prefix === 'create') {
       const code = document.getElementById('createCode').value.trim();
-      if (!code || !/^[A-Z0-9_-]{3,20}$/i.test(code)) {
-        showError(errEl, 'Enter a valid coupon code (3–20 chars, letters/numbers/_ /-).');
-        return false;
+      if (!code) {
+        setFieldInvalid('create', 'Code', true, 'Coupon code is required.');
+        ok = false;
+      } else if (!/^[A-Z0-9_-]{3,20}$/i.test(code)) {
+        setFieldInvalid('create', 'Code', true, '3–20 chars — letters, numbers, _ and - only.');
+        ok = false;
       }
     }
 
-    if (!type) { showError(errEl, 'Please select a discount type.'); return false; }
-
-    if (type !== 'free_shipping') {
-      if (isNaN(val) || val <= 0) { showError(errEl, 'Enter a positive discount value.'); return false; }
-      if (type === 'percentage' && val > 100) { showError(errEl, 'Percentage discount cannot exceed 100.'); return false; }
+    // Discount type
+    const typeEl = document.getElementById(prefix + 'DiscountType');
+    const type   = typeEl ? typeEl.value : '';
+    if (!type) {
+      setFieldInvalid(prefix, 'DiscountType', true, 'Please select a discount type.');
+      ok = false;
     }
 
-    if (!isNaN(minVal) && minVal < 0) { showError(errEl, 'Minimum cart value cannot be negative.'); return false; }
-
-    if (type === 'percentage' && cap !== null && (isNaN(cap) || cap <= 0)) {
-      showError(errEl, 'Max discount cap must be a positive number.'); return false;
+    // Discount value (not required for free shipping)
+    const valEl  = document.getElementById(prefix + 'DiscountValue');
+    const valRaw = valEl ? valEl.value.trim() : '';
+    if (type && type !== 'free_shipping') {
+      const typeLabel = type === 'flat' ? 'a flat discount amount (₹)' : 'a percentage discount value';
+      if (valRaw === '') {
+        setFieldInvalid(prefix, 'DiscountValue', true, `Please enter ${typeLabel}.`);
+        ok = false;
+      } else {
+        const val = parseFloat(valRaw);
+        if (isNaN(val) || val <= 0) {
+          setFieldInvalid(prefix, 'DiscountValue', true, `Enter ${typeLabel} greater than 0.`);
+          ok = false;
+        } else if (type === 'percentage' && val > 100) {
+          setFieldInvalid(prefix, 'DiscountValue', true, 'Percentage discount cannot exceed 100.');
+          ok = false;
+        }
+      }
     }
 
-    if (!expiry || new Date(expiry) <= new Date()) {
-      showError(errEl, 'Expiry date must be a future date.'); return false;
+    // Max discount cap (percentage only, optional but must be positive if filled)
+    const capEl  = document.getElementById(prefix + 'MaxDiscountCap');
+    const capRaw = capEl ? capEl.value.trim() : '';
+    if (type === 'percentage' && capRaw !== '') {
+      const cap = parseFloat(capRaw);
+      if (isNaN(cap) || cap <= 0) {
+        setFieldInvalid(prefix, 'MaxDiscountCap', true, 'Max discount cap must be a positive number.');
+        ok = false;
+      }
     }
 
-    errEl.classList.remove('show');
+    // Min cart value (optional, cannot be negative)
+    const minEl  = document.getElementById(prefix + 'MinOrderValue');
+    const minRaw = minEl ? minEl.value.trim() : '';
+    if (minRaw !== '') {
+      const minVal = parseFloat(minRaw);
+      if (isNaN(minVal) || minVal < 0) {
+        setFieldInvalid(prefix, 'MinOrderValue', true, 'Minimum cart value cannot be negative.');
+        ok = false;
+      }
+    }
+
+    // Flat discount must be lower than min cart value
+    // (prevents a coupon from discounting more than — or exactly as much as — the order is worth)
+    if (type === 'flat' && valRaw !== '' && minRaw !== '') {
+      const flatVal = parseFloat(valRaw);
+      const minVal2 = parseFloat(minRaw);
+      if (!isNaN(flatVal) && !isNaN(minVal2) && minVal2 > 0 && flatVal >= minVal2) {
+        setFieldInvalid(prefix, 'DiscountValue', true, 'Flat discount must be lower than the minimum cart value.');
+        setFieldInvalid(prefix, 'MinOrderValue', true, 'Minimum cart value must exceed the flat discount amount.');
+        ok = false;
+      }
+    }
+
+    // Expiry date — required, must be in the future
+    const expiryEl = document.getElementById(prefix + 'ExpiryDate');
+    const expiry   = expiryEl ? expiryEl.value : '';
+    if (!expiry) {
+      setFieldInvalid(prefix, 'ExpiryDate', true, 'Expiry date is required.');
+      ok = false;
+    } else if (new Date(expiry) <= new Date()) {
+      setFieldInvalid(prefix, 'ExpiryDate', true, 'Expiry date must be a future date.');
+      ok = false;
+    }
+
+    // Total usage limit (optional, must be a positive whole number if filled)
+    const usageEl  = document.getElementById(prefix + 'UsageLimit');
+    const usageRaw = usageEl ? usageEl.value.trim() : '';
+    if (usageRaw !== '') {
+      if (!/^\d+$/.test(usageRaw) || parseInt(usageRaw, 10) < 1) {
+        setFieldInvalid(prefix, 'UsageLimit', true, 'Usage limit must be a whole number of 1 or more.');
+        ok = false;
+      }
+    }
+
+    // Per-user limit (required field with a default of 1, must stay >= 1)
+    const peruserEl  = document.getElementById(prefix + 'PerUserLimit');
+    const peruserRaw = peruserEl ? peruserEl.value.trim() : '';
+    if (peruserRaw === '') {
+      setFieldInvalid(prefix, 'PerUserLimit', true, 'Per-user limit is required.');
+      ok = false;
+    } else if (!/^\d+$/.test(peruserRaw) || parseInt(peruserRaw, 10) < 1) {
+      setFieldInvalid(prefix, 'PerUserLimit', true, 'Per-user limit must be a whole number of 1 or more.');
+      ok = false;
+    }
+
+    if (!ok) {
+      e.preventDefault();
+      errEl.textContent = 'Please fix the highlighted field(s) below.';
+      errEl.classList.add('show');
+      return false;
+    }
+
     return true;
-  }
-
-  function showError(el, msg) {
-    el.textContent = msg;
-    el.classList.add('show');
   }
 
   // ── CREATE modal ──────────────────────────────────────────────────────────
@@ -781,6 +938,7 @@
     document.getElementById('createModalError').classList.remove('show');
     document.getElementById('createModalError').textContent = '';
     document.getElementById('createCapGroup').style.display = 'none';
+    clearFieldErrors('create');
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     document.getElementById('createExpiryDate').min = tomorrow.toISOString().split('T')[0];
@@ -792,10 +950,11 @@
     // Read all coupon data from safe data-* attributes (avoids inline JSON breakage)
     const d = btn.dataset;
 
-    // Clear previous error
+    // Clear previous errors
     const errEl = document.getElementById('editModalError');
     errEl.classList.remove('show');
     errEl.textContent = '';
+    clearFieldErrors('edit');
 
     // Set form action
     document.getElementById('editForm').action = '/admin/coupons/' + d.id + '/edit';
@@ -878,6 +1037,10 @@
       showToast('Network error. Please try again.', 'error');
     }
   }
+
+  // ── Init live-clear listeners ───────────────────────────────────────────────
+  initLiveClear('create');
+  initLiveClear('edit');
 </script>
 </body>
 </html>

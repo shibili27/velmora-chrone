@@ -227,6 +227,43 @@ export const removeCouponFromSession = async (userId, session) => {
   return { message: 'Coupon removed.', pricing };
 };
 
+/**
+ * Get the list of coupons a user could actually apply right now, given the
+ * current cart subtotal. Reuses the same Coupon#validateFor logic that
+ * applyCouponToSession uses, so a coupon shown here is guaranteed to
+ * succeed if the user clicks "Apply" on it (assuming subtotal doesn't
+ * change in between).
+ *
+ * @param {string|ObjectId} userId
+ * @param {number} subtotal  cart subtotal (pre-coupon), same value passed to validateFor elsewhere
+ * @returns {Promise<Array>} plain objects safe to pass straight into res.render
+ */
+export const getAvailableCoupons = async (userId, subtotal) => {
+  const now = new Date();
+
+  const coupons = await Coupon.find({
+    isActive  : true,
+    isDeleted : false,
+    expiryDate: { $gt: now },
+  }).sort({ createdAt: -1 });
+
+  return coupons
+    .filter(coupon => {
+      const userUsageCount = coupon.getUserUsageCount(userId);
+      const { valid }      = coupon.validateFor(subtotal, userUsageCount);
+      return valid;
+    })
+    .map(coupon => ({
+      code          : coupon.code,
+      description   : coupon.description,
+      discountType  : coupon.discountType,
+      discountValue : coupon.discountValue,
+      minOrderValue : coupon.minOrderValue,
+      maxDiscountCap: coupon.maxDiscountCap,
+      expiryDate    : coupon.expiryDate,
+    }));
+};
+
 const recordCouponUsage = async (couponCode, userId) => {
   if (!couponCode) return;
   const coupon = await Coupon.findOne({ code: couponCode });
@@ -256,6 +293,11 @@ export const buildCheckoutData = async (userId, session) => {
   const wallet        = await Wallet.getOrCreate(userId);
   const walletBalance = wallet.balance;
 
+  const availableCoupons = await getAvailableCoupons(userId, pricing.subtotal);
+  const filteredCoupons  = couponCode
+    ? availableCoupons.filter(c => c.code !== couponCode)
+    : availableCoupons;
+
   const items = cart.items.map(item => {
     const p               = item.product;
     const mrp             = p.mrp || p.price || item.price;
@@ -276,7 +318,15 @@ export const buildCheckoutData = async (userId, session) => {
     };
   });
 
-  return { user, addresses: user.addresses || [], items, pricing, couponCode, walletBalance };
+  return {
+    user,
+    addresses     : user.addresses || [],
+    items,
+    pricing,
+    couponCode,
+    walletBalance,
+    availableCoupons: filteredCoupons,
+  };
 };
 
 
