@@ -31,6 +31,10 @@ function showToast(type = "default", message = "") {
   }, 3000);
 }
 
+// Must match the backend OTP expiry exactly (see authService.js: initiateSignupOTP,
+// initiateForgotPassword, resendOTPToSession — all use 5 * 60 * 1000 ms).
+const OTP_TTL_MS = 5 * 60 * 1000;
+
 const inputs      = document.querySelectorAll(".otp-boxes input");
 const verifyBtn   = document.getElementById("verifyBtn");
 const resendBtn   = document.getElementById("resendBtn");
@@ -120,8 +124,21 @@ async function submitOTP(otp) {
   }
 }
 
+// FIXED: was hardcoded to 59000ms (59 seconds). Now matches the real
+// 5-minute backend OTP TTL.
 function setExpiry() {
-  localStorage.setItem("otpExpiry", Date.now() + 59000);
+  localStorage.setItem("otpExpiry", Date.now() + OTP_TTL_MS);
+}
+
+// FIXED: was hardcoded to display "00:SS", which only looked correct because
+// the old expiry never exceeded 59 seconds. Now properly formats mm:ss for
+// any duration.
+function formatTime(totalSeconds) {
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  const mm = minutes < 10 ? "0" + minutes : minutes;
+  const ss = seconds < 10 ? "0" + seconds : seconds;
+  return `${mm}:${ss}`;
 }
 
 function startTimer() {
@@ -140,7 +157,7 @@ function startTimer() {
       return;
     }
 
-    timerEl.innerText = "00:" + (remaining < 10 ? "0" + remaining : remaining);
+    timerEl.innerText = formatTime(remaining);
   }, 1000);
 }
 

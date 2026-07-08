@@ -1,8 +1,9 @@
-import User      from '../../models/user.js';
-import Category  from '../../models/category.js';
-import Product   from '../../models/product.js';
-import Brand     from '../../models/brand.js';
-import Order     from '../../models/order.js';
+import mongoose   from 'mongoose';
+import User       from '../../models/user.js';
+import Category   from '../../models/category.js';
+import Product    from '../../models/product.js';
+import Brand      from '../../models/brand.js';
+import Order      from '../../models/order.js';
 import cloudinary from '../../config/cloudinary.js';
 import { broadcast } from '../../public/utils/ssemanager.js';
 import Coupon from '../../models/coupon.js';
@@ -94,7 +95,7 @@ export const getDashboard = async (req, res) => {
         { $limit: 12 },
       ]),
 
-      
+
       Order.aggregate([
         { $match: { orderStatus: 'delivered' } },
         { $unwind: '$items' },
@@ -113,7 +114,7 @@ export const getDashboard = async (req, res) => {
         { $limit: 10 },
       ]),
 
-      
+
       Order.aggregate([
         { $match: { orderStatus: 'delivered' } },
         { $unwind: '$items' },
@@ -158,7 +159,7 @@ export const getDashboard = async (req, res) => {
         { $limit: 10 },
       ]),
 
-      
+
       Order.aggregate([
         { $match: { orderStatus: 'delivered' } },
         { $unwind: '$items' },
@@ -367,7 +368,7 @@ export const getCategories = async (req, res) => {
 
 export const addCategory = async (req, res) => {
   try {
-    const { name, description, brand } = req.body;
+    const { name, description } = req.body;
     if (!name?.trim()) {
       req.flash('error', 'Category name is required.');
       return res.redirect('/admin/categories');
@@ -380,7 +381,7 @@ export const addCategory = async (req, res) => {
       req.flash('error', `A category named "${name.trim()}" already exists.`);
       return res.redirect('/admin/categories');
     }
-    await Category.create({ name: name.trim(), description: description?.trim() || '', brand: brand?.trim() || '' });
+    await Category.create({ name: name.trim(), description: description?.trim() || '' });
     req.flash('success', 'Category added successfully.');
     res.redirect('/admin/categories');
   } catch (err) {
@@ -392,7 +393,7 @@ export const addCategory = async (req, res) => {
 
 export const editCategory = async (req, res) => {
   try {
-    const { name, description, brand } = req.body;
+    const { name, description } = req.body;
     if (!name?.trim()) {
       req.flash('error', 'Category name is required.');
       return res.redirect('/admin/categories');
@@ -409,7 +410,6 @@ export const editCategory = async (req, res) => {
     await Category.findByIdAndUpdate(req.params.id, {
       name: name.trim(),
       description: description?.trim() || '',
-      brand: brand?.trim() || '',
     });
     req.flash('success', 'Category updated successfully.');
     res.redirect('/admin/categories');
@@ -553,52 +553,119 @@ async function parseAndUploadVariants(raw) {
   return result;
 }
 
+// ── Backend validation for the core product fields ──────────────────────────
+// Mirrors (and backstops) the client-side checks in the admin products view.
+async function validateProductBody({ name, description, price, category, brand }) {
+  const errors = [];
+
+  if (!name?.trim()) {
+    errors.push('Product name is required.');
+  } else if (name.trim().length < 2) {
+    errors.push('Product name must be at least 2 characters.');
+  } else if (!/^[A-Za-z][A-Za-z0-9 ]*$/.test(name.trim())) {
+    errors.push('Product name can only contain letters, numbers, and spaces, and cannot start with a number.');
+  }
+
+  if (!description?.trim()) {
+    errors.push('Description is required.');
+  } else if (description.trim().length < 10) {
+    errors.push('Description must be at least 10 characters.');
+  }
+
+  const priceNum = parseFloat(price);
+  if (price === undefined || price === null || price === '') {
+    errors.push('Price is required.');
+  } else if (isNaN(priceNum) || priceNum <= 0) {
+    errors.push('Price must be a positive number.');
+  }
+
+  if (!category) {
+    errors.push('Category is required.');
+  } else if (!mongoose.isValidObjectId(category)) {
+    errors.push('Invalid category selected.');
+  } else {
+    const catExists = await Category.exists({ _id: category, isDeleted: false });
+    if (!catExists) errors.push('Selected category does not exist.');
+  }
+
+  if (!brand) {
+    errors.push('Brand is required.');
+  } else if (!mongoose.isValidObjectId(brand)) {
+    errors.push('Invalid brand selected.');
+  } else {
+    const brandExists = await Brand.exists({ _id: brand, isDeleted: false });
+    if (!brandExists) errors.push('Selected brand does not exist.');
+  }
+
+  return errors;
+}
+
 export const addProduct = async (req, res) => {
+  const wantsJson = req.headers.accept?.includes('application/json');
   try {
     const { name, description, price, colorVariants: rawVariants } = req.body;
     const category = req.body.category || null;
     const brand    = req.body.brand    || null;
-    if (!name || !price || !category) {
-      req.flash('error', 'Name, price, and category are required.');
+
+    const errors = await validateProductBody({ name, description, price, category, brand });
+    if (errors.length) {
+      if (wantsJson) return res.status(400).json({ success: false, errors });
+      errors.forEach(e => req.flash('error', e));
       return res.redirect('/admin/products');
     }
+
     const colorVariants = await parseAndUploadVariants(rawVariants);
     if (colorVariants.length === 0) {
-      req.flash('error', 'Please add at least one colour variant with 3 or more images.');
+      const msg = 'Please add at least one colour variant with 3 or more images.';
+      if (wantsJson) return res.status(400).json({ success: false, errors: [msg] });
+      req.flash('error', msg);
       return res.redirect('/admin/products');
     }
+
     const totalStock = colorVariants.reduce((s, v) => s + v.stock, 0);
     const colors     = colorVariants.map(v => ({ name: v.name, hex: v.hex }));
     await Product.create({
       name: name.trim(), description: description?.trim() || '',
       price: parseFloat(price), stock: totalStock,
-      category, brand: brand || null,
+      category, brand,
       images: colorVariants[0].images,
       colorVariants, colors, isListed: true, isDeleted: false,
     });
+
+    if (wantsJson) return res.json({ success: true, message: 'Product added successfully.', redirect: '/admin/products' });
     req.flash('success', 'Product added successfully.');
     res.redirect('/admin/products');
   } catch (err) {
     console.error('Add product error:', err);
-    req.flash('error', `Failed to add product: ${err.message}`);
+    const msg = `Failed to add product: ${err.message}`;
+    if (wantsJson) return res.status(500).json({ success: false, errors: [msg] });
+    req.flash('error', msg);
     res.redirect('/admin/products');
   }
 };
 
 export const editProduct = async (req, res) => {
+  const wantsJson = req.headers.accept?.includes('application/json');
   try {
     const { name, description, price, colorVariants: rawVariants } = req.body;
     const category = req.body.category || null;
     const brand    = req.body.brand    || null;
-    if (!name || !price || !category) {
-      req.flash('error', 'Name, price, and category are required.');
+
+    const errors = await validateProductBody({ name, description, price, category, brand });
+    if (errors.length) {
+      if (wantsJson) return res.status(400).json({ success: false, errors });
+      errors.forEach(e => req.flash('error', e));
       return res.redirect('/admin/products');
     }
+
     const colorVariants = await parseAndUploadVariants(rawVariants);
     if (colorVariants.length === 0) {
-      req.flash('error', 'Please add at least one colour variant with 3 or more images.');
+      const msg = 'Please add at least one colour variant with 3 or more images.';
+      if (wantsJson) return res.status(400).json({ success: false, errors: [msg] });
+      req.flash('error', msg);
       return res.redirect('/admin/products');
     }
+
     const totalStock = colorVariants.reduce((s, v) => s + v.stock, 0);
     const colors     = colorVariants.map(v => ({ name: v.name, hex: v.hex }));
     const updated = await Product.findByIdAndUpdate(
@@ -606,12 +673,13 @@ export const editProduct = async (req, res) => {
       {
         name: name.trim(), description: description?.trim() || '',
         price: parseFloat(price), stock: totalStock,
-        category, brand: brand || null,
+        category, brand,
         images: colorVariants[0].images,
         colorVariants, colors,
       },
       { new: true, runValidators: true }
     );
+
     broadcast('productUpdate', {
       productId:     req.params.id,
       stock:         totalStock,
@@ -620,11 +688,15 @@ export const editProduct = async (req, res) => {
       isDeleted:     updated.isDeleted,
       colorVariants: colorVariants.map(v => ({ name: v.name, hex: v.hex, stock: v.stock })),
     });
+
+    if (wantsJson) return res.json({ success: true, message: 'Product updated successfully.', redirect: '/admin/products' });
     req.flash('success', 'Product updated successfully.');
     res.redirect('/admin/products');
   } catch (err) {
     console.error('Edit product error:', err);
-    req.flash('error', `Failed to update product: ${err.message}`);
+    const msg = `Failed to update product: ${err.message}`;
+    if (wantsJson) return res.status(500).json({ success: false, errors: [msg] });
+    req.flash('error', msg);
     res.redirect('/admin/products');
   }
 };
@@ -773,7 +845,7 @@ function validateCouponBody(body) {
   if (!isNaN(min) && min < 0)
     errors.push('Minimum order amount cannot be negative.');
 
- 
+
   if (discountType === 'flat') {
     const flatVal = parseFloat(discountValue);
     if (!isNaN(flatVal) && !isNaN(min) && min > 0 && flatVal >= min) {

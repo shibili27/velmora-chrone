@@ -913,7 +913,7 @@ function clearMainFieldErrors(prefix) {
   ['Name', 'Category', 'Brand', 'Price', 'Description'].forEach(f => setMainFieldInvalid(prefix, f, false));
 }
 
-// Validates the top-level product fields (Name, Category, Price).
+// Validates the top-level product fields (Name, Category, Brand, Price, Description).
 // Returns true if everything is OK; otherwise marks every bad field red+shaking
 // and returns false.
 function validateMainFields(prefix) {
@@ -1136,8 +1136,6 @@ function renderVariantUI(prefix) {
   }).join('');
 }
 
-// ── updateVariantStock: empty/invalid input now marks stock as invalid (null)
-// instead of silently coercing to 0 ────────────────────────────────────────────
 // ── updateVariantStock: empty/non-numeric input marks stock as missing (null);
 // a parsable negative number is kept as-is so the panel can show a specific
 // "cannot be negative" message. `rerender=true` is passed on blur so the
@@ -1164,10 +1162,33 @@ function triggerVariantUpload(prefix, idx) {
 
 let cropQueue = [], cropCtx = null, currentCropper = null, currentFileObj = null;
 
+// ── handleVariantFiles: rejects non-image files and oversized files BEFORE
+// they ever reach the cropper/upload pipeline, with a clear inline message ────
 function handleVariantFiles(event, prefix, varIdx) {
-  cropCtx   = { prefix, varIdx };
-  cropQueue = Array.from(event.target.files);
+  const files = Array.from(event.target.files);
   event.target.value = '';
+
+  const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+  const valid = [];
+  const rejected = [];
+
+  files.forEach(f => {
+    if (!f.type.startsWith('image/')) {
+      rejected.push(`"${f.name}" is not a valid image file.`);
+    } else if (f.size > MAX_SIZE) {
+      rejected.push(`"${f.name}" is larger than 5MB.`);
+    } else {
+      valid.push(f);
+    }
+  });
+
+  if (rejected.length) {
+    showModalError(prefix, rejected.join(' '));
+  }
+  if (valid.length === 0) return;
+
+  cropCtx   = { prefix, varIdx };
+  cropQueue = valid;
   processNextCrop();
 }
 
@@ -1218,10 +1239,12 @@ function pushVariantImage(src, isExisting) {
   renderVariantUI(prefix);
 }
 
-// ── submitForm: re-validates label, stock, AND image count for every variant
-// right before building the payload, so nothing slips through even if state
-// was mutated after the initial addVariant() check ─────────────────────────────
-function submitForm(e, prefix) {
+// ── submitForm: fully AJAX-based. Validates client-side first, then POSTs
+// via fetch() with Accept: application/json so the backend returns JSON
+// instead of doing a redirect. On error the modal stays open with the
+// message shown inline — nothing is lost. On success we close the modal,
+// toast, and navigate to refresh the table. ────────────────────────────────
+async function submitForm(e, prefix) {
   e.preventDefault();
   clearModalError(prefix);
 
@@ -1273,15 +1296,53 @@ function submitForm(e, prefix) {
     newImages:      v.images.filter((_, i) => !v.existing[i]),
   }));
 
-  document.getElementById(prefix + 'ColorVariantsInput').value = JSON.stringify(payload);
+  const form = document.getElementById(prefix + 'Form');
+  const btn  = document.getElementById(prefix + 'SubmitBtn');
 
-  const btn = document.getElementById(prefix + 'SubmitBtn');
+  const params = new URLSearchParams();
+  params.append('name', document.getElementById(prefix + 'Name').value.trim());
+  params.append('description', document.getElementById(prefix + 'Description').value.trim());
+  params.append('price', document.getElementById(prefix + 'Price').value.trim());
+  params.append('category', document.getElementById(prefix + 'Category').value);
+  params.append('brand', document.getElementById(prefix + 'Brand').value);
+  params.append('colorVariants', JSON.stringify(payload));
+
   if (btn) {
     btn.classList.add('btn--loading');
+    btn.disabled = true;
     btn.textContent = prefix === 'add' ? 'Uploading…' : 'Saving…';
   }
 
-  document.getElementById(prefix + 'Form').submit();
+  try {
+    const res = await fetch(form.action, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: params.toString(),
+    });
+    const data = await res.json();
+
+    if (!data.success) {
+      showModalError(prefix, (data.errors && data.errors[0]) || 'Something went wrong. Please check the form.');
+      return;
+    }
+
+    showToast(data.message || 'Saved successfully.', 'success');
+    closeModal(prefix === 'add' ? 'addModal' : 'editModal');
+    setTimeout(() => { window.location.href = data.redirect || '/admin/products'; }, 500);
+
+  } catch (err) {
+    console.error('Submit error:', err);
+    showModalError(prefix, 'Network error — please try again.');
+  } finally {
+    if (btn) {
+      btn.classList.remove('btn--loading');
+      btn.disabled = false;
+      btn.textContent = prefix === 'add' ? 'Add Product' : 'Save Changes';
+    }
+  }
 }
 
 function openAddModal() {

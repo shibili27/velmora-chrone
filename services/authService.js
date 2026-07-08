@@ -2,6 +2,7 @@ import User      from '../models/user.js';
 import bcrypt     from 'bcryptjs';
 import nodemailer from 'nodemailer';
 import { validateReferralCode } from './referralService.js';
+import { generateReferralCode } from '../utils/referralcode.js';
 
 export const generateOTP = () =>
   Math.floor(100000 + Math.random() * 900000).toString();
@@ -21,7 +22,7 @@ export const sendOTP = async (email, otp, subject = 'Your OTP Code') => {
 };
 
 export const validateSignupFields = ({ name, email, password, confirmPassword }) => {
-  
+
   if (!name?.trim())return { field: 'name',message: 'Full name is required.' };
   if (!/^[a-zA-Z\s]+$/.test(name.trim()))return { field: 'name',message: 'Only letters and spaces allowed.' };
   if (name.trim().length < 3)return { field: 'name',message: 'Name must be at least 3 characters.' };
@@ -68,6 +69,9 @@ export const initiateSignupOTP = async ({ name, email, password, referralCode })
   };
 };
 
+// FIXED: now generates and assigns a referralCode at account creation time,
+// using the same name-based generator used elsewhere, instead of leaving
+// new users without a code until a separate backfill job runs.
 export const verifySignupAndCreate = async ({ otp, session }) => {
   const { signupOTP, signupEmail, signupName, signupPassword, signupOTPExpiry, signupReferrerId } = session;
 
@@ -80,12 +84,15 @@ export const verifySignupAndCreate = async ({ otp, session }) => {
   const existing = await User.findOne({ email: signupEmail });
   if (existing) throw new Error('Email already registered. Please login.');
 
-  const hashed = await bcrypt.hash(signupPassword, 10);
-  const user   = new User({
-    name    : signupName,
-    email   : signupEmail,
-    password: hashed,
-    referredBy: signupReferrerId || null, 
+  const hashed        = await bcrypt.hash(signupPassword, 10);
+  const referralCode  = await generateReferralCode(signupName); // NEW
+
+  const user = new User({
+    name        : signupName,
+    email       : signupEmail,
+    password    : hashed,
+    referredBy  : signupReferrerId || null,
+    referralCode, // NEW — was missing entirely before
   });
   await user.save();
   return user;

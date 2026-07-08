@@ -30,11 +30,6 @@ async function sendOtpEmail(to, otp) {
   });
 }
 
-const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-const generateReferralCode = () =>
-  Array.from({ length: 8 }, () => CHARS[Math.floor(Math.random() * CHARS.length)]).join('');
-
-
 const getProfile = async (req, res) => {
   try {
     const user = await User.findById(req.session.user).lean();
@@ -89,6 +84,7 @@ const uploadProfileImage = async (req, res) => {
 };
 
 
+// FIXED: now checks new email against the current user's email before anything else.
 const requestEmailChange = async (req, res) => {
   try {
     const { newEmail } = req.body;
@@ -96,7 +92,19 @@ const requestEmailChange = async (req, res) => {
       return res.json({ success: false, message: 'Enter a valid email address.' });
     }
 
-    const existing = await User.findOne({ email: newEmail.trim().toLowerCase() });
+    const trimmedEmail = newEmail.trim().toLowerCase();
+
+    const currentUser = await User.findById(req.session.user).select('email');
+    if (!currentUser) {
+      return res.json({ success: false, message: 'Session expired. Please log in again.' });
+    }
+
+    // NEW CHECK — this was missing entirely before
+    if (trimmedEmail === currentUser.email.toLowerCase()) {
+      return res.json({ success: false, message: 'New email must be different from your current email.' });
+    }
+
+    const existing = await User.findOne({ email: trimmedEmail });
     if (existing) {
       return res.json({ success: false, message: 'That email is already in use.' });
     }
@@ -107,7 +115,7 @@ const requestEmailChange = async (req, res) => {
     const updatedUser = await User.findByIdAndUpdate(
       req.session.user,
       {
-        pendingEmail:      newEmail.trim().toLowerCase(),
+        pendingEmail:      trimmedEmail,
         emailChangeOtp:    otp,
         emailChangeOtpExp: expiry,
       },
@@ -119,12 +127,10 @@ const requestEmailChange = async (req, res) => {
       return res.json({ success: false, message: 'Session expired. Please log in again.' });
     }
 
-   
-
-    console.log(`[OTP] Email change code for ${newEmail.trim()} → ${otp}`);
+    console.log(`[OTP] Email change code for ${trimmedEmail} → ${otp}`);
 
     if (process.env.NODE_ENV === 'production') {
-      await sendOtpEmail(newEmail.trim(), otp);
+      await sendOtpEmail(trimmedEmail, otp);
     }
 
     res.json({ success: true });
@@ -142,14 +148,6 @@ const verifyEmailChange = async (req, res) => {
     const user = await User.findById(req.session.user).select(
       'pendingEmail emailChangeOtp emailChangeOtpExp'
     );
-
-    console.log('[DEBUG] verifyEmailChange read:', {
-      userId:            req.session.user,
-      pendingEmail:      user?.pendingEmail,
-      emailChangeOtp:    user?.emailChangeOtp,
-      emailChangeOtpExp: user?.emailChangeOtpExp,
-      submittedOtp:      otp,
-    });
 
     if (!user || !user.emailChangeOtp) {
       return res.json({ success: false, message: 'No pending email change. Please start again.' });
@@ -174,34 +172,48 @@ const verifyEmailChange = async (req, res) => {
 };
 
 
+// FIXED: two bugs —
+// 1. Was storing `newPassword` in plain text instead of hashing it.
+// 2. Was validating correctly but responding via redirect instead of JSON,
+//    so an AJAX/fetch-based frontend never sees the validation failure.
+// If your frontend form does a real (non-AJAX) POST + full page reload,
+// tell me and I'll give you the redirect+flash version instead — but the
+// plaintext-password fix applies either way.
 const changePassword = async (req, res) => {
   try {
     const { oldPassword, newPassword, confirmPassword } = req.body;
+
     if (!oldPassword || !newPassword || !confirmPassword) {
-      req.flash?.('error', 'All fields are required.');
-      return res.redirect('/profile#password');
+      return res.status(400).json({ success: false, message: 'All fields are required.' });
     }
     if (newPassword.length < 8) {
-      req.flash?.('error', 'New password must be at least 8 characters.');
-      return res.redirect('/profile#password');
+      return res.status(400).json({ success: false, message: 'New password must be at least 8 characters.' });
     }
     if (newPassword !== confirmPassword) {
-      req.flash?.('error', 'Passwords do not match.');
-      return res.redirect('/profile#password');
+      return res.status(400).json({ success: false, message: 'Passwords do not match.' });
     }
+
     const user = await User.findById(req.session.user).select('password');
+    if (!user) {
+      return res.status(401).json({ success: false, message: 'Session expired. Please log in again.' });
+    }
+
     const valid = await bcrypt.compare(oldPassword, user.password);
     if (!valid) {
-      req.flash?.('error', 'Current password is incorrect.');
-      return res.redirect('/profile#password');
+      return res.status(400).json({ success: false, message: 'Current password is incorrect.' });
     }
-    user.password = newPassword;
+
+    if (oldPassword === newPassword) {
+      return res.status(400).json({ success: false, message: 'New password must be different from current password.' });
+    }
+
+    user.password = await bcrypt.hash(newPassword, 10); // FIXED — was plaintext
     await user.save();
-    req.flash?.('success', 'Password updated successfully.');
-    res.redirect('/profile');
+
+    return res.json({ success: true, message: 'Password updated successfully.' });
   } catch (err) {
     console.error('changePassword error:', err);
-    res.redirect('/profile');
+    return res.status(500).json({ success: false, message: 'Something went wrong. Please try again.' });
   }
 };
 
@@ -209,6 +221,10 @@ const changePassword = async (req, res) => {
 const addAddress = async (req, res) => {
   try {
     const user = await User.findById(req.session.user);
+    const validationError = validateAddressFields(req.body);
+    if (validationError) {
+      return res.status(400).json({ success: false, message: validationError });
+    }
     const addr = buildAddrFromBody(req.body);
     if (user.addresses.length === 0) addr.isDefault = true;
     user.addresses.push(addr);
@@ -225,6 +241,12 @@ const updateAddress = async (req, res) => {
     const user = await User.findById(req.session.user);
     const addr = user.addresses.id(req.params.id);
     if (!addr) return res.status(404).json({ success: false, message: 'Address not found.' });
+
+    const validationError = validateAddressFields(req.body);
+    if (validationError) {
+      return res.status(400).json({ success: false, message: validationError });
+    }
+
     Object.assign(addr, buildAddrFromBody(req.body));
     await user.save();
     res.json({ success: true, addresses: user.addresses });
@@ -262,6 +284,19 @@ const setDefaultAddress = async (req, res) => {
   }
 };
 
+// NEW: proper server-side address validation (matches the rules already
+// present in services/profileService.js's validateAddress, which the
+// controller's own addAddress/updateAddress were NOT using before).
+function validateAddressFields({ fullName, phone, line1, city, state, pincode }) {
+  if (!fullName?.trim())                           return 'Full name is required.';
+  if (!phone || !/^\d{10}$/.test(phone.trim()))    return 'Enter a valid 10-digit phone number.';
+  if (!line1?.trim())                              return 'Address line 1 is required.';
+  if (!city?.trim())                               return 'City is required.';
+  if (!state?.trim())                              return 'Please select a state.';
+  if (!pincode || !/^\d{6}$/.test(pincode.trim())) return 'Enter a valid 6-digit PIN code.';
+  return null;
+}
+
 function buildAddrFromBody(body) {
   return {
     fullName:    (body.fullName    || '').trim(),
@@ -276,7 +311,12 @@ function buildAddrFromBody(body) {
 }
 
 
+// Kept only as a one-time backfill for old accounts created before referral
+// codes were assigned at signup. Not used in the normal signup flow anymore
+// — see authService.verifySignupAndCreate, which now assigns a code directly
+// using the same generator as everywhere else.
 export const generateMissingReferralCodes = async () => {
+  const { generateReferralCode } = await import('../../utils/referralcode.js');
   try {
     const usersWithoutCode = await User.find({
       $or: [
@@ -284,7 +324,7 @@ export const generateMissingReferralCodes = async () => {
         { referralCode: null },
         { referralCode: '' },
       ],
-    }).select('_id');
+    }).select('_id name');
 
     if (usersWithoutCode.length === 0) {
       console.log('[Referral] All users already have referral codes. ✓');
@@ -294,13 +334,7 @@ export const generateMissingReferralCodes = async () => {
     console.log(`[Referral] Generating codes for ${usersWithoutCode.length} user(s)…`);
 
     for (const u of usersWithoutCode) {
-      let code, exists, attempts = 0;
-      do {
-        code   = generateReferralCode();
-        exists = await User.findOne({ referralCode: code }).lean();
-        attempts++;
-      } while (exists && attempts < 20);
-
+      const code = await generateReferralCode(u.name);
       await User.updateOne({ _id: u._id }, { $set: { referralCode: code } });
       console.log(`  ✓ Generated code ${code} for user ${u._id}`);
     }

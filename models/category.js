@@ -1,4 +1,3 @@
-
 import mongoose from 'mongoose';
 
 const categorySchema = new mongoose.Schema(
@@ -14,19 +13,13 @@ const categorySchema = new mongoose.Schema(
       trim:    true,
       default: '',
     },
-    brand: {
-      type:    String,
-      trim:    true,
-      default: '',
-      enum:    ['', 'Men', 'Women', 'Kids', 'Unisex', 'Luxury', 'Sport'],
-    },
     isDeleted: {
       type:    Boolean,
       default: false,
     },
     isListed: {
       type:    Boolean,
-      default: true,   
+      default: true,
     },
   },
   { timestamps: true }

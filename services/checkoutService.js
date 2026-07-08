@@ -10,7 +10,7 @@ import { createRazorpayOrder, verifyPaymentSignature } from './razorpayService.j
 import { rewardReferralIfEligible } from './referralService.js';
 
 const TAX_RATE            = 0.18;
-export const SHIPPING_THRESHOLD = 50000; 
+export const SHIPPING_THRESHOLD = 50000;
 
 export const getPopulatedCart = async (userId) => {
   return Cart.findOne({ user: userId }).populate({
@@ -75,15 +75,29 @@ export const clearCouponIfCartChanged = (session) => {
   }
 };
 
+// FIXED: this is now the single source of truth for "can this cart be
+// ordered right now" — it checks availability (deleted/unlisted/category
+// blocked) AND stock, and produces a specific message per item. Previously,
+// callers ran the generic cartIsValid() check FIRST, which threw a vague
+// "some items are unavailable" error before this function (and its detailed
+// stockErrors array) ever got a chance to run — so the frontend's stock
+// error banner never received anything useful.
 export const validateStockBeforeOrder = async (cartItems) => {
   const errors = [];
 
   for (const cartItem of cartItems) {
-    const product     = await Product.findById(cartItem.product._id).select('name stock colorVariants isDeleted isListed');
+    const product     = await Product.findById(cartItem.product._id)
+      .select('name stock colorVariants isDeleted isListed category')
+      .populate('category', 'isBlocked');
     const variantName = cartItem.variantName || null;
 
     if (!product || product.isDeleted || product.isListed === false) {
       errors.push(`"${cartItem.product.name}" is no longer available.`);
+      continue;
+    }
+
+    if (product.category?.isBlocked) {
+      errors.push(`"${cartItem.product.name}" is currently unavailable.`);
       continue;
     }
 
@@ -272,8 +286,15 @@ const recordCouponUsage = async (couponCode, userId) => {
 
 export const buildCheckoutData = async (userId, session) => {
   const cart = await getPopulatedCart(userId);
-  if (!cart || !cart.items.length) throw Object.assign(new Error('EMPTY_CART'),   { status: 302 });
-  if (!cartIsValid(cart))          throw Object.assign(new Error('INVALID_CART'), { status: 302 });
+  if (!cart || !cart.items.length) throw Object.assign(new Error('EMPTY_CART'), { status: 302 });
+
+  // NOTE: still using cartIsValid here (page load, not order placement) —
+  // if this throws, getCheckout redirects to /cart with a flash message.
+  // Worth double-checking your cart.ejs actually renders `cartError` from
+  // req.flash — if connect-flash isn't wired up, that redirect silently
+  // shows nothing, which would also explain "no warning shown" for the
+  // case where stock runs out BEFORE the user even reaches checkout.
+  if (!cartIsValid(cart)) throw Object.assign(new Error('INVALID_CART'), { status: 302 });
 
   const user           = await User.findById(userId).select('name email phone addresses');
   const couponDiscount = session.couponDiscount || 0;
@@ -320,6 +341,9 @@ export const buildCheckoutData = async (userId, session) => {
 };
 
 
+// FIXED: this is now the ONLY availability/stock check before order
+// placement — cartIsValid() is no longer called first, so its generic
+// error can't shadow this function's detailed stockErrors[] anymore.
 const buildOrderItemsAndValidate = async (cart) => {
   const stockErrors = await validateStockBeforeOrder(cart.items);
   if (stockErrors.length > 0) {
@@ -357,9 +381,12 @@ const clearCartAndCoupon = async (cart, session) => {
 
 export const placeOrder = async (userId, { addressId, session }) => {
   const cart = await getPopulatedCart(userId);
-  if (!cart || !cart.items.length) throw Object.assign(new Error('Your cart is empty.'),                                          { status: 400 });
-  if (!cartIsValid(cart))          throw Object.assign(new Error('Some items are no longer available. Please review your cart.'), { status: 400 });
+  if (!cart || !cart.items.length) throw Object.assign(new Error('Your cart is empty.'), { status: 400 });
 
+  // REMOVED: the old `if (!cartIsValid(cart)) throw ...` generic check that
+  // used to run here. It's gone — buildOrderItemsAndValidate below now
+  // handles ALL availability/stock validation and returns a real
+  // stockErrors[] array your frontend can actually display.
   const orderItems      = await buildOrderItemsAndValidate(cart);
   const user            = await User.findById(userId).select('name email phone addresses');
   const shippingAddress = resolveShippingAddress(user, addressId);
@@ -404,9 +431,9 @@ export const placeOrder = async (userId, { addressId, session }) => {
 
 export const placeOrderWithWallet = async (userId, { addressId, session }) => {
   const cart = await getPopulatedCart(userId);
-  if (!cart || !cart.items.length) throw Object.assign(new Error('Your cart is empty.'),                                          { status: 400 });
-  if (!cartIsValid(cart))          throw Object.assign(new Error('Some items are no longer available. Please review your cart.'), { status: 400 });
+  if (!cart || !cart.items.length) throw Object.assign(new Error('Your cart is empty.'), { status: 400 });
 
+  // REMOVED: same generic cartIsValid() shadow-check as placeOrder above.
   const orderItems      = await buildOrderItemsAndValidate(cart);
   const user            = await User.findById(userId).select('name email phone addresses');
   const shippingAddress = resolveShippingAddress(user, addressId);
@@ -470,9 +497,9 @@ export const placeOrderWithWallet = async (userId, { addressId, session }) => {
 
 export const createRazorpayCheckoutOrder = async (userId, { addressId, session }) => {
   const cart = await getPopulatedCart(userId);
-  if (!cart || !cart.items.length) throw Object.assign(new Error('Your cart is empty.'),                                          { status: 400 });
-  if (!cartIsValid(cart))          throw Object.assign(new Error('Some items are no longer available. Please review your cart.'), { status: 400 });
+  if (!cart || !cart.items.length) throw Object.assign(new Error('Your cart is empty.'), { status: 400 });
 
+  // REMOVED: same generic cartIsValid() shadow-check as placeOrder above.
   const orderItems      = await buildOrderItemsAndValidate(cart);
   const user            = await User.findById(userId).select('name email phone addresses');
   const shippingAddress = resolveShippingAddress(user, addressId);
