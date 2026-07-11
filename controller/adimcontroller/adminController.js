@@ -9,9 +9,6 @@ import { broadcast } from '../../public/utils/ssemanager.js';
 import Coupon from '../../models/coupon.js';
 import PDFDocument from 'pdfkit';
 
-
-
-
 export const getDashboard = async (req, res) => {
   try {
     const now            = new Date();
@@ -95,7 +92,6 @@ export const getDashboard = async (req, res) => {
         { $limit: 12 },
       ]),
 
-
       Order.aggregate([
         { $match: { orderStatus: 'delivered' } },
         { $unwind: '$items' },
@@ -113,7 +109,6 @@ export const getDashboard = async (req, res) => {
         { $sort: { totalSold: -1 } },
         { $limit: 10 },
       ]),
-
 
       Order.aggregate([
         { $match: { orderStatus: 'delivered' } },
@@ -158,7 +153,6 @@ export const getDashboard = async (req, res) => {
         { $sort: { totalSold: -1 } },
         { $limit: 10 },
       ]),
-
 
       Order.aggregate([
         { $match: { orderStatus: 'delivered' } },
@@ -336,7 +330,36 @@ export const getDashboard = async (req, res) => {
   }
 };
 
+function validateNameField(name, { min = 2, max = 60, label = 'Name' } = {}) {
+  const errors = [];
+  const v = (name || '').trim();
 
+  if (!v) { errors.push(`${label} is required.`); return errors; }
+  if (v.length < min) errors.push(`${label} must be at least ${min} characters.`);
+  if (v.length > max) errors.push(`${label} cannot exceed ${max} characters.`);
+
+  const letterCount = (v.match(/[a-zA-Z]/g) || []).length;
+  if (letterCount < 2) {
+    errors.push(`${label} must contain real words, not just symbols or numbers.`);
+  }
+
+  if (/^(.)\1+$/.test(v)) {
+    errors.push(`${label} cannot be a single character repeated.`);
+  }
+
+  if (/^[\s_\-.,!@#$%^&*()+=~`|\\/<>[\]{}:;'"?]+$/.test(v)) {
+    errors.push(`${label} cannot consist only of symbols.`);
+  }
+
+  return errors;
+}
+
+function validateDescriptionField(desc, { max = 250, label = 'Description' } = {}) {
+  const errors = [];
+  const v = (desc || '').trim();
+  if (v.length > max) errors.push(`${label} cannot exceed ${max} characters.`);
+  return errors;
+}
 
 export const getCategories = async (req, res) => {
   try {
@@ -369,10 +392,16 @@ export const getCategories = async (req, res) => {
 export const addCategory = async (req, res) => {
   try {
     const { name, description } = req.body;
-    if (!name?.trim()) {
-      req.flash('error', 'Category name is required.');
+
+    const errors = [
+      ...validateNameField(name, { min: 2, max: 60, label: 'Category name' }),
+      ...validateDescriptionField(description, { max: 250, label: 'Description' }),
+    ];
+    if (errors.length) {
+      errors.forEach(e => req.flash('error', e));
       return res.redirect('/admin/categories');
     }
+
     const exists = await Category.findOne({
       name: { $regex: `^${name.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, $options: 'i' },
       isDeleted: false,
@@ -394,10 +423,16 @@ export const addCategory = async (req, res) => {
 export const editCategory = async (req, res) => {
   try {
     const { name, description } = req.body;
-    if (!name?.trim()) {
-      req.flash('error', 'Category name is required.');
+
+    const errors = [
+      ...validateNameField(name, { min: 2, max: 60, label: 'Category name' }),
+      ...validateDescriptionField(description, { max: 250, label: 'Description' }),
+    ];
+    if (errors.length) {
+      errors.forEach(e => req.flash('error', e));
       return res.redirect('/admin/categories');
     }
+
     const duplicate = await Category.findOne({
       name: { $regex: `^${name.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, $options: 'i' },
       isDeleted: false,
@@ -431,8 +466,6 @@ export const deleteCategory = async (req, res) => {
     res.redirect('/admin/categories');
   }
 };
-
-
 
 export const getProducts = async (req, res) => {
   try {
@@ -723,7 +756,6 @@ export const deleteProduct = async (req, res) => {
   }
 };
 
-
 export const getBrands = async (req, res) => {
   try {
     const search = req.query.search?.trim() || '';
@@ -755,10 +787,16 @@ export const getBrands = async (req, res) => {
 export const addBrand = async (req, res) => {
   try {
     const { name, description } = req.body;
-    if (!name?.trim()) {
-      req.flash('error', 'Brand name is required.');
+
+    const errors = [
+      ...validateNameField(name, { min: 2, max: 60, label: 'Brand name' }),
+      ...validateDescriptionField(description, { max: 250, label: 'Description' }),
+    ];
+    if (errors.length) {
+      errors.forEach(e => req.flash('error', e));
       return res.redirect('/admin/brands');
     }
+
     const exists = await Brand.findOne({
       name: { $regex: `^${name.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, $options: 'i' },
       isDeleted: false,
@@ -780,10 +818,16 @@ export const addBrand = async (req, res) => {
 export const editBrand = async (req, res) => {
   try {
     const { name, description } = req.body;
-    if (!name?.trim()) {
-      req.flash('error', 'Brand name is required.');
+
+    const errors = [
+      ...validateNameField(name, { min: 2, max: 60, label: 'Brand name' }),
+      ...validateDescriptionField(description, { max: 250, label: 'Description' }),
+    ];
+    if (errors.length) {
+      errors.forEach(e => req.flash('error', e));
       return res.redirect('/admin/brands');
     }
+
     const duplicate = await Brand.findOne({
       name: { $regex: `^${name.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, $options: 'i' },
       isDeleted: false,
@@ -815,8 +859,6 @@ export const deleteBrand = async (req, res) => {
   }
 };
 
-
-
 function escapeRegex(str) {
   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
@@ -844,7 +886,6 @@ function validateCouponBody(body) {
   const min = parseFloat(minOrderValue);
   if (!isNaN(min) && min < 0)
     errors.push('Minimum order amount cannot be negative.');
-
 
   if (discountType === 'flat') {
     const flatVal = parseFloat(discountValue);
@@ -1107,7 +1148,6 @@ export const getDashboardChartData = async (req, res) => {
   }
 };
 
-
 export const getLedgerData = async (req, res) => {
   try {
     const { type, year, month, from, to } = req.query;
@@ -1173,8 +1213,6 @@ export const getLedgerData = async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to fetch ledger data' });
   }
 };
-
-
 
 export const downloadLedgerPDF = async (req, res) => {
   try {
@@ -1275,7 +1313,6 @@ export const downloadLedgerPDF = async (req, res) => {
     });
     doc.y += 22;
 
-
     orders.forEach((o, idx) => {
       if (doc.y > doc.page.height - 80) {
         doc.addPage({ margin: 40, size: 'A4', layout: 'landscape' });
@@ -1322,7 +1359,6 @@ export const downloadLedgerPDF = async (req, res) => {
       doc.moveTo(margin, doc.y + 18).lineTo(margin + colW, doc.y + 18).strokeColor('#e2e6e4').lineWidth(0.5).stroke();
       doc.y += 18;
     });
-
 
     doc.y += 16;
     doc.fontSize(7).font('Helvetica').fillColor(LIGHT)

@@ -14,7 +14,7 @@ import {
   blockProduct,  unblockProduct,
   getBrands,     addBrand,    editBrand,    deleteBrand,
   getCoupons,    createCoupon, editCoupon, deleteCoupon, toggleCouponStatus,
-} from '../controller/adimconrtoller/adminController.js';
+} from '../controller/adimcontroller/adminController.js';
 import {
   listOrders,
   getOrderDetail,
@@ -22,18 +22,18 @@ import {
   handleReturnRequest,
   handleItemReturnRequest,
   getRecentOrders,
-} from '../controller/adimconrtoller/orderController.js';
+} from '../controller/adimcontroller/orderController.js';
 import {
   getSalesReport,
   exportSalesReportPDF,
   exportSalesReportExcel,
-} from '../controller/adimconrtoller/salesController.js';
+} from '../controller/adimcontroller/salesController.js';
 import {
   getOffers, addOffer, editOffer, toggleOfferActive, deleteOffer,
-} from '../controller/adimconrtoller/offerController.js';
+} from '../controller/adimcontroller/offerController.js';
 import {
   getReferralSettings, updateReferralSettings,
-} from '../controller/adimconrtoller/referralController.js';
+} from '../controller/adimcontroller/referralController.js';
 
 const router = express.Router();
 
