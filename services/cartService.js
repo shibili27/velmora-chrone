@@ -1,4 +1,4 @@
-import Cart    from '../models/cart.js';
+import Cart from '../models/cart.js';
 import Product from '../models/product.js';
 
 export const MAX_QTY = 5;
@@ -9,17 +9,17 @@ export const getValidProduct = async (productId) => {
     .populate('brand', 'name')
     .lean();
 
-  if (!product)                    throw Object.assign(new Error('Product not found'), { status: 404 });
-  if (product.isDeleted)           throw Object.assign(new Error('This product is no longer available'), { status: 403 });
-  if (!product.isListed)           throw Object.assign(new Error('This product is currently unavailable'), { status: 403 });
+  if (!product)throw Object.assign(new Error('Product not found'), { status: 404 });
+  if (product.isDeleted)throw Object.assign(new Error('This product is no longer available'), { status: 403 });
+  if (!product.isListed)throw Object.assign(new Error('This product is currently unavailable'), { status: 403 });
   if (product.category?.isBlocked) throw Object.assign(new Error('This category is no longer available'), { status: 403 });
-  if (product.stock === 0)         throw Object.assign(new Error('This product is out of stock'), { status: 400 });
+  if (product.stock === 0)throw Object.assign(new Error('This product is out of stock'), { status: 400 });
   return product;
 };
 
 export const getCleanCart = async (userId) => {
   const cart = await Cart.findOne({ user: userId }).populate({
-    path    : 'items.product',
+    path : 'items.product',
     populate: [
       { path: 'category', select: 'name isBlocked' },
       { path: 'brand',    select: 'name' },
@@ -35,18 +35,18 @@ export const getCleanCart = async (userId) => {
   cart.items   = existingItems;
 
   for (const item of cart.items) {
-    const p            = item.product;
+    const p = item.product;
     const variantStock = item.variantName
       ? p.colorVariants?.find(v => v.name === item.variantName)?.stock ?? p.stock
       : p.stock;
 
     if (variantStock > 0 && item.quantity > variantStock) {
       item.quantity = variantStock;
-      modified      = true;
+      modified = true;
     }
     if (item.quantity > MAX_QTY) {
       item.quantity = MAX_QTY;
-      modified      = true;
+      modified = true;
     }
   }
 

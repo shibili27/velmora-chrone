@@ -3,7 +3,7 @@ import Wallet  from '../../models/wallet.js';
 import Product from '../../models/product.js';
 import { broadcastOrderUpdate } from '../../public/utils/ssemanager.js';
 
-const LIMIT = 15;
+const LIMIT = 5;
 
 export const listOrders = async (req, res) => {
   try {

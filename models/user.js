@@ -57,10 +57,7 @@ const userSchema = new mongoose.Schema({
     default: false
   },
 
-  // --- Email-change flow fields ---
-  // These back the requestEmailChange / verifyEmailChange controllers.
-  // Without them declared here, Mongoose strict mode silently drops
-  // any write to these paths via findByIdAndUpdate or save.
+
   pendingEmail: {
     type: String,
     lowercase: true,

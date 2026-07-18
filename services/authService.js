@@ -69,9 +69,7 @@ export const initiateSignupOTP = async ({ name, email, password, referralCode })
   };
 };
 
-// FIXED: now generates and assigns a referralCode at account creation time,
-// using the same name-based generator used elsewhere, instead of leaving
-// new users without a code until a separate backfill job runs.
+
 export const verifySignupAndCreate = async ({ otp, session }) => {
   const { signupOTP, signupEmail, signupName, signupPassword, signupOTPExpiry, signupReferrerId } = session;
 
@@ -85,14 +83,14 @@ export const verifySignupAndCreate = async ({ otp, session }) => {
   if (existing) throw new Error('Email already registered. Please login.');
 
   const hashed        = await bcrypt.hash(signupPassword, 10);
-  const referralCode  = await generateReferralCode(signupName); // NEW
+  const referralCode  = await generateReferralCode(signupName); 
 
   const user = new User({
     name        : signupName,
     email       : signupEmail,
     password    : hashed,
     referredBy  : signupReferrerId || null,
-    referralCode, // NEW — was missing entirely before
+    referralCode,
   });
   await user.save();
   return user;

@@ -586,8 +586,7 @@ async function parseAndUploadVariants(raw) {
   return result;
 }
 
-// ── Backend validation for the core product fields ──────────────────────────
-// Mirrors (and backstops) the client-side checks in the admin products view.
+
 async function validateProductBody({ name, description, price, category, brand }) {
   const errors = [];
 

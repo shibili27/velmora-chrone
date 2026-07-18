@@ -33,7 +33,6 @@ const contactMessageSchema = new Schema(
       enum: ['new', 'read', 'resolved'],
       default: 'new',
     },
-    // Optional: link to a logged-in user if they submitted while authenticated
     user: {
       type: Schema.Types.ObjectId,
       ref: 'User',

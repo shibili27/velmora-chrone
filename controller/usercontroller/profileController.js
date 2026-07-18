@@ -84,7 +84,6 @@ const uploadProfileImage = async (req, res) => {
 };
 
 
-// FIXED: now checks new email against the current user's email before anything else.
 const requestEmailChange = async (req, res) => {
   try {
     const { newEmail } = req.body;
@@ -172,13 +171,6 @@ const verifyEmailChange = async (req, res) => {
 };
 
 
-// FIXED: two bugs —
-// 1. Was storing `newPassword` in plain text instead of hashing it.
-// 2. Was validating correctly but responding via redirect instead of JSON,
-//    so an AJAX/fetch-based frontend never sees the validation failure.
-// If your frontend form does a real (non-AJAX) POST + full page reload,
-// tell me and I'll give you the redirect+flash version instead — but the
-// plaintext-password fix applies either way.
 const changePassword = async (req, res) => {
   try {
     const { oldPassword, newPassword, confirmPassword } = req.body;
@@ -284,9 +276,7 @@ const setDefaultAddress = async (req, res) => {
   }
 };
 
-// NEW: proper server-side address validation (matches the rules already
-// present in services/profileService.js's validateAddress, which the
-// controller's own addAddress/updateAddress were NOT using before).
+
 function validateAddressFields({ fullName, phone, line1, city, state, pincode }) {
   if (!fullName?.trim())                           return 'Full name is required.';
   if (!phone || !/^\d{10}$/.test(phone.trim()))    return 'Enter a valid 10-digit phone number.';
@@ -310,11 +300,6 @@ function buildAddrFromBody(body) {
   };
 }
 
-
-// Kept only as a one-time backfill for old accounts created before referral
-// codes were assigned at signup. Not used in the normal signup flow anymore
-// — see authService.verifySignupAndCreate, which now assigns a code directly
-// using the same generator as everywhere else.
 export const generateMissingReferralCodes = async () => {
   const { generateReferralCode } = await import('../../utils/referralcode.js');
   try {

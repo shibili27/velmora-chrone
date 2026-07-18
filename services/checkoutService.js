@@ -288,12 +288,7 @@ export const buildCheckoutData = async (userId, session) => {
   const cart = await getPopulatedCart(userId);
   if (!cart || !cart.items.length) throw Object.assign(new Error('EMPTY_CART'), { status: 302 });
 
-  // NOTE: still using cartIsValid here (page load, not order placement) —
-  // if this throws, getCheckout redirects to /cart with a flash message.
-  // Worth double-checking your cart.ejs actually renders `cartError` from
-  // req.flash — if connect-flash isn't wired up, that redirect silently
-  // shows nothing, which would also explain "no warning shown" for the
-  // case where stock runs out BEFORE the user even reaches checkout.
+
   if (!cartIsValid(cart)) throw Object.assign(new Error('INVALID_CART'), { status: 302 });
 
   const user           = await User.findById(userId).select('name email phone addresses');
@@ -341,9 +336,6 @@ export const buildCheckoutData = async (userId, session) => {
 };
 
 
-// FIXED: this is now the ONLY availability/stock check before order
-// placement — cartIsValid() is no longer called first, so its generic
-// error can't shadow this function's detailed stockErrors[] anymore.
 const buildOrderItemsAndValidate = async (cart) => {
   const stockErrors = await validateStockBeforeOrder(cart.items);
   if (stockErrors.length > 0) {
@@ -383,10 +375,7 @@ export const placeOrder = async (userId, { addressId, session }) => {
   const cart = await getPopulatedCart(userId);
   if (!cart || !cart.items.length) throw Object.assign(new Error('Your cart is empty.'), { status: 400 });
 
-  // REMOVED: the old `if (!cartIsValid(cart)) throw ...` generic check that
-  // used to run here. It's gone — buildOrderItemsAndValidate below now
-  // handles ALL availability/stock validation and returns a real
-  // stockErrors[] array your frontend can actually display.
+
   const orderItems      = await buildOrderItemsAndValidate(cart);
   const user            = await User.findById(userId).select('name email phone addresses');
   const shippingAddress = resolveShippingAddress(user, addressId);
@@ -433,7 +422,6 @@ export const placeOrderWithWallet = async (userId, { addressId, session }) => {
   const cart = await getPopulatedCart(userId);
   if (!cart || !cart.items.length) throw Object.assign(new Error('Your cart is empty.'), { status: 400 });
 
-  // REMOVED: same generic cartIsValid() shadow-check as placeOrder above.
   const orderItems      = await buildOrderItemsAndValidate(cart);
   const user            = await User.findById(userId).select('name email phone addresses');
   const shippingAddress = resolveShippingAddress(user, addressId);
@@ -525,10 +513,7 @@ export const createRazorpayCheckoutOrder = async (userId, { addressId, session }
     grandTotal    : pricing.grandTotal,
   };
 
-  // Reuse an existing unpaid Razorpay order for this user instead of creating
-  // a brand new Order document every time checkout/pay is retried, the page
-  // is reloaded, or the popup is reopened. Without this, every retry spawns
-  // a duplicate order — and each one gets marked 'confirmed' at creation.
+ 
   let order = await Order.findOne({
     user         : userId,
     paymentMethod: 'Razorpay',
@@ -550,12 +535,11 @@ export const createRazorpayCheckoutOrder = async (userId, { addressId, session }
       couponCode,
       paymentMethod: 'Razorpay',
       paymentStatus: 'pending',
-      orderStatus  : 'payment_pending', // not 'confirmed' until payment is verified
+      orderStatus  : 'payment_pending',
     });
   }
 
-  // Save first so a new order gets its orderNumber assigned (pre-save hook),
-  // which we then use as the Razorpay receipt.
+ 
   await order.save();
 
   const razorpayOrder   = await createRazorpayOrder(pricing.grandTotal, order.orderNumber);
@@ -592,14 +576,12 @@ export const verifyRazorpayCheckoutPayment = async (userId, {
   }
 
   order.paymentStatus     = 'paid';
-  order.orderStatus       = 'confirmed'; // only confirmed now, after real verification
+  order.orderStatus       = 'confirmed'; 
   order.razorpayPaymentId = razorpayPaymentId;
   order.razorpaySignature = razorpaySignature;
   await order.save();
 
-  // Notify admin dashboard now that the order is genuinely confirmed, since
-  // the model's post('save') hook intentionally skips this for Razorpay
-  // orders created as 'payment_pending'.
+
   const io = getIO();
   if (io) {
     io.to('admin-room').emit('new-order', {

@@ -54,8 +54,7 @@ const orderSchema = new mongoose.Schema({
   razorpaySignature   : { type: String, default: null },
   paymentFailureReason: { type: String, default: '' },
 
-  // 'payment_pending' and 'payment_failed' added so a Razorpay order isn't
-  // forced into 'confirmed' before the payment has actually succeeded.
+
   orderStatus     : {
     type    : String,
     enum    : [
@@ -91,11 +90,7 @@ orderSchema.pre('save', async function () {
   }
 });
 
-// Only notify admin in real time when an order is a genuinely confirmed,
-// payable order at creation time (COD / Wallet). Razorpay orders start as
-// 'payment_pending' and are announced separately once verified — see
-// verifyRazorpayCheckoutPayment in checkoutService.js — so unpaid Razorpay
-// attempts don't get broadcast to the admin dashboard as real orders.
+
 orderSchema.post('save', function (doc) {
   if (!this._wasNew) return;
   if (doc.paymentMethod === 'Razorpay' && doc.orderStatus === 'payment_pending') return;

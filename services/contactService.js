@@ -40,15 +40,7 @@ class ContactService {
       user: userId,
     });
 
-    // Plug in your existing mailer here if you want an admin notification
-    // or a confirmation email to the sender, e.g.:
-    //
-    // import { sendMail } from '../utils/mailer.js';
-    // await sendMail({
-    //   to: process.env.CONTACT_NOTIFY_EMAIL,
-    //   subject: `New contact message: ${subject}`,
-    //   text: `${fullName} (${email}) wrote:\n\n${message}`,
-    // }).catch(err => console.error('Contact notify email failed:', err));
+   
 
     return doc;
   }
