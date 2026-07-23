@@ -6,36 +6,263 @@
   <title>Velmora Chroné — Apply for Membership</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            display: ["Cormorant Garamond", "serif"],
-            body: ["Jost", "sans-serif"],
-          },
-          colors: { cream: "#f5f2eb", vault: "#1a1a18", accent: "#0d9488" },
-          letterSpacing: { widest2: "0.25em" },
-        },
-      },
-    };
-  </script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="/user/css/signup.css" />
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Jost', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      background: #111110;
+      color: #f5f2eb;
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* grain overlay, matches site-wide aesthetic */
+    body::before {
+      content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity: .016;
+    }
+
+    .brand-mark {
+      font-family: 'Cormorant Garamond', Garamond, Georgia, 'Times New Roman', serif; font-size: 0.85rem; font-weight: 300;
+      letter-spacing: 0.25em; text-transform: uppercase; color: #f5f2eb; text-decoration: none;
+    }
+
+    .field-label {
+      font-family: 'Jost', 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 0.6rem; font-weight: 500;
+      letter-spacing: 0.2em; text-transform: uppercase; color: rgba(245,242,235,0.35); margin-bottom: 0.55rem;
+    }
+
+    .input-vault {
+      background: transparent; border: none; border-bottom: 1px solid rgba(245,242,235,0.16);
+      border-radius: 0; outline: none; color: #f5f2eb;
+      font-family: 'Jost', 'Helvetica Neue', Helvetica, Arial, sans-serif; font-weight: 300; font-size: 0.82rem;
+      width: 100%; padding: 0.4rem 0; transition: border-color 0.3s;
+    }
+    .input-vault::placeholder { color: rgba(245,242,235,0.22); }
+    .input-vault:focus        { border-bottom-color: #c9a96e; }
+    .input-vault.input-error  { border-bottom-color: #f87171; }
+
+    .toggle-icon { cursor: pointer; color: rgba(245,242,235,0.3); transition: color 0.2s; }
+    .toggle-icon:hover { color: #c9a96e; }
+
+    .btn-gold {
+      font-family: 'Jost', 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 0.62rem; letter-spacing: 0.24em; text-transform: uppercase; color: #0d0b08;
+      display: flex; align-items: center; justify-content: center; gap: 0.6rem; padding: 0.95rem 2rem; border-radius: 100px;
+      text-decoration: none; position: relative; overflow: hidden; width: 100%; cursor: pointer; border: none;
+      background: linear-gradient(135deg, #e0c47e 0%, #c9a96e 50%, #b8913d 100%);
+      transition: transform 0.2s cubic-bezier(.34,1.56,.64,1), box-shadow 0.22s;
+      box-shadow: 0 1px 0 rgba(255,255,255,0.35) inset, 0 4px 18px rgba(185,140,55,0.3), 0 1px 4px rgba(0,0,0,0.4);
+    }
+    .btn-gold::after { content: ''; position: absolute; top: 0; left: -75%; width: 50%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent); transform: skewX(-18deg); transition: left 0.55s ease; }
+    .btn-gold:hover::after { left: 130%; }
+    .btn-gold:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 1px 0 rgba(255,255,255,0.4) inset, 0 8px 28px rgba(185,140,55,0.4), 0 2px 8px rgba(0,0,0,0.45); }
+    .btn-gold:active { transform: translateY(1px) scale(0.99); }
+    .btn-gold:disabled { cursor: not-allowed; opacity: 0.8; transform: none !important; }
+    .btn-gold:disabled::after { display: none; }
+
+    .btn-google {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      width: 100%; padding: 0.85rem 1rem;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(245,242,235,0.12); border-radius: 100px;
+      font-family: 'Jost', 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 0.6rem; font-weight: 400;
+      letter-spacing: 0.15em; text-transform: uppercase; color: rgba(245,242,235,0.65);
+      cursor: pointer; text-decoration: none;
+      transition: background 0.2s, border-color 0.2s, transform 0.18s;
+    }
+    .btn-google:hover { background: rgba(255,255,255,0.07); border-color: rgba(201,169,110,0.35); transform: translateY(-1px); }
+    .btn-google svg { flex-shrink: 0; width: 15px; height: 15px; }
+
+    .divider { display: flex; align-items: center; gap: 14px; margin: 0.35rem 0; }
+    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: rgba(245,242,235,0.08); }
+    .divider span {
+      font-family: 'Jost', 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 0.55rem;
+      letter-spacing: 0.15em; text-transform: uppercase; color: rgba(245,242,235,0.22);
+    }
+
+    .footer-link { color: rgba(245,242,235,0.28); transition: color 0.2s; text-decoration: none; }
+    .footer-link:hover { color: #c9a96e; }
+
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-up { animation: fadeUp 0.8s ease both; }
+    .delay-1 { animation-delay: 0.10s; }
+    .delay-2 { animation-delay: 0.22s; }
+    .delay-3 { animation-delay: 0.34s; }
+    .delay-4 { animation-delay: 0.46s; }
+    .delay-5 { animation-delay: 0.58s; }
+    .delay-6 { animation-delay: 0.68s; }
+
+    /* ── Crest emblem ── */
+    .crest-wrap { display: flex; justify-content: center; margin-bottom: 1.1rem; }
+    .crest {
+      position: relative; width: 54px; height: 54px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .crest-ring {
+      position: absolute; inset: 0; border-radius: 50%;
+      border: 1px solid rgba(201,169,110,0.28);
+    }
+    .crest-ring-dashed {
+      position: absolute; inset: -7px; border-radius: 50%;
+      border: 1px dashed rgba(201,169,110,0.16);
+      animation: crestSpin 26s linear infinite;
+    }
+    @keyframes crestSpin { to { transform: rotate(360deg); } }
+    .crest-hand {
+      position: absolute; left: 50%; bottom: 50%; width: 1px; height: 14px;
+      background: linear-gradient(180deg, #c9a96e, transparent);
+      transform-origin: bottom center; transform: rotate(0deg);
+      animation: crestTick 8s linear infinite;
+    }
+    @keyframes crestTick { 100% { transform: rotate(360deg); } }
+    .crest-monogram {
+      font-family: 'Cormorant Garamond', Garamond, Georgia, 'Times New Roman', serif;
+      font-style: italic; font-weight: 400; font-size: 1.1rem; letter-spacing: 0.02em;
+      background: linear-gradient(135deg, #e8d49a 0%, #c9a96e 55%, #a8873d 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+
+    .access-badge {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 0.4rem 0.95rem; border-radius: 100px;
+      border: 1px solid rgba(201,169,110,0.22); background: rgba(201,169,110,0.05);
+      font-family: 'Jost', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-size: 0.44rem; letter-spacing: 0.32em; text-transform: uppercase; color: #c9a96e;
+    }
+    .access-badge svg { width: 9px; height: 9px; flex-shrink: 0; }
+
+    .welcome-glow { position: relative; }
+    .welcome-glow::before {
+      content: ''; position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
+      width: 260px; height: 90px; border-radius: 50%;
+      background: radial-gradient(ellipse, rgba(201,169,110,0.13), transparent 72%);
+      pointer-events: none; z-index: -1;
+    }
+
+    /* ── Password strength bar ── */
+    .strength-bar { width: 100%; height: 2px; background: rgba(245,242,235,0.08); border-radius: 2px; margin-top: 8px; overflow: hidden; }
+    .strength-fill { height: 100%; width: 0%; border-radius: 2px; transition: width 0.3s ease, background 0.3s ease; }
+
+    /* ── Checkbox ── */
+    .checkbox-vault { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; }
+    .checkbox-vault input[type="checkbox"] {
+      appearance: none; -webkit-appearance: none; flex-shrink: 0; margin-top: 2px;
+      width: 15px; height: 15px; border-radius: 3px; border: 1px solid rgba(245,242,235,0.25);
+      background: rgba(255,255,255,0.02); cursor: pointer; position: relative; transition: border-color 0.2s, background 0.2s;
+    }
+    .checkbox-vault input[type="checkbox"]:checked {
+      background: linear-gradient(135deg, #e0c47e 0%, #c9a96e 100%); border-color: #c9a96e;
+    }
+    .checkbox-vault input[type="checkbox"]:checked::after {
+      content: ''; position: absolute; left: 4px; top: 1px; width: 4px; height: 8px;
+      border: solid #0d0b08; border-width: 0 1.5px 1.5px 0; transform: rotate(45deg);
+    }
+    .checkbox-vault input[type="checkbox"].input-error { border-color: #f87171; }
+
+    .field-hint {
+      font-family: 'Jost', 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 0.57rem; letter-spacing: 0.08em;
+      color: #f87171; margin-top: 6px; opacity: 0; max-height: 0;
+      overflow: hidden; transition: opacity 0.3s, max-height 0.3s;
+    }
+    .field-hint.hint-show { opacity: 1; max-height: 30px; }
+    .field-hint a { color: #c9a96e; }
+
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      20%     { transform: translateX(-6px); }
+      40%     { transform: translateX(6px); }
+      60%     { transform: translateX(-3px); }
+      80%     { transform: translateX(3px); }
+    }
+    .shake { animation: shake 0.38s ease both; }
+
+    /* ── Vault Seal notification — slides from top ── */
+    #vault-seal {
+      position: fixed; top: -160px; left: 50%; transform: translateX(-50%);
+      z-index: 9999; transition: top 0.55s cubic-bezier(0.34, 1.56, 0.64, 1); pointer-events: none;
+    }
+    #vault-seal.seal-visible { top: 1.75rem; pointer-events: auto; }
+
+    .seal-body {
+      position: relative; display: flex; align-items: center; gap: 15px;
+      background: rgba(22,22,20,0.92); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(245,242,235,0.09); border-radius: 14px;
+      padding: 14px 20px 14px 16px; min-width: 300px; max-width: 380px;
+      box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 20px 50px rgba(0,0,0,0.55), 0 0 0 1px rgba(201,169,110,0.06);
+    }
+    .seal-icon-holder {
+      flex-shrink: 0; width: 38px; height: 38px; position: relative;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .seal-icon-ring {
+      position: absolute; inset: 0; border-radius: 50%;
+      border: 1px solid rgba(248,113,113,0.3); background: rgba(248,113,113,0.06);
+    }
+    .seal-icon-ring-dashed {
+      position: absolute; inset: -5px; border-radius: 50%;
+      border: 1px dashed rgba(248,113,113,0.16); animation: bezelSpin 12s linear infinite;
+    }
+    @keyframes bezelSpin { to { transform: rotate(360deg); } }
+    .seal-icon-holder svg { width: 15px; height: 15px; color: #f87171; position: relative; z-index: 1; }
+    .seal-label {
+      font-family: 'Jost', 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 0.5rem; font-weight: 500;
+      letter-spacing: 0.24em; text-transform: uppercase; color: #f87171; margin-bottom: 3px;
+    }
+    .seal-message {
+      font-family: 'Cormorant Garamond', Garamond, Georgia, 'Times New Roman', serif; font-style: italic;
+      font-size: 0.98rem; font-weight: 300; color: #e2ddd7; line-height: 1.3;
+    }
+    .seal-drain {
+      position: absolute; top: 0; left: 0; height: 2px; width: 100%; border-radius: 14px 14px 0 0;
+      background: linear-gradient(90deg, #c9a96e, rgba(201,169,110,0.3)); transform-origin: left; transform: scaleX(1); transition: none;
+    }
+    .seal-drain.draining { transition: transform 4.2s linear; transform: scaleX(0); }
+    .seal-x {
+      position: absolute; top: 8px; right: 9px; cursor: pointer;
+      opacity: 0.3; transition: opacity 0.2s; line-height: 0;
+    }
+    .seal-x:hover { opacity: 0.75; }
+    .seal-x svg { width: 9px; height: 9px; color: rgba(245,242,235,0.8); }
+
+    /* ── Toast notifications (top-right stack) ── */
+    .toast-notification {
+      display: flex; align-items: center; gap: 10px;
+      background: rgba(22,22,20,0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(245,242,235,0.09); border-radius: 10px;
+      padding: 12px 18px; margin-bottom: 10px; min-width: 220px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.5);
+      animation: slideIn 0.3s ease;
+      font-family: 'Jost', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-size: 0.65rem; letter-spacing: 0.03em; color: #f5f2eb;
+      border-left: 2px solid;
+    }
+    .toast-notification.success { border-left-color: #c9a96e; }
+    .toast-notification.error   { border-left-color: #f87171; }
+    .toast-notification.warning { border-left-color: #d9a441; }
+    @keyframes slideIn {
+      from { transform: translateX(40px); opacity: 0; }
+      to   { transform: translateX(0);    opacity: 1; }
+    }
+  </style>
 </head>
 
-<body class="min-h-screen flex flex-col">
+<body>
 
   <!-- VAULT SEAL -->
   <div id="vault-seal" role="alert" aria-live="assertive">
     <div class="seal-body">
-      <div class="seal-wax">
-        <div class="seal-bezel"></div>
+      <div class="seal-icon-holder">
+        <div class="seal-icon-ring-dashed"></div>
+        <div class="seal-icon-ring"></div>
         <svg id="seal-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
           fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
@@ -61,201 +288,185 @@
   <div id="toast-container" class="fixed top-4 right-4 z-50"></div>
 
   <!-- MAIN CARD -->
-  <main class="flex flex-1 items-center justify-center p-4 md:p-8">
-    <div class="w-full max-w-5xl flex shadow-2xl" style="min-height:560px;">
+  <main class="flex flex-1 items-center justify-center p-4 md:p-8" style="position:relative;z-index:1;">
+    <div class="w-full max-w-2xl fade-up px-6 py-10 md:px-14 md:py-12" style="background:#161614; border-radius:18px; border:1px solid rgba(245,242,235,0.07); box-shadow:0 24px 60px rgba(0,0,0,0.45);">
 
-      <!-- LEFT PANEL -->
-      <section class="w-full md:w-5/12 bg-cream flex flex-col justify-between p-10 md:p-12 fade-up">
-
-        <div class="mb-6">
-          <img src="/images/logo-velmora.svg" alt="Velmora Chroné"
-            class="h-6 opacity-70" onerror="this.style.display='none'" />
-        </div>
-
-        <div class="flex-1 flex flex-col justify-center">
-
-          <h1 class="font-display text-4xl font-light text-vault leading-tight mb-1 fade-up delay-1">
-            Join the Heritage
-          </h1>
-          <p class="field-label mb-7 fade-up delay-2">
-            Secure an exclusive invitation to the manufacture estate.
-          </p>
-
-          <% if (locals.authError) { %>
-          <div id="server-auth-error" data-message="<%= authError %>" style="display:none;"></div>
-          <% } %>
-
-          <form id="signupForm" class="space-y-5 fade-up delay-3" novalidate>
-
-            <% if (typeof csrfToken !== 'undefined') { %>
-              <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-            <% } %>
-
-            <!-- Row 1: Full Name + Email -->
-            <div class="grid grid-cols-2 gap-5">
-              <div>
-                <label for="name" class="field-label block">Full Name</label>
-                <input id="name" name="name" type="text" class="input-vault"
-                  placeholder="Arthur M. Morgan"
-                  value="<%= locals.formData ? formData.name : '' %>"
-                  autocomplete="name" />
-                <div class="field-hint" id="hint-name">Full name is required.</div>
-              </div>
-              <div>
-                <label for="email" class="field-label block">Preferred Email</label>
-                <input id="email" name="email" type="email" class="input-vault"
-                  placeholder="collector@velmora.com"
-                  value="<%= locals.formData ? formData.email : '' %>"
-                  autocomplete="email" />
-                <div class="field-hint" id="hint-email">A valid email is required.</div>
-              </div>
-            </div>
-
-            <!-- Row 2: Password + Confirm -->
-            <div class="grid grid-cols-2 gap-5">
-              <div>
-                <label for="password" class="field-label block">Choose Password</label>
-                <div class="relative flex items-center">
-                  <input id="password" name="password" type="password"
-                    class="input-vault pr-6" placeholder="············"
-                    autocomplete="new-password" oninput="updateStrength(this.value)" />
-                  <button type="button" class="toggle-icon absolute right-0 bottom-1"
-                    onclick="toggleField('password','eye-pw')" aria-label="Toggle password">
-                    <svg id="eye-pw" xmlns="http://www.w3.org/2000/svg" width="14" height="14"
-                      viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                      <circle cx="12" cy="12" r="3"/>
-                      <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/>
-                    </svg>
-                  </button>
-                </div>
-                <div class="strength-bar"><div class="strength-fill" id="strength-fill"></div></div>
-                <div class="field-hint" id="hint-password">Password is required.</div>
-              </div>
-              <div>
-                <label for="confirmPassword" class="field-label block">Confirm Password</label>
-                <div class="relative flex items-center">
-                  <input id="confirmPassword" name="confirmPassword" type="password"
-                    class="input-vault pr-6" placeholder="············"
-                    autocomplete="new-password" />
-                  <button type="button" class="toggle-icon absolute right-0 bottom-1"
-                    onclick="toggleField('confirmPassword','eye-cpw')" aria-label="Toggle confirm password">
-                    <svg id="eye-cpw" xmlns="http://www.w3.org/2000/svg" width="14" height="14"
-                      viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                      <circle cx="12" cy="12" r="3"/>
-                      <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/>
-                    </svg>
-                  </button>
-                </div>
-                <div class="field-hint" id="hint-confirm">Passwords do not match.</div>
-              </div>
-            </div>
-
-            <!-- ══ REFERRAL CODE (optional) ══ -->
-            <div class="fade-up delay-4">
-              <label for="referralCode" class="field-label block">
-                Referral Code
-                <span style="opacity:0.4;text-transform:none;font-size:0.6rem;margin-left:4px;">(optional)</span>
-              </label>
-              <div class="relative flex items-center">
-                <input id="referralCode" name="referralCode" type="text"
-                  class="input-vault" placeholder="e.g. 3F9A12BC"
-                  autocomplete="off" maxlength="8"
-                  style="letter-spacing:0.15em;text-transform:uppercase;"
-                  oninput="this.value = this.value.toUpperCase(); clearReferralHint();" />
-                <!-- tick icon — shown when code looks valid -->
-                <span id="ref-tick" style="display:none;position:absolute;right:0;
-                  color:#0d9488;font-size:0.75rem;pointer-events:none;">✓</span>
-              </div>
-              <div class="field-hint" id="hint-referral"></div>
-            </div>
-            <!-- ══ END REFERRAL CODE ══ -->
-
-            <!-- Terms -->
-            <div class="fade-up delay-4">
-              <label class="checkbox-vault">
-                <input type="checkbox" id="terms" name="terms" />
-                <span class="field-label" style="margin:0;text-transform:none;font-size:0.65rem;line-height:1.5;color:#666;">
-                  I agree to the
-                  <a href="/terms" class="footer-link text-vault underline underline-offset-2">Terms</a>
-                  &amp;
-                  <a href="/privacy" class="footer-link text-vault underline underline-offset-2">Privacy Policy</a>
-                </span>
-              </label>
-              <div class="field-hint" id="hint-terms">You must accept the terms to proceed.</div>
-            </div>
-
-            <!-- Submit -->
-            <div class="pt-1 fade-up delay-5">
-              <button type="submit" class="btn-vault" id="submitBtn">Create Account</button>
-            </div>
-
-            <a href="/auth/google" class="btn-google fade-up delay-6">
-              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
-                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-              </svg>
-              Continue with Google
-            </a>
-
-          </form>
-
-          <p class="mt-7 text-xs text-gray-400 fade-up delay-6"
-             style="font-family:'Jost',sans-serif;font-weight:300;">
-            Already a member?
-            <a href="/login" class="footer-link text-vault underline underline-offset-2">
-              Sign in to access
-            </a>
-          </p>
-
-        </div>
-        <div></div>
-      </section>
-
-      <!-- RIGHT PANEL -->
-      <section class="hidden md:block md:w-7/12 relative overflow-hidden">
-        <img src="https://res.cloudinary.com/dwb0hd0m6/image/upload/v1774530629/wp12480364_djglbm.jpg"
-          alt="Luxury timepiece — Velmora Chroné"
-          class="absolute inset-0 w-full h-full object-cover object-center"
-          onerror="this.style.background='#1a1a18';this.removeAttribute('src')" />
-        <div class="hero-overlay absolute inset-0"></div>
-        <div class="relative z-10 flex flex-col justify-center h-full px-12 pb-16">
-          <h2 class="font-display text-5xl font-light text-white leading-tight mb-4"
-              style="text-shadow:0 2px 24px rgba(0,0,0,0.5);">
-            The Soul of<br />Precision
-          </h2>
-          <p class="text-white/60 text-sm font-light max-w-xs leading-relaxed"
-             style="font-family:'Jost',sans-serif;">
-            Born in the craft tradition, each timepiece tells a story of heritage,
-            design excellence, and refined individuality.
-          </p>
-          <div class="mt-8 flex items-center gap-3">
-            <div class="h-px w-8 bg-white/30"></div>
-            <span class="text-white/40 text-xs tracking-widest2 uppercase"
-                  style="font-family:'Jost',sans-serif;font-size:0.6rem;">Est. 1997</span>
+      <div class="text-center mb-9">
+        <div class="crest-wrap">
+          <div class="crest">
+            <div class="crest-ring-dashed"></div>
+            <div class="crest-ring"></div>
+            <div class="crest-hand"></div>
+            <span class="crest-monogram">VC</span>
           </div>
         </div>
-      </section>
+        <a href="/home" class="brand-mark">Velmora Chroné</a>
+        <div class="mt-4">
+          <span class="access-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="16" y1="11" x2="22" y2="11"/>
+            </svg>
+            Membership Application
+          </span>
+        </div>
+      </div>
+
+      <h1 class="text-center fade-up delay-1 welcome-glow" style="font-family:'Cormorant Garamond',Garamond,Georgia,'Times New Roman',serif; font-weight:300; font-size:2rem; line-height:1.1; color:#f5f2eb; margin-bottom:0.6rem;">
+        Join the <em style="font-style:italic; background:linear-gradient(125deg,#e8d49a 0%,#c9a96e 45%,#a8873d 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;">Heritage</em>
+      </h1>
+      <p class="text-center mb-9 fade-up delay-2" style="font-family:'Jost','Helvetica Neue',Helvetica,Arial,sans-serif; font-weight:300; font-size:0.68rem; letter-spacing:0.02em; color:rgba(245,242,235,0.3);">
+        Secure an exclusive invitation to the manufacture estate.
+      </p>
+
+      <% if (locals.authError) { %>
+      <div id="server-auth-error" data-message="<%= authError %>" style="display:none;"></div>
+      <% } %>
+
+      <form id="signupForm" class="space-y-7 fade-up delay-3" novalidate>
+
+        <% if (typeof csrfToken !== 'undefined') { %>
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+        <% } %>
+
+        <!-- Row 1: Full Name + Email -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-7">
+          <div>
+            <label for="name" class="field-label block">Full Name</label>
+            <input id="name" name="name" type="text" class="input-vault"
+              placeholder="Arthur M. Morgan"
+              value="<%= locals.formData ? formData.name : '' %>"
+              autocomplete="name" />
+            <div class="field-hint" id="hint-name">Full name is required.</div>
+          </div>
+          <div>
+            <label for="email" class="field-label block">Preferred Email</label>
+            <input id="email" name="email" type="email" class="input-vault"
+              placeholder="collector@velmora.com"
+              value="<%= locals.formData ? formData.email : '' %>"
+              autocomplete="email" />
+            <div class="field-hint" id="hint-email">A valid email is required.</div>
+          </div>
+        </div>
+
+        <!-- Row 2: Password + Confirm -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-7">
+          <div>
+            <label for="password" class="field-label block">Choose Password</label>
+            <div class="relative flex items-center">
+              <input id="password" name="password" type="password"
+                class="input-vault pr-6" placeholder="············"
+                autocomplete="new-password" oninput="updateStrength(this.value)" />
+              <button type="button" class="toggle-icon absolute right-0 bottom-1"
+                onclick="toggleField('password','eye-pw')" aria-label="Toggle password">
+                <svg id="eye-pw" xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                  viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="3"/>
+                  <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/>
+                </svg>
+              </button>
+            </div>
+            <div class="strength-bar"><div class="strength-fill" id="strength-fill"></div></div>
+            <div class="field-hint" id="hint-password">Password is required.</div>
+          </div>
+          <div>
+            <label for="confirmPassword" class="field-label block">Confirm Password</label>
+            <div class="relative flex items-center">
+              <input id="confirmPassword" name="confirmPassword" type="password"
+                class="input-vault pr-6" placeholder="············"
+                autocomplete="new-password" />
+              <button type="button" class="toggle-icon absolute right-0 bottom-1"
+                onclick="toggleField('confirmPassword','eye-cpw')" aria-label="Toggle confirm password">
+                <svg id="eye-cpw" xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                  viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="3"/>
+                  <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/>
+                </svg>
+              </button>
+            </div>
+            <div class="field-hint" id="hint-confirm">Passwords do not match.</div>
+          </div>
+        </div>
+
+        <!-- ══ REFERRAL CODE (optional) ══ -->
+        <div class="fade-up delay-4">
+          <label for="referralCode" class="field-label block">
+            Referral Code
+            <span style="opacity:0.4;text-transform:none;font-size:0.6rem;margin-left:4px;">(optional)</span>
+          </label>
+          <div class="relative flex items-center">
+            <input id="referralCode" name="referralCode" type="text"
+              class="input-vault" placeholder="e.g. 3F9A12BC"
+              autocomplete="off" maxlength="8"
+              style="letter-spacing:0.15em;text-transform:uppercase;"
+              oninput="this.value = this.value.toUpperCase(); clearReferralHint();" />
+            <!-- tick icon — shown when code looks valid -->
+            <span id="ref-tick" style="display:none;position:absolute;right:0;
+              color:#c9a96e;font-size:0.75rem;pointer-events:none;">✓</span>
+          </div>
+          <div class="field-hint" id="hint-referral"></div>
+        </div>
+        <!-- ══ END REFERRAL CODE ══ -->
+
+        <!-- Terms -->
+        <div class="fade-up delay-4 pt-1">
+          <label class="checkbox-vault">
+            <input type="checkbox" id="terms" name="terms" />
+            <span class="field-label" style="margin:0;text-transform:none;font-size:0.65rem;line-height:1.6;color:rgba(245,242,235,0.4);letter-spacing:0.01em;">
+              I agree to the
+              <a href="/terms" class="footer-link" style="color:#c9a96e;text-decoration:underline;text-underline-offset:2px;">Terms</a>
+              &amp;
+              <a href="/privacy" class="footer-link" style="color:#c9a96e;text-decoration:underline;text-underline-offset:2px;">Privacy Policy</a>
+            </span>
+          </label>
+          <div class="field-hint" id="hint-terms">You must accept the terms to proceed.</div>
+        </div>
+
+        <!-- Submit -->
+        <div class="pt-2 fade-up delay-5">
+          <button type="submit" class="btn-gold" id="submitBtn">Create Account</button>
+        </div>
+
+        <!-- Divider -->
+        <div class="divider fade-up delay-6" style="margin: 0.15rem 0;">
+          <span>or</span>
+        </div>
+
+        <a href="/auth/google" class="btn-google fade-up delay-6">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+          </svg>
+          Continue with Google
+        </a>
+
+      </form>
+
+      <p class="text-center mt-7 fade-up delay-6" style="font-family:'Jost','Helvetica Neue',Helvetica,Arial,sans-serif; font-weight:300; font-size:0.68rem; color:rgba(245,242,235,0.28);">
+        Already a member?
+        <a href="/login" class="footer-link" style="color:#c9a96e; text-decoration:underline; text-underline-offset:2px;">
+          Sign in to access
+        </a>
+      </p>
 
     </div>
   </main>
 
   <!-- FOOTER -->
-  <footer class="w-full px-8 py-4 flex items-center justify-between">
-    <span class="text-white/30 text-xs tracking-widest uppercase"
-          style="font-family:'Jost',sans-serif;font-size:0.6rem;font-weight:300;">
+  <footer class="w-full px-8 py-4 flex items-center justify-between" style="position:relative;z-index:1;">
+    <span style="font-family:'Jost','Helvetica Neue',Helvetica,Arial,sans-serif; font-size:0.46rem; letter-spacing:0.15em; text-transform:uppercase; color:rgba(245,242,235,0.15);">
       &copy; <%= new Date().getFullYear() %> Velmora Chroné Manufacture
     </span>
     <nav class="flex gap-6">
-      <a href="/privacy"       class="footer-link text-white/30 text-xs tracking-widest uppercase" style="font-size:0.6rem;">Privacy Policy</a>
-      <a href="/terms"         class="footer-link text-white/30 text-xs tracking-widest uppercase" style="font-size:0.6rem;">Terms of Service</a>
-      <a href="/accessibility" class="footer-link text-white/30 text-xs tracking-widest uppercase" style="font-size:0.6rem;">Accessibility</a>
+      <a href="/privacy"       class="footer-link" style="font-size:0.46rem; letter-spacing:0.1em; text-transform:uppercase;">Privacy Policy</a>
+      <a href="/terms"         class="footer-link" style="font-size:0.46rem; letter-spacing:0.1em; text-transform:uppercase;">Terms of Service</a>
+      <a href="/accessibility" class="footer-link" style="font-size:0.46rem; letter-spacing:0.1em; text-transform:uppercase;">Accessibility</a>
     </nav>
     <div class="flex gap-4">
-      <a href="#" aria-label="Instagram" class="toggle-icon text-white/30">
+      <a href="#" aria-label="Instagram" class="toggle-icon">
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
           fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
@@ -263,7 +474,7 @@
           <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/>
         </svg>
       </a>
-      <a href="#" aria-label="X" class="toggle-icon text-white/30">
+      <a href="#" aria-label="X" class="toggle-icon">
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
           <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L2.25 2.25h7.086l4.26 5.63 4.648-5.63Zm-1.161 17.52h1.833L7.084 4.126H5.117Z"/>
         </svg>
@@ -569,7 +780,7 @@
           } else if (error.response.status === 409 || errorMsg.toLowerCase().includes('already registered')) {
             errorMsg = 'This email is already registered. Please use a different email or login.';
             markError(emailEl); shakeEl(emailEl);
-            showHint('hint-email', `${errorMsg} <a href="/login" style="color:#0d9488;text-decoration:underline;">Login here</a>`);
+            showHint('hint-email', `${errorMsg} <a href="/login" style="color:#c9a96e;text-decoration:underline;">Login here</a>`);
             emailEl.focus();
           } else if (errorMsg.toLowerCase().includes('email')) {
             markError(emailEl); shakeEl(emailEl);
@@ -589,33 +800,6 @@
       if (event.persisted) { window.location.reload(); }
     });
   </script>
-
-  <style>
-    .toast-notification {
-      background: white; border-radius: 8px; padding: 12px 20px;
-      margin-bottom: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      animation: slideIn 0.3s ease; font-family: 'Jost', sans-serif;
-      font-size: 14px; border-left: 4px solid;
-    }
-    .btn-google {
-      display: flex; align-items: center; justify-content: center; gap: 10px;
-      width: 100%; padding: 0.7rem 1rem;
-      background: #fff; border: 1px solid #ddd; border-radius: 2px;
-      font-family: "Jost", sans-serif; font-size: 0.65rem; font-weight: 400;
-      letter-spacing: 0.15em; text-transform: uppercase; color: #3c3c3c;
-      cursor: pointer; text-decoration: none;
-      transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
-    }
-    .btn-google:hover { background: #f7f7f7; border-color: #bbb; box-shadow: 0 1px 6px rgba(0,0,0,0.08); }
-    .btn-google svg { flex-shrink: 0; width: 16px; height: 16px; }
-    .toast-notification.success { border-left-color: #0d9488; background: #f0fdf9; }
-    .toast-notification.error   { border-left-color: #dc2626; background: #fef2f2; }
-    .toast-notification.warning { border-left-color: #f59e0b; background: #fffbeb; }
-    @keyframes slideIn {
-      from { transform: translateX(100%); opacity: 0; }
-      to   { transform: translateX(0);    opacity: 1; }
-    }
-  </style>
 
 </body>
 </html>

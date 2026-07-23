@@ -1,60 +1,307 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Verify Code</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Velmora Chroné — Verify Code</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Cinzel:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/user/otp.css">
+  <script src="https://cdn.tailwindcss.com"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet" />
 
-<style>
-  #verifyBtn {
-    background-color: #1a1a18;
-    color: #f5f2eb;
-    font-family: "Jost", sans-serif;
-    font-size: 0.65rem;
-    font-weight: 400;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    border: none;
-    cursor: pointer;
-    padding: 1rem 2rem;
-    width: 100%;
-    transition: background-color 0.3s, color 0.3s;
-  }
-  #verifyBtn:hover { background-color: #0d9488; color: #fff; }
-  #verifyBtn:disabled { opacity: 0.5; cursor: not-allowed; }
-</style>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      font-family: 'Jost', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      background: #111110;
+      color: #f5f2eb;
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    main { flex: 1 0 auto; width: 100%; }
+    footer { flex-shrink: 0; }
+
+    body::before {
+      content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity: .016;
+    }
+
+    .brand-mark {
+      font-family: 'Cormorant Garamond', Garamond, Georgia, 'Times New Roman', serif; font-size: 0.85rem; font-weight: 300;
+      letter-spacing: 0.25em; text-transform: uppercase; color: #f5f2eb; text-decoration: none;
+    }
+
+    .access-badge {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 0.4rem 0.95rem; border-radius: 100px;
+      border: 1px solid rgba(201,169,110,0.22); background: rgba(201,169,110,0.05);
+      font-family: 'Jost', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-size: 0.44rem; letter-spacing: 0.32em; text-transform: uppercase; color: #c9a96e;
+    }
+    .access-badge svg { width: 9px; height: 9px; flex-shrink: 0; }
+
+    .welcome-glow { position: relative; }
+    .welcome-glow::before {
+      content: ''; position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
+      width: 260px; height: 90px; border-radius: 50%;
+      background: radial-gradient(ellipse, rgba(201,169,110,0.13), transparent 72%);
+      pointer-events: none; z-index: -1;
+    }
+
+    .crest-wrap { display: flex; justify-content: center; margin-bottom: 1.1rem; }
+    .crest {
+      position: relative; width: 54px; height: 54px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .crest-ring {
+      position: absolute; inset: 0; border-radius: 50%;
+      border: 1px solid rgba(201,169,110,0.28);
+    }
+    .crest-ring-dashed {
+      position: absolute; inset: -7px; border-radius: 50%;
+      border: 1px dashed rgba(201,169,110,0.16);
+      animation: crestSpin 26s linear infinite;
+    }
+    @keyframes crestSpin { to { transform: rotate(360deg); } }
+    .crest-hand {
+      position: absolute; left: 50%; bottom: 50%; width: 1px; height: 14px;
+      background: linear-gradient(180deg, #c9a96e, transparent);
+      transform-origin: bottom center; transform: rotate(0deg);
+      animation: crestTick 8s linear infinite;
+    }
+    @keyframes crestTick { 100% { transform: rotate(360deg); } }
+    .crest-monogram {
+      font-family: 'Cormorant Garamond', Garamond, Georgia, 'Times New Roman', serif;
+      font-style: italic; font-weight: 400; font-size: 1.1rem; letter-spacing: 0.02em;
+      background: linear-gradient(135deg, #e8d49a 0%, #c9a96e 55%, #a8873d 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-up { animation: fadeUp 0.8s ease both; }
+    .delay-1 { animation-delay: 0.10s; }
+    .delay-2 { animation-delay: 0.22s; }
+    .delay-3 { animation-delay: 0.34s; }
+    .delay-4 { animation-delay: 0.46s; }
+    .delay-5 { animation-delay: 0.58s; }
+
+    .footer-link { color: rgba(245,242,235,0.28); transition: color 0.2s; text-decoration: none; }
+    .footer-link:hover { color: #c9a96e; }
+
+    /* ══ Card container — overrides otp.css .card visuals, structure untouched ══ */
+    .card {
+      background: #161614;
+      border-radius: 18px;
+      border: 1px solid rgba(245,242,235,0.07);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.45);
+      width: 100%;
+      max-width: 440px;
+      padding: 3rem 2.75rem;
+      text-align: center;
+    }
+
+    .card h2 {
+      font-family: 'Cormorant Garamond', Garamond, Georgia, 'Times New Roman', serif;
+      font-weight: 300;
+      font-size: 2rem;
+      line-height: 1.1;
+      color: #f5f2eb;
+      margin-bottom: 0.5rem;
+    }
+
+    .otp-subtext {
+      font-family: 'Jost', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-weight: 300;
+      font-size: 0.68rem;
+      letter-spacing: 0.02em;
+      color: rgba(245,242,235,0.3);
+      margin-bottom: 2.2rem;
+    }
+
+    /* ══ OTP boxes — same structure/inputs, restyled to vault-input look ══ */
+    .otp-boxes {
+      display: flex;
+      justify-content: center;
+      gap: 0.7rem;
+      margin-bottom: 1.6rem;
+    }
+    .otp-boxes input {
+      width: 46px;
+      height: 56px;
+      text-align: center;
+      font-family: 'Cormorant Garamond', Garamond, Georgia, 'Times New Roman', serif;
+      font-size: 1.5rem;
+      font-weight: 500;
+      color: #f5f2eb;
+      background: rgba(255,255,255,0.02);
+      border: none;
+      border-bottom: 1px solid rgba(245,242,235,0.16);
+      border-radius: 6px 6px 0 0;
+      outline: none;
+      transition: border-color 0.3s, background 0.3s;
+    }
+    .otp-boxes input:focus {
+      border-bottom-color: #c9a96e;
+      background: rgba(201,169,110,0.06);
+    }
+    .otp-boxes input.error,
+    .otp-boxes input.input-error {
+      border-bottom-color: #f87171;
+    }
+
+    /* ══ Resend / timer ══ */
+    .resend {
+      font-family: 'Jost', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.02em;
+      color: rgba(245,242,235,0.32);
+      line-height: 1.9;
+      margin-bottom: 2rem;
+    }
+    .resend a {
+      color: #c9a96e;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      font-weight: 400;
+    }
+    .resend a.disabled {
+      color: rgba(245,242,235,0.22);
+      text-decoration: none;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+    #timer {
+      display: inline-block;
+      margin-top: 4px;
+      font-family: 'Jost', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-size: 0.6rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(245,242,235,0.4);
+    }
+
+    /* ══ Verify button — same gold treatment as signup's btn-gold ══ */
+    #verifyBtn {
+      font-family: 'Jost', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-size: 0.62rem;
+      font-weight: 400;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: #0d0b08;
+      display: flex; align-items: center; justify-content: center;
+      padding: 0.95rem 2rem;
+      border-radius: 100px;
+      border: none;
+      width: 100%;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #e0c47e 0%, #c9a96e 50%, #b8913d 100%);
+      box-shadow: 0 1px 0 rgba(255,255,255,0.35) inset, 0 4px 18px rgba(185,140,55,0.3), 0 1px 4px rgba(0,0,0,0.4);
+      transition: transform 0.2s cubic-bezier(.34,1.56,.64,1), box-shadow 0.22s, background-color 0.3s, color 0.3s;
+    }
+    #verifyBtn::after {
+      content: ''; position: absolute; top: 0; left: -75%; width: 50%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent);
+      transform: skewX(-18deg); transition: left 0.55s ease;
+    }
+    #verifyBtn:hover::after { left: 130%; }
+    #verifyBtn:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 1px 0 rgba(255,255,255,0.4) inset, 0 8px 28px rgba(185,140,55,0.4), 0 2px 8px rgba(0,0,0,0.45);
+    }
+    #verifyBtn:active { transform: translateY(1px) scale(0.99); }
+    #verifyBtn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+      background: linear-gradient(135deg, #e0c47e 0%, #c9a96e 50%, #b8913d 100%);
+      color: #0d0b08;
+    }
+    #verifyBtn:disabled::after { display: none; }
+
+    /* ══ Error message ══ */
+    .error-msg {
+      font-family: 'Jost', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-size: 0.62rem;
+      letter-spacing: 0.05em;
+      color: #f87171;
+      margin-top: 1rem;
+      min-height: 1em;
+    }
+  </style>
 </head>
 
 <body>
 
-<div class="card">
-  <h2>Enter OTP</h2>
+  <main class="flex flex-1 items-center justify-center p-4 md:p-8" style="position:relative;z-index:1;">
+    <div class="card fade-up">
 
-  <div class="otp-boxes">
-    <input type="text" maxlength="1" inputmode="numeric">
-    <input type="text" maxlength="1" inputmode="numeric">
-    <input type="text" maxlength="1" inputmode="numeric">
-    <input type="text" maxlength="1" inputmode="numeric">
-    <input type="text" maxlength="1" inputmode="numeric">
-    <input type="text" maxlength="1" inputmode="numeric">
-  </div>
+      <div class="crest-wrap">
+        <div class="crest">
+          <div class="crest-ring-dashed"></div>
+          <div class="crest-ring"></div>
+          <div class="crest-hand"></div>
+          <span class="crest-monogram">VC</span>
+        </div>
+      </div>
+      <a href="/home" class="brand-mark">Velmora Chroné</a>
+      <div class="mt-4 mb-8">
+        <span class="access-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+          Identity Verification
+        </span>
+      </div>
 
-  <p class="resend">
-    Didn't receive the code?
-    <a href="#" id="resendBtn" class="disabled">Resend Code</a><br>
-    <span id="timer">05:00</span>
-  </p>
+      <h2 class="welcome-glow fade-up delay-1">Enter OTP</h2>
+      <p class="otp-subtext fade-up delay-2">A 6-digit code has been sent to your email.</p>
 
-  <button id="verifyBtn">VERIFY</button>
+      <div class="otp-boxes fade-up delay-3">
+        <input type="text" maxlength="1" inputmode="numeric">
+        <input type="text" maxlength="1" inputmode="numeric">
+        <input type="text" maxlength="1" inputmode="numeric">
+        <input type="text" maxlength="1" inputmode="numeric">
+        <input type="text" maxlength="1" inputmode="numeric">
+        <input type="text" maxlength="1" inputmode="numeric">
+      </div>
 
-  <p id="otpError" class="error-msg"></p>
-</div>
+      <p class="resend fade-up delay-4">
+        Didn't receive the code?
+        <a href="#" id="resendBtn" class="disabled">Resend Code</a><br>
+        <span id="timer">05:00</span>
+      </p>
 
-<script type="module" src="/user/js/otp.js"></script>
+      <div class="fade-up delay-5">
+        <button id="verifyBtn">Verify</button>
+      </div>
+
+      <p id="otpError" class="error-msg"></p>
+
+    </div>
+  </main>
+
+  <footer class="w-full px-8 py-4 flex items-center justify-center" style="position:relative;z-index:1;">
+    <span style="font-family:'Jost','Helvetica Neue',Helvetica,Arial,sans-serif; font-size:0.46rem; letter-spacing:0.15em; text-transform:uppercase; color:rgba(245,242,235,0.15);">
+      &copy; <span id="year"></span> Velmora Chroné Manufacture
+    </span>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+
+  <!-- Original logic untouched — same script, same element IDs/classes it expects -->
+  <script type="module" src="/user/js/otp.js"></script>
 
 </body>
 </html>
