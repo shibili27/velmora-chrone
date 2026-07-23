@@ -1,5 +1,6 @@
 import Cart from '../models/cart.js';
 import Product from '../models/product.js';
+import { attachOffer, attachOffers } from './offerService.js';
 
 export const MAX_QTY = 5;
 
@@ -28,7 +29,7 @@ export const getCleanCart = async (userId) => {
 
   if (!cart) return null;
 
-  
+
   const existingItems = cart.items.filter(item => item.product);
 
   let modified = existingItems.length !== cart.items.length;
@@ -50,6 +51,21 @@ export const getCleanCart = async (userId) => {
     }
   }
 
+  // Refresh each item's price against the currently active offer, in case an
+  // offer started, changed, or expired after the item was added to the cart.
+  if (cart.items.length) {
+    const productsForOffers = cart.items.map(item => item.product);
+    await attachOffers(productsForOffers);
+
+    for (const item of cart.items) {
+      const currentEffectivePrice = item.product.effectivePrice;
+      if (currentEffectivePrice != null && item.price !== currentEffectivePrice) {
+        item.price = currentEffectivePrice;
+        modified = true;
+      }
+    }
+  }
+
   if (modified) await cart.save();
   return cart;
 };
@@ -57,6 +73,7 @@ export const getCleanCart = async (userId) => {
 export const addItemToCart = async (userId, productId, quantity, variantName = null) => {
   const qty     = Math.max(1, parseInt(quantity, 10) || 1);
   const product = await getValidProduct(productId);
+  const { effectivePrice } = await attachOffer(product);
 
   const variantStock = variantName
     ? product.colorVariants?.find(v => v.name === variantName)?.stock ?? product.stock
@@ -76,11 +93,11 @@ export const addItemToCart = async (userId, productId, quantity, variantName = n
     if (newQty > variantStock) throw Object.assign(new Error(`Only ${variantStock} unit(s) available. You already have ${cart.items[existingIndex].quantity} in your cart.`), { status: 400 });
     if (newQty > MAX_QTY)      throw Object.assign(new Error(`Maximum ${MAX_QTY} units allowed per item.`), { status: 400 });
     cart.items[existingIndex].quantity = newQty;
-    cart.items[existingIndex].price    = product.price;
+    cart.items[existingIndex].price    = effectivePrice;
   } else {
     if (qty > variantStock) throw Object.assign(new Error(`Only ${variantStock} unit(s) in stock.`), { status: 400 });
     if (qty > MAX_QTY)      throw Object.assign(new Error(`Maximum ${MAX_QTY} units allowed per item.`), { status: 400 });
-    cart.items.push({ product: productId, variantName, quantity: qty, price: product.price });
+    cart.items.push({ product: productId, variantName, quantity: qty, price: effectivePrice });
   }
 
   await cart.save();
@@ -88,7 +105,10 @@ export const addItemToCart = async (userId, productId, quantity, variantName = n
 };
 
 export const updateItem = async (userId, itemId, action) => {
-  const cart = await Cart.findOne({ user: userId }).populate('items.product');
+  const cart = await Cart.findOne({ user: userId }).populate({
+    path: 'items.product',
+    populate: [{ path: 'category', select: 'name isBlocked' }],
+  });
   if (!cart) throw Object.assign(new Error('Cart not found'), { status: 404 });
 
   const itemIndex = cart.items.findIndex(i => i._id.toString() === itemId);
@@ -102,6 +122,10 @@ export const updateItem = async (userId, itemId, action) => {
     await cart.save();
     throw Object.assign(new Error('Product is no longer available and has been removed from your cart.'), { status: 403, removed: true });
   }
+
+  // Keep price in sync with the current offer whenever the item is touched.
+  const { effectivePrice } = await attachOffer(product);
+  item.price = effectivePrice;
 
   const variantStock = item.variantName
     ? product.colorVariants?.find(v => v.name === item.variantName)?.stock ?? product.stock

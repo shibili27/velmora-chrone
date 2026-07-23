@@ -1275,22 +1275,86 @@
   }
 
   /* ── PASSWORD ── */
-  function togglePw(id) { const el = document.getElementById(id); el.type = el.type==='password'?'text':'password'; }
-  function updateStrength(val) {
-    let score = 0;
-    if (val.length >= 8) score++;
-    if (/[A-Z]/.test(val) && /[0-9]/.test(val)) score++;
-    if (/[^A-Za-z0-9]/.test(val)) score++;
-    const b1=document.getElementById('bar1'),b2=document.getElementById('bar2'),b3=document.getElementById('bar3'),lb=document.getElementById('pwStrengthLabel');
-    if (!b1) return;
-    b1.className=b2.className=b3.className='pw-bar';
-    if (score===1){b1.classList.add('weak');lb.textContent='Weak';lb.style.color='#f87171';}
-    else if (score===2){b1.classList.add('medium');b2.classList.add('medium');lb.textContent='Good';lb.style.color='#fbbf24';}
-    else if (score===3){b1.classList.add('strong');b2.classList.add('strong');b3.classList.add('strong');lb.textContent='Strong';lb.style.color='#4ade80';}
-    else{lb.textContent='';}
-  }
-  function submitPassword() { if (!validateCurrentPw()||!validateNewPw()||!validateConfirmPw()) return; document.getElementById('pwForm').submit(); }
+  function togglePw(id) {
+  const el = document.getElementById(id);
+  el.type = el.type === 'password' ? 'text' : 'password';
+}
 
+function updateStrength(val) {
+  let score = 0;
+  if (val.length >= 8) score++;
+  if (/[A-Z]/.test(val) && /[0-9]/.test(val)) score++;
+  if (/[^A-Za-z0-9]/.test(val)) score++;
+  const b1 = document.getElementById('bar1');
+  const b2 = document.getElementById('bar2');
+  const b3 = document.getElementById('bar3');
+  const lb = document.getElementById('pwStrengthLabel');
+  if (!b1) return;
+  b1.className = b2.className = b3.className = 'pw-bar';
+  if (score === 1) {
+    b1.classList.add('weak');
+    lb.textContent = 'Weak';
+    lb.style.color = '#f87171';
+  } else if (score === 2) {
+    b1.classList.add('medium');
+    b2.classList.add('medium');
+    lb.textContent = 'Good';
+    lb.style.color = '#fbbf24';
+  } else if (score === 3) {
+    b1.classList.add('strong');
+    b2.classList.add('strong');
+    b3.classList.add('strong');
+    lb.textContent = 'Strong';
+    lb.style.color = '#4ade80';
+  } else {
+    lb.textContent = '';
+  }
+}
+
+async function submitPassword() {
+  if (!validateCurrentPw() || !validateNewPw() || !validateConfirmPw()) return;
+
+  const form = document.getElementById('pwForm');
+  const btn = form.querySelector('.btn-gold');
+  const oldPassword = document.getElementById('pw-current').value;
+  const newPassword = document.getElementById('pw-new').value;
+  const confirmPassword = document.getElementById('pw-confirm').value;
+
+  const originalHTML = btn.innerHTML;
+  btn.disabled = true;
+  btn.textContent = 'Updating…';
+
+  try {
+    const res = await fetch('/change-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ oldPassword, newPassword, confirmPassword })
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      showToast(data.message || 'Password updated successfully.', 'success');
+      form.reset();
+      updateStrength('');
+      ['pw-current', 'pw-new', 'pw-confirm'].forEach(id => {
+        const el = document.getElementById(id);
+        el.classList.remove('input-error', 'input-valid');
+      });
+    } else {
+      showToast(data.message || 'Failed to update password.', 'error');
+      if (res.status === 400 && /current password/i.test(data.message || '')) {
+        setFieldError(document.getElementById('pw-current'), 'err-pw-current', data.message);
+      }
+    }
+  } catch {
+    showToast('Network error. Please try again.', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = originalHTML;
+  }
+}
+
+document.getElementById('pwForm').addEventListener('submit', e => e.preventDefault());
   /* ════ ADDRESSES ════ */
   let editingAddrId = null, deleteAddrId = null;
   function renderAddresses() {

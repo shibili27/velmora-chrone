@@ -10,6 +10,10 @@ export const getHomePage = async (req, res) => {
   }
 };
 
+export const getAboutPage = (req, res) => {
+  res.render('user/about');
+};
+
 export const getProducts = async (req, res) => {
   try {
     const filters = {

@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate"/>
+  <meta http-equiv="Pragma" content="no-cache"/>
+  <meta http-equiv="Expires" content="0"/>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ratings &amp; Reviews — Velmora Chroné Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --teal:       #2d8c84;
+      --teal-dark:  #1f6e67;
+      --teal-light: #e8f4f3;
+      --sidebar-w:  220px;
+      --bg:         #f2f4f3;
+      --white:      #ffffff;
+      --border:     #e2e6e4;
+      --text:       #1a1f1e;
+      --text-mid:   #5a6461;
+      --text-light: #9aa8a5;
+      --green:      #16a34a;
+      --green-bg:   #dcfce7;
+      --blue:       #2563eb;
+      --blue-bg:    #dbeafe;
+      --red:        #dc2626;
+      --red-bg:     #fee2e2;
+      --amber:      #d97706;
+      --amber-bg:   #fef3c7;
+      --purple:     #7c3aed;
+      --purple-bg:  #ede9fe;
+      --gold:       #ca8a04;
+      --gold-bg:    #fef9c3;
+    }
+    html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--bg); color: var(--text); }
+    .layout { display: flex; min-height: 100vh; }
+
+    .sidebar { width: var(--sidebar-w); background: var(--white); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; }
+    .sidebar__brand { padding: 24px 20px 18px; border-bottom: 1px solid var(--border); }
+    .sidebar__brand-name { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 600; letter-spacing: 0.06em; color: var(--text); line-height: 1.2; }
+    .sidebar__brand-sub  { font-size: 9px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-light); margin-top: 3px; }
+    .sidebar__nav { flex: 1; padding: 14px 0; overflow-y: auto; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 20px; font-size: 13px; font-weight: 500; color: var(--text-mid); text-decoration: none; transition: background 0.15s, color 0.15s; cursor: pointer; }
+    .nav-item:hover  { background: var(--teal-light); color: var(--teal); }
+    .nav-item.active { background: var(--teal-light); color: var(--teal); border-right: 3px solid var(--teal); }
+    .nav-item svg    { width: 16px; height: 16px; flex-shrink: 0; }
+    .sidebar__footer { padding: 16px 20px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+    .avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--teal); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 13px; font-weight: 600; flex-shrink: 0; }
+    .sidebar__footer-info { overflow: hidden; flex: 1; }
+    .sidebar__footer-name { font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sidebar__footer-role { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); }
+    .btn-logout { display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 6px; border: 1px solid #fecaca; background: var(--red-bg); color: var(--red); cursor: pointer; flex-shrink: 0; transition: background 0.15s, border-color 0.15s; text-decoration: none; }
+    .btn-logout:hover { background: var(--red); color: #fff; border-color: var(--red); }
+    .btn-logout svg { width: 14px; height: 14px; }
+
+    .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+    .topbar { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 32px; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+    .topbar__title { font-size: 13px; font-weight: 500; color: var(--text-mid); letter-spacing: 0.04em; }
+    .topbar__right { display: flex; align-items: center; gap: 12px; }
+    .topbar__date  { font-size: 11px; color: var(--text-light); letter-spacing: 0.04em; }
+    .content { padding: 32px; flex: 1; }
+
+    .notif-wrap { position: relative; }
+    .notif-bell { position: relative; background: none; border: 1px solid var(--border); border-radius: 6px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-mid); transition: background 0.15s, color 0.15s; }
+    .notif-bell:hover { background: var(--teal-light); color: var(--teal); border-color: var(--teal); }
+    .notif-count { position: absolute; top: -5px; right: -5px; background: var(--red); color: #fff; font-size: 9px; font-weight: 700; min-width: 16px; height: 16px; border-radius: 8px; display: flex; align-items: center; justify-content: center; padding: 0 3px; border: 1.5px solid var(--white); }
+    .notif-dropdown { position: absolute; top: calc(100% + 8px); right: 0; width: 340px; background: var(--white); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.10); z-index: 200; display: none; overflow: hidden; }
+    .notif-dropdown.open { display: block; }
+    .notif-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+    .notif-header-left { font-size: 12px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 8px; }
+    .notif-tabs { display: flex; gap: 4px; }
+    .notif-tab { font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg); color: var(--text-mid); cursor: pointer; transition: all 0.15s; }
+    .notif-tab.active { background: var(--teal); color: #fff; border-color: var(--teal); }
+    .notif-clear { background: none; border: none; font-family: 'Jost', sans-serif; font-size: 11px; color: var(--teal); cursor: pointer; font-weight: 500; white-space: nowrap; }
+    .notif-clear:hover { text-decoration: underline; }
+    .notif-list { max-height: 360px; overflow-y: auto; }
+    .notif-empty { padding: 28px; text-align: center; font-size: 12px; color: var(--text-light); }
+    .notif-item { display: flex; align-items: flex-start; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--border); text-decoration: none; transition: background 0.12s; position: relative; background: #f0faf9; }
+    .notif-item:last-child { border-bottom: none; }
+    .notif-item:hover { background: var(--teal-light); }
+    .notif-item.read { background: var(--white); }
+    .notif-item.read:hover { background: var(--bg); }
+    .notif-item__dot { width: 7px; height: 7px; border-radius: 50%; background: var(--teal); flex-shrink: 0; margin-top: 5px; transition: opacity 0.2s; }
+    .notif-item.read .notif-item__dot { background: transparent; border: 1.5px solid var(--border); }
+    .notif-item.kind-report .notif-item__dot,
+    .notif-item.kind-lowrating .notif-item__dot { background: var(--red); }
+    .notif-item.kind-spam .notif-item__dot { background: var(--amber); }
+    .notif-item__body-wrap { flex: 1; min-width: 0; }
+    .notif-item__top  { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px; gap: 8px; }
+    .notif-item__id   { font-size: 12px; font-weight: 600; color: var(--teal); font-family: 'Cormorant Garamond', serif; }
+    .notif-item.kind-report .notif-item__id,
+    .notif-item.kind-lowrating .notif-item__id { color: var(--red); }
+    .notif-item.kind-spam .notif-item__id { color: var(--amber); }
+    .notif-item.read .notif-item__id { color: var(--text-mid); }
+    .notif-item__time { font-size: 10px; color: var(--text-light); flex-shrink: 0; }
+    .notif-item__info { font-size: 11.5px; color: var(--text-mid); }
+    .notif-item__customer { font-size: 10px; color: var(--text-light); margin-top: 1px; }
+    .notif-item__actions { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
+    .notif-mark-btn { font-size: 9px; font-weight: 600; color: var(--teal); background: none; border: 1px solid var(--teal-light); border-radius: 4px; padding: 2px 6px; cursor: pointer; white-space: nowrap; font-family: 'Jost', sans-serif; transition: background 0.12s; }
+    .notif-mark-btn:hover { background: var(--teal-light); }
+    .notif-item.read .notif-mark-btn { color: var(--text-light); border-color: var(--border); }
+    .notif-view-btn { font-size: 9px; font-weight: 600; color: var(--text-mid); background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: 2px 6px; cursor: pointer; white-space: nowrap; font-family: 'Jost', sans-serif; text-decoration: none; transition: background 0.12s; }
+    .notif-view-btn:hover { background: var(--border); }
+    .notif-footer { padding: 10px 16px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .notif-footer-count { font-size: 10px; color: var(--text-light); }
+
+    .live-dot { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 600; color: var(--green); letter-spacing: 0.06em; }
+    .live-dot__pulse { width: 7px; height: 7px; border-radius: 50%; background: var(--green); animation: livePulse 1.8s ease-in-out infinite; }
+    @keyframes livePulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.4; transform:scale(0.65); } }
+
+    .page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px; }
+    .page-header__title { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 600; color: var(--text); }
+    .page-header__sub   { font-size: 12px; color: var(--text-light); margin-top: 3px; }
+    .page-header__actions { display: flex; gap: 8px; }
+
+    .flash { padding: 11px 16px; border-radius: 6px; font-size: 12.5px; font-weight: 500; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+    .flash--success { background: var(--green-bg); color: var(--green); border: 1px solid #bbf7d0; }
+    .flash--error   { background: var(--red-bg);   color: var(--red);   border: 1px solid #fecaca; }
+
+    /* Stat strip */
+    .stat-strip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin-bottom: 20px; }
+    .stat-pill { background: var(--white); border: 1px solid var(--border); border-radius: 6px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; cursor: pointer; transition: box-shadow 0.15s, border-color 0.15s; text-decoration: none; }
+    .stat-pill:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.06); border-color: var(--teal); }
+    .stat-pill.active { border-color: var(--teal); background: var(--teal-light); }
+    .stat-pill__label { font-size: 9px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); }
+    .stat-pill__val   { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 600; color: var(--text); }
+    .stat-pill.active .stat-pill__label { color: var(--teal-dark); }
+    .stat-pill.active .stat-pill__val   { color: var(--teal); }
+    .stat-pill--red.active { border-color: var(--red); background: var(--red-bg); }
+    .stat-pill--red.active .stat-pill__label { color: #991b1b; }
+    .stat-pill--red.active .stat-pill__val   { color: var(--red); }
+    .stat-pill--red:hover { border-color: var(--red); }
+    .stat-pill--gold .stat-pill__val { color: var(--gold); }
+
+    /* Rating distribution mini-bar row */
+    .rating-dist { display: flex; align-items: center; gap: 14px; background: var(--white); border: 1px solid var(--border); border-radius: 6px; padding: 14px 20px; margin-bottom: 20px; }
+    .rating-dist__row { display: flex; align-items: center; gap: 8px; flex: 1; }
+    .rating-dist__label { font-size: 11px; font-weight: 600; color: var(--text-mid); width: 34px; display: flex; align-items: center; gap: 2px; white-space: nowrap; }
+    .rating-dist__track { flex: 1; height: 7px; border-radius: 4px; background: var(--bg); overflow: hidden; }
+    .rating-dist__fill { height: 100%; background: var(--gold); border-radius: 4px; }
+    .rating-dist__count { font-size: 10.5px; color: var(--text-light); width: 34px; text-align: right; }
+
+    .toolbar { background: var(--white); border: 1px solid var(--border); border-radius: 6px; padding: 16px 20px; margin-bottom: 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .search-wrap { position: relative; flex: 1; min-width: 200px; }
+    .search-wrap svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: var(--text-light); pointer-events: none; }
+    .search-input { width: 100%; padding: 8px 12px 8px 32px; border: 1px solid var(--border); border-radius: 5px; font-family: 'Jost', sans-serif; font-size: 12.5px; color: var(--text); background: var(--bg); outline: none; transition: border-color 0.15s; }
+    .search-input:focus { border-color: var(--teal); background: var(--white); }
+    .search-input::placeholder { color: var(--text-light); }
+    select.filter-select { padding: 8px 12px; border: 1px solid var(--border); border-radius: 5px; font-family: 'Jost', sans-serif; font-size: 12.5px; color: var(--text); background: var(--bg); outline: none; cursor: pointer; transition: border-color 0.15s; min-width: 120px; }
+    select.filter-select:focus { border-color: var(--teal); background: var(--white); }
+    input[type="date"].filter-select { padding: 7px 12px; }
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 5px; font-family: 'Jost', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; border: none; transition: background 0.15s, color 0.15s; text-decoration: none; white-space: nowrap; }
+    .btn--teal    { background: var(--teal); color: #fff; }
+    .btn--teal:hover { background: var(--teal-dark); }
+    .btn--outline { background: var(--white); color: var(--text-mid); border: 1px solid var(--border); }
+    .btn--outline:hover { background: var(--bg); color: var(--text); }
+    .btn--green { background: var(--green); color: #fff; }
+    .btn--green:hover { background: #15803d; }
+    .btn--red { background: var(--red); color: #fff; }
+    .btn--red:hover { background: #b91c1c; }
+    .btn--amber { background: var(--amber); color: #fff; }
+    .btn--amber:hover { background: #b45309; }
+    .btn--sm { padding: 5px 9px; font-size: 10.5px; }
+    .btn svg { width: 13px; height: 13px; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* Bulk action bar */
+    .bulk-bar { display: none; align-items: center; gap: 10px; background: var(--teal-light); border: 1px solid var(--teal); border-radius: 6px; padding: 10px 16px; margin-bottom: 16px; }
+    .bulk-bar.show { display: flex; }
+    .bulk-bar__count { font-size: 12px; font-weight: 600; color: var(--teal-dark); margin-right: auto; }
+
+    .section-card { background: var(--white); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+    .section-card__header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .section-card__title  { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text); }
+    .section-card__meta   { font-size: 11px; color: var(--text-light); }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { background: #f8faf9; }
+    th { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); padding: 11px 16px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+    td { padding: 13px 16px; font-size: 12.5px; color: var(--text); border-bottom: 1px solid var(--border); vertical-align: middle; }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: #fafcfb; }
+    tbody tr.new-review-flash { animation: rowFlash 2.5s ease forwards; }
+    @keyframes rowFlash { 0% { background:#e8f4f3; } 60% { background:#e8f4f3; } 100% { background:transparent; } }
+    tbody tr.reported-row { background: #fff5f5; }
+    tbody tr.reported-row:hover { background: #fef0f0; }
+    .empty-row td { text-align: center; padding: 48px; color: var(--text-light); font-size: 13px; }
+
+    .checkbox { width: 15px; height: 15px; accent-color: var(--teal); cursor: pointer; }
+
+    .stars { display: inline-flex; gap: 1px; color: var(--gold); }
+    .stars svg { width: 13px; height: 13px; }
+    .stars .empty { color: var(--border); }
+    .rating-num { font-size: 11px; color: var(--text-mid); margin-left: 4px; font-weight: 600; }
+
+    .review-title { font-weight: 600; font-size: 12.5px; color: var(--text); margin-bottom: 2px; }
+    .review-excerpt { font-size: 11.5px; color: var(--text-mid); max-width: 260px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+    .img-thumbs { display: flex; gap: 4px; }
+    .img-thumb { width: 30px; height: 30px; border-radius: 4px; object-fit: cover; border: 1px solid var(--border); cursor: pointer; }
+    .img-thumb-more { width: 30px; height: 30px; border-radius: 4px; background: var(--bg); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 600; color: var(--text-mid); }
+
+    .verified-badge { display: inline-flex; align-items: center; gap: 3px; font-size: 9px; font-weight: 600; padding: 2px 7px; border-radius: 10px; background: var(--green-bg); color: var(--green); white-space: nowrap; }
+    .report-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 9px; font-weight: 600; padding: 2px 7px; border-radius: 10px; background: var(--red-bg); color: var(--red); border: 1px solid #fecaca; white-space: nowrap; margin-left: 4px; }
+    .report-badge__dot { width: 5px; height: 5px; border-radius: 50%; background: var(--red); animation: livePulse 1.6s ease-in-out infinite; }
+
+    .status-select { font-family: 'Jost', sans-serif; font-size: 11px; font-weight: 600; padding: 4px 8px; border-radius: 20px; border: none; cursor: pointer; outline: none; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%235a6461' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 6px center; padding-right: 22px; }
+    .status-select.s-pending  { color: var(--amber);  background-color: var(--amber-bg); }
+    .status-select.s-approved { color: var(--green);  background-color: var(--green-bg); }
+    .status-select.s-rejected { color: var(--red);    background-color: var(--red-bg); }
+    .status-select.s-spam     { color: var(--purple); background-color: var(--purple-bg); }
+    .status-select.s-hidden   { color: var(--text-mid); background-color: var(--bg); }
+
+    .user-cell   { display: flex; align-items: center; gap: 9px; }
+    .user-avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--teal); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 11px; font-weight: 600; flex-shrink: 0; }
+    .user-name   { font-size: 12.5px; font-weight: 500; color: var(--text); white-space: nowrap; }
+    .user-email  { font-size: 10px; color: var(--text-light); margin-top: 1px; }
+
+    .action-icons { display: flex; gap: 4px; }
+    .icon-btn { width: 28px; height: 28px; border-radius: 5px; border: 1px solid var(--border); background: var(--white); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-mid); transition: all 0.15s; }
+    .icon-btn svg { width: 14px; height: 14px; }
+    .icon-btn:hover { background: var(--teal-light); color: var(--teal); border-color: var(--teal); }
+    .icon-btn--approve:hover { background: var(--green-bg); color: var(--green); border-color: var(--green); }
+    .icon-btn--reject:hover  { background: var(--red-bg); color: var(--red); border-color: var(--red); }
+    .icon-btn--delete:hover  { background: var(--red-bg); color: var(--red); border-color: var(--red); }
+
+    .pagination { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-top: 1px solid var(--border); }
+    .pagination__info  { font-size: 11px; color: var(--text-light); }
+    .pagination__pages { display: flex; align-items: center; gap: 4px; }
+    .page-btn { width: 30px; height: 30px; border-radius: 5px; border: 1px solid var(--border); background: var(--white); font-family: 'Jost', sans-serif; font-size: 12px; font-weight: 500; color: var(--text-mid); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; text-decoration: none; }
+    .page-btn:hover { background: var(--teal-light); color: var(--teal); border-color: var(--teal); }
+    .page-btn.active   { background: var(--teal); color: #fff; border-color: var(--teal); }
+    .page-btn:disabled, .page-btn.disabled { opacity: 0.4; cursor: default; pointer-events: none; }
+    .page-btn svg { width: 12px; height: 12px; }
+
+    .page-footer { text-align: center; padding: 20px 32px; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); border-top: 1px solid var(--border); }
+
+    .toast { position: fixed; bottom: 24px; right: 24px; background: var(--text); color: #fff; padding: 12px 18px; border-radius: 6px; font-size: 12.5px; font-weight: 500; z-index: 9999; transform: translateY(80px); opacity: 0; transition: transform 0.25s, opacity 0.25s; pointer-events: none; max-width: 320px; }
+    .toast.show    { transform: translateY(0); opacity: 1; }
+    .toast.success { background: var(--green); }
+    .toast.error   { background: var(--red); }
+
+    /* Modal */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(20,26,24,0.45); z-index: 500; display: none; align-items: flex-start; justify-content: center; padding: 40px 20px; overflow-y: auto; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: var(--white); border-radius: 8px; width: 100%; max-width: 640px; box-shadow: 0 20px 60px rgba(0,0,0,0.25); }
+    .modal__header { display: flex; align-items: center; justify-content: space-between; padding: 18px 24px; border-bottom: 1px solid var(--border); }
+    .modal__title { font-family: 'Cormorant Garamond', serif; font-size: 19px; font-weight: 600; }
+    .modal__close { width: 30px; height: 30px; border-radius: 6px; border: none; background: var(--bg); color: var(--text-mid); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .modal__close svg { width: 14px; height: 14px; }
+    .modal__body { padding: 22px 24px; max-height: 65vh; overflow-y: auto; }
+    .modal__footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-group.full { grid-column: 1 / -1; }
+    .form-label { font-size: 11px; font-weight: 600; color: var(--text-mid); letter-spacing: 0.03em; }
+    .form-input, .form-select, .form-textarea { padding: 8px 11px; border: 1px solid var(--border); border-radius: 5px; font-family: 'Jost', sans-serif; font-size: 12.5px; color: var(--text); background: var(--bg); outline: none; transition: border-color 0.15s; }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--teal); background: var(--white); }
+    .form-textarea { resize: vertical; min-height: 80px; font-family: 'Jost', sans-serif; }
+    .form-hint { font-size: 10px; color: var(--text-light); }
+    .star-picker { display: flex; gap: 4px; }
+    .star-picker button { background: none; border: none; cursor: pointer; padding: 2px; color: var(--border); }
+    .star-picker button.on { color: var(--gold); }
+    .star-picker svg { width: 22px; height: 22px; }
+    .view-block { margin-bottom: 16px; }
+    .view-block__label { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-light); margin-bottom: 4px; }
+    .view-block__val { font-size: 13px; color: var(--text); }
+    .reply-box { background: var(--teal-light); border-radius: 6px; padding: 12px 14px; margin-top: 8px; }
+    .reply-box__label { font-size: 10px; font-weight: 700; color: var(--teal-dark); margin-bottom: 4px; }
+  </style>
+</head>
+<body>
+<div class="layout">
+
+  <aside class="sidebar">
+    <div class="sidebar__brand">
+      <div class="sidebar__brand-name">Velmora<br>Chroné</div>
+      <div class="sidebar__brand-sub">Admin Dashboard</div>
+    </div>
+    <nav class="sidebar__nav">
+      <a href="/admin/dashboard" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Dashboard
+      </a>
+      <a href="/admin/orders" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+        Orders
+      </a>
+      <a href="/admin/products" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"/></svg>
+        Products
+      </a>
+      <a href="/admin/reviews" class="nav-item active">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+        Rating/Review
+      </a>
+      <a href="/admin/customers" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        Customers
+      </a>
+      <a href="/admin/coupons" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+        Coupons
+      </a>
+      <a href="/admin/offers" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/></svg>
+        Offers
+      </a>
+      <a href="/admin/categories" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+        Categories
+      </a>
+      <a href="/admin/brands" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 4H7a2 2 0 01-2-2V6a2 2 0 012-2h5l2 2h3a2 2 0 012 2v12a2 2 0 01-2 2z"/></svg>
+        Brands
+      </a>
+      <a href="/admin/refunds" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
+        Refund/Return
+      </a>
+      <a href="/admin/banners" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+        Banner
+      </a>
+      <a href="/admin/referrals" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+        Referral
+      </a>
+      <a href="/admin/sales-report" class="nav-item">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+        Sales Report
+      </a>
+    </nav>
+    <div class="sidebar__footer">
+      <div class="avatar"><%= adminName ? adminName.charAt(0).toUpperCase() : 'A' %></div>
+      <div class="sidebar__footer-info">
+        <div class="sidebar__footer-name"><%= adminName || 'Admin' %></div>
+        <div class="sidebar__footer-role"><%= adminRole || 'Administrator' %></div>
+      </div>
+      <a href="/admin/logout" class="btn-logout" title="Logout">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+      </a>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <span class="topbar__title">Rating &amp; Review Management</span>
+      <div class="topbar__right">
+        <span class="topbar__date" id="topbarDate"></span>
+        <div class="live-dot" id="liveDot" title="Live updates active">
+          <div class="live-dot__pulse"></div>
+          LIVE
+        </div>
+        <div class="notif-wrap" id="notifWrap">
+          <button class="notif-bell" id="notifBell" onclick="toggleDropdown()">
+            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+            </svg>
+            <span class="notif-count" id="notifCount" style="display:none">0</span>
+          </button>
+          <div class="notif-dropdown" id="notifDropdown">
+            <div class="notif-header">
+              <div class="notif-header-left">
+                <span>Reviews</span>
+                <div class="notif-tabs">
+                  <button class="notif-tab active" id="tabAll"    onclick="switchTab('all')">All</button>
+                  <button class="notif-tab"         id="tabUnread" onclick="switchTab('unread')">Unread</button>
+                  <button class="notif-tab"         id="tabRead"   onclick="switchTab('read')">Read</button>
+                </div>
+              </div>
+              <button onclick="markAllRead()" class="notif-clear">Mark all read</button>
+            </div>
+            <div class="notif-list" id="notifList">
+              <div class="notif-empty">No new activity</div>
+            </div>
+            <div class="notif-footer">
+              <span class="notif-footer-count" id="notifFooterCount">0 notifications</span>
+              <button onclick="clearAll()" class="notif-clear">Clear all</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <% if (locals.success && success.length > 0) { %>
+        <div class="flash flash--success">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+          <%= success[0] %>
+        </div>
+      <% } %>
+      <% if (locals.error && error.length > 0) { %>
+        <div class="flash flash--error">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+          <%= error[0] %>
+        </div>
+      <% } %>
+
+      <div class="page-header">
+        <div>
+          <div class="page-header__title">Ratings &amp; Reviews</div>
+          <div class="page-header__sub">Moderate customer reviews and track product ratings</div>
+        </div>
+        <div class="page-header__actions">
+          <a href="/admin/reviews/analytics" class="btn btn--outline">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+            Analytics
+          </a>
+          <button class="btn btn--outline" onclick="openExportMenu()">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3"/></svg>
+            Export
+          </button>
+          <button class="btn btn--teal" onclick="openAddModal()">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+            Add Review
+          </button>
+        </div>
+      </div>
+
+      <!-- Stat Strip -->
+      <div class="stat-strip">
+        <a href="/admin/reviews?status=all&page=1" class="stat-pill <%= (currentStatus === 'all' || !currentStatus) ? 'active' : '' %>">
+          <div class="stat-pill__label">Total Reviews</div>
+          <div class="stat-pill__val"><%= counts.total || 0 %></div>
+        </a>
+        <a href="/admin/reviews?status=pending&page=1" class="stat-pill <%= currentStatus === 'pending' ? 'active' : '' %>">
+          <div class="stat-pill__label">Pending</div>
+          <div class="stat-pill__val"><%= counts.pending || 0 %></div>
+        </a>
+        <a href="/admin/reviews?status=approved&page=1" class="stat-pill <%= currentStatus === 'approved' ? 'active' : '' %>">
+          <div class="stat-pill__label">Approved</div>
+          <div class="stat-pill__val"><%= counts.approved || 0 %></div>
+        </a>
+        <a href="/admin/reviews?status=rejected&page=1" class="stat-pill <%= currentStatus === 'rejected' ? 'active' : '' %>">
+          <div class="stat-pill__label">Rejected</div>
+          <div class="stat-pill__val"><%= counts.rejected || 0 %></div>
+        </a>
+        <a href="/admin/reviews?status=spam&page=1" class="stat-pill <%= currentStatus === 'spam' ? 'active' : '' %>">
+          <div class="stat-pill__label">Spam</div>
+          <div class="stat-pill__val"><%= counts.spam || 0 %></div>
+        </a>
+        <a href="/admin/reviews?reported=1&page=1" class="stat-pill stat-pill--red <%= currentReported ? 'active' : '' %>">
+          <div class="stat-pill__label">Reported</div>
+          <div class="stat-pill__val"><%= counts.reported || 0 %></div>
+        </a>
+        <div class="stat-pill stat-pill--gold" style="cursor:default">
+          <div class="stat-pill__label">Avg Rating</div>
+          <div class="stat-pill__val"><%= (counts.avgRating || 0).toFixed(1) %> ★</div>
+        </div>
+      </div>
+
+      <!-- Rating Distribution -->
+      <div class="rating-dist">
+        <% [5,4,3,2,1].forEach(function(star){
+             const dist = counts.distribution || {};
+             const c = dist[star] || 0;
+             const total = counts.total || 1;
+             const pct = Math.round((c/total)*100);
+        %>
+        <div class="rating-dist__row">
+          <span class="rating-dist__label"><%= star %> ★</span>
+          <span class="rating-dist__track"><span class="rating-dist__fill" style="width:<%= pct %>%"></span></span>
+          <span class="rating-dist__count"><%= c %></span>
+        </div>
+        <% }) %>
+      </div>
+
+      <form method="GET" action="/admin/reviews" id="filterForm">
+        <input type="hidden" name="page" value="1"/>
+        <div class="toolbar">
+          <div class="search-wrap">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35"/></svg>
+            <input type="text" name="search" class="search-input" placeholder="Search by review ID, product, customer, email or text…" value="<%= currentSearch || '' %>"/>
+          </div>
+          <select name="status" class="filter-select" onchange="document.getElementById('filterForm').submit()">
+            <option value="all"      <%= (currentStatus === 'all' || !currentStatus) ? 'selected' : '' %>>All Statuses</option>
+            <option value="pending"  <%= currentStatus === 'pending'  ? 'selected' : '' %>>Pending</option>
+            <option value="approved" <%= currentStatus === 'approved' ? 'selected' : '' %>>Approved</option>
+            <option value="rejected" <%= currentStatus === 'rejected' ? 'selected' : '' %>>Rejected</option>
+            <option value="spam"     <%= currentStatus === 'spam'     ? 'selected' : '' %>>Spam</option>
+            <option value="hidden"   <%= currentStatus === 'hidden'   ? 'selected' : '' %>>Hidden</option>
+          </select>
+          <select name="rating" class="filter-select" onchange="document.getElementById('filterForm').submit()">
+            <option value="" <%= !currentRating ? 'selected' : '' %>>All Ratings</option>
+            <% [5,4,3,2,1].forEach(function(r){ %>
+              <option value="<%= r %>" <%= String(currentRating) === String(r) ? 'selected' : '' %>><%= r %> Star</option>
+            <% }) %>
+          </select>
+          <select name="verified" class="filter-select" onchange="document.getElementById('filterForm').submit()">
+            <option value="" <%= currentVerified === undefined || currentVerified === '' ? 'selected' : '' %>>Verified: Any</option>
+            <option value="yes" <%= currentVerified === 'yes' ? 'selected' : '' %>>Verified Only</option>
+            <option value="no"  <%= currentVerified === 'no'  ? 'selected' : '' %>>Unverified Only</option>
+          </select>
+          <select name="product" class="filter-select" onchange="document.getElementById('filterForm').submit()">
+            <option value="">All Products</option>
+            <% (products || []).forEach(function(p){ %>
+              <option value="<%= p._id %>" <%= String(currentProduct) === String(p._id) ? 'selected' : '' %>><%= p.name %></option>
+            <% }) %>
+          </select>
+          <input type="date" name="from" class="filter-select" value="<%= currentFrom || '' %>" title="From date"/>
+          <input type="date" name="to"   class="filter-select" value="<%= currentTo   || '' %>" title="To date"/>
+          <button type="submit" class="btn btn--teal">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            Search
+          </button>
+          <a href="/admin/reviews" class="btn btn--outline">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+            Clear
+          </a>
+        </div>
+      </form>
+
+      <!-- Bulk action bar -->
+      <div class="bulk-bar" id="bulkBar">
+        <span class="bulk-bar__count" id="bulkCount">0 selected</span>
+        <button class="btn btn--green btn--sm" onclick="bulkAction('approve')">Approve Selected</button>
+        <button class="btn btn--red btn--sm" onclick="bulkAction('reject')">Reject Selected</button>
+        <button class="btn btn--amber btn--sm" onclick="bulkAction('spam')">Mark as Spam</button>
+        <button class="btn btn--outline btn--sm" onclick="bulkAction('delete')">Delete Selected</button>
+      </div>
+
+      <div class="section-card">
+        <div class="section-card__header">
+          <span class="section-card__title">Reviews</span>
+          <span class="section-card__meta"><%= totalReviews %> total</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th><input type="checkbox" class="checkbox" id="selectAll" onchange="toggleSelectAll(this)"/></th>
+                <th>Review ID</th>
+                <th>Customer</th>
+                <th>Product</th>
+                <th>Rating</th>
+                <th>Review</th>
+                <th>Images</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="reviewsTableBody">
+              <% if (reviews && reviews.length > 0) { %>
+                <% reviews.forEach(function(rv) { %>
+                <% const isReported = (rv.reportsCount || 0) > 0; %>
+                <tr data-review-id="<%= rv._id %>" class="<%= isReported ? 'reported-row' : '' %>">
+                  <td><input type="checkbox" class="checkbox row-check" value="<%= rv._id %>" onchange="updateBulkBar()"/></td>
+                  <td>
+                    <div style="display:flex;flex-direction:column;gap:3px">
+                      <span style="font-family:'Cormorant Garamond',serif;font-size:13px;font-weight:600;color:var(--teal)">
+                        #<%= rv._id.toString().slice(-6).toUpperCase() %>
+                      </span>
+                      <% if (isReported) { %>
+                        <span class="report-badge"><span class="report-badge__dot"></span>Reported (<%= rv.reportsCount %>)</span>
+                      <% } %>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="user-cell">
+                      <div class="user-avatar"><%= rv.customerName ? rv.customerName.charAt(0).toUpperCase() : '?' %></div>
+                      <div>
+                        <div class="user-name"><%= rv.customerName || 'Deleted User' %></div>
+                        <div class="user-email"><%= rv.customerEmail || '' %></div>
+                        <% if (rv.verifiedPurchase) { %>
+                          <span class="verified-badge">
+                            <svg width="9" height="9" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                            Verified
+                          </span>
+                        <% } %>
+                      </div>
+                    </div>
+                  </td>
+                  <td style="max-width:140px;color:var(--text-mid);font-size:12px"><%= rv.productName || '—' %></td>
+                  <td>
+                    <div class="stars">
+                      <% for (let i=1;i<=5;i++){ %>
+                        <svg viewBox="0 0 20 20" fill="currentColor" class="<%= i <= rv.rating ? '' : 'empty' %>"><path d="M10 15.27L16.18 19l-1.64-7.03L20 7.24l-7.19-.61L10 0 7.19 6.63 0 7.24l5.46 4.73L3.82 19z"/></svg>
+                      <% } %>
+                      <span class="rating-num"><%= rv.rating %>.0</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="review-title"><%= rv.reviewTitle || '(no title)' %></div>
+                    <div class="review-excerpt"><%= rv.reviewMessage %></div>
+                  </td>
+                  <td>
+                    <% if (rv.reviewImages && rv.reviewImages.length > 0) { %>
+                      <div class="img-thumbs">
+                        <% rv.reviewImages.slice(0,2).forEach(function(img){ %>
+                          <img src="<%= img %>" class="img-thumb" onclick="viewImage('<%= img %>')"/>
+                        <% }) %>
+                        <% if (rv.reviewImages.length > 2) { %>
+                          <div class="img-thumb-more">+<%= rv.reviewImages.length - 2 %></div>
+                        <% } %>
+                      </div>
+                    <% } else { %>
+                      <span style="color:var(--text-light);font-size:11px">—</span>
+                    <% } %>
+                  </td>
+                  <td style="color:var(--text-mid);font-size:12px;white-space:nowrap">
+                    <%= new Date(rv.createdAt).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' }) %>
+                  </td>
+                  <td>
+                    <select class="status-select s-<%= rv.status %>" data-review-id="<%= rv._id %>" onchange="updateStatus(this)">
+                      <option value="pending"  <%= rv.status === 'pending'  ? 'selected' : '' %>>Pending</option>
+                      <option value="approved" <%= rv.status === 'approved' ? 'selected' : '' %>>Approved</option>
+                      <option value="rejected" <%= rv.status === 'rejected' ? 'selected' : '' %>>Rejected</option>
+                      <option value="spam"     <%= rv.status === 'spam'     ? 'selected' : '' %>>Spam</option>
+                      <option value="hidden"   <%= rv.status === 'hidden'   ? 'selected' : '' %>>Hidden</option>
+                    </select>
+                  </td>
+                  <td>
+                    <div class="action-icons">
+                      <button class="icon-btn" title="View" onclick='openViewModal(<%- JSON.stringify(rv) %>)'>
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                      </button>
+                      <button class="icon-btn" title="Edit" onclick='openEditModal(<%- JSON.stringify(rv) %>)'>
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                      </button>
+                      <button class="icon-btn icon-btn--approve" title="Approve" onclick="quickAction('<%= rv._id %>','approve')">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                      </button>
+                      <button class="icon-btn icon-btn--reject" title="Reject" onclick="quickAction('<%= rv._id %>','reject')">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                      </button>
+                      <button class="icon-btn icon-btn--delete" title="Delete" onclick="deleteReview('<%= rv._id %>')">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3M4 7h16"/></svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                <% }) %>
+              <% } else { %>
+                <tr class="empty-row" id="emptyRow">
+                  <td colspan="10">
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
+                      <svg width="36" height="36" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.2" style="color:var(--border)"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+                      <span>No reviews found</span>
+                    </div>
+                  </td>
+                </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+
+        <% if (totalPages > 1) { %>
+        <div class="pagination">
+          <div class="pagination__info">
+            Showing <%= (currentPage - 1) * limit + 1 %>–<%= Math.min(currentPage * limit, totalReviews) %> of <%= totalReviews %> reviews
+          </div>
+          <div class="pagination__pages">
+            <% const qBase = `status=${currentStatus||'all'}&search=${currentSearch||''}&rating=${currentRating||''}&verified=${currentVerified||''}&product=${currentProduct||''}&from=${currentFrom||''}&to=${currentTo||''}`; %>
+            <% if (currentPage > 1) { %>
+              <a href="/admin/reviews?page=<%= currentPage-1 %>&<%= qBase %>" class="page-btn">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+              </a>
+            <% } else { %>
+              <span class="page-btn disabled"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg></span>
+            <% } %>
+            <% for (let p = Math.max(1, currentPage-2); p <= Math.min(totalPages, currentPage+2); p++) { %>
+              <a href="/admin/reviews?page=<%= p %>&<%= qBase %>" class="page-btn <%= p === currentPage ? 'active' : '' %>"><%= p %></a>
+            <% } %>
+            <% if (currentPage < totalPages) { %>
+              <a href="/admin/reviews?page=<%= currentPage+1 %>&<%= qBase %>" class="page-btn">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+              </a>
+            <% } else { %>
+              <span class="page-btn disabled"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg></span>
+            <% } %>
+          </div>
+        </div>
+        <% } %>
+      </div>
+
+    </div>
+    <footer class="page-footer">© 2026 Velmora Chroné. All Rights Reserved. Admin Panel.</footer>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Add / Edit Review Modal -->
+<div class="modal-overlay" id="reviewModalOverlay">
+  <div class="modal">
+    <div class="modal__header">
+      <span class="modal__title" id="reviewModalTitle">Add Review</span>
+      <button class="modal__close" onclick="closeReviewModal()">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal__body">
+      <form id="reviewForm">
+        <input type="hidden" id="rf_reviewId" value=""/>
+        <div class="form-grid">
+          <div class="form-group full">
+            <label class="form-label">Product *</label>
+            <select class="form-select" id="rf_product" required>
+              <option value="">Select a product…</option>
+              <% (products || []).forEach(function(p){ %>
+                <option value="<%= p._id %>"><%= p.name %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Customer Name *</label>
+            <input type="text" class="form-input" id="rf_customerName" required/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Customer Email *</label>
+            <input type="email" class="form-input" id="rf_customerEmail" required/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Rating *</label>
+            <div class="star-picker" id="rf_starPicker">
+              <% for (let i=1;i<=5;i++){ %>
+                <button type="button" data-val="<%= i %>" onclick="setStarPicker(<%= i %>)">
+                  <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 15.27L16.18 19l-1.64-7.03L20 7.24l-7.19-.61L10 0 7.19 6.63 0 7.24l5.46 4.73L3.82 19z"/></svg>
+                </button>
+              <% } %>
+            </div>
+            <input type="hidden" id="rf_rating" value="0"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Verified Purchase</label>
+            <select class="form-select" id="rf_verified">
+              <option value="no">No</option>
+              <option value="yes">Yes</option>
+            </select>
+          </div>
+          <div class="form-group full">
+            <label class="form-label">Review Title</label>
+            <input type="text" class="form-input" id="rf_title" maxlength="120"/>
+          </div>
+          <div class="form-group full">
+            <label class="form-label">Review Message * (20–1000 characters)</label>
+            <textarea class="form-textarea" id="rf_message" minlength="20" maxlength="1000" required></textarea>
+            <span class="form-hint" id="rf_charCount">0 / 1000</span>
+          </div>
+          <div class="form-group full">
+            <label class="form-label">Upload Images (JPG, PNG, WEBP)</label>
+            <input type="file" class="form-input" id="rf_images" accept=".jpg,.jpeg,.png,.webp" multiple/>
+          </div>
+          <div class="form-group full">
+            <label class="form-label">Publish Status</label>
+            <select class="form-select" id="rf_status">
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+              <option value="hidden">Hidden</option>
+            </select>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal__footer">
+      <button class="btn btn--outline" onclick="closeReviewModal()">Cancel</button>
+      <button class="btn btn--outline" onclick="saveReview(false)">Save</button>
+      <button class="btn btn--teal" onclick="saveReview(true)">Save &amp; Publish</button>
+    </div>
+  </div>
+</div>
+
+<!-- View Review Modal -->
+<div class="modal-overlay" id="viewModalOverlay">
+  <div class="modal">
+    <div class="modal__header">
+      <span class="modal__title">Review Details</span>
+      <button class="modal__close" onclick="closeViewModal()">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal__body" id="viewModalBody"></div>
+    <div class="modal__footer">
+      <button class="btn btn--outline" onclick="closeViewModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  (function () {
+    const el = document.getElementById('topbarDate');
+    if (el) el.textContent = new Date().toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+  })();
+
+  /* ---------- status update (single) ---------- */
+  function refreshSelectColor(sel) { sel.className = 'status-select s-' + sel.value; }
+
+  async function updateStatus(sel) {
+    const reviewId  = sel.dataset.reviewId;
+    const newStatus = sel.value;
+    const prev      = sel.dataset.prev || sel.getAttribute('data-current') || newStatus;
+    try {
+      const res  = await fetch(`/admin/reviews/${reviewId}/status`, {
+        method : 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body   : JSON.stringify({ status: newStatus }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        refreshSelectColor(sel);
+        sel.dataset.prev = newStatus;
+        showToast('Review marked as "' + newStatus + '"', 'success');
+      } else {
+        showToast(data.message || 'Update failed', 'error');
+        sel.value = prev;
+        refreshSelectColor(sel);
+      }
+    } catch {
+      showToast('Network error', 'error');
+      sel.value = prev;
+      refreshSelectColor(sel);
+    }
+  }
+
+  async function quickAction(reviewId, action) {
+    const statusMap = { approve: 'approved', reject: 'rejected' };
+    try {
+      const res  = await fetch(`/admin/reviews/${reviewId}/status`, {
+        method : 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body   : JSON.stringify({ status: statusMap[action] }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        const sel = document.querySelector(`select.status-select[data-review-id="${reviewId}"]`);
+        if (sel) { sel.value = statusMap[action]; refreshSelectColor(sel); }
+        showToast('Review ' + (action === 'approve' ? 'approved' : 'rejected'), 'success');
+      } else {
+        showToast(data.message || 'Action failed', 'error');
+      }
+    } catch { showToast('Network error', 'error'); }
+  }
+
+  async function deleteReview(reviewId) {
+    if (!confirm('Delete this review permanently? This cannot be undone.')) return;
+    try {
+      const res  = await fetch(`/admin/reviews/${reviewId}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) {
+        const row = document.querySelector(`tr[data-review-id="${reviewId}"]`);
+        if (row) row.remove();
+        showToast('Review deleted', 'success');
+      } else {
+        showToast(data.message || 'Delete failed', 'error');
+      }
+    } catch { showToast('Network error', 'error'); }
+  }
+
+  /* ---------- bulk actions ---------- */
+  function toggleSelectAll(cb) {
+    document.querySelectorAll('.row-check').forEach(el => { el.checked = cb.checked; });
+    updateBulkBar();
+  }
+  function getSelectedIds() {
+    return Array.from(document.querySelectorAll('.row-check:checked')).map(el => el.value);
+  }
+  function updateBulkBar() {
+    const ids = getSelectedIds();
+    const bar = document.getElementById('bulkBar');
+    document.getElementById('bulkCount').textContent = ids.length + ' selected';
+    bar.classList.toggle('show', ids.length > 0);
+  }
+  async function bulkAction(action) {
+    const ids = getSelectedIds();
+    if (ids.length === 0) return;
+    if (action === 'delete' && !confirm(`Delete ${ids.length} review(s) permanently?`)) return;
+
+    try {
+      const res  = await fetch('/admin/reviews/bulk', {
+        method : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body   : JSON.stringify({ ids, action }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        if (action === 'delete') {
+          ids.forEach(id => { const row = document.querySelector(`tr[data-review-id="${id}"]`); if (row) row.remove(); });
+        } else {
+          const statusMap = { approve: 'approved', reject: 'rejected', spam: 'spam' };
+          ids.forEach(id => {
+            const sel = document.querySelector(`select.status-select[data-review-id="${id}"]`);
+            if (sel) { sel.value = statusMap[action]; refreshSelectColor(sel); }
+          });
+        }
+        showToast(`${ids.length} review(s) updated`, 'success');
+        document.getElementById('selectAll').checked = false;
+        updateBulkBar();
+      } else {
+        showToast(data.message || 'Bulk action failed', 'error');
+      }
+    } catch { showToast('Network error', 'error'); }
+  }
+
+  /* ---------- export ---------- */
+  function openExportMenu() {
+    const fmt = prompt('Export as: pdf / excel / csv');
+    if (!fmt) return;
+    const map = { pdf: 'pdf', excel: 'xlsx', csv: 'csv' };
+    const type = map[fmt.trim().toLowerCase()];
+    if (!type) { showToast('Unknown format', 'error'); return; }
+    window.location = `/admin/reviews/export?format=${type}`;
+  }
+
+  /* ---------- add / edit modal ---------- */
+  function setStarPicker(val) {
+    document.getElementById('rf_rating').value = val;
+    document.querySelectorAll('#rf_starPicker button').forEach(btn => {
+      btn.classList.toggle('on', Number(btn.dataset.val) <= val);
+    });
+  }
+  document.getElementById('rf_message')?.addEventListener('input', function () {
+    document.getElementById('rf_charCount').textContent = this.value.length + ' / 1000';
+  });
+
+  function openAddModal() {
+    document.getElementById('reviewModalTitle').textContent = 'Add Review';
+    document.getElementById('reviewForm').reset();
+    document.getElementById('rf_reviewId').value = '';
+    setStarPicker(0);
+    document.getElementById('rf_charCount').textContent = '0 / 1000';
+    document.getElementById('reviewModalOverlay').classList.add('open');
+  }
+  function openEditModal(rv) {
+    document.getElementById('reviewModalTitle').textContent = 'Edit Review';
+    document.getElementById('rf_reviewId').value       = rv._id;
+    document.getElementById('rf_product').value        = rv.productId || '';
+    document.getElementById('rf_customerName').value   = rv.customerName || '';
+    document.getElementById('rf_customerEmail').value  = rv.customerEmail || '';
+    document.getElementById('rf_title').value          = rv.reviewTitle || '';
+    document.getElementById('rf_message').value        = rv.reviewMessage || '';
+    document.getElementById('rf_verified').value        = rv.verifiedPurchase ? 'yes' : 'no';
+    document.getElementById('rf_status').value          = rv.status || 'pending';
+    setStarPicker(rv.rating || 0);
+    document.getElementById('rf_charCount').textContent = (rv.reviewMessage || '').length + ' / 1000';
+    document.getElementById('reviewModalOverlay').classList.add('open');
+  }
+  function closeReviewModal() { document.getElementById('reviewModalOverlay').classList.remove('open'); }
+
+  async function saveReview(publish) {
+    const id      = document.getElementById('rf_reviewId').value;
+    const rating  = Number(document.getElementById('rf_rating').value);
+    const message = document.getElementById('rf_message').value.trim();
+
+    if (!document.getElementById('rf_product').value) return showToast('Please select a product', 'error');
+    if (!rating) return showToast('Please select a rating', 'error');
+    if (message.length < 20) return showToast('Review must be at least 20 characters', 'error');
+    if (message.length > 1000) return showToast('Review cannot exceed 1000 characters', 'error');
+
+    const payload = {
+      productId       : document.getElementById('rf_product').value,
+      customerName    : document.getElementById('rf_customerName').value.trim(),
+      customerEmail   : document.getElementById('rf_customerEmail').value.trim(),
+      rating,
+      reviewTitle     : document.getElementById('rf_title').value.trim(),
+      reviewMessage   : message,
+      verifiedPurchase: document.getElementById('rf_verified').value === 'yes',
+      status          : publish ? 'approved' : document.getElementById('rf_status').value,
+    };
+
+    try {
+      const url    = id ? `/admin/reviews/${id}` : '/admin/reviews';
+      const method = id ? 'PUT' : 'POST';
+      const res    = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body   : JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast(id ? 'Review updated' : 'Review created', 'success');
+        closeReviewModal();
+        setTimeout(() => window.location.reload(), 600);
+      } else {
+        showToast(data.message || 'Save failed', 'error');
+      }
+    } catch { showToast('Network error', 'error'); }
+  }
+
+  /* ---------- view modal ---------- */
+  function starsHtml(rating) {
+    let out = '<div class="stars">';
+    for (let i = 1; i <= 5; i++) {
+      out += `<svg viewBox="0 0 20 20" fill="currentColor" class="${i <= rating ? '' : 'empty'}"><path d="M10 15.27L16.18 19l-1.64-7.03L20 7.24l-7.19-.61L10 0 7.19 6.63 0 7.24l5.46 4.73L3.82 19z"/></svg>`;
+    }
+    out += `<span class="rating-num">${rating}.0</span></div>`;
+    return out;
+  }
+  function openViewModal(rv) {
+    const body = document.getElementById('viewModalBody');
+    const imgsHtml = (rv.reviewImages && rv.reviewImages.length)
+      ? `<div class="img-thumbs">${rv.reviewImages.map(i => `<img src="${i}" class="img-thumb" style="width:56px;height:56px" onclick="viewImage('${i}')"/>`).join('')}</div>`
+      : '<span style="color:var(--text-light);font-size:12px">No images attached</span>';
+
+    body.innerHTML = `
+      <div class="view-block"><div class="view-block__label">Product</div><div class="view-block__val">${rv.productName || '—'}</div></div>
+      <div class="view-block"><div class="view-block__label">Customer</div><div class="view-block__val">${rv.customerName || 'Deleted User'} &nbsp;·&nbsp; ${rv.customerEmail || ''} ${rv.verifiedPurchase ? '<span class="verified-badge">Verified</span>' : ''}</div></div>
+      <div class="view-block"><div class="view-block__label">Rating</div><div class="view-block__val">${starsHtml(rv.rating)}</div></div>
+      <div class="view-block"><div class="view-block__label">Title</div><div class="view-block__val">${rv.reviewTitle || '(no title)'}</div></div>
+      <div class="view-block"><div class="view-block__label">Message</div><div class="view-block__val">${rv.reviewMessage || ''}</div></div>
+      <div class="view-block"><div class="view-block__label">Images</div>${imgsHtml}</div>
+      <div class="view-block"><div class="view-block__label">Submitted</div><div class="view-block__val">${new Date(rv.createdAt).toLocaleString('en-IN')}</div></div>
+      <div class="view-block">
+        <div class="view-block__label">Admin Reply</div>
+        ${rv.adminReply ? `<div class="reply-box"><div class="reply-box__label">Your reply</div>${rv.adminReply}</div>` : ''}
+        <textarea class="form-textarea" id="replyText" placeholder="Write a reply to this customer…" style="margin-top:8px;width:100%">${rv.adminReply || ''}</textarea>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="btn btn--teal btn--sm" onclick="saveReply('${rv._id}')">Save Reply</button>
+          ${rv.adminReply ? `<button class="btn btn--outline btn--sm" onclick="deleteReply('${rv._id}')">Delete Reply</button>` : ''}
+        </div>
+      </div>`;
+    document.getElementById('viewModalOverlay').classList.add('open');
+  }
+  function closeViewModal() { document.getElementById('viewModalOverlay').classList.remove('open'); }
+
+  async function saveReply(reviewId) {
+    const text = document.getElementById('replyText').value.trim();
+    if (!text) return showToast('Reply cannot be empty', 'error');
+    try {
+      const res  = await fetch(`/admin/reviews/${reviewId}/reply`, {
+        method : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body   : JSON.stringify({ reply: text }),
+      });
+      const data = await res.json();
+      if (data.success) { showToast('Reply saved', 'success'); closeViewModal(); }
+      else showToast(data.message || 'Failed to save reply', 'error');
+    } catch { showToast('Network error', 'error'); }
+  }
+  async function deleteReply(reviewId) {
+    if (!confirm('Delete this reply?')) return;
+    try {
+      const res  = await fetch(`/admin/reviews/${reviewId}/reply`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) { showToast('Reply deleted', 'success'); closeViewModal(); }
+      else showToast(data.message || 'Failed to delete reply', 'error');
+    } catch { showToast('Network error', 'error'); }
+  }
+
+  function viewImage(src) { window.open(src, '_blank'); }
+
+  /* ---------- toast ---------- */
+  function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className   = `toast ${type} show`;
+    setTimeout(() => { t.className = 'toast'; }, 3500);
+  }
+  function playNotifSound() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const t   = ctx.currentTime;
+      [0, 0.18].forEach((delay, i) => {
+        const osc  = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(i === 0 ? 880 : 660, t + delay);
+        gain.gain.setValueAtTime(0.3, t + delay);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + delay + 0.4);
+        osc.start(t + delay); osc.stop(t + delay + 0.4);
+      });
+    } catch (_) {}
+  }
+
+  /* ---------- notifications (new review / reported / spam / low rating) ---------- */
+  const STORAGE_KEY = 'vc_admin_review_notifs';
+  const SEEN_KEY    = 'vc_seen_review_ids';
+
+  function loadNotifications() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch { return []; } }
+  function saveNotifications() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(notifications)); } catch (_) {} }
+  function loadSeenIds() { try { return new Set(JSON.parse(localStorage.getItem(SEEN_KEY) || '[]')); } catch { return new Set(); } }
+  function saveSeenIds(set) { try { localStorage.setItem(SEEN_KEY, JSON.stringify([...set].slice(-500))); } catch (_) {} }
+
+  let notifications = loadNotifications();
+  let seenIds       = loadSeenIds();
+  let currentTab    = 'all';
+
+  function getVisible() {
+    if (currentTab === 'unread') return notifications.filter(n => !n.read);
+    if (currentTab === 'read')   return notifications.filter(n =>  n.read);
+    return notifications;
+  }
+  function unreadCount() { return notifications.filter(n => !n.read).length; }
+  function updateBadge() {
+    const badge = document.getElementById('notifCount');
+    const count = unreadCount();
+    badge.textContent   = count > 9 ? '9+' : count;
+    badge.style.display = count > 0 ? 'flex' : 'none';
+  }
+  function updateFooter() {
+    document.getElementById('notifFooterCount').textContent = `${notifications.length} total · ${unreadCount()} unread`;
+  }
+  function timeAgo(date) {
+    const s = Math.floor((Date.now() - new Date(date)) / 1000);
+    if (s < 60)   return 'just now';
+    if (s < 3600) return Math.floor(s / 60) + 'm ago';
+    return Math.floor(s / 3600) + 'h ago';
+  }
+  function kindLabel(kind) {
+    return { new: 'New Review', reported: 'Reported', spam: 'Spam Detected', lowrating: 'Low Rating' }[kind] || 'Review';
+  }
+
+  function renderList() {
+    const list    = document.getElementById('notifList');
+    const visible = getVisible();
+    list.innerHTML = '';
+    if (visible.length === 0) {
+      list.innerHTML = `<div class="notif-empty">${
+        currentTab === 'unread' ? 'No unread notifications' :
+        currentTab === 'read'   ? 'No read notifications'   : 'No notifications'
+      }</div>`;
+      return;
+    }
+    visible.forEach(n => {
+      const el = document.createElement('div');
+      el.className  = 'notif-item kind-' + (n.kind || 'new') + (n.read ? ' read' : '');
+      el.dataset.id = n.id;
+      el.innerHTML  = `
+        <div class="notif-item__dot"></div>
+        <div class="notif-item__body-wrap">
+          <div class="notif-item__top">
+            <span class="notif-item__id">${kindLabel(n.kind)} · ${n.reviewNumber}</span>
+            <span class="notif-item__time">${timeAgo(n.createdAt)}</span>
+          </div>
+          <div class="notif-item__info">${n.rating ? n.rating + '★ · ' : ''}${n.productName || ''}</div>
+          ${n.customerName ? `<div class="notif-item__customer">${n.customerName}</div>` : ''}
+        </div>
+        <div class="notif-item__actions">
+          <button class="notif-mark-btn" onclick="toggleRead('${n.id}', event)">${n.read ? 'Mark unread' : 'Mark read'}</button>
+          <a href="/admin/reviews/${n.id}" class="notif-view-btn" onclick="markOneRead('${n.id}')">View</a>
+        </div>`;
+      list.appendChild(el);
+    });
+  }
+
+  function toggleRead(id, e) {
+    e.preventDefault(); e.stopPropagation();
+    const n = notifications.find(x => x.id === id);
+    if (!n) return;
+    n.read = !n.read;
+    saveNotifications(); updateBadge(); updateFooter(); renderList();
+  }
+  function markOneRead(id) {
+    const n = notifications.find(x => x.id === id);
+    if (n) { n.read = true; saveNotifications(); }
+    updateBadge(); updateFooter();
+  }
+  function markAllRead() {
+    notifications.forEach(n => { n.read = true; });
+    saveNotifications(); updateBadge(); updateFooter(); renderList();
+  }
+  function clearAll() {
+    notifications = [];
+    saveNotifications(); updateBadge(); updateFooter(); renderList();
+    document.getElementById('notifDropdown').classList.remove('open');
+  }
+  function switchTab(tab) {
+    currentTab = tab;
+    document.querySelectorAll('.notif-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+    renderList();
+  }
+  function toggleDropdown() { document.getElementById('notifDropdown').classList.toggle('open'); }
+  document.addEventListener('click', (e) => {
+    if (!document.getElementById('notifWrap').contains(e.target))
+      document.getElementById('notifDropdown').classList.remove('open');
+  });
+
+  function addNotification(review, kind) {
+    const id  = String(review._id);
+    const key = id + ':' + kind;
+    if (seenIds.has(key)) return;
+    seenIds.add(key); saveSeenIds(seenIds);
+
+    notifications.unshift({
+      id, kind: kind || 'new',
+      reviewNumber : '#' + id.slice(-6).toUpperCase(),
+      rating       : review.rating,
+      productName  : review.productName || '',
+      customerName : review.customerName || '',
+      createdAt    : review.createdAt || new Date().toISOString(),
+      read         : false,
+    });
+    saveNotifications();
+    updateBadge(); updateFooter(); renderList();
+    playNotifSound();
+
+    const msgMap = {
+      new      : `New review submitted — ${review.productName || ''}`,
+      reported : `A review was reported — ${review.productName || ''}`,
+      spam     : `Possible spam review detected`,
+      lowrating: `Low rating alert (${review.rating}★) — ${review.productName || ''}`,
+    };
+    showToast(msgMap[kind] || msgMap.new, kind === 'new' ? 'success' : 'error');
+  }
+
+  const socket = io();
+  socket.emit('join-admin');
+  socket.on('new-review',       (review) => addNotification(review, 'new'));
+  socket.on('reported-review',  (review) => addNotification(review, 'reported'));
+  socket.on('spam-review',      (review) => addNotification(review, 'spam'));
+  socket.on('low-rating-review',(review) => addNotification(review, 'lowrating'));
+  socket.on('disconnect', () => { const d = document.getElementById('liveDot'); if (d) d.style.color = 'var(--text-light)'; });
+  socket.on('connect', () => { const d = document.getElementById('liveDot'); if (d) d.style.color = 'var(--green)'; socket.emit('join-admin'); });
+
+  async function pollRecent() {
+    try {
+      const res  = await fetch('/admin/reviews/notify/recent');
+      const data = await res.json();
+      if (data.success) {
+        (data.newReviews || []).forEach(r => addNotification(r, 'new'));
+        (data.reported   || []).forEach(r => addNotification(r, 'reported'));
+        (data.spam       || []).forEach(r => addNotification(r, 'spam'));
+        (data.lowRating  || []).forEach(r => addNotification(r, 'lowrating'));
+      }
+    } catch (_) {}
+  }
+  pollRecent();
+  setInterval(pollRecent, 30_000);
+
+  updateBadge(); updateFooter(); renderList(); updateBulkBar();
+</script>
+</body>
+</html>

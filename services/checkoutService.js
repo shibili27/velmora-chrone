@@ -8,6 +8,7 @@ import { broadcast } from '../public/utils/ssemanager.js';
 import { getIO } from '../utils/socket.js';
 import { createRazorpayOrder, verifyPaymentSignature } from './razorpayService.js';
 import { rewardReferralIfEligible } from './referralService.js';
+import { attachOffers } from './offerService.js';
 
 const TAX_RATE            = 0.18;
 export const SHIPPING_THRESHOLD = 50000;
@@ -39,7 +40,22 @@ export const cartIsValid = (cart) => {
   });
 };
 
-export const buildPriceSummary = (cart, couponDiscount = 0) => {
+export const applyLiveOfferPrices = async (cart) => {
+  const products = cart.items.map(item => item.product);
+  await attachOffers(products);
+
+  cart.items.forEach(item => {
+    const product = item.product;
+    const livePrice = product.hasOffer ? product.effectivePrice : product.price;
+    item.price = livePrice;
+  });
+
+  return cart;
+};
+
+export const buildPriceSummary = async (cart, couponDiscount = 0) => {
+  await applyLiveOfferPrices(cart);
+
   let subtotal = 0, totalDiscount = 0;
 
   for (const item of cart.items) {
@@ -75,13 +91,6 @@ export const clearCouponIfCartChanged = (session) => {
   }
 };
 
-// FIXED: this is now the single source of truth for "can this cart be
-// ordered right now" — it checks availability (deleted/unlisted/category
-// blocked) AND stock, and produces a specific message per item. Previously,
-// callers ran the generic cartIsValid() check FIRST, which threw a vague
-// "some items are unavailable" error before this function (and its detailed
-// stockErrors array) ever got a chance to run — so the frontend's stock
-// error banner never received anything useful.
 export const validateStockBeforeOrder = async (cartItems) => {
   const errors = [];
 
@@ -206,7 +215,7 @@ export const applyCouponToSession = async (userId, code, session) => {
     throw Object.assign(new Error('Your cart is empty.'), { status: 400 });
   }
 
-  const { subtotal } = buildPriceSummary(cart, 0);
+  const { subtotal } = await buildPriceSummary(cart, 0);
 
   const userUsageCount     = coupon.getUserUsageCount(userId);
   const { valid, message } = coupon.validateFor(subtotal, userUsageCount);
@@ -215,7 +224,7 @@ export const applyCouponToSession = async (userId, code, session) => {
   }
 
   const discount = coupon.calculateDiscount(subtotal);
-  const pricing  = buildPriceSummary(cart, discount);
+  const pricing  = await buildPriceSummary(cart, discount);
 
   session.couponCode     = coupon.code;
   session.couponDiscount = discount;
@@ -237,7 +246,7 @@ export const removeCouponFromSession = async (userId, session) => {
   delete session.couponDiscount;
 
   const cart    = await getPopulatedCart(userId);
-  const pricing = cart && cart.items.length ? buildPriceSummary(cart, 0) : null;
+  const pricing = cart && cart.items.length ? await buildPriceSummary(cart, 0) : null;
 
   return { message: 'Coupon removed.', pricing };
 };
@@ -294,7 +303,7 @@ export const buildCheckoutData = async (userId, session) => {
   const user           = await User.findById(userId).select('name email phone addresses');
   const couponDiscount = session.couponDiscount || 0;
   const couponCode     = session.couponCode     || null;
-  const pricing        = buildPriceSummary(cart, couponDiscount);
+  const pricing        = await buildPriceSummary(cart, couponDiscount);
 
   const wallet        = await Wallet.getOrCreate(userId);
   const walletBalance = wallet.balance;
@@ -375,13 +384,12 @@ export const placeOrder = async (userId, { addressId, session }) => {
   const cart = await getPopulatedCart(userId);
   if (!cart || !cart.items.length) throw Object.assign(new Error('Your cart is empty.'), { status: 400 });
 
-
-  const orderItems      = await buildOrderItemsAndValidate(cart);
   const user            = await User.findById(userId).select('name email phone addresses');
   const shippingAddress = resolveShippingAddress(user, addressId);
   const couponDiscount  = session.couponDiscount || 0;
   const couponCode      = session.couponCode     || null;
-  const pricing         = buildPriceSummary(cart, couponDiscount);
+  const pricing         = await buildPriceSummary(cart, couponDiscount);
+  const orderItems      = await buildOrderItemsAndValidate(cart);
 
   for (const item of cart.items) await decrementStockAndBroadcast(item);
 
@@ -422,12 +430,12 @@ export const placeOrderWithWallet = async (userId, { addressId, session }) => {
   const cart = await getPopulatedCart(userId);
   if (!cart || !cart.items.length) throw Object.assign(new Error('Your cart is empty.'), { status: 400 });
 
-  const orderItems      = await buildOrderItemsAndValidate(cart);
   const user            = await User.findById(userId).select('name email phone addresses');
   const shippingAddress = resolveShippingAddress(user, addressId);
   const couponDiscount  = session.couponDiscount || 0;
   const couponCode      = session.couponCode     || null;
-  const pricing         = buildPriceSummary(cart, couponDiscount);
+  const pricing         = await buildPriceSummary(cart, couponDiscount);
+  const orderItems      = await buildOrderItemsAndValidate(cart);
 
   const wallet = await Wallet.getOrCreate(userId);
   if (wallet.balance < pricing.grandTotal) {
@@ -487,13 +495,12 @@ export const createRazorpayCheckoutOrder = async (userId, { addressId, session }
   const cart = await getPopulatedCart(userId);
   if (!cart || !cart.items.length) throw Object.assign(new Error('Your cart is empty.'), { status: 400 });
 
-  // REMOVED: same generic cartIsValid() shadow-check as placeOrder above.
-  const orderItems      = await buildOrderItemsAndValidate(cart);
   const user            = await User.findById(userId).select('name email phone addresses');
   const shippingAddress = resolveShippingAddress(user, addressId);
   const couponDiscount  = session.couponDiscount || 0;
   const couponCode      = session.couponCode     || null;
-  const pricing         = buildPriceSummary(cart, couponDiscount);
+  const pricing         = await buildPriceSummary(cart, couponDiscount);
+  const orderItems      = await buildOrderItemsAndValidate(cart);
 
   const shippingAddressPayload = {
     fullName: shippingAddress.fullName || user.name,
@@ -513,7 +520,6 @@ export const createRazorpayCheckoutOrder = async (userId, { addressId, session }
     grandTotal    : pricing.grandTotal,
   };
 
- 
   let order = await Order.findOne({
     user         : userId,
     paymentMethod: 'Razorpay',
@@ -539,7 +545,6 @@ export const createRazorpayCheckoutOrder = async (userId, { addressId, session }
     });
   }
 
- 
   await order.save();
 
   const razorpayOrder   = await createRazorpayOrder(pricing.grandTotal, order.orderNumber);

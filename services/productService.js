@@ -1,6 +1,7 @@
 import Product  from '../models/product.js';
 import Category from '../models/category.js';
 import Brand    from '../models/brand.js';
+import Review   from '../models/review.js';
 import { attachOffers, attachOffer } from './offerService.js';
 
 export const getFeaturedProducts = async () => {
@@ -130,6 +131,32 @@ export const getProductById = async (productId) => {
     attachOffer(product),
     attachOffers(related),
   ]);
+
+  /* ---------------------------------------------------------------------
+     Attach ADMIN-APPROVED reviews only. Only reviews with status
+     'approved' (moderated via /admin/reviews) are ever shown on the
+     product page — pending/rejected/spam/hidden reviews never surface here.
+  --------------------------------------------------------------------- */
+  const approvedReviews = await Review.find({ product: product._id, status: 'approved' })
+    .sort({ replyPinned: -1, createdAt: -1 })
+    .lean();
+
+  const reviewCount = approvedReviews.length;
+  const avgRating   = reviewCount
+    ? approvedReviews.reduce((sum, r) => sum + r.rating, 0) / reviewCount
+    : 0;
+
+  product.reviews = approvedReviews.map((r) => ({
+    userName        : r.customerName,
+    title           : r.reviewTitle,
+    body            : r.reviewMessage,
+    rating          : r.rating,
+    createdAt       : r.createdAt,
+    verifiedPurchase: r.verifiedPurchase,
+    adminReply      : r.adminReply,
+  }));
+  product.reviewCount = reviewCount;
+  product.avgRating   = avgRating;
 
   return { product, related };
 };

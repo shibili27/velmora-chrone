@@ -299,10 +299,7 @@
           <div class="filter-group">
             <label>Period</label>
             <select name="filter" id="filterSelect" onchange="toggleCustom()">
-              <%
-                // FIX: added 'today' and 'alltime' options
-                // 'today'/'daily' both mean today (controller handles both)
-              %>
+            
               <option value="today"   <%= (filter === 'today'   || filter === 'daily') ? 'selected' : '' %>>Today</option>
               <option value="weekly"  <%= filter === 'weekly'  ? 'selected' : '' %>>Last 7 Days</option>
               <option value="monthly" <%= filter === 'monthly' ? 'selected' : '' %>>This Month</option>
@@ -326,25 +323,16 @@
           <button type="submit" class="btn btn--teal">
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="M21 21l-4.35-4.35"/></svg>
             Apply
-          </button>
+          </button><% if (startDate>endDate) 
+          { %>
+              <div class="flash flash--error">Start date must be before end date.</div>
+            <% }%>
         </div>
       </form>
 
-      <%
-        // ── FIX: Correct card values ──────────────────────────────────────────
-        // totalRevenue  = sum of grandTotal (what customers actually paid)
-        // totalSubtotal = sum of subtotal (before tax & shipping) — shown as reference
-        // totalDiscount = itemDiscount + couponDiscount
-        // orderAmount   = totalRevenue (grandTotal is the real "order amount")
-        //
-        // The old template showed totalSubtotal as "Order Amount" which was always
-        // LESS than totalRevenue because revenue = subtotal + tax + shipping.
-        // Now Order Amount shows grandTotal to match what was actually charged.
-      %>
-
-      <!-- Summary: hero card + supporting metrics -->
+     
       <div class="summary-grid">
-        <!-- Hero: Total Revenue (grandTotal sum) -->
+       
         <div class="summary-card summary-card--hero">
           <div class="summary-card__label">Total Revenue</div>
           <div class="summary-card__value">₹<%= summary.totalRevenue.toLocaleString('en-IN') %></div>
@@ -363,11 +351,7 @@
           <div class="summary-card__sub">Product subtotal before tax &amp; shipping</div>
         </div>
 
-        <%
-          // FIX: Total Discount — was always 0 because pricing.itemDiscount is 0 in DB
-          // Controller now computes this from originalPrice vs price per item
-          // and sends it back as summary.totalDiscount
-        %>
+      
         <div class="summary-card c-red">
           <div class="summary-card__label">Total Discount</div>
           <div class="summary-card__value">₹<%= summary.totalDiscount.toLocaleString('en-IN') %></div>

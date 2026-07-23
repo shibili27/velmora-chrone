@@ -1160,23 +1160,44 @@ function triggerVariantUpload(prefix, idx) {
   document.getElementById(prefix + 'VFileInput' + idx).click();
 }
 
+// ══════════════════════════════════════════════════════════════════════════════
+// ══ CROPPER PIPELINE (shared by Add Product & Edit Product) ═══════════════════
+// ══════════════════════════════════════════════════════════════════════════════
+//
+// FIX: previously this code set img.src and immediately created `new Cropper(...)`,
+// trusting the image would already be loaded. For images that fail to decode into
+// an <img> element (HEIC/HEIF from iPhones, corrupted files, or anything that slips
+// past the `image/*` mime check but the browser can't actually render), the `load`
+// event never fires (or fires with naturalWidth/Height = 0), so Cropper.js never
+// initializes — the modal opens but stays blank/non-interactive. There was also no
+// try/catch, so a thrown error inside the library would silently stall the whole
+// upload queue. This version waits for a real load/error event, verifies the image
+// actually decoded, wraps init in try/catch, and automatically skips + reports any
+// image that can't be cropped instead of getting stuck.
+
 let cropQueue = [], cropCtx = null, currentCropper = null, currentFileObj = null;
 
-// ── handleVariantFiles: rejects non-image files and oversized files BEFORE
-// they ever reach the cropper/upload pipeline, with a clear inline message ────
-function handleVariantFiles(event, prefix, varIdx) {
+// ── handleVariantFiles: rejects non-image files (and anything absurdly large
+// that would freeze the browser trying to compress it). Anything over the
+// soft 5MB target gets auto-compressed client-side instead of rejected. ──────
+const SOFT_MAX_SIZE = 5 * 1024 * 1024;   // target size — compress down to this
+const HARD_MAX_SIZE = 40 * 1024 * 1024;  // above this we still reject outright
+
+async function handleVariantFiles(event, prefix, varIdx) {
   const files = Array.from(event.target.files);
   event.target.value = '';
 
-  const MAX_SIZE = 5 * 1024 * 1024; // 5MB
   const valid = [];
+  const toCompress = [];
   const rejected = [];
 
   files.forEach(f => {
     if (!f.type.startsWith('image/')) {
       rejected.push(`"${f.name}" is not a valid image file.`);
-    } else if (f.size > MAX_SIZE) {
-      rejected.push(`"${f.name}" is larger than 5MB.`);
+    } else if (f.size > HARD_MAX_SIZE) {
+      rejected.push(`"${f.name}" is too large to process (over 40MB).`);
+    } else if (f.size > SOFT_MAX_SIZE) {
+      toCompress.push(f);
     } else {
       valid.push(f);
     }
@@ -1185,6 +1206,24 @@ function handleVariantFiles(event, prefix, varIdx) {
   if (rejected.length) {
     showModalError(prefix, rejected.join(' '));
   }
+
+  if (toCompress.length) {
+    showModalError(
+      prefix,
+      `Compressing ${toCompress.length} large image${toCompress.length > 1 ? 's' : ''}, one moment…`
+    );
+    for (const f of toCompress) {
+      try {
+        const compressed = await compressImageFile(f, SOFT_MAX_SIZE);
+        valid.push(compressed);
+      } catch (err) {
+        console.error('Compression failed:', f.name, err);
+        showModalError(prefix, `"${f.name}" couldn't be compressed and was skipped.`);
+      }
+    }
+    if (valid.length) clearModalError(prefix);
+  }
+
   if (valid.length === 0) return;
 
   cropCtx   = { prefix, varIdx };
@@ -1192,21 +1231,151 @@ function handleVariantFiles(event, prefix, varIdx) {
   processNextCrop();
 }
 
+// Resizes/re-encodes an oversized image via canvas until it's under
+// maxSizeBytes (or gives up gracefully after a few rounds and returns the
+// best result it managed, rather than failing the whole upload).
+function compressImageFile(file, maxSizeBytes, startDimension = 2200) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('Could not read file'));
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onerror = () => reject(new Error('Could not decode image'));
+      img.onload = () => attempt(img, startDimension, 0.85, 0);
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+
+    function attempt(img, dimension, quality, round) {
+      const scale  = Math.min(1, dimension / Math.max(img.width, img.height));
+      const width  = Math.max(1, Math.round(img.width * scale));
+      const height = Math.max(1, Math.round(img.height * scale));
+
+      const canvas = document.createElement('canvas');
+      canvas.width  = width;
+      canvas.height = height;
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+
+      canvas.toBlob(blob => {
+        if (!blob) { reject(new Error('Could not encode image')); return; }
+
+        const underLimit     = blob.size <= maxSizeBytes;
+        const outOfQuality    = quality <= 0.4;
+        const outOfRounds     = round >= 4;
+
+        if (underLimit || (outOfQuality && outOfRounds)) {
+          const base = file.name.replace(/\.\w+$/, '');
+          resolve(new File([blob], `${base}.jpg`, { type: 'image/jpeg' }));
+          return;
+        }
+
+        if (outOfQuality) {
+          // Ran out of quality headroom — shrink dimensions further and retry.
+          attempt(img, Math.round(dimension * 0.75), 0.85, round + 1);
+        } else {
+          attempt(img, dimension, quality - 0.15, round);
+        }
+      }, 'image/jpeg', quality);
+    }
+  });
+}
+
 function processNextCrop() {
   if (cropQueue.length === 0) return;
   const file = cropQueue.shift();
   const reader = new FileReader();
   reader.onload = e => openCropper(e.target.result, file);
+  reader.onerror = () => {
+    showModalError(cropCtx.prefix, `Could not read "${file.name}". Skipping this image.`);
+    processNextCrop();
+  };
   reader.readAsDataURL(file);
+}
+
+let cropWatchdog = null;
+
+// Cropper.js wraps/mutates whatever element it's given. Reusing the SAME
+// <img id="cropperImage"> node across every image in a batch means that if a
+// previous instance is destroyed slightly before its internal setup fully
+// settles (a timing race — not tied to any particular file), leftover state
+// can silently break the next instance with no thrown error. Swapping in a
+// brand-new <img> node for every crop session removes that class of bug
+// entirely: each Cropper always starts from a completely clean element.
+function getFreshCropperImage() {
+  const old = document.getElementById('cropperImage');
+  const fresh = document.createElement('img');
+  fresh.id = 'cropperImage';
+  fresh.alt = 'crop';
+  old.replaceWith(fresh);
+  return fresh;
 }
 
 function openCropper(src, file) {
   currentFileObj = file;
-  const img = document.getElementById('cropperImage');
-  img.src = src;
-  document.getElementById('cropperModal').classList.add('open');
+
+  // Tear down any previous instance, then start this one on a fresh node.
   if (currentCropper) { currentCropper.destroy(); currentCropper = null; }
-  currentCropper = new Cropper(img, { aspectRatio: 1, viewMode: 1, autoCropArea: 0.9 });
+  if (cropWatchdog) { clearTimeout(cropWatchdog); cropWatchdog = null; }
+  const img = getFreshCropperImage();
+
+  let settled = false; // guards against onload/onerror/timeout all firing
+
+  const settle = (fn) => {
+    if (settled) return;
+    settled = true;
+    if (cropWatchdog) { clearTimeout(cropWatchdog); cropWatchdog = null; }
+    fn();
+  };
+
+  const initCropper = () => settle(() => {
+    // Some "images" (e.g. HEIC, corrupted files) fire a load event but decode
+    // to 0x0 — Cropper.js silently does nothing useful in that case, so guard for it.
+    if (!img.naturalWidth || !img.naturalHeight) {
+      console.warn('Cropper: image decoded with 0 dimensions', file.name);
+      handleCropperFailure(file, 'decoded with zero dimensions');
+      return;
+    }
+    try {
+      currentCropper = new Cropper(img, { aspectRatio: 1, viewMode: 1, autoCropArea: 0.9 });
+    } catch (err) {
+      console.error('Cropper init error:', err, file.name);
+      handleCropperFailure(file, err && err.message);
+    }
+  });
+
+  const failLoad = () => settle(() => {
+    console.warn('Cropper: image failed to load', file.name);
+    handleCropperFailure(file, 'failed to load');
+  });
+
+  img.onload  = initCropper;
+  img.onerror = failLoad;
+
+  document.getElementById('cropperModal').classList.add('open');
+  img.src = src;
+
+  // If the browser already has this exact data URL decoded (e.g. same file
+  // picked twice in one session), no new 'load' event fires — handle directly.
+  if (img.complete && img.naturalWidth) {
+    initCropper();
+  }
+
+  // Safety net: if neither load nor error fires within 6s for any reason
+  // (browser quirk, huge image still decoding, etc.), don't leave the user stuck.
+  cropWatchdog = setTimeout(() => settle(() => {
+    console.warn('Cropper: timed out waiting for image', file.name);
+    handleCropperFailure(file, 'timed out');
+  }), 6000);
+}
+
+function handleCropperFailure(file, reason) {
+  closeCropper();
+  console.error('Cropper failure for', file.name, '-', reason);
+  showModalError(
+    cropCtx.prefix,
+    `"${file.name}" couldn't be loaded for cropping (${reason || 'unknown error'}). It was skipped — please use a standard JPG, PNG, or WebP.`
+  );
+  processNextCrop();
 }
 
 function applyCrop() {
@@ -1229,6 +1398,7 @@ function cancelCrop() {
 function closeCropper() {
   document.getElementById('cropperModal').classList.remove('open');
   if (currentCropper) { currentCropper.destroy(); currentCropper = null; }
+  if (cropWatchdog) { clearTimeout(cropWatchdog); cropWatchdog = null; }
 }
 
 function pushVariantImage(src, isExisting) {

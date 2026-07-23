@@ -25,8 +25,14 @@ export const listOrders = async (req, res) => {
       query.orderStatus = status;
     }
 
+    // FIX: match both order-level AND item-level returnStatus, same as the
+    // returnPending count below — previously this only checked order.returnStatus,
+    // so orders with only an item-level pending/accepted/rejected return never showed up.
     if (returnFilter && ['pending', 'accepted', 'rejected'].includes(returnFilter)) {
-      query.returnStatus = returnFilter;
+      query.$or = [
+        { returnStatus: returnFilter },
+        { 'items.returnStatus': returnFilter },
+      ];
     }
 
     if (from || to) {
@@ -62,7 +68,7 @@ export const listOrders = async (req, res) => {
             as          : 'user',
           },
         },
-        { $unwind: { path: '$user', preserveNullAndEmpty: true } },
+        { $unwind: { path: '$user', preserveNullAndEmptyArrays: true } },
         {
           $match: {
             $or: [

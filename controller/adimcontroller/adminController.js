@@ -8,6 +8,7 @@ import cloudinary from '../../config/cloudinary.js';
 import { broadcast } from '../../public/utils/ssemanager.js';
 import Coupon from '../../models/coupon.js';
 import PDFDocument from 'pdfkit';
+import { getRefundAmount } from '../../services/orderService.js';
 
 export const getDashboard = async (req, res) => {
   try {
@@ -1080,7 +1081,6 @@ export const editCoupon = async (req, res) => {
   }
 };
 
-// dash
 export const getDashboardChartData = async (req, res) => {
   try {
     const period = req.query.period || 'monthly';
@@ -1190,9 +1190,9 @@ export const getLedgerData = async (req, res) => {
     const grossRevenue    = deliveredOrders.reduce((s, o) => s + o.subtotal, 0);
     const totalDiscount   = deliveredOrders.reduce((s, o) => s + o.itemDiscount + o.couponDiscount, 0);
     const netRevenue      = deliveredOrders.reduce((s, o) => s + o.grandTotal, 0);
-    const totalRefunds    = mapped
-      .filter(o => o.status === 'returned')
-      .reduce((s, o) => s + o.grandTotal, 0);
+    const totalRefunds    = orders
+      .filter(o => o.orderStatus === 'returned')
+      .reduce((s, o) => s + getRefundAmount(o), 0);
 
     res.json({
       success: true,
@@ -1269,7 +1269,7 @@ export const downloadLedgerPDF = async (req, res) => {
     const grossRevenue = delivered.reduce((s, o) => s + o.pricing.subtotal, 0);
     const totalDisc    = delivered.reduce((s, o) => s + (o.pricing.itemDiscount || 0) + (o.pricing.couponDiscount || 0), 0);
     const netRevenue   = delivered.reduce((s, o) => s + o.pricing.grandTotal, 0);
-    const totalRefunds = orders.filter(o => o.orderStatus === 'returned').reduce((s, o) => s + o.pricing.grandTotal, 0);
+    const totalRefunds = orders.filter(o => o.orderStatus === 'returned').reduce((s, o) => s + getRefundAmount(o), 0);
 
     const summaryItems = [
       { label: 'Total Orders',   value: String(orders.length) },

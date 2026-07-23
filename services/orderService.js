@@ -20,10 +20,15 @@ const recalculateOrderPricing = (order) => {
   const originalItemDiscount   = p.itemDiscount   || 0;
   const originalCouponDiscount = p.couponDiscount || 0;
 
+  // itemDiscount is informational only — item.totalPrice (and therefore
+  // activeSubtotal) is already net of the offer/item discount, exactly as it
+  // was at order-creation time in checkoutService.buildPriceSummary. Only the
+  // coupon discount actually needs to be subtracted here to get the taxable
+  // amount. Subtracting itemDiscount again here would double-count it.
   const newItemDiscount   = Math.round(originalItemDiscount   * activeRatio);
   const newCouponDiscount = Math.round(originalCouponDiscount * activeRatio);
 
-  const discountedSubtotal = Math.max(activeSubtotal - newItemDiscount - newCouponDiscount, 0);
+  const discountedSubtotal = Math.max(activeSubtotal - newCouponDiscount, 0);
   const newTax             = Math.round(discountedSubtotal * GST_RATE);
   const shipping           = p.shipping || 0;
 
@@ -39,7 +44,7 @@ const recalculateOrderPricing = (order) => {
 };
 
 
-const getRefundAmount = (order) => {
+export const getRefundAmount = (order) => {
   if (order.paymentMethod === 'COD') return 0;
   if (order.paymentMethod === 'Razorpay' && order.paymentStatus !== 'paid') return 0;
 
@@ -50,7 +55,7 @@ const getRefundAmount = (order) => {
 };
 
 
-const getItemRefundAmount = (order, item) => {
+export const getItemRefundAmount = (order, item) => {
   if (order.paymentMethod === 'COD') return 0;
   if (order.paymentMethod === 'Razorpay' && order.paymentStatus !== 'paid') return 0;
 
@@ -141,7 +146,7 @@ export const cancelEntireOrder = async ({ orderNumber, userId, reason }) => {
   order.orderStatus      = 'cancelled';
   order.cancellationNote = trimmedReason;
 
-  
+
   recalculateOrderPricing(order);
 
   await order.save();
@@ -269,7 +274,7 @@ export const requestItemReturn = async ({ orderNumber, userId, itemId, reason })
     order.orderStatus       = 'returned';
   }
 
-  
+
   await order.save();
   return order;
 };
@@ -350,7 +355,7 @@ export const acceptItemReturn = async ({ orderNumber, itemId }) => {
   await restoreStockAndBroadcast(item.product, item.quantity, item.variantName || null);
 
   item.returnStatus = 'accepted';
-  item.status        = 'cancelled'; 
+  item.status        = 'cancelled';
 
   const activeItems = order.items.filter(i => i.status === 'active');
   const allAccepted = activeItems.length === 0 || activeItems.every(i => i.returnStatus === 'accepted');

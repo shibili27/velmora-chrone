@@ -34,6 +34,20 @@ import {
 import {
   getReferralSettings, updateReferralSettings,
 } from '../controller/adimcontroller/referralController.js';
+import {
+  listReviews,
+  createReview,
+  editReview,
+  deleteReview,
+  updateReviewStatus,
+  bulkReviewAction,
+  addReviewReply,
+  deleteReviewReply,
+  getRecentReviews,
+  exportReviewsPDF,
+  exportReviewsExcel,
+  exportReviewsCSV,
+} from '../controller/adimcontroller/reviewController.js';
 
 const router = express.Router();
 
@@ -242,6 +256,25 @@ router.patch('/orders/:id/return',isAuthenticated, handleReturnRequest);
 
 
 router.patch('/orders/:id/items/:itemId/return',isAuthenticated, handleItemReturnRequest);
+
+
+router.get   ('/reviews',isAuthenticated, listReviews);
+router.get   ('/reviews/notify/recent',isAuthenticated, getRecentReviews);
+router.post  ('/reviews',isAuthenticated, createReview);
+router.put   ('/reviews/:id',isAuthenticated, editReview);
+router.delete('/reviews/:id',isAuthenticated, deleteReview);
+router.patch ('/reviews/:id/status',isAuthenticated, updateReviewStatus);
+router.post  ('/reviews/bulk',isAuthenticated, bulkReviewAction);
+router.post  ('/reviews/:id/reply',isAuthenticated, addReviewReply);
+router.delete('/reviews/:id/reply',isAuthenticated, deleteReviewReply);
+
+router.get('/reviews/export', isAuthenticated, (req, res) => {
+  const { format } = req.query;
+  if (format === 'pdf')   return exportReviewsPDF(req, res);
+  if (format === 'excel' || format === 'xlsx') return exportReviewsExcel(req, res);
+  if (format === 'csv')   return exportReviewsCSV(req, res);
+  res.status(400).send('Invalid export format. Use ?format=pdf, ?format=excel, or ?format=csv');
+});
 
 
 

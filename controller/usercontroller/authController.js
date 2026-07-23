@@ -163,6 +163,64 @@ const resendOTP = async (req, res) => {
   }
 };
 
+// ── Page renders (GET) ─────────────────────────────────────────────────────
+
+const getLoginPage = (req, res) => {
+  const authError   = req.flash('authError')[0]   || null;
+  const errorSource = req.flash('errorSource')[0] || null;
+  res.render('user/login', {
+    authError,
+    errorSource,
+    formData: { email: req.flash('formEmail')[0] || '' },
+  });
+};
+
+const getSignupPage = (req, res) => {
+  res.render('user/signup', {
+    authError: req.flash('authError')[0] || null,
+    formData: {
+      email: req.flash('formEmail')[0] || '',
+      name:  req.flash('formName')[0]  || '',
+    },
+  });
+};
+
+const getOtpPage = (req, res) => {
+  res.render('user/otp');
+};
+
+const getForgotPasswordPage = (req, res) => {
+  res.render('user/forgot');
+};
+
+const getResetPasswordPage = (req, res) => {
+  res.render('user/newPassword');
+};
+
+// Handler for the passport.authenticate('google', ...) callback route.
+// Runs AFTER passport has already populated req.user.
+const googleAuthCallback = async (req, res) => {
+  try {
+    req.session.user = req.user._id;
+    await new Promise((resolve, reject) =>
+      req.session.save(err => (err ? reject(err) : resolve()))
+    );
+    res.redirect('/');
+  } catch (err) {
+    console.error('Google callback error:', err);
+    req.flash('authError', 'Google sign-in failed. Please try again.');
+    req.flash('errorSource', 'email');
+    res.redirect('/login');
+  }
+};
+
+const logout = (req, res) => {
+  req.session.destroy(() => {
+    res.clearCookie('connect.sid');
+    res.redirect('/login');
+  });
+};
+
 export default {
   login,
   sendSignupOtp,
@@ -171,4 +229,11 @@ export default {
   verifyResetOTP,
   resetPassword,
   resendOTP,
+  getLoginPage,
+  getSignupPage,
+  getOtpPage,
+  getForgotPasswordPage,
+  getResetPasswordPage,
+  googleAuthCallback,
+  logout,
 };

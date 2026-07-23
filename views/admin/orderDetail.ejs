@@ -250,6 +250,33 @@
     .fc-backdrop { position: fixed; inset: 0; z-index: 300; background: transparent; display: none; }
     .fc-backdrop.active { display: block; }
     .page-footer { text-align:center; padding:20px 32px; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-light); border-top:1px solid var(--border); }
+
+    /* ── Item-level return badges & inline actions ── */
+    .item-return-badge { display:inline-flex; align-items:center; gap:5px; font-size:9px; font-weight:600; padding:2px 8px; border-radius:20px; white-space:nowrap; margin-top:5px; }
+    .item-return-badge::before { content:''; width:5px; height:5px; border-radius:50%; background:currentColor; flex-shrink:0; }
+    .item-return-badge--pending  { color:var(--amber); background:var(--amber-bg); }
+    .item-return-badge--pending::before { animation:pulse 1.5s ease-in-out infinite; }
+    .item-return-badge--accepted { color:var(--green); background:var(--green-bg); }
+    .item-return-badge--rejected { color:var(--red);   background:var(--red-bg);   }
+    .item-actions-row { display:flex; gap:6px; margin-top:6px; flex-wrap:wrap; }
+    .item-btn { display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border-radius:4px; font-family:'Jost',sans-serif; font-size:10.5px; font-weight:600; cursor:pointer; border:none; transition:background 0.15s; }
+    .item-btn svg { width:10px; height:10px; }
+    .item-btn--accept { background:var(--green); color:#fff; }
+    .item-btn--accept:hover { background:#15803d; }
+    .item-btn--reject { background:var(--white); color:var(--red); border:1px solid #fca5a5; }
+    .item-btn--reject:hover { background:var(--red-bg); }
+    .item-btn--restock { background:var(--teal-light); color:var(--teal-dark); border:1px solid var(--teal); }
+    .item-btn--restock:hover { background:var(--teal); color:#fff; }
+    .item-btn:disabled { opacity:0.55; cursor:not-allowed; }
+    .item-return-reason { font-size:10.5px; color:var(--text-light); margin-top:3px; font-style:italic; }
+
+    /* ── Item return decision modal (centered) ── */
+    .item-modal-backdrop { position:fixed; inset:0; z-index:500; background:rgba(17,17,16,0.42); display:none; align-items:center; justify-content:center; }
+    .item-modal-backdrop.open { display:flex; }
+    .item-modal { width:380px; max-width:92vw; background:var(--white); border-radius:10px; box-shadow:0 20px 60px rgba(0,0,0,0.25); animation:slideIn 0.2s ease; overflow:hidden; }
+    .item-modal__header { padding:16px 20px 14px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px; }
+    .item-modal__body { padding:16px 20px; max-height:60vh; overflow-y:auto; }
+    .item-modal__footer { padding:12px 20px 16px; display:flex; gap:8px; justify-content:flex-end; }
   </style>
 </head>
 <body>
@@ -570,11 +597,14 @@
             </div>
             <table>
               <thead>
-                <tr><th>Product</th><th>Price</th><th>Qty</th><th>Total</th><th>Status</th></tr>
+                <tr><th>Product</th><th>Price</th><th>Qty</th><th>Total</th><th>Status</th><th>Return</th></tr>
               </thead>
-              <tbody>
+              <tbody id="itemsTableBody">
                 <% order.items.forEach(function(item) { %>
-                <tr>
+                <%
+                  const iReturn = item.returnStatus || 'none';
+                %>
+                <tr data-item-id="<%= item._id %>">
                   <td>
                     <div class="product-cell">
                       <% if (item.image) { %>
@@ -593,10 +623,58 @@
                   <td>₹<%= item.price.toLocaleString('en-IN') %></td>
                   <td><%= item.quantity %></td>
                   <td style="font-weight:600">₹<%= item.totalPrice.toLocaleString('en-IN') %></td>
+                  <%
+                    let _statusLabel = item.status === 'active' ? 'Active' : 'Cancelled';
+                    let _statusClass = item.status === 'active' ? 'active' : 'item-cancelled';
+                    if (iReturn === 'accepted') {
+                      _statusLabel = 'Returned';
+                      _statusClass = 'returned';
+                    }
+                  %>
                   <td>
-                    <span class="badge badge--<%= item.status === 'active' ? 'active' : 'item-cancelled' %>">
-                      <%= item.status === 'active' ? 'Active' : 'Cancelled' %>
+                    <span class="badge badge--<%= _statusClass %>">
+                      <%= _statusLabel %>
                     </span>
+                  </td>
+                  <td class="item-return-cell" style="min-width:170px">
+                    <% if (iReturn === 'none') { %>
+                      <span style="color:var(--text-light);font-size:11px">—</span>
+
+                    <% } else if (iReturn === 'pending') { %>
+                      <span class="item-return-badge item-return-badge--pending">Return Pending</span>
+                      <% if (item.returnReason) { %>
+                        <div class="item-return-reason">"<%= item.returnReason %>"</div>
+                      <% } %>
+                      <div class="item-actions-row">
+                        <button class="item-btn item-btn--accept" onclick="openItemModal('<%= item._id %>', 'accept', event)">
+                          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                          Accept
+                        </button>
+                        <button class="item-btn item-btn--reject" onclick="openItemModal('<%= item._id %>', 'reject', event)">
+                          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                          Reject
+                        </button>
+                      </div>
+
+                    <% } else if (iReturn === 'accepted') { %>
+                      <span class="item-return-badge item-return-badge--accepted">Return Accepted</span>
+                      <% if (!item.restocked) { %>
+                        <div class="item-actions-row">
+                          <button class="item-btn item-btn--restock" onclick="restockItemAction('<%= item._id %>', this)">
+                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                            Restock
+                          </button>
+                        </div>
+                      <% } else { %>
+                        <div class="item-return-reason" style="font-style:normal;color:var(--text-light)">Restocked ✓</div>
+                      <% } %>
+
+                    <% } else if (iReturn === 'rejected') { %>
+                      <span class="item-return-badge item-return-badge--rejected">Return Rejected</span>
+                      <% if (item.returnRejectionReason) { %>
+                        <div class="item-return-reason">Reason: <%= item.returnRejectionReason %></div>
+                      <% } %>
+                    <% } %>
                   </td>
                 </tr>
                 <% }) %>
@@ -803,6 +881,53 @@
   </div>
 </div>
 
+<!-- ── Item return decision modal ── -->
+<div class="item-modal-backdrop" id="itemModalBackdrop" onclick="closeItemModal(event)">
+  <div class="item-modal" id="itemModal" onclick="event.stopPropagation()">
+    <div class="item-modal__header">
+      <div class="float-card__icon" id="itemModalIcon">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+      </div>
+      <div>
+        <div class="float-card__title" id="itemModalTitle">Confirm</div>
+        <div class="float-card__sub" id="itemModalSub">Review before proceeding</div>
+      </div>
+    </div>
+    <div class="item-modal__body">
+      <div class="fcs-row">
+        <span class="fcs-row__label">Item</span>
+        <span class="fcs-row__val" id="itemModalName">—</span>
+      </div>
+      <div class="fcs-row">
+        <span class="fcs-row__label">Refund amount</span>
+        <span class="fcs-row__val" id="itemModalAmount">—</span>
+      </div>
+
+      <!-- Accept-only: restock toggle -->
+      <div class="restock-toggle-row" id="itemModalRestockRow">
+        <div class="restock-toggle-row__text">
+          <div class="restock-toggle-row__label">Add item back to stock?</div>
+          <div class="restock-toggle-row__sub">Increases product (and variant) inventory by the returned quantity</div>
+        </div>
+        <label class="restock-switch">
+          <input type="checkbox" id="itemModalRestockToggle" checked />
+          <span class="restock-switch__slider"></span>
+        </label>
+      </div>
+
+      <!-- Reject-only: reason textarea -->
+      <div id="itemModalRejectSection" style="display:none">
+        <label class="float-card__textarea-label">Rejection Reason <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-light)">(optional)</span></label>
+        <textarea class="float-card__textarea" id="itemModalRejectReason" placeholder="e.g. Item shows signs of use / not covered by return policy…"></textarea>
+      </div>
+    </div>
+    <div class="item-modal__footer">
+      <button class="fc-btn fc-btn--cancel" onclick="closeItemModal()">Cancel</button>
+      <button class="fc-btn" id="itemModalConfirmBtn" onclick="confirmItemDecision()">Confirm</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script src="/socket.io/socket.io.js"></script>
@@ -844,7 +969,7 @@
     });
   })();
 
-  /* ── Float card helpers ── */
+  /* ── Float card helpers (order-level return) ── */
   function closeAllCards() {
     document.getElementById('acceptCard')?.classList.remove('open');
     document.getElementById('rejectCard')?.classList.remove('open');
@@ -875,9 +1000,9 @@
     const el = document.getElementById(id);
     if (el) el.addEventListener('click', e => e.stopPropagation());
   });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAllCards(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeAllCards(); closeItemModal(); } });
 
-  /* ── Return decision ── */
+  /* ── Return decision (order-level) ── */
   async function confirmAccept() {
     const btn     = document.getElementById('acceptOkBtn');
     const restock = document.getElementById('restockToggle').checked;
@@ -1021,6 +1146,181 @@
     const div = document.createElement('div');
     div.textContent = str;
     return div.innerHTML;
+  }
+
+  /* ══════════════════════════════════════════════════════
+     ── ITEM-LEVEL RETURN APPROVAL ──
+     Mirrors the order-level flow above, but scoped to a
+     single item inside order.items[]. Talks to:
+       PATCH /admin/orders/:id/items/:itemId/return   (accept/reject)
+       PATCH /admin/orders/:id/items/:itemId/restock  (manual restock)
+     If your actual route paths differ, update ITEM_RETURN_URL /
+     ITEM_RESTOCK_URL below — nothing else needs to change.
+     ══════════════════════════════════════════════════════ */
+
+  function ITEM_RETURN_URL(itemId)  { return `/admin/orders/${ORDER_ID}/items/${itemId}/return`; }
+  function ITEM_RESTOCK_URL(itemId) { return `/admin/orders/${ORDER_ID}/items/${itemId}/restock`; }
+
+  let activeItemId       = null;
+  let activeItemDecision = null; // 'accept' | 'reject'
+
+  function openItemModal(itemId, decision, e) {
+    e?.stopPropagation();
+    activeItemId       = itemId;
+    activeItemDecision = decision;
+
+    const row      = document.querySelector(`tr[data-item-id="${itemId}"]`);
+    const nameEl    = row?.querySelector('.product-name');
+    const totalCell = row?.children[3]; // Total column
+    const itemName   = nameEl ? nameEl.textContent.trim() : 'Item';
+    const itemTotal  = totalCell ? totalCell.textContent.trim() : '';
+
+    document.getElementById('itemModalName').textContent = itemName;
+
+    const icon      = document.getElementById('itemModalIcon');
+    const title     = document.getElementById('itemModalTitle');
+    const sub       = document.getElementById('itemModalSub');
+    const amountEl  = document.getElementById('itemModalAmount');
+    const restockRow= document.getElementById('itemModalRestockRow');
+    const rejectSec = document.getElementById('itemModalRejectSection');
+    const confirmBtn= document.getElementById('itemModalConfirmBtn');
+
+    if (decision === 'accept') {
+      icon.className = 'float-card__icon float-card__icon--green';
+      icon.innerHTML = '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>';
+      title.textContent = 'Confirm Accept Item Return';
+      sub.textContent    = 'Refund goes to the customer\'s wallet';
+      amountEl.textContent   = itemTotal || '—';
+      amountEl.className     = 'fcs-row__val fcs-row__val--green';
+      restockRow.style.display = 'flex';
+      rejectSec.style.display  = 'none';
+      confirmBtn.className    = 'fc-btn fc-btn--accept';
+      confirmBtn.innerHTML    = '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> Yes, Accept';
+    } else {
+      icon.className = 'float-card__icon float-card__icon--red';
+      icon.innerHTML = '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>';
+      title.textContent = 'Confirm Reject Item Return';
+      sub.textContent    = 'Customer will be notified';
+      amountEl.textContent   = `${itemTotal || ''} — Not refunded`;
+      amountEl.className     = 'fcs-row__val';
+      amountEl.style.color   = 'var(--red)';
+      restockRow.style.display = 'none';
+      rejectSec.style.display  = 'block';
+      document.getElementById('itemModalRejectReason').value = '';
+      confirmBtn.className    = 'fc-btn fc-btn--reject';
+      confirmBtn.innerHTML    = '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg> Reject';
+    }
+
+    document.getElementById('itemModalBackdrop').classList.add('open');
+  }
+
+  function closeItemModal(e) {
+    if (e && e.target !== document.getElementById('itemModalBackdrop')) return;
+    document.getElementById('itemModalBackdrop').classList.remove('open');
+    activeItemId = null;
+    activeItemDecision = null;
+  }
+
+  async function confirmItemDecision() {
+    if (!activeItemId || !activeItemDecision) return;
+    const itemId   = activeItemId;
+    const decision = activeItemDecision === 'accept' ? 'accepted' : 'rejected';
+    const restock  = decision === 'accepted'
+      ? document.getElementById('itemModalRestockToggle').checked
+      : true;
+    const rejectionReason = decision === 'rejected'
+      ? document.getElementById('itemModalRejectReason').value.trim()
+      : '';
+
+    const btn = document.getElementById('itemModalConfirmBtn');
+    btn.disabled = true;
+    const originalHtml = btn.innerHTML;
+    btn.innerHTML = '… Processing';
+
+    try {
+      const res  = await fetch(ITEM_RETURN_URL(itemId), {
+        method : 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body   : JSON.stringify({ decision, rejectionReason, restock }),
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        showToast(data.message || (decision === 'accepted' ? '✓ Item return accepted' : '✕ Item return rejected'),
+          decision === 'accepted' ? 'success' : 'error');
+        applyItemDecisionToDOM(itemId, decision, rejectionReason, restock);
+        closeItemModal();
+      } else {
+        showToast(data.message || 'Action failed', 'error');
+      }
+    } catch {
+      showToast('Network error — please try again', 'error');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = originalHtml;
+    }
+  }
+
+  function applyItemDecisionToDOM(itemId, decision, rejectionReason, restocked) {
+    const row  = document.querySelector(`tr[data-item-id="${itemId}"]`);
+    const cell = row?.querySelector('.item-return-cell');
+    if (!cell) return;
+
+    if (decision === 'accepted') {
+      // Status column (5th <td>) still says "Active" since item.status is a
+      // separate field from returnStatus — flip it to "Returned" here too.
+      const statusCell = row.children[4];
+      if (statusCell) {
+        statusCell.innerHTML = `<span class="badge badge--returned">Returned</span>`;
+      }
+      cell.innerHTML = `
+        <span class="item-return-badge item-return-badge--accepted">Return Accepted</span>
+        ${restocked
+          ? `<div class="item-return-reason" style="font-style:normal;color:var(--text-light)">Restocked ✓</div>`
+          : `<div class="item-actions-row">
+               <button class="item-btn item-btn--restock" onclick="restockItemAction('${itemId}', this)">
+                 <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                 Restock
+               </button>
+             </div>`}
+      `;
+    } else {
+      cell.innerHTML = `
+        <span class="item-return-badge item-return-badge--rejected">Return Rejected</span>
+        ${rejectionReason ? `<div class="item-return-reason">Reason: ${escapeHtml(rejectionReason)}</div>` : ''}
+      `;
+    }
+  }
+
+  async function restockItemAction(itemId, btnEl) {
+    btnEl.disabled = true;
+    const originalHtml = btnEl.innerHTML;
+    btnEl.innerHTML = '… Restocking';
+    try {
+      const res  = await fetch(ITEM_RESTOCK_URL(itemId), {
+        method : 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast(data.message || '✓ Restocked', 'success');
+        const row  = document.querySelector(`tr[data-item-id="${itemId}"]`);
+        const cell = row?.querySelector('.item-return-cell');
+        if (cell) {
+          cell.innerHTML = `
+            <span class="item-return-badge item-return-badge--accepted">Return Accepted</span>
+            <div class="item-return-reason" style="font-style:normal;color:var(--text-light)">Restocked ✓</div>`;
+        }
+      } else {
+        showToast(data.message || 'Restock failed', 'error');
+        btnEl.disabled = false;
+        btnEl.innerHTML = originalHtml;
+      }
+    } catch {
+      showToast('Network error — please try again', 'error');
+      btnEl.disabled = false;
+      btnEl.innerHTML = originalHtml;
+    }
   }
 
   /* ── Status update ── */
