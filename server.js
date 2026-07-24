@@ -3,6 +3,10 @@ import session from 'express-session';
 import flash from 'connect-flash';
 import dotenv from 'dotenv';
 dotenv.config();
+
+import dns from 'dns';
+dns.setServers(['8.8.8.8', '1.1.1.1']);
+
 import MongoStore from 'connect-mongo';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -25,6 +29,9 @@ connectDB().then(() => {
 });
 
 const app        = express();
+
+app.set('trust proxy', 1);
+
 const httpServer = createServer(app);
 const io         = new Server(httpServer, {
   cors: { origin: '*', methods: ['GET', 'POST'] },
@@ -43,7 +50,7 @@ app.use(express.json({ limit: '50mb' }));
 
 app.use(session({
   secret           : process.env.SESSION_SECRET || 'superSecretKey123',
- 
+
   resave           : true,
   saveUninitialized: false,
   rolling          : true,
@@ -51,7 +58,7 @@ app.use(session({
     mongoUrl   : process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/velmora',
     ttl        : 6000 * 60 * 24,
     autoRemove : 'native',
-   
+
     touchAfter : 1500 * 60,
   }),
   cookie: {
