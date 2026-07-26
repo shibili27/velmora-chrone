@@ -331,6 +331,24 @@
     .footer-legal { display: flex; gap: 1.25rem; }
     .footer-legal a { font-family: 'Jost', sans-serif; font-size: 0.44rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(245,242,235,0.18); text-decoration: none; transition: color 0.2s; }
     .footer-legal a:hover { color: rgba(245,242,235,0.5); }
+
+    /* ── PAGE LOADER ── */
+    .page-loader {
+      position: fixed; inset: 0; z-index: 500;
+      background: rgba(8,8,7,0.55);
+      backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+    .page-loader.show { opacity: 1; pointer-events: all; }
+    .loader-spinner {
+      width: 40px; height: 40px; border-radius: 50%;
+      border: 2px solid rgba(201,169,110,0.15);
+      border-top-color: #c9a96e;
+      animation: loaderSpin 0.8s linear infinite;
+    }
+    @keyframes loaderSpin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
@@ -957,6 +975,9 @@
   </div>
 </div>
 
+<!-- ══ PAGE LOADER ══ -->
+<div class="page-loader" id="pageLoader"><div class="loader-spinner"></div></div>
+
 <!-- ══ TOAST ══ -->
 <div class="toast" id="toast"><span class="toast-dot"></span><span id="toastMsg"></span></div>
 
@@ -1024,6 +1045,27 @@
     toastTimer = setTimeout(() => t.classList.remove('show'), 3200);
   }
 
+  /* ── PAGE LOADER ── */
+  let loaderCount = 0;
+  function showLoader() {
+    loaderCount++;
+    document.getElementById('pageLoader').classList.add('show');
+  }
+  function hideLoader() {
+    loaderCount = Math.max(0, loaderCount - 1);
+    if (loaderCount === 0) document.getElementById('pageLoader').classList.remove('show');
+  }
+
+  /* ── NAVIGATION BUFFER (matches home.ejs behavior) ── */
+  document.addEventListener('click', function (e) {
+    const link = e.target.closest('a[href]');
+    if (!link) return;
+    const href = link.getAttribute('href');
+    if (!href || href.startsWith('#') || href.startsWith('javascript:') || href.startsWith('mailto:') || href.startsWith('tel:')) return;
+    if (link.target === '_blank') return;
+    showLoader();
+  }, true);
+
   /* ════ VALIDATION ════ */
   const ERR_ICON = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
 
@@ -1045,15 +1087,6 @@
 
   /* ════ ADDRESS FIELD VALIDATION ════ */
 
-  /**
-   * Generic "must contain real text" check — used for Full Name and City.
-   * Rejects:
-   *   - empty / whitespace-only
-   *   - values with no letters at all (e.g. "____", "....", "1234", "!!!")
-   *   - characters outside letters/marks/spaces/apostrophes/hyphens/periods
-   *   - runs of 5+ identical characters (e.g. "aaaaaaa", "______")
-   * Uses \p{L}/\p{M} so non-Latin scripts (Devanagari, Tamil, etc.) still work.
-   */
   function isValidTextField(val) {
     if (!val) return { ok: false, msg: 'This field cannot be empty.' };
     if (!/\p{L}/u.test(val)) return { ok: false, msg: 'Must contain letters, not just symbols or numbers.' };
@@ -1063,12 +1096,6 @@
     return { ok: true };
   }
 
-  /**
-   * Address line check — like isValidTextField but also allows digits,
-   * commas, and slashes since street addresses legitimately contain
-   * house/flat numbers (e.g. "12/4, MG Road"). Still rejects symbol-only
-   * junk like "____", "....", "////".
-   */
   function isValidAddressLine(val) {
     if (!val) return { ok: false, msg: 'This field cannot be empty.' };
     if (!/\p{L}/u.test(val) && !/\d/.test(val)) return { ok: false, msg: 'Must contain letters or numbers, not just symbols.' };
@@ -1109,78 +1136,31 @@
     return setFieldValid(el, 'err-addr-pincode');
   }
 
-  /**
-   * Full-name validation (Edit Profile tab).
-   * Rejects:
-   *   - empty / whitespace-only values
-   *   - values with no letters at all (e.g. "____", "....", "1234", "!!!")
-   *   - values containing characters outside letters/marks/spaces/apostrophes/hyphens/periods
-   *   - single-character "names"
-   *   - runs of 5+ identical characters (e.g. "aaaaaaa", "xxxxxxx")
-   * Uses \p{L} (Unicode letter) + \p{M} (combining mark) rather than A-Z, so names
-   * in Devanagari, Tamil, Arabic, etc. — including diacritics/matras — are accepted.
-   * Change to /[A-Za-z]/ only if you want Latin-only names.
-   */
   function validateEditName() {
     const el = document.getElementById('edit-name');
     const val = el.value.trim();
-
-    if (!val) {
-      return setFieldError(el, 'err-edit-name', 'Name cannot be empty.');
-    }
-    if (!/\p{L}/u.test(val)) {
-      return setFieldError(el, 'err-edit-name', 'Name must contain letters.');
-    }
-    if (!/^[\p{L}\p{M}\s.'-]+$/u.test(val)) {
-      return setFieldError(el, 'err-edit-name', "Name can only contain letters, spaces, hyphens, periods, and apostrophes.");
-    }
-    if (val.replace(/\s/g, '').length < 2) {
-      return setFieldError(el, 'err-edit-name', 'Name is too short.');
-    }
-    if (/(.)\1{4,}/u.test(val)) {
-      return setFieldError(el, 'err-edit-name', 'Please enter a valid name.');
-    }
-
+    if (!val) return setFieldError(el, 'err-edit-name', 'Name cannot be empty.');
+    if (!/\p{L}/u.test(val)) return setFieldError(el, 'err-edit-name', 'Name must contain letters.');
+    if (!/^[\p{L}\p{M}\s.'-]+$/u.test(val)) return setFieldError(el, 'err-edit-name', "Name can only contain letters, spaces, hyphens, periods, and apostrophes.");
+    if (val.replace(/\s/g, '').length < 2) return setFieldError(el, 'err-edit-name', 'Name is too short.');
+    if (/(.)\1{4,}/u.test(val)) return setFieldError(el, 'err-edit-name', 'Please enter a valid name.');
     return setFieldValid(el, 'err-edit-name');
   }
 
-  /**
-   * New-email validation (Change Email tab).
-   * Beyond the basic shape check, also rejects local-parts (the bit before
-   * the @) that contain no letters or digits at all — e.g. "____@gmail.com",
-   * "....@gmail.com", "----@gmail.com" are syntactically "valid" emails per
-   * RFC but are obviously junk/test input, not a real address.
-   */
   function validateNewEmail() {
     const el = document.getElementById('new-email');
     const val = el.value.trim();
-
-    if (!val) {
-      return setFieldError(el, 'err-new-email', 'Enter your new email address.');
-    }
-    if (!/^\S+@\S+\.\S+$/.test(val)) {
-      return setFieldError(el, 'err-new-email', 'Enter a valid email address.');
-    }
+    if (!val) return setFieldError(el, 'err-new-email', 'Enter your new email address.');
+    if (!/^\S+@\S+\.\S+$/.test(val)) return setFieldError(el, 'err-new-email', 'Enter a valid email address.');
 
     const atIndex = val.lastIndexOf('@');
     const localPart = val.slice(0, atIndex);
     const domainPart = val.slice(atIndex + 1);
 
-    // Local part must contain at least one letter or digit — not just
-    // underscores/dots/hyphens/plus signs strung together.
-    if (!/[A-Za-z0-9]/.test(localPart)) {
-      return setFieldError(el, 'err-new-email', 'Enter a real email address, not just symbols.');
-    }
-    // Reject local parts that are a single character repeated 4+ times
-    // (e.g. "____", "....", "----") even if mixed with one stray letter.
-    if (/^(.)\1{3,}$/.test(localPart)) {
-      return setFieldError(el, 'err-new-email', 'Enter a real email address, not just symbols.');
-    }
-    // Domain part (before the dot) must also contain real letters/digits.
+    if (!/[A-Za-z0-9]/.test(localPart)) return setFieldError(el, 'err-new-email', 'Enter a real email address, not just symbols.');
+    if (/^(.)\1{3,}$/.test(localPart)) return setFieldError(el, 'err-new-email', 'Enter a real email address, not just symbols.');
     const domainLabel = domainPart.split('.')[0];
-    if (!domainLabel || !/[A-Za-z0-9]/.test(domainLabel)) {
-      return setFieldError(el, 'err-new-email', 'Enter a valid email domain.');
-    }
+    if (!domainLabel || !/[A-Za-z0-9]/.test(domainLabel)) return setFieldError(el, 'err-new-email', 'Enter a valid email domain.');
 
     return setFieldValid(el, 'err-new-email');
   }
@@ -1191,8 +1171,10 @@
   function submitEditProfile() {
     if (!validateEditName()) return;
     const nameEl = document.getElementById('edit-name');
-    nameEl.value = nameEl.value.trim().replace(/\s+/g, ' '); // collapse internal multiple spaces
+    nameEl.value = nameEl.value.trim().replace(/\s+/g, ' ');
+    showLoader();
     document.getElementById('editProfileForm').submit();
+    // page will navigate away; no need to hideLoader
   }
 
   /* ── AVATAR ── */
@@ -1200,6 +1182,7 @@
     const file = e.target.files[0]; if (!file) return;
     const statusEl = document.getElementById('avatarStatus'); statusEl.textContent = 'Uploading…';
     const formData = new FormData(); formData.append('profileImage', file);
+    showLoader();
     try {
       const res = await fetch('/profile/upload-image', { method: 'POST', body: formData });
       const data = await res.json();
@@ -1207,8 +1190,18 @@
         const wrap = document.querySelector('.avatar-wrap'), old = document.getElementById('avatarPreview'), img = document.createElement('img');
         img.id = 'avatarPreview'; img.src = data.imageUrl; img.alt = 'Profile'; img.className = 'avatar-img';
         wrap.replaceChild(img, old); statusEl.textContent = 'Click to change'; showToast('Profile photo updated!','success');
-      } else { statusEl.textContent = 'Upload failed'; showToast(data.message || 'Upload failed','error'); }
-    } catch { statusEl.textContent = 'Click to change'; showToast('Network error. Try again.','error'); }
+      } else {
+        statusEl.textContent = 'Upload failed';
+        console.error('uploadAvatar failed:', res.status, data);
+        showToast(data.message || 'Upload failed','error');
+      }
+    } catch (err) {
+      statusEl.textContent = 'Click to change';
+      console.error('uploadAvatar error:', err);
+      showToast('Network error. Try again.','error');
+    } finally {
+      hideLoader();
+    }
   }
 
   /* ── EMAIL OTP ── */
@@ -1217,6 +1210,7 @@
     if (!validateNewEmail()) return;
     const email = document.getElementById('new-email').value.trim(), btn = document.getElementById('sendOtpBtn');
     btn.disabled = true; btn.textContent = 'Sending…';
+    showLoader();
     try {
       const res = await fetch('/profile/request-email-change', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ newEmail: email }) });
       const data = await res.json();
@@ -1225,9 +1219,17 @@
         document.getElementById('email-step1').style.display = 'none';
         document.getElementById('email-step2').style.display = 'block';
         document.querySelectorAll('.otp-cell')[0].focus(); startResendTimer(); showToast('OTP sent! Check your inbox.','success');
-      } else { setFieldError(document.getElementById('new-email'),'err-new-email', data.message || 'Failed to send OTP.'); }
-    } catch { setFieldError(document.getElementById('new-email'),'err-new-email','Network error. Please try again.'); }
-    btn.disabled = false; btn.textContent = 'Send Verification Code';
+      } else {
+        console.error('sendEmailOTP failed:', res.status, data);
+        setFieldError(document.getElementById('new-email'),'err-new-email', data.message || 'Failed to send OTP.');
+      }
+    } catch (err) {
+      console.error('sendEmailOTP error:', err);
+      setFieldError(document.getElementById('new-email'),'err-new-email','Network error. Please try again.');
+    } finally {
+      btn.disabled = false; btn.textContent = 'Send Verification Code';
+      hideLoader();
+    }
   }
   async function verifyEmailOTP() {
     const cells = document.querySelectorAll('.otp-cell'), otp = Array.from(cells).map(c => c.value).join('');
@@ -1235,6 +1237,7 @@
     errEl.style.display = 'none';
     if (otp.length < 6) { errEl.textContent = 'Enter the complete 6-digit code.'; errEl.style.display = 'block'; return; }
     btn.disabled = true; btn.textContent = 'Verifying…';
+    showLoader();
     try {
       const res = await fetch('/profile/verify-email-change', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ otp }) });
       const data = await res.json();
@@ -1242,20 +1245,35 @@
         showToast('Email updated successfully!','success'); clearInterval(resendInterval);
         const el = document.getElementById('displayEmail'); if (el) el.textContent = document.getElementById('new-email').value.trim();
         resetEmailForm();
-      } else { errEl.textContent = data.message || 'Invalid OTP. Try again.'; errEl.style.display = 'block'; cells.forEach(c => { c.style.borderColor = 'rgba(248,113,113,0.5)'; }); setTimeout(() => cells.forEach(c => { c.style.borderColor = ''; }), 1400); }
-    } catch { errEl.textContent = 'Network error.'; errEl.style.display = 'block'; }
-    btn.disabled = false; btn.textContent = 'Verify & Update';
+      } else {
+        console.error('verifyEmailOTP failed:', res.status, data);
+        errEl.textContent = data.message || 'Invalid OTP. Try again.'; errEl.style.display = 'block';
+        cells.forEach(c => { c.style.borderColor = 'rgba(248,113,113,0.5)'; }); setTimeout(() => cells.forEach(c => { c.style.borderColor = ''; }), 1400);
+      }
+    } catch (err) {
+      console.error('verifyEmailOTP error:', err);
+      errEl.textContent = 'Network error.'; errEl.style.display = 'block';
+    } finally {
+      btn.disabled = false; btn.textContent = 'Verify & Update';
+      hideLoader();
+    }
   }
   async function resendEmailOTP() {
     const btn = document.getElementById('resendOtpBtn'), errEl = document.getElementById('otpError');
     errEl.style.display = 'none'; btn.disabled = true;
+    showLoader();
     try {
       const email = document.getElementById('new-email').value.trim();
       const res = await fetch('/profile/request-email-change', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ newEmail: email }) });
       const data = await res.json();
       if (data.success) { document.querySelectorAll('.otp-cell').forEach(c => c.value = ''); document.querySelectorAll('.otp-cell')[0].focus(); startResendTimer(); showToast('New OTP sent!','success'); }
-      else { errEl.textContent = data.message || 'Failed to resend.'; errEl.style.display = 'block'; btn.disabled = false; }
-    } catch { errEl.textContent = 'Network error.'; errEl.style.display = 'block'; btn.disabled = false; }
+      else { console.error('resendEmailOTP failed:', res.status, data); errEl.textContent = data.message || 'Failed to resend.'; errEl.style.display = 'block'; btn.disabled = false; }
+    } catch (err) {
+      console.error('resendEmailOTP error:', err);
+      errEl.textContent = 'Network error.'; errEl.style.display = 'block'; btn.disabled = false;
+    } finally {
+      hideLoader();
+    }
   }
   function otpNext(input, idx) { input.value = input.value.replace(/[^0-9]/g,''); const cells = document.querySelectorAll('.otp-cell'); if (input.value.length===1 && idx<5) cells[idx+1].focus(); if (idx===5 && input.value.length===1) { const otp = Array.from(cells).map(c=>c.value).join(''); if (otp.length===6) verifyEmailOTP(); } }
   function otpBack(e, input, idx) { if (e.key==='Backspace' && !input.value && idx>0) document.querySelectorAll('.otp-cell')[idx-1].focus(); }
@@ -1279,87 +1297,87 @@
 
   /* ── PASSWORD ── */
   function togglePw(id) {
-  const el = document.getElementById(id);
-  el.type = el.type === 'password' ? 'text' : 'password';
-}
-
-function updateStrength(val) {
-  let score = 0;
-  if (val.length >= 8) score++;
-  if (/[A-Z]/.test(val) && /[0-9]/.test(val)) score++;
-  if (/[^A-Za-z0-9]/.test(val)) score++;
-  const b1 = document.getElementById('bar1');
-  const b2 = document.getElementById('bar2');
-  const b3 = document.getElementById('bar3');
-  const lb = document.getElementById('pwStrengthLabel');
-  if (!b1) return;
-  b1.className = b2.className = b3.className = 'pw-bar';
-  if (score === 1) {
-    b1.classList.add('weak');
-    lb.textContent = 'Weak';
-    lb.style.color = '#f87171';
-  } else if (score === 2) {
-    b1.classList.add('medium');
-    b2.classList.add('medium');
-    lb.textContent = 'Good';
-    lb.style.color = '#fbbf24';
-  } else if (score === 3) {
-    b1.classList.add('strong');
-    b2.classList.add('strong');
-    b3.classList.add('strong');
-    lb.textContent = 'Strong';
-    lb.style.color = '#4ade80';
-  } else {
-    lb.textContent = '';
+    const el = document.getElementById(id);
+    el.type = el.type === 'password' ? 'text' : 'password';
   }
-}
 
-async function submitPassword() {
-  if (!validateCurrentPw() || !validateNewPw() || !validateConfirmPw()) return;
+  function updateStrength(val) {
+    let score = 0;
+    if (val.length >= 8) score++;
+    if (/[A-Z]/.test(val) && /[0-9]/.test(val)) score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+    const b1 = document.getElementById('bar1');
+    const b2 = document.getElementById('bar2');
+    const b3 = document.getElementById('bar3');
+    const lb = document.getElementById('pwStrengthLabel');
+    if (!b1) return;
+    b1.className = b2.className = b3.className = 'pw-bar';
+    if (score === 1) { b1.classList.add('weak'); lb.textContent = 'Weak'; lb.style.color = '#f87171'; }
+    else if (score === 2) { b1.classList.add('medium'); b2.classList.add('medium'); lb.textContent = 'Good'; lb.style.color = '#fbbf24'; }
+    else if (score === 3) { b1.classList.add('strong'); b2.classList.add('strong'); b3.classList.add('strong'); lb.textContent = 'Strong'; lb.style.color = '#4ade80'; }
+    else { lb.textContent = ''; }
+  }
 
-  const form = document.getElementById('pwForm');
-  const btn = form.querySelector('.btn-gold');
-  const oldPassword = document.getElementById('pw-current').value;
-  const newPassword = document.getElementById('pw-new').value;
-  const confirmPassword = document.getElementById('pw-confirm').value;
+  async function submitPassword() {
+    if (!validateCurrentPw() || !validateNewPw() || !validateConfirmPw()) return;
 
-  const originalHTML = btn.innerHTML;
-  btn.disabled = true;
-  btn.textContent = 'Updating…';
+    const form = document.getElementById('pwForm');
+    const btn = form.querySelector('.btn-gold');
+    const oldPassword = document.getElementById('pw-current').value;
+    const newPassword = document.getElementById('pw-new').value;
+    const confirmPassword = document.getElementById('pw-confirm').value;
 
-  try {
-    const res = await fetch('/change-password', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ oldPassword, newPassword, confirmPassword })
-    });
-    const data = await res.json();
+    const originalHTML = btn.innerHTML;
+    btn.disabled = true;
+    btn.textContent = 'Updating…';
+    showLoader();
 
-    if (data.success) {
-      showToast(data.message || 'Password updated successfully.', 'success');
-      form.reset();
-      updateStrength('');
-      ['pw-current', 'pw-new', 'pw-confirm'].forEach(id => {
-        const el = document.getElementById(id);
-        el.classList.remove('input-error', 'input-valid');
+    try {
+      const res = await fetch('/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ oldPassword, newPassword, confirmPassword })
       });
-    } else {
-      showToast(data.message || 'Failed to update password.', 'error');
-      if (res.status === 400 && /current password/i.test(data.message || '')) {
-        setFieldError(document.getElementById('pw-current'), 'err-pw-current', data.message);
-      }
-    }
-  } catch {
-    showToast('Network error. Please try again.', 'error');
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = originalHTML;
-  }
-}
+      const data = await res.json();
 
-document.getElementById('pwForm').addEventListener('submit', e => e.preventDefault());
+      if (data.success) {
+        showToast(data.message || 'Password updated successfully.', 'success');
+        form.reset();
+        updateStrength('');
+        ['pw-current', 'pw-new', 'pw-confirm'].forEach(id => {
+          const el = document.getElementById(id);
+          el.classList.remove('input-error', 'input-valid');
+        });
+      } else {
+        console.error('submitPassword failed:', res.status, data);
+        showToast(data.message || 'Failed to update password.', 'error');
+        if (res.status === 400 && /current password/i.test(data.message || '')) {
+          setFieldError(document.getElementById('pw-current'), 'err-pw-current', data.message);
+        }
+      }
+    } catch (err) {
+      console.error('submitPassword error:', err);
+      showToast('Network error. Please try again.', 'error');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = originalHTML;
+      hideLoader();
+    }
+  }
+
+  const pwFormEl = document.getElementById('pwForm');
+  if (pwFormEl) pwFormEl.addEventListener('submit', e => e.preventDefault());
+
   /* ════ ADDRESSES ════ */
   let editingAddrId = null, deleteAddrId = null;
+
+  function normalizeAddresses(list) {
+    return (list || []).map(a => ({
+      ...a,
+      id: (a._id || a.id || String(Math.random())).toString()
+    }));
+  }
+
   function renderAddresses() {
     const list = document.getElementById('addressList'), empty = document.getElementById('noAddresses');
     list.innerHTML = '';
@@ -1374,6 +1392,7 @@ document.getElementById('pwForm').addEventListener('submit', e => e.preventDefau
     });
     const statEl = document.getElementById('statAddresses'); if (statEl) statEl.textContent = addresses.length;
   }
+
   function openAddressModal(id = null) {
     editingAddrId = id;
     ['addr-fullName','addr-phone','addr-line1','addr-line2','addr-city','addr-pincode'].forEach(fid => { const el=document.getElementById(fid); el.value=''; el.classList.remove('input-error','input-valid','shake'); });
@@ -1386,6 +1405,7 @@ document.getElementById('pwForm').addEventListener('submit', e => e.preventDefau
     setTimeout(() => document.getElementById('addr-fullName').focus(), 300);
   }
   function closeAddressModal() { document.getElementById('addrModal').classList.remove('open'); editingAddrId = null; }
+
   async function saveAddress() {
     const v1 = validateAddrField('addr-fullName','err-addr-fullName');
     const v2 = validatePhone();
@@ -1396,19 +1416,70 @@ document.getElementById('pwForm').addEventListener('submit', e => e.preventDefau
     if (!v1||!v2||!v3||!v4||!v5||!v6) return;
     const fullName=document.getElementById('addr-fullName').value.trim(), phone=document.getElementById('addr-phone').value.trim(), line1=document.getElementById('addr-line1').value.trim(), line2=document.getElementById('addr-line2').value.trim(), city=document.getElementById('addr-city').value.trim(), state=document.getElementById('addr-state').value, pincode=document.getElementById('addr-pincode').value.trim(), addressType=document.getElementById('addr-type').value;
     const btn = document.getElementById('saveAddrBtn'); btn.disabled=true; btn.textContent='Saving…';
+    showLoader();
     try {
       const res = await fetch(editingAddrId?`/profile/address/${editingAddrId}`:'/profile/address', { method:editingAddrId?'PUT':'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({fullName,phone,line1,line2,city,state,pincode,addressType}) });
       const data = await res.json();
-      if (data.success) { addresses=data.addresses.map(a=>({...a,id:a._id.toString()})); closeAddressModal(); renderAddresses(); showToast(editingAddrId?'Address updated.':'Address saved.','success'); }
-      else showToast(data.message||'Failed to save address.','error');
-    } catch { showToast('Network error. Please try again.','error'); }
-    finally { btn.disabled=false; btn.textContent='Save Address'; }
+      if (!res.ok || !data.success) {
+        console.error('saveAddress failed:', res.status, data);
+        showToast(data.message || `Failed to save address (${res.status}).`, 'error');
+        return;
+      }
+      addresses = normalizeAddresses(data.addresses);
+      closeAddressModal();
+      renderAddresses();
+      showToast(editingAddrId ? 'Address updated.' : 'Address saved.', 'success');
+    } catch (err) {
+      console.error('saveAddress error:', err);
+      showToast('Network error. Please try again.','error');
+    } finally {
+      btn.disabled=false; btn.textContent='Save Address';
+      hideLoader();
+    }
   }
-  function setDefaultAddr(id) { fetch(`/profile/address/${id}/default`,{method:'PATCH'}).then(r=>r.json()).then(data=>{if(data.success){addresses=data.addresses.map(a=>({...a,id:a._id.toString()}));renderAddresses();showToast('Default address updated.','success');}else showToast(data.message||'Failed.','error');}).catch(()=>showToast('Network error.','error')); }
+
+  function setDefaultAddr(id) {
+    showLoader();
+    fetch(`/profile/address/${id}/default`,{method:'PATCH'})
+      .then(r => r.json().then(data => ({ ok: r.ok, data })))
+      .then(({ ok, data }) => {
+        if (ok && data.success) {
+          addresses = normalizeAddresses(data.addresses);
+          renderAddresses();
+          showToast('Default address updated.','success');
+        } else {
+          console.error('setDefaultAddr failed:', data);
+          showToast(data.message || 'Failed.','error');
+        }
+      })
+      .catch(err => { console.error('setDefaultAddr error:', err); showToast('Network error.','error'); })
+      .finally(hideLoader);
+  }
+
   function editAddress(id) { openAddressModal(id); }
   function promptDelete(id) { deleteAddrId=id; document.getElementById('deleteModal').classList.add('open'); }
   function closeDeleteModal() { document.getElementById('deleteModal').classList.remove('open'); deleteAddrId=null; }
-  function confirmDelete() { if (!deleteAddrId) return; fetch(`/profile/address/${deleteAddrId}`,{method:'DELETE'}).then(r=>r.json()).then(data=>{if(data.success){addresses=data.addresses.map(a=>({...a,id:a._id.toString()}));closeDeleteModal();renderAddresses();showToast('Address removed.','info');}else showToast(data.message||'Delete failed.','error');}).catch(()=>showToast('Network error.','error')); }
+
+  function confirmDelete() {
+    if (!deleteAddrId) return;
+    showLoader();
+    fetch(`/profile/address/${deleteAddrId}`,{method:'DELETE'})
+      .then(r => r.json().then(data => ({ ok: r.ok, data })))
+      .then(({ ok, data }) => {
+        if (ok && data.success) {
+          addresses = normalizeAddresses(data.addresses);
+          closeDeleteModal();
+          renderAddresses();
+          showToast('Address removed.','info');
+        } else {
+          console.error('confirmDelete failed:', data);
+          showToast(data.message || 'Delete failed.','error');
+        }
+      })
+      .catch(err => { console.error('confirmDelete error:', err); showToast('Network error.','error'); })
+      .finally(hideLoader);
+  }
+
   document.getElementById('addrModal').addEventListener('click', e=>{if(e.target===document.getElementById('addrModal'))closeAddressModal();});
   document.getElementById('deleteModal').addEventListener('click', e=>{if(e.target===document.getElementById('deleteModal'))closeDeleteModal();});
 

@@ -292,6 +292,13 @@
     .footer-legal a:hover { color: rgba(245,242,235,0.5); }
     .reveal { opacity: 0; transform: translateY(20px); transition: opacity .6s ease, transform .6s ease; }
     .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ═══ PAGE BUFFER OVERLAY (matches cart.ejs) ═══ */
+    .buffer-overlay { position: fixed; inset: 0; z-index: 10000; display: flex; align-items: center; justify-content: center; background: rgba(8,8,7,.75); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: opacity .25s ease; flex-direction: column; gap: 0.85rem; }
+    .buffer-overlay.show { opacity: 1; pointer-events: all; }
+    .buffer-spinner { width: 34px; height: 34px; border-radius: 50%; border: 2px solid rgba(201,169,110,.15); border-top-color: #c9a96e; animation: bufferSpin .7s linear infinite; }
+    @keyframes bufferSpin { to { transform: rotate(360deg); } }
+    .buffer-label { font-family: 'Jost', sans-serif; font-size: 0.46rem; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(245,242,235,0.35); }
   </style>
 </head>
 <body>
@@ -654,6 +661,12 @@
 
 <div class="toast" id="toast"><span class="toast-dot"></span><span id="toastMsg"></span></div>
 
+<!-- PAGE BUFFER OVERLAY (matches cart.ejs) -->
+<div class="buffer-overlay" id="bufferOverlay">
+  <div class="buffer-spinner"></div>
+  <span class="buffer-label" id="bufferLabel">Please wait…</span>
+</div>
+
 <script>
   const PRODUCT_ID     = '<%= product._id %>';
   const MAX_QTY        = 5;
@@ -673,6 +686,27 @@
   const counterEl    = document.getElementById('slideCounter');
   const dotsEl       = document.getElementById('slideDots');
   const mainWrap     = document.getElementById('mainImgWrap');
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     PAGE BUFFER OVERLAY
+     Reference-counted (showBuffer / hideBuffer) so overlapping async calls
+     don't flicker it on/off. The overlay is now ONLY triggered explicitly,
+     from inside real network requests (Add to Cart, Wishlist toggle, etc.)
+     — there is no longer a global "any button click" listener, so instant
+     local-only actions (gallery arrows, dots, thumbnails, tabs, qty
+     stepper, hamburger, color swatches) never show it.
+  ═══════════════════════════════════════════════════════════════════════ */
+  let _bufferCount = 0;
+  function showBuffer(label) {
+    _bufferCount++;
+    const lbl = document.getElementById('bufferLabel');
+    if (lbl) lbl.textContent = label || 'Please wait…';
+    document.getElementById('bufferOverlay').classList.add('show');
+  }
+  function hideBuffer() {
+    _bufferCount = Math.max(0, _bufferCount - 1);
+    if (_bufferCount === 0) document.getElementById('bufferOverlay').classList.remove('show');
+  }
 
   function buildDots() {
     dotsEl.innerHTML = '';
@@ -929,6 +963,7 @@
     const btn = document.getElementById('addCartBtn');
     btn.disabled = true;
     btn.textContent = 'Adding…';
+    showBuffer('Adding to cart…');
     try {
       const body = { productId, quantity: qty };
       if (COLOR_VARIANTS.length > 0) {
@@ -961,6 +996,7 @@
       const isNowOOS = stockNow === 0;
       btn.disabled    = isNowOOS;
       btn.textContent = isNowOOS ? 'Out of Stock' : 'Add to Cart';
+      hideBuffer();
     }
   }
 
@@ -1006,6 +1042,7 @@
     if (!IS_LOGGED_IN) { window.location.href = '/login'; return; }
     const btn = document.getElementById('wishlistBtn');
     if (btn) btn.disabled = true;
+    showBuffer('Updating wishlist…');
     try {
       const res  = await fetch('/wishlist/toggle', {
         method: 'POST',
@@ -1024,7 +1061,7 @@
         .then(d => updateWishBadge(d.count || 0))
         .catch(() => {});
     } catch { showToast('Something went wrong', true); }
-    finally { if (btn) btn.disabled = false; }
+    finally { if (btn) btn.disabled = false; hideBuffer(); }
   }
 
   checkWishlistStatus();
@@ -1048,6 +1085,20 @@
   document.getElementById('hamburger').addEventListener('click', function () {
     this.classList.toggle('open');
     document.getElementById('mobileMenu').classList.toggle('open');
+  });
+
+  // ── Nav link buffer (real page navigation) ─────────────────────────────────
+  // Clicking a nav link (or icon button) triggers an actual page load, which
+  // has real wait time — unlike the local-only controls above. Show the
+  // full-page buffer immediately on click and just let the browser navigate;
+  // there's no need to hide it since this page is about to unload.
+  document.querySelectorAll('.nav-root a[href]').forEach(a => {
+    a.addEventListener('click', function (e) {
+      const href = a.getAttribute('href');
+      if (!href || href.startsWith('#') || a.target === '_blank') return;
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return; // opening in new tab/window
+      showBuffer('Loading…');
+    });
   });
 
   // ── Reveal on scroll ──────────────────────────────────────────────────────

@@ -151,6 +151,12 @@
     .footer-legal{display:flex;gap:1.25rem}
     .footer-legal a{font-family:'Jost',sans-serif;font-size:.44rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(245,242,235,.18);text-decoration:none;transition:color .2s}
     .footer-legal a:hover{color:rgba(245,242,235,.5)}
+
+    /* ═══ BUFFER OVERLAY ═══ */
+    .buffer-overlay{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;background:rgba(8,8,7,.75);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .25s ease}
+    .buffer-overlay.show{opacity:1;pointer-events:all}
+    .buffer-spinner{width:34px;height:34px;border-radius:50%;border:2px solid rgba(201,169,110,.15);border-top-color:#c9a96e;animation:bufferSpin .7s linear infinite}
+    @keyframes bufferSpin{to{transform:rotate(360deg)}}
   </style>
 </head>
 <body>
@@ -298,7 +304,7 @@
             <% if (inCart) { %>
               <div class="btn-in-cart">Already in Cart</div>
             <% } else { %>
-              <button class="btn-add-cart" <%= isOOS ? 'disabled' : '' %> onclick="moveToCart('<%= item._id %>')">
+              <button class="btn-add-cart" <%= isOOS ? 'disabled' : '' %> onclick="moveToCart('<%= item._id %>', this)">
                 <%= isOOS ? 'Out of Stock' : 'Add to Cart' %>
               </button>
             <% } %>
@@ -389,6 +395,10 @@
 
 <div class="toast" id="toast"></div>
 
+<div class="buffer-overlay" id="bufferOverlay">
+  <div class="buffer-spinner"></div>
+</div>
+
 <script>
   // ── Nav scroll ──────────────────────────────────────────────────────────
   const navbar = document.getElementById('navbar');
@@ -415,6 +425,33 @@
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
   }
+
+  // ── Buffer overlay ──────────────────────────────────────────────────────
+  let _bufferCount = 0;
+  function showBuffer() {
+    _bufferCount++;
+    document.getElementById('bufferOverlay').classList.add('show');
+  }
+  function hideBuffer() {
+    _bufferCount = Math.max(0, _bufferCount - 1);
+    if (_bufferCount === 0) document.getElementById('bufferOverlay').classList.remove('show');
+  }
+
+  // Show buffer on navigation-style clicks (links, view button, breadcrumbs, footer links, nav icons).
+  // Actions that manage their own UI state (remove, move-to-cart, clear-all) are excluded below
+  // so they don't fight with their own toast/fade animations.
+  document.addEventListener('click', function (e) {
+    const btn = e.target.closest('a, button');
+    if (!btn || btn.disabled || btn.classList.contains('disabled')) return;
+    if (btn.id === 'hamburger' || btn.closest('#hamburger')) return;
+    if (btn.id === 'modalCancel' || btn.id === 'modalConfirm') return;
+    if (btn.classList.contains('clear-all-btn')) return;   // opens modal only
+    if (btn.classList.contains('card-remove')) return;      // removeItem() handles its own state
+    if (btn.classList.contains('btn-add-cart')) return;     // moveToCart() shows/hides its own buffer internally
+    if (btn.tagName === 'A' && (!btn.getAttribute('href') || btn.getAttribute('href').startsWith('#'))) return;
+    showBuffer();
+    setTimeout(hideBuffer, 600);
+  }, true);
 
   // ── Badge helpers ────────────────────────────────────────────────────────
   function updateHeroCount(count) {
@@ -459,6 +496,7 @@
   modalConfirm.addEventListener('click', async () => {
     closeClearModal();
     modalConfirm.disabled = true;
+    showBuffer();
     try {
       const res  = await fetch('/wishlist/clear', { method: 'DELETE' });
       const data = await res.json();
@@ -468,10 +506,12 @@
         showToast('Wishlist cleared');
         setTimeout(() => window.location.reload(), 400);
       } else {
+        hideBuffer();
         showToast(data.message || 'Could not clear wishlist', 'err');
         modalConfirm.disabled = false;
       }
     } catch (_) {
+      hideBuffer();
       showToast('Something went wrong', 'err');
       modalConfirm.disabled = false;
     }
@@ -504,7 +544,9 @@
   }
 
   // ── Move to cart ────────────────────────────────────────────────────────
-  async function moveToCart(itemId) {
+  async function moveToCart(itemId, btn) {
+    if (btn) { btn.disabled = true; }
+    showBuffer();
     try {
       const res  = await fetch('/wishlist/move-to-cart', {
         method : 'POST',
@@ -512,7 +554,12 @@
         body   : JSON.stringify({ itemId }),
       });
       const data = await res.json();
-      if (!res.ok) { showToast(data.message || 'Could not add to cart', 'err'); return; }
+      if (!res.ok) {
+        hideBuffer();
+        if (btn) btn.disabled = false;
+        showToast(data.message || 'Could not add to cart', 'err');
+        return;
+      }
       const card = document.getElementById(`wishCard-${itemId}`);
       if (card) {
         card.classList.add('removing');
@@ -526,7 +573,10 @@
       }
       if (data.cartCount !== undefined) updateCartBadge(data.cartCount);
       showToast('Added to cart', 'gold');
+      hideBuffer();
     } catch (_) {
+      hideBuffer();
+      if (btn) btn.disabled = false;
       showToast('Something went wrong', 'err');
     }
   }
@@ -534,8 +584,19 @@
   // ── Cart count on load ───────────────────────────────────────────────────
   fetch('/api/cart/count').then(r => r.json()).then(d => updateCartBadge(d.count || 0)).catch(() => {});
 
-  history.pushState(null, null, window.location.href);
-  window.addEventListener('popstate', () => history.pushState(null, null, window.location.href));
+  history.pushState({ velmoraLock: true }, '', window.location.href);
+  window.addEventListener('popstate', function () {
+    requestAnimationFrame(() => {
+      history.pushState({ velmoraLock: true }, '', window.location.href);
+    });
+  });
+
+  // Safety net: force-hide buffer overlay whenever page is (re)shown, including bfcache restores from Back/Forward
+  window.addEventListener('pageshow', function () {
+    _bufferCount = 0;
+    const overlay = document.getElementById('bufferOverlay');
+    if (overlay) overlay.classList.remove('show');
+  });
 
   // ── SSE: live stock updates ──────────────────────────────────────────────
   (function () {

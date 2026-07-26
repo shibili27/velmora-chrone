@@ -32,7 +32,7 @@ async function sendOtpEmail(to, otp) {
 
 const getProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.session.user).lean();
+    const user = await User.findById(req.user._id).lean();
     if (!user) return res.redirect('/login');
 
     const referralData = await getReferralStats(user._id);
@@ -53,7 +53,7 @@ const updateProfile = async (req, res) => {
     if (!name || !name.trim()) {
       return res.redirect('/profile?editError=Name+cannot+be+empty');
     }
-    await User.findByIdAndUpdate(req.session.user, { name: name.trim() });
+    await User.findByIdAndUpdate(req.user._id, { name: name.trim() });
     req.flash?.('success', 'Profile updated.');
     res.redirect('/profile');
   } catch (err) {
@@ -75,7 +75,7 @@ const uploadProfileImage = async (req, res) => {
       );
       streamifier.createReadStream(req.file.buffer).pipe(stream);
     });
-    await User.findByIdAndUpdate(req.session.user, { profileImage: result.secure_url });
+    await User.findByIdAndUpdate(req.user._id, { profileImage: result.secure_url });
     res.json({ success: true, imageUrl: result.secure_url });
   } catch (err) {
     console.error('uploadProfileImage error:', err);
@@ -93,12 +93,11 @@ const requestEmailChange = async (req, res) => {
 
     const trimmedEmail = newEmail.trim().toLowerCase();
 
-    const currentUser = await User.findById(req.session.user).select('email');
+    const currentUser = await User.findById(req.user._id).select('email');
     if (!currentUser) {
       return res.json({ success: false, message: 'Session expired. Please log in again.' });
     }
 
-    // NEW CHECK — this was missing entirely before
     if (trimmedEmail === currentUser.email.toLowerCase()) {
       return res.json({ success: false, message: 'New email must be different from your current email.' });
     }
@@ -112,7 +111,7 @@ const requestEmailChange = async (req, res) => {
     const expiry = new Date(Date.now() + 10 * 60 * 1000);
 
     const updatedUser = await User.findByIdAndUpdate(
-      req.session.user,
+      req.user._id,
       {
         pendingEmail:      trimmedEmail,
         emailChangeOtp:    otp,
@@ -122,7 +121,7 @@ const requestEmailChange = async (req, res) => {
     );
 
     if (!updatedUser) {
-      console.error('requestEmailChange: no user found for session id', req.session.user);
+      console.error('requestEmailChange: no user found for id', req.user._id);
       return res.json({ success: false, message: 'Session expired. Please log in again.' });
     }
 
@@ -144,7 +143,7 @@ const requestEmailChange = async (req, res) => {
 const verifyEmailChange = async (req, res) => {
   try {
     const { otp } = req.body;
-    const user = await User.findById(req.session.user).select(
+    const user = await User.findById(req.user._id).select(
       'pendingEmail emailChangeOtp emailChangeOtpExp'
     );
 
@@ -157,7 +156,7 @@ const verifyEmailChange = async (req, res) => {
     if (otp.toString().trim() !== user.emailChangeOtp) {
       return res.json({ success: false, message: 'Incorrect code. Please try again.' });
     }
-    await User.findByIdAndUpdate(req.session.user, {
+    await User.findByIdAndUpdate(req.user._id, {
       email:             user.pendingEmail,
       pendingEmail:      null,
       emailChangeOtp:    null,
@@ -185,7 +184,7 @@ const changePassword = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Passwords do not match.' });
     }
 
-    const user = await User.findById(req.session.user).select('password');
+    const user = await User.findById(req.user._id).select('password');
     if (!user) {
       return res.status(401).json({ success: false, message: 'Session expired. Please log in again.' });
     }
@@ -199,7 +198,7 @@ const changePassword = async (req, res) => {
       return res.status(400).json({ success: false, message: 'New password must be different from current password.' });
     }
 
-    user.password = await bcrypt.hash(newPassword, 10); // FIXED — was plaintext
+    user.password = await bcrypt.hash(newPassword, 10);
     await user.save();
 
     return res.json({ success: true, message: 'Password updated successfully.' });
@@ -212,7 +211,7 @@ const changePassword = async (req, res) => {
 
 const addAddress = async (req, res) => {
   try {
-    const user = await User.findById(req.session.user);
+    const user = await User.findById(req.user._id);
     const validationError = validateAddressFields(req.body);
     if (validationError) {
       return res.status(400).json({ success: false, message: validationError });
@@ -230,7 +229,7 @@ const addAddress = async (req, res) => {
 
 const updateAddress = async (req, res) => {
   try {
-    const user = await User.findById(req.session.user);
+    const user = await User.findById(req.user._id);
     const addr = user.addresses.id(req.params.id);
     if (!addr) return res.status(404).json({ success: false, message: 'Address not found.' });
 
@@ -250,7 +249,7 @@ const updateAddress = async (req, res) => {
 
 const deleteAddress = async (req, res) => {
   try {
-    const user = await User.findById(req.session.user);
+    const user = await User.findById(req.user._id);
     const addr = user.addresses.id(req.params.id);
     if (!addr) return res.status(404).json({ success: false, message: 'Address not found.' });
     const wasDefault = addr.isDefault;
@@ -266,7 +265,7 @@ const deleteAddress = async (req, res) => {
 
 const setDefaultAddress = async (req, res) => {
   try {
-    const user = await User.findById(req.session.user);
+    const user = await User.findById(req.user._id);
     user.addresses.forEach(a => { a.isDefault = a._id.toString() === req.params.id; });
     await user.save();
     res.json({ success: true, addresses: user.addresses });

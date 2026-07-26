@@ -315,6 +315,13 @@
     .reveal { opacity:0; transform:translateY(16px); transition:opacity .55s ease,transform .55s ease; }
     .reveal.visible { opacity:1; transform:translateY(0); }
 
+    /* ── PAGE BUFFER OVERLAY (matches cart.ejs) ── */
+    .buffer-overlay { position: fixed; inset: 0; z-index: 10000; display: flex; align-items: center; justify-content: center; background: rgba(8,8,7,.75); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: opacity .25s ease; flex-direction: column; gap: 0.85rem; }
+    .buffer-overlay.show { opacity: 1; pointer-events: all; }
+    .buffer-spinner { width: 34px; height: 34px; border-radius: 50%; border: 2px solid rgba(201,169,110,.15); border-top-color: #c9a96e; animation: bufferSpin .7s linear infinite; }
+    @keyframes bufferSpin { to { transform: rotate(360deg); } }
+    .buffer-label { font-family: 'Jost', sans-serif; font-size: 0.46rem; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(245,242,235,0.35); }
+
     /* ── RESPONSIVE ── */
     @media (max-width: 1024px) { .product-grid { grid-template-columns:repeat(3,1fr); } }
     @media (max-width: 767px) {
@@ -446,7 +453,7 @@
         Filters
         <% if(category||brand||minPrice||maxPrice){ %><span class="mob-filter-active-dot"></span><% } %>
       </button>
-      <select class="sort-select" onchange="applySort(this.value)">
+      <select class="sort-select" id="sortSelect" onchange="applySort(this.value)">
         <option value="newest"    <%= sort==='newest'    ?'selected':'' %>>Newest</option>
         <option value="oldest"    <%= sort==='oldest'    ?'selected':'' %>>Oldest</option>
         <option value="priceLow"  <%= sort==='priceLow'  ?'selected':'' %>>Price ↑</option>
@@ -670,6 +677,12 @@
   </div>
 </footer>
 
+<!-- PAGE BUFFER OVERLAY (matches cart.ejs) -->
+<div class="buffer-overlay" id="bufferOverlay">
+  <div class="buffer-spinner"></div>
+  <span class="buffer-label" id="bufferLabel">Please wait…</span>
+</div>
+
 <script>
   const navbar = document.getElementById('navbar');
   window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', scrollY > 30), { passive:true });
@@ -739,6 +752,7 @@
 
   function applySort(val) {
     document.getElementById('sortInput').value = val;
+    showBuffer('Sorting…');
     document.getElementById('filterFormTop').submit();
   }
 
@@ -769,6 +783,59 @@
 
   history.pushState(null, null, window.location.href);
   window.addEventListener('popstate', () => history.pushState(null, null, window.location.href));
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     PAGE BUFFER OVERLAY
+     Same mechanism as cart.ejs / product-detail.ejs: reference-counted
+     showBuffer()/hideBuffer() driving a full-page spinner, with an
+     auto-hide fallback so nothing can get stuck.
+
+     This is a catalog page, so most interactive elements are <a> links
+     (product cards, pagination, filter tags, nav icons) rather than async
+     buttons — the global catcher below covers both:
+       • real <button> presses (Apply Filters, drawer/hamburger excluded
+         since those just toggle a panel instantly, no page load involved)
+       • real navigational <a href> clicks (skips "#" placeholders, and
+         skips ctrl/cmd/shift/middle-clicks that open a new tab, since the
+         current page never actually leaves in that case)
+  ═══════════════════════════════════════════════════════════════════════ */
+  let _bufferCount = 0;
+  function showBuffer(label) {
+    _bufferCount++;
+    const lbl = document.getElementById('bufferLabel');
+    if (lbl) lbl.textContent = label || 'Please wait…';
+    document.getElementById('bufferOverlay').classList.add('show');
+  }
+  function hideBuffer() {
+    _bufferCount = Math.max(0, _bufferCount - 1);
+    if (_bufferCount === 0) document.getElementById('bufferOverlay').classList.remove('show');
+  }
+
+  document.addEventListener('click', function (e) {
+    // Instant local UI toggles — never show the full-page buffer for these
+    if (e.target.closest('#hamburger')) return;
+    if (e.target.closest('#drawerClose')) return;
+    if (e.target.closest('#filterToggleDesktop')) return;
+    if (e.target.closest('#mobFilterBtn')) return;
+    if (e.target.closest('#filterOverlay')) return;
+
+    const link = e.target.closest('a[href]');
+    if (link) {
+      const href = link.getAttribute('href') || '';
+      if (!href || href.startsWith('#')) return;               // placeholder / no destination
+      if (e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1) return; // opening in a new tab
+      showBuffer();
+      setTimeout(hideBuffer, 4000); // safety net in case navigation is blocked
+      return;
+    }
+
+    const btn = e.target.closest('button');
+    if (btn && !btn.disabled) {
+      const isFormSubmit = btn.type === 'submit' && btn.closest('form');
+      showBuffer();
+      setTimeout(hideBuffer, isFormSubmit ? 4000 : 600);
+    }
+  }, true);
 </script>
 </body>
 </html>

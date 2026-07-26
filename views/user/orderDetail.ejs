@@ -213,10 +213,11 @@
     .item-row {
       display: flex; align-items: center; gap: 16px;
       padding: 16px 0; border-bottom: 1px solid rgba(42,42,39,0.6);
-      position: relative;
+      position: relative; transition: opacity 0.25s ease;
     }
     .item-row:last-child { border-bottom: none; }
     .item-row.item-cancelled { opacity: 0.5; }
+    .item-row.row-loading { opacity: 0.45; pointer-events: none; }
 
     .item-thumb {
       width: 60px; height: 60px; object-fit: cover; flex-shrink: 0;
@@ -243,7 +244,7 @@
     .item-status-tag .cancel-note { color: var(--text-dim); font-style: italic; }
 
     .item-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex-shrink: 0; }
-    .item-qty   { font-size: 0.6rem; color: var(--text-muted); }
+    .item-qty   { font-size: 0.6rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
     .item-price {
       font-family: 'Cormorant Garamond', serif; font-size: 18px;
       color: var(--gold); white-space: nowrap;
@@ -265,6 +266,14 @@
       cursor: pointer; border-radius: 2px; transition: all 0.18s; white-space: nowrap;
     }
     .btn-return-item:hover { background: rgba(201,169,110,0.1); border-color: rgba(201,169,110,0.5); }
+
+    /* Small inline spinner used on a loading item row */
+    .row-mini-spinner {
+      width: 11px; height: 11px; border-radius: 50%;
+      border: 1.5px solid rgba(201,169,110,0.2); border-top-color: var(--gold);
+      display: inline-block; animation: miniSpin 0.6s linear infinite;
+    }
+    @keyframes miniSpin { to { transform: rotate(360deg); } }
 
     /* ══ PRICING SUMMARY ══ */
     .pricing-row {
@@ -410,12 +419,20 @@
       flex: 2; padding: 11px; border: none; cursor: pointer;
       font-family: 'Jost', sans-serif; font-size: 0.44rem;
       letter-spacing: 0.14em; text-transform: uppercase; transition: all 0.18s;
+      display: flex; align-items: center; justify-content: center; gap: 7px;
     }
     .modal-confirm-btn.danger { background: rgba(248,113,113,0.15); color: var(--red); border: 1px solid rgba(248,113,113,0.3); }
     .modal-confirm-btn.danger:hover { background: rgba(248,113,113,0.25); }
     .modal-confirm-btn.gold   { background: rgba(201,169,110,0.12); color: var(--gold); border: 1px solid var(--border-gold); }
     .modal-confirm-btn.gold:hover   { background: rgba(201,169,110,0.22); }
     .modal-confirm-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* Spinner shown inside modal confirm buttons while a request is in flight */
+    .btn-mini-spinner {
+      width: 10px; height: 10px; border-radius: 50%;
+      border: 1.5px solid rgba(255,255,255,0.25); border-top-color: currentColor;
+      display: inline-block; animation: miniSpin 0.6s linear infinite; flex-shrink: 0;
+    }
 
     .modal-close {
       position: absolute; top: 16px; right: 16px; width: 28px; height: 28px;
@@ -442,6 +459,21 @@
     .toast.err  { border-color: rgba(248,113,113,0.3); }
     .toast-dot  { width: 5px; height: 5px; border-radius: 50%; background: var(--gold); flex-shrink: 0; }
     .toast.err .toast-dot { background: var(--red); }
+
+    /* ══ PAGE BUFFER OVERLAY (whole-order actions / navigation) ══ */
+    .buffer-overlay {
+      position: fixed; inset: 0; z-index: 10000;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(8,8,7,.75); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+      opacity: 0; pointer-events: none; transition: opacity .25s ease;
+    }
+    .buffer-overlay.show { opacity: 1; pointer-events: all; }
+    .buffer-spinner {
+      width: 34px; height: 34px; border-radius: 50%;
+      border: 2px solid rgba(201,169,110,.15); border-top-color: #c9a96e;
+      animation: bufferSpin .7s linear infinite;
+    }
+    @keyframes bufferSpin { to { transform: rotate(360deg); } }
 
     /* ══ FOOTER ══ */
     .site-footer {
@@ -639,7 +671,12 @@
                 </div>
 
                 <div class="item-right">
-                  <span class="item-qty">× <%= item.quantity %></span>
+                  <span class="item-qty">
+                    <span class="row-loading-indicator" style="display:none">
+                      <span class="row-mini-spinner"></span>
+                    </span>
+                    <span class="row-qty-text">× <%= item.quantity %></span>
+                  </span>
                   <span class="item-price <%= isCancelledItem ? 'struck' : '' %>">
                     ₹<%= item.totalPrice.toLocaleString('en-IN') %>
                   </span>
@@ -782,7 +819,7 @@
 
               <!-- Invoice — only available once the order has been delivered -->
               <% if (canDownloadInvoice) { %>
-                <a href="/orders/<%= order.orderNumber %>/invoice" class="btn-primary">
+                <a href="/orders/<%= order.orderNumber %>/invoice" class="btn-primary" data-buffer="1">
                   <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                   Download Invoice
                 </a>
@@ -867,7 +904,7 @@
                 </div>
               <% } %>
 
-              <a href="/orders" class="btn-secondary">
+              <a href="/orders" class="btn-secondary" data-buffer="1">
                 <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
                 Back to Orders
               </a>
@@ -918,7 +955,9 @@
       <div class="modal-error" id="cancelOrderErr"></div>
       <div class="modal-actions">
         <button class="modal-cancel-btn" onclick="closeModal('modalCancelOrder')">Keep Order</button>
-        <button class="modal-confirm-btn danger" id="cancelOrderConfirmBtn" onclick="confirmCancelOrder()">Yes, Cancel Order</button>
+        <button class="modal-confirm-btn danger" id="cancelOrderConfirmBtn" onclick="confirmCancelOrder()">
+          <span class="btn-label">Yes, Cancel Order</span>
+        </button>
       </div>
     </div>
   </div>
@@ -939,7 +978,9 @@
       <div class="modal-error" id="cancelItemErr"></div>
       <div class="modal-actions">
         <button class="modal-cancel-btn" onclick="closeModal('modalCancelItem')">Keep Item</button>
-        <button class="modal-confirm-btn danger" id="cancelItemConfirmBtn" onclick="confirmCancelItem()">Cancel Item</button>
+        <button class="modal-confirm-btn danger" id="cancelItemConfirmBtn" onclick="confirmCancelItem()">
+          <span class="btn-label">Cancel Item</span>
+        </button>
       </div>
     </div>
   </div>
@@ -960,7 +1001,9 @@
       <div class="modal-error" id="returnErr"></div>
       <div class="modal-actions">
         <button class="modal-cancel-btn" onclick="closeModal('modalReturn')">Cancel</button>
-        <button class="modal-confirm-btn gold" id="returnConfirmBtn" onclick="confirmReturn()">Submit Return</button>
+        <button class="modal-confirm-btn gold" id="returnConfirmBtn" onclick="confirmReturn()">
+          <span class="btn-label">Submit Return</span>
+        </button>
       </div>
     </div>
   </div>
@@ -981,13 +1024,20 @@
       <div class="modal-error" id="returnItemErr"></div>
       <div class="modal-actions">
         <button class="modal-cancel-btn" onclick="closeModal('modalReturnItem')">Cancel</button>
-        <button class="modal-confirm-btn gold" id="returnItemConfirmBtn" onclick="confirmReturnItem()">Submit Return</button>
+        <button class="modal-confirm-btn gold" id="returnItemConfirmBtn" onclick="confirmReturnItem()">
+          <span class="btn-label">Submit Return</span>
+        </button>
       </div>
     </div>
   </div>
 
   <!-- TOAST -->
   <div class="toast" id="toast"><span class="toast-dot"></span><span id="toastMsg"></span></div>
+
+  <!-- PAGE BUFFER OVERLAY -->
+  <div class="buffer-overlay" id="bufferOverlay">
+    <div class="buffer-spinner"></div>
+  </div>
 
   <script>
     const ORDER_ID = '<%= order.orderNumber %>';
@@ -1006,6 +1056,47 @@
       toastTimer = setTimeout(() => toast.classList.remove('show'), 3500);
     }
 
+    /* ── FULL-PAGE BUFFER (order-level actions + navigation) ── */
+    let _bufferCount = 0;
+    function showBuffer() {
+      _bufferCount++;
+      document.getElementById('bufferOverlay').classList.add('show');
+    }
+    function hideBuffer() {
+      _bufferCount = Math.max(0, _bufferCount - 1);
+      if (_bufferCount === 0) document.getElementById('bufferOverlay').classList.remove('show');
+    }
+    // Links marked data-buffer="1" (Invoice download, Back to Orders) show the full-page
+    // buffer briefly since they navigate away / trigger a download.
+    document.querySelectorAll('a[data-buffer="1"]').forEach(link => {
+      link.addEventListener('click', () => {
+        showBuffer();
+        setTimeout(hideBuffer, 2500); // fallback in case navigation doesn't unload the page (e.g. file download)
+      });
+    });
+
+    /* ── Helper: put a modal confirm button into / out of a loading state ── */
+    function setModalBtnLoading(btn, loadingText) {
+      btn.disabled = true;
+      btn.dataset.originalHtml = btn.innerHTML;
+      btn.innerHTML = '<span class="btn-mini-spinner"></span><span class="btn-label">' + loadingText + '</span>';
+    }
+    function resetModalBtn(btn) {
+      btn.disabled = false;
+      if (btn.dataset.originalHtml) btn.innerHTML = btn.dataset.originalHtml;
+    }
+
+    /* ── Helper: put an item row into / out of its own local loading state ── */
+    function setRowLoading(itemId, loading) {
+      const row = document.getElementById(`item-row-${itemId}`);
+      if (!row) return;
+      row.classList.toggle('row-loading', loading);
+      const spinner = row.querySelector('.row-loading-indicator');
+      const qtyText = row.querySelector('.row-qty-text');
+      if (spinner) spinner.style.display = loading ? 'inline-flex' : 'none';
+      if (qtyText) qtyText.style.display = loading ? 'none' : 'inline';
+    }
+
     function openModal(id) {
       document.getElementById(id).classList.add('open');
       document.body.style.overflow = 'hidden';
@@ -1021,6 +1112,7 @@
       if (e.key === 'Escape') document.querySelectorAll('.modal-backdrop.open').forEach(bd => closeModal(bd.id));
     });
 
+    /* ── CANCEL WHOLE ORDER — uses the full-page buffer, since the page reloads after success ── */
     function openCancelOrder() {
       document.getElementById('cancelOrderReason').value = '';
       document.getElementById('cancelOrderErr').classList.remove('show');
@@ -1038,7 +1130,8 @@
         return;
       }
 
-      btn.disabled = true; btn.textContent = 'Cancelling…';
+      setModalBtnLoading(btn, 'Cancelling…');
+      showBuffer();
       try {
         const res  = await fetch(`/orders/${ORDER_ID}/cancel`, {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -1048,13 +1141,15 @@
         if (!res.ok || !data.success) throw new Error(data.message || 'Failed to cancel order.');
         closeModal('modalCancelOrder');
         showToast('Order cancelled successfully.');
-        setTimeout(() => window.location.reload(), 1200);
+        setTimeout(() => window.location.reload(), 1200); // buffer stays visible until reload
       } catch (err) {
+        hideBuffer();
         errEl.textContent = err.message; errEl.classList.add('show');
-        btn.disabled = false; btn.textContent = 'Yes, Cancel Order';
+        resetModalBtn(btn);
       }
     }
 
+    /* ── CANCEL SINGLE ITEM — local row-level loading only ── */
     function openCancelItem(itemId, itemName) {
       pendingCancelItemId = itemId;
       document.getElementById('cancelItemNameDisplay').textContent = itemName;
@@ -1075,7 +1170,9 @@
         return;
       }
 
-      btn.disabled = true; btn.textContent = 'Cancelling…';
+      setModalBtnLoading(btn, 'Cancelling…');
+      closeModal('modalCancelItem');            // close the dialog immediately…
+      setRowLoading(pendingCancelItemId, true);  // …and show the loading state on just that row
       try {
         const res  = await fetch(`/orders/${ORDER_ID}/cancel-item`, {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -1083,15 +1180,16 @@
         });
         const data = await res.json();
         if (!res.ok || !data.success) throw new Error(data.message || 'Failed to cancel item.');
-        closeModal('modalCancelItem');
         showToast('Item cancelled successfully.');
-        setTimeout(() => window.location.reload(), 1200);
+        setTimeout(() => window.location.reload(), 900);
       } catch (err) {
-        errEl.textContent = err.message; errEl.classList.add('show');
-        btn.disabled = false; btn.textContent = 'Cancel Item';
+        setRowLoading(pendingCancelItemId, false);
+        resetModalBtn(btn);
+        showToast(err.message, true);
       }
     }
 
+    /* ── RETURN WHOLE ORDER — uses the full-page buffer, since the page reloads after success ── */
     function openReturn() { openModal('modalReturn'); }
     async function confirmReturn() {
       const reason = document.getElementById('returnReason').value.trim();
@@ -1099,7 +1197,9 @@
       const errEl  = document.getElementById('returnErr');
       errEl.classList.remove('show');
       if (!reason) { errEl.textContent = 'A return reason is required.'; errEl.classList.add('show'); return; }
-      btn.disabled = true; btn.textContent = 'Submitting…';
+
+      setModalBtnLoading(btn, 'Submitting…');
+      showBuffer();
       try {
         const res  = await fetch(`/orders/${ORDER_ID}/return`, {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -1111,11 +1211,13 @@
         showToast('Return request submitted successfully.');
         setTimeout(() => window.location.reload(), 1200);
       } catch (err) {
+        hideBuffer();
         errEl.textContent = err.message; errEl.classList.add('show');
-        btn.disabled = false; btn.textContent = 'Submit Return';
+        resetModalBtn(btn);
       }
     }
 
+    /* ── RETURN SINGLE ITEM — local row-level loading only ── */
     function openReturnItem(itemId, itemName) {
       pendingReturnItemId = itemId;
       document.getElementById('returnItemNameDisplay').textContent = itemName;
@@ -1130,7 +1232,10 @@
       const errEl  = document.getElementById('returnItemErr');
       errEl.classList.remove('show');
       if (!reason) { errEl.textContent = 'A return reason is required.'; errEl.classList.add('show'); return; }
-      btn.disabled = true; btn.textContent = 'Submitting…';
+
+      setModalBtnLoading(btn, 'Submitting…');
+      closeModal('modalReturnItem');
+      setRowLoading(pendingReturnItemId, true);
       try {
         const res  = await fetch(`/orders/${ORDER_ID}/return-item`, {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -1138,12 +1243,12 @@
         });
         const data = await res.json();
         if (!res.ok || !data.success) throw new Error(data.message || 'Failed to submit item return.');
-        closeModal('modalReturnItem');
         showToast('Item return request submitted.');
-        setTimeout(() => window.location.reload(), 1200);
+        setTimeout(() => window.location.reload(), 900);
       } catch (err) {
-        errEl.textContent = err.message; errEl.classList.add('show');
-        btn.disabled = false; btn.textContent = 'Submit Return';
+        setRowLoading(pendingReturnItemId, false);
+        resetModalBtn(btn);
+        showToast(err.message, true);
       }
     }
   </script>

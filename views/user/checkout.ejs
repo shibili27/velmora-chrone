@@ -257,6 +257,11 @@
     .footer-legal{display:flex;gap:1.25rem}
     .footer-legal a{font-family:'Jost',sans-serif;font-size:.44rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(245,242,235,.18);text-decoration:none;transition:color .2s}
     .footer-legal a:hover{color:rgba(245,242,235,.5)}
+
+    .buffer-overlay{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;background:rgba(8,8,7,.75);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .25s ease}
+    .buffer-overlay.show{opacity:1;pointer-events:all}
+    .buffer-spinner{width:34px;height:34px;border-radius:50%;border:2px solid rgba(201,169,110,.15);border-top-color:#c9a96e;animation:bufferSpin .7s linear infinite}
+    @keyframes bufferSpin{to{transform:rotate(360deg)}}
   </style>
 </head>
 <body>
@@ -357,9 +362,10 @@
       <div class="section-label">Delivery Address</div>
 
       <% if (addresses && addresses.length > 0) { %>
+        <% const selectedAddr = addresses.find(a => a.isDefault) || addresses[0]; %>
         <div class="addr-grid" id="addrGrid">
-          <% addresses.forEach((addr, idx) => { %>
-          <div class="addr-card <%= addr.isDefault || idx === 0 ? 'selected' : '' %>"
+          <% addresses.forEach((addr) => { %>
+          <div class="addr-card <%= addr._id.toString() === selectedAddr._id.toString() ? 'selected' : '' %>"
                onclick="selectAddr(this, '<%= addr._id %>')"
                data-addr-id="<%= addr._id %>">
             <div class="addr-radio"><div class="addr-radio-dot"></div></div>
@@ -757,6 +763,10 @@
 
 <div class="toast" id="toast"></div>
 
+<div class="buffer-overlay" id="bufferOverlay">
+  <div class="buffer-spinner"></div>
+</div>
+
 <script>
   const navbar     = document.getElementById('navbar');
   const hamburger  = document.getElementById('hamburger');
@@ -790,6 +800,36 @@
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
   }
+
+  let _bufferCount = 0;
+  function showBuffer() {
+    _bufferCount++;
+    document.getElementById('bufferOverlay').classList.add('show');
+  }
+  function hideBuffer() {
+    _bufferCount = Math.max(0, _bufferCount - 1);
+    if (_bufferCount === 0) document.getElementById('bufferOverlay').classList.remove('show');
+  }
+
+  // Catches every navigation click — nav icons (wallet/cart), breadcrumb, footer links,
+  // "Back to Cart", etc. Excludes controls that manage their own async loading state below.
+  document.addEventListener('click', function (e) {
+    const btn = e.target.closest('a, button');
+    if (!btn || btn.disabled || btn.classList.contains('disabled')) return;
+    if (btn.id === 'hamburger' || btn.closest('#hamburger')) return;
+    if (btn.id === 'couponListToggleBtn') return;              // just expands/collapses a list
+    if (btn.classList.contains('coupon-card')) return;          // applyListedCoupon() has its own state
+    if (btn.classList.contains('modal-close')) return;          // just closes the modal
+    if (btn.closest('.modal-overlay') && btn.textContent.trim() === 'Cancel') return;
+    if (btn.classList.contains('addr-btn')) return;             // just opens the edit modal
+    if (btn.id === 'placeOrderBtn') return;                     // has its own "Processing…" state
+    if (btn.id === 'modalSaveBtn') return;                      // has its own "Saving…" state
+    if (btn.classList.contains('coupon-apply-btn')) return;     // applyCoupon() handles its own feedback
+    if (btn.classList.contains('coupon-remove-btn')) return;    // removeCoupon() handles its own feedback
+    if (btn.tagName === 'A' && (!btn.getAttribute('href') || btn.getAttribute('href').startsWith('#'))) return;
+    showBuffer();
+    setTimeout(hideBuffer, 600);
+  }, true);
 
   function selectAddr(card, addrId) {
     document.querySelectorAll('.addr-card').forEach(c => c.classList.remove('selected'));
@@ -1166,8 +1206,25 @@
     }
   }
 
-  history.pushState(null, null, window.location.href);
-  window.addEventListener('popstate', () => history.pushState(null, null, window.location.href));
+  /* ── PREVENT BACK NAV (safer version — doesn't fight the browser's own navigation state) ── */
+  (function () {
+    let blocking = true;
+    history.pushState({ velmoraLock: true }, '', window.location.href);
+
+    window.addEventListener('popstate', function () {
+      if (!blocking) return;
+      requestAnimationFrame(() => {
+        history.pushState({ velmoraLock: true }, '', window.location.href);
+      });
+    });
+  })();
+
+  /* ── Safety net: force-hide buffer overlay whenever page is (re)shown, including bfcache restores from Back/Forward ── */
+  window.addEventListener('pageshow', function () {
+    _bufferCount = 0;
+    const overlay = document.getElementById('bufferOverlay');
+    if (overlay) overlay.classList.remove('show');
+  });
 </script>
 </body>
 </html>

@@ -271,6 +271,12 @@
     .d1 { animation-delay: .1s; } .d2 { animation-delay: .25s; } .d3 { animation-delay: .42s; } .d4 { animation-delay: .58s; }
     .reveal { opacity: 0; transform: translateY(28px); transition: opacity .75s ease, transform .75s ease; }
     .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ═══ BUFFER OVERLAY ═══ */
+    .buffer-overlay { position: fixed; inset: 0; z-index: 10000; display: flex; align-items: center; justify-content: center; background: rgba(8,8,7,.75); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: opacity .25s ease; }
+    .buffer-overlay.show { opacity: 1; pointer-events: all; }
+    .buffer-spinner { width: 34px; height: 34px; border-radius: 50%; border: 2px solid rgba(201,169,110,.15); border-top-color: #c9a96e; animation: bufferSpin .7s linear infinite; }
+    @keyframes bufferSpin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
@@ -566,6 +572,10 @@
 
 <div class="toast" id="toast"><span class="toast-dot"></span><span id="toastMsg"></span></div>
 
+<div class="buffer-overlay" id="bufferOverlay">
+  <div class="buffer-spinner"></div>
+</div>
+
 <script>
 /* ── NAV SCROLL ── */
 const navbar = document.getElementById('navbar');
@@ -595,6 +605,28 @@ function showToast(msg, isErr = false) {
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
 }
+
+/* ── BUFFER OVERLAY ── */
+let _bufferCount = 0;
+function showBuffer() {
+  _bufferCount++;
+  document.getElementById('bufferOverlay').classList.add('show');
+}
+function hideBuffer() {
+  _bufferCount = Math.max(0, _bufferCount - 1);
+  if (_bufferCount === 0) document.getElementById('bufferOverlay').classList.remove('show');
+}
+
+document.addEventListener('click', function (e) {
+  const btn = e.target.closest('button, .btn-gold, .btn-outline, .nav-icon-btn, .view-all, .prod-card a, .cat-card');
+  if (!btn || btn.disabled || btn.classList.contains('disabled')) return;
+  if (btn.id === 'hamburger' || btn.closest('#hamburger')) return;
+  if (btn.id === 'heroSoundBtn' || btn.closest('#heroSoundBtn')) return;
+  if (btn.classList.contains('card-wish-btn')) return;
+  if (btn.classList.contains('carousel-dot')) return;
+  showBuffer();
+  setTimeout(hideBuffer, 600);
+}, true);
 
 /* ── HERO VIDEO ── */
 (function () {

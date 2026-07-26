@@ -200,6 +200,21 @@
     .reveal { opacity: 0; transform: translateY(20px); transition: opacity .6s ease, transform .6s ease; }
     .reveal.visible { opacity: 1; transform: translateY(0); }
 
+    /* ═══ PAGE BUFFER OVERLAY (navigation actions: view details, invoice, search, pagination) ═══ */
+    .buffer-overlay {
+      position: fixed; inset: 0; z-index: 10000;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(8,8,7,.75); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+      opacity: 0; pointer-events: none; transition: opacity .25s ease;
+    }
+    .buffer-overlay.show { opacity: 1; pointer-events: all; }
+    .buffer-spinner {
+      width: 34px; height: 34px; border-radius: 50%;
+      border: 2px solid rgba(201,169,110,.15); border-top-color: #c9a96e;
+      animation: bufferSpin .7s linear infinite;
+    }
+    @keyframes bufferSpin { to { transform: rotate(360deg); } }
+
     @media(max-width:640px) {
       .card-head { flex-direction: column; align-items: flex-start; }
       .card-foot { flex-direction: column; align-items: flex-start; }
@@ -268,13 +283,13 @@
 
   <div class="toolbar reveal">
     <span class="orders-count"><strong><%= total %></strong> order<%= total !== 1 ? 's' : '' %> found</span>
-    <form class="search-form" action="/orders" method="GET">
+    <form class="search-form" action="/orders" method="GET" id="ordersSearchForm">
       <span class="search-icon">
         <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="M21 21l-4.35-4.35"/></svg>
       </span>
       <input class="search-input" type="text" name="search" value="<%= search %>" placeholder="Search orders…" autocomplete="off"/>
       <% if (search) { %>
-        <a href="/orders" class="search-clear" title="Clear">
+        <a href="/orders" class="search-clear" title="Clear" data-buffer="1">
           <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </a>
       <% } %>
@@ -344,12 +359,12 @@
         </div>
         <div class="card-actions" id="actions-<%= order.orderNumber %>">
           <% if (order.orderStatus === 'delivered') { %>
-            <a href="/orders/<%= order.orderNumber %>/invoice" class="btn-invoice">
+            <a href="/orders/<%= order.orderNumber %>/invoice" class="btn-invoice" data-buffer="1">
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
               Invoice
             </a>
           <% } %>
-          <a href="/orders/<%= order.orderNumber %>" class="btn-view">View Details</a>
+          <a href="/orders/<%= order.orderNumber %>" class="btn-view" data-buffer="1">View Details</a>
         </div>
       </div>
 
@@ -359,17 +374,17 @@
 
   <% if (totalPages > 1) { %>
   <div class="pagination reveal">
-    <a href="/orders?search=<%= encodeURIComponent(search) %>&page=<%= page - 1 %>" class="page-btn <%= page <= 1 ? 'disabled' : '' %>">
+    <a href="/orders?search=<%= encodeURIComponent(search) %>&page=<%= page - 1 %>" class="page-btn <%= page <= 1 ? 'disabled' : '' %>" data-buffer="1">
       <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
     </a>
     <% for (let p = 1; p <= totalPages; p++) { %>
       <% if (p === 1 || p === totalPages || (p >= page - 1 && p <= page + 1)) { %>
-        <a href="/orders?search=<%= encodeURIComponent(search) %>&page=<%= p %>" class="page-btn <%= p === page ? 'active' : '' %>"><%= p %></a>
+        <a href="/orders?search=<%= encodeURIComponent(search) %>&page=<%= p %>" class="page-btn <%= p === page ? 'active' : '' %>" data-buffer="1"><%= p %></a>
       <% } else if (p === page - 2 || p === page + 2) { %>
         <span style="color:rgba(245,242,235,0.15);font-size:0.6rem;padding:0 4px;">…</span>
       <% } %>
     <% } %>
-    <a href="/orders?search=<%= encodeURIComponent(search) %>&page=<%= page + 1 %>" class="page-btn <%= page >= totalPages ? 'disabled' : '' %>">
+    <a href="/orders?search=<%= encodeURIComponent(search) %>&page=<%= page + 1 %>" class="page-btn <%= page >= totalPages ? 'disabled' : '' %>" data-buffer="1">
       <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
     </a>
   </div>
@@ -387,7 +402,7 @@
     <svg width="52" height="52" fill="none" stroke="rgba(201,169,110,0.1)" stroke-width="0.6" viewBox="0 0 24 24" style="margin:0 auto 1.5rem;display:block"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
     <h3>No Orders Yet</h3>
     <p>Your timepiece collection awaits.<br/>Begin your journey with Velmora Chroné.</p>
-    <a href="/products" class="btn-explore">Explore Collection</a>
+    <a href="/products" class="btn-explore" data-buffer="1">Explore Collection</a>
   </div>
   <% } %>
 
@@ -448,6 +463,11 @@
   </div>
 </footer>
 
+<!-- PAGE BUFFER OVERLAY -->
+<div class="buffer-overlay" id="bufferOverlay">
+  <div class="buffer-spinner"></div>
+</div>
+
 <script>
   const navbar = document.getElementById('navbar');
   window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', scrollY > 30), { passive: true });
@@ -464,6 +484,33 @@
 
   fetch('/api/cart/count', { headers: { 'Accept': 'application/json' } })
     .then(r => r.json()).then(d => { if (d.count !== undefined) document.getElementById('cartCount').textContent = d.count; }).catch(() => {});
+
+  /* ═══ FULL-PAGE BUFFER — shown for links/forms that trigger a real navigation ═══
+     Filter tabs are intentionally excluded: they just re-filter cards already
+     in the DOM, so there's no request/navigation to wait on. */
+  let _bufferCount = 0;
+  function showBuffer() {
+    _bufferCount++;
+    document.getElementById('bufferOverlay').classList.add('show');
+  }
+  function hideBuffer() {
+    _bufferCount = Math.max(0, _bufferCount - 1);
+    if (_bufferCount === 0) document.getElementById('bufferOverlay').classList.remove('show');
+  }
+  document.querySelectorAll('a[data-buffer="1"]').forEach(link => {
+    link.addEventListener('click', function (e) {
+      if (this.classList.contains('disabled')) return;
+      showBuffer();
+      setTimeout(hideBuffer, 2500); // fallback in case navigation doesn't unload the page (e.g. invoice download)
+    });
+  });
+  const ordersSearchForm = document.getElementById('ordersSearchForm');
+  if (ordersSearchForm) {
+    ordersSearchForm.addEventListener('submit', () => {
+      showBuffer();
+      setTimeout(hideBuffer, 2500);
+    });
+  }
 
   const tabs  = document.querySelectorAll('.f-tab');
   const cards = document.querySelectorAll('.order-card');
@@ -544,7 +591,12 @@
         const invoiceBtn = document.createElement('a');
         invoiceBtn.href      = `/orders/${orderNum}/invoice`;
         invoiceBtn.className = 'btn-invoice';
+        invoiceBtn.setAttribute('data-buffer', '1');
         invoiceBtn.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Invoice`;
+        invoiceBtn.addEventListener('click', function () {
+          showBuffer();
+          setTimeout(hideBuffer, 2500);
+        });
         actionsEl.insertBefore(invoiceBtn, actionsEl.firstChild);
       }
     }

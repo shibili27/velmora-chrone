@@ -95,12 +95,17 @@
     .item-warning{font-family:'Jost',sans-serif;font-size:.42rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(248,113,113,.8);border:1px solid rgba(248,113,113,.2);padding:3px 10px;border-radius:100px;display:inline-block;background:rgba(248,113,113,.05)}
     .item-low{font-family:'Jost',sans-serif;font-size:.42rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(251,191,36,.8);border:1px solid rgba(251,191,36,.2);padding:3px 10px;border-radius:100px;display:inline-block;background:rgba(251,191,36,.04)}
 
-    .qty-ctrl{display:flex;align-items:center;border:1px solid rgba(245,242,235,.1);border-radius:100px;overflow:hidden}
+    .qty-ctrl{display:flex;align-items:center;border:1px solid rgba(245,242,235,.1);border-radius:100px;overflow:hidden;transition:opacity .2s,border-color .2s}
+    .qty-ctrl.loading{opacity:.55;border-color:rgba(201,169,110,.2)}
     .qty-btn{width:30px;height:30px;background:none;border:none;cursor:pointer;color:rgba(245,242,235,.45);font-size:.9rem;display:flex;align-items:center;justify-content:center;transition:color .2s,background .2s;line-height:1}
     .qty-btn:hover:not(:disabled){color:#c9a96e;background:rgba(201,169,110,.07)}
     .qty-btn:disabled{opacity:.2;cursor:not-allowed}
-    .qty-val{min-width:32px;text-align:center;font-family:'Jost',sans-serif;font-size:.65rem;color:#f5f2eb;padding:0 4px}
-    .item-total{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:300;color:rgba(201,169,110,.9)}
+    .qty-val{min-width:32px;text-align:center;font-family:'Jost',sans-serif;font-size:.65rem;color:#f5f2eb;padding:0 4px;display:flex;align-items:center;justify-content:center}
+    .item-total{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:300;color:rgba(201,169,110,.9);transition:opacity .2s}
+    .item-total.loading{opacity:.4}
+
+    .qty-mini-spinner{width:9px;height:9px;border-radius:50%;border:1.5px solid rgba(201,169,110,.2);border-top-color:#c9a96e;animation:qtySpin .6s linear infinite;display:inline-block}
+    @keyframes qtySpin{to{transform:rotate(360deg)}}
 
     .oos-banner{background:rgba(248,113,113,.04);border:1px solid rgba(248,113,113,.15);border-radius:12px;padding:.85rem 1.1rem;margin-bottom:1.25rem;display:flex;gap:10px;align-items:flex-start}
     .oos-banner-text{font-family:'Jost',sans-serif;font-size:.5rem;color:rgba(245,242,235,.4);line-height:1.7}
@@ -182,6 +187,12 @@
     .vc-cancel:hover{border-color:rgba(245,242,235,.18);color:rgba(245,242,235,.6)}
     .vc-divider{height:1px;background:linear-gradient(90deg,transparent,rgba(201,169,110,.12),transparent);margin:.35rem 0}
     .vc-item-count{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:300;color:rgba(201,169,110,.6);text-align:center;display:block;margin-bottom:.2rem}
+
+    /* ── PAGE BUFFER OVERLAY ── */
+    .buffer-overlay{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;background:rgba(8,8,7,.75);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .25s ease}
+    .buffer-overlay.show{opacity:1;pointer-events:all}
+    .buffer-spinner{width:34px;height:34px;border-radius:50%;border:2px solid rgba(201,169,110,.15);border-top-color:#c9a96e;animation:bufferSpin .7s linear infinite}
+    @keyframes bufferSpin{to{transform:rotate(360deg)}}
   </style>
 </head>
 <body>
@@ -321,7 +332,7 @@
             <% } %>
 
             <div class="item-bottom">
-              <div class="qty-ctrl">
+              <div class="qty-ctrl" id="qtyCtrl-<%= item._id %>">
                 <button class="qty-btn"
                   <%= (isOOS || isBlocked || item.quantity <= 1) ? 'disabled' : '' %>
                   onclick="updateQty('<%= item._id %>', 'dec')">−</button>
@@ -479,6 +490,11 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- PAGE BUFFER OVERLAY -->
+<div class="buffer-overlay" id="bufferOverlay">
+  <div class="buffer-spinner"></div>
+</div>
+
 <script>
   const MAX_QTY          = <%= MAX_QTY %>;
   const SHIPPING_FEE     = <%= shipping %>;
@@ -520,6 +536,32 @@
 
   function fmt(n) { return '₹' + Number(n).toLocaleString('en-IN'); }
 
+  /* ── BUFFER OVERLAY (full page — not used for qty changes, they have local loading) ── */
+  let _bufferCount = 0;
+  function showBuffer() {
+    _bufferCount++;
+    document.getElementById('bufferOverlay').classList.add('show');
+  }
+  function hideBuffer() {
+    _bufferCount = Math.max(0, _bufferCount - 1);
+    if (_bufferCount === 0) document.getElementById('bufferOverlay').classList.remove('show');
+  }
+
+  // Catches every navigation click on the page — nav icons (profile/wallet/wishlist/cart),
+  // breadcrumb links, product image/name links, footer links, checkout, continue shopping, etc.
+  document.addEventListener('click', function (e) {
+    const btn = e.target.closest('a, button');
+    if (!btn || btn.disabled || btn.classList.contains('disabled')) return;
+    if (btn.id === 'hamburger' || btn.closest('#hamburger')) return;              // mobile menu toggle
+    if (btn.id === 'vcConfirmBtn' || btn.classList.contains('vc-cancel')) return; // dialog handles its own buffer
+    if (btn.classList.contains('qty-btn')) return;        // qty buttons use local inline loading state
+    if (btn.classList.contains('remove-btn')) return;     // removeItem() shows/hides its own buffer
+    if (btn.classList.contains('clear-all-btn')) return;  // just opens the confirm dialog, no async work yet
+    if (btn.tagName === 'A' && (!btn.getAttribute('href') || btn.getAttribute('href').startsWith('#'))) return;
+    showBuffer();
+    setTimeout(hideBuffer, 600); // auto-hide fallback for links/buttons with no async work of their own
+  }, true);
+
   /* ── CLEAR CART DIALOG ── */
   let _pendingClearCallback = null;
 
@@ -550,6 +592,7 @@
   function clearCart() {
     const itemCount = document.querySelectorAll('.cart-item').length;
     openClearDialog(itemCount, async () => {
+      showBuffer();
       try {
         const res = await fetch('/cart/clear', { method: 'DELETE' });
         if (res.ok) {
@@ -563,19 +606,39 @@
           showToast('Could not clear cart', 'err');
         }
       } catch (_) { showToast('Something went wrong', 'err'); }
+      finally { hideBuffer(); }
     });
   }
 
-  /* ── QTY UPDATE ── */
+  /* ── QTY UPDATE (local, per-item loading — no full-page buffer) ── */
   async function updateQty(itemId, action) {
-    const decBtn = document.querySelector(`#cartItem-${itemId} .qty-btn:first-child`);
-    const incBtn = document.querySelector(`#cartItem-${itemId} .qty-btn:last-child`);
+    const ctrl    = document.getElementById(`qtyCtrl-${itemId}`);
+    const decBtn  = document.querySelector(`#cartItem-${itemId} .qty-btn:first-child`);
+    const incBtn  = document.querySelector(`#cartItem-${itemId} .qty-btn:last-child`);
+    const qtyEl   = document.getElementById(`qty-${itemId}`);
+    const totalEl = document.getElementById(`total-${itemId}`);
+
+    // guard against double-clicks while a request is already in flight
+    if (ctrl && ctrl.classList.contains('loading')) return;
+
+    const originalQty = qtyEl ? qtyEl.textContent : '';
+
+    if (ctrl) ctrl.classList.add('loading');
+    if (totalEl) totalEl.classList.add('loading');
     if (decBtn) decBtn.disabled = true;
     if (incBtn) incBtn.disabled = true;
+    if (qtyEl) qtyEl.innerHTML = '<span class="qty-mini-spinner"></span>';
+
     try {
       const res  = await fetch(`/cart/update/${itemId}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action }) });
       const data = await res.json();
-      if (!res.ok) { showToast(data.message || 'Could not update quantity', 'err'); return; }
+
+      if (!res.ok) {
+        if (qtyEl) qtyEl.textContent = originalQty;
+        showToast(data.message || 'Could not update quantity', 'err');
+        return;
+      }
+
       if (data.removed) {
         const row = document.getElementById(`cartItem-${itemId}`);
         if (row) { row.classList.add('removing'); setTimeout(() => row.remove(), 300); }
@@ -584,22 +647,31 @@
         showToast('Item removed from cart');
         return;
       }
-      const qtyEl = document.getElementById(`qty-${itemId}`);
+
       if (qtyEl) qtyEl.textContent = data.quantity;
-      const totalEl = document.getElementById(`total-${itemId}`);
       if (totalEl) totalEl.textContent = fmt(data.itemTotal);
       updateSummary(data.subtotal, data.cartCount);
+
       if (decBtn) decBtn.disabled = data.quantity <= 1;
       if (incBtn) incBtn.disabled = data.quantity >= MAX_QTY || (data.maxStock !== undefined && data.quantity >= data.maxStock);
-    } catch (err) { showToast('Something went wrong', 'err'); }
-    finally {
-      const q = parseInt(document.getElementById(`qty-${itemId}`)?.textContent || '1');
-      if (decBtn && decBtn.disabled === true && q > 1) decBtn.disabled = false;
+    } catch (err) {
+      if (qtyEl) qtyEl.textContent = originalQty;
+      showToast('Something went wrong', 'err');
+    } finally {
+      if (ctrl) ctrl.classList.remove('loading');
+      if (totalEl) totalEl.classList.remove('loading');
+      // re-enable dec button if it's still valid (only if item wasn't removed)
+      const stillExists = document.getElementById(`cartItem-${itemId}`);
+      if (stillExists && decBtn) {
+        const q = parseInt(document.getElementById(`qty-${itemId}`)?.textContent || '1');
+        if (q > 1) decBtn.disabled = false;
+      }
     }
   }
 
   /* ── REMOVE SINGLE ITEM ── */
   async function removeItem(itemId) {
+    showBuffer();
     const row = document.getElementById(`cartItem-${itemId}`);
     if (row) row.classList.add('removing');
     try {
@@ -611,6 +683,7 @@
       checkEmptyState();
       showToast('Item removed from cart');
     } catch (_) { if (row) row.classList.remove('removing'); showToast('Something went wrong', 'err'); }
+    finally { hideBuffer(); }
   }
 
   /* ── SUMMARY UPDATE (called after qty/remove AJAX) ── */
@@ -647,9 +720,25 @@
     if (items.length === 0) window.location.reload();
   }
 
-  /* ── PREVENT BACK NAV ── */
-  history.pushState(null, null, window.location.href);
-  window.addEventListener('popstate', () => history.pushState(null, null, window.location.href));
+  /* ── PREVENT BACK NAV (safer version — doesn't fight the browser's own navigation state) ── */
+  (function () {
+    let blocking = true;
+    history.pushState({ velmoraLock: true }, '', window.location.href);
+
+    window.addEventListener('popstate', function () {
+      if (!blocking) return;
+      requestAnimationFrame(() => {
+        history.pushState({ velmoraLock: true }, '', window.location.href);
+      });
+    });
+  })();
+
+  /* ── Safety net: force-hide buffer overlay whenever page is (re)shown, including bfcache restores from Back/Forward ── */
+  window.addEventListener('pageshow', function () {
+    _bufferCount = 0;
+    const overlay = document.getElementById('bufferOverlay');
+    if (overlay) overlay.classList.remove('show');
+  });
 
   /* ── SSE: REAL-TIME PRODUCT UPDATES ── */
   (function () {

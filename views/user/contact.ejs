@@ -210,6 +210,13 @@
   .footer-legal{display:flex;gap:1.25rem;}
   .footer-legal a{font-family:'Jost',sans-serif;font-size:.46rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(245,242,235,.2);text-decoration:none;transition:color .2s;}
   .footer-legal a:hover{color:rgba(245,242,235,.5);}
+
+  /* ═══ PAGE BUFFER OVERLAY (matches product-detail.ejs / cart.ejs) ═══ */
+  .buffer-overlay{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;background:rgba(8,8,7,.75);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .25s ease;flex-direction:column;gap:.85rem;}
+  .buffer-overlay.show{opacity:1;pointer-events:all;}
+  .buffer-spinner{width:34px;height:34px;border-radius:50%;border:2px solid rgba(201,169,110,.15);border-top-color:#c9a96e;animation:bufferSpin .7s linear infinite;}
+  @keyframes bufferSpin{to{transform:rotate(360deg);}}
+  .buffer-label{font-family:'Jost',sans-serif;font-size:.46rem;letter-spacing:.22em;text-transform:uppercase;color:rgba(245,242,235,.35);}
 </style>
 </head>
 <body>
@@ -467,6 +474,12 @@
   </div>
 </footer>
 
+<!-- PAGE BUFFER OVERLAY (matches product-detail.ejs / cart.ejs) -->
+<div class="buffer-overlay" id="bufferOverlay">
+  <div class="buffer-spinner"></div>
+  <span class="buffer-label" id="bufferLabel">Please wait…</span>
+</div>
+
 <script>
 document.getElementById('year').textContent = new Date().getFullYear();
 
@@ -494,6 +507,24 @@ document.querySelectorAll('.faq-item').forEach(item => {
     if (!wasOpen) item.classList.add('open');
   });
 });
+
+/* ══════════════════════ PAGE BUFFER OVERLAY ══════════════════════
+   Reference-counted (showBuffer / hideBuffer) so overlapping async calls
+   don't flicker it on/off. Triggered ONLY around real network requests
+   (the contact form submit) — never on purely local UI interactions like
+   the FAQ accordion, hamburger menu, or scroll/reveal effects.
+════════════════════════════════════════════════════════════════════ */
+let _bufferCount = 0;
+function showBuffer(label) {
+  _bufferCount++;
+  const lbl = document.getElementById('bufferLabel');
+  if (lbl) lbl.textContent = label || 'Please wait…';
+  document.getElementById('bufferOverlay').classList.add('show');
+}
+function hideBuffer() {
+  _bufferCount = Math.max(0, _bufferCount - 1);
+  if (_bufferCount === 0) document.getElementById('bufferOverlay').classList.remove('show');
+}
 
 /* ══════════════════════ CONTACT FORM VALIDATION ══════════════════════ */
 const contactForm  = document.getElementById('contactForm');
@@ -618,6 +649,7 @@ contactForm.addEventListener('submit', async (e) => {
 
   submitBtn.disabled = true;
   submitLabel.textContent = 'Sending...';
+  showBuffer('Sending your message…');
 
   try {
     const res = await fetch('/api/contact', {
@@ -642,6 +674,7 @@ contactForm.addEventListener('submit', async (e) => {
   } finally {
     submitBtn.disabled = false;
     submitLabel.textContent = 'Send Message';
+    hideBuffer();
   }
 });
 
