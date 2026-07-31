@@ -6,7 +6,7 @@ import streamifier from 'streamifier';
 import bcrypt      from 'bcrypt';
 import crypto      from 'crypto';
 import multer      from 'multer';
-import { sendOTP as sendOtpEmail } from '../../services/authService.js'; // confirm this matches the file actually used by your working signup/login OTP flow
+import { sendOTP as sendOtpEmail } from '../../services/authService.js'; 
 
 export const upload = multer({
   storage: multer.memoryStorage(),
@@ -114,11 +114,7 @@ const requestEmailChange = async (req, res) => {
 
     console.log(`[OTP] Email change code for ${trimmedEmail} → ${otp}`);
 
-    // FIX: previously this was gated behind `if (process.env.NODE_ENV === 'production')`,
-    // which meant the email was silently never sent in dev/staging (or whenever
-    // NODE_ENV wasn't exactly 'production'), while the response still said success: true.
-    // Now we always attempt to send, and if it fails we tell the client honestly
-    // instead of returning a false "success".
+   
     try {
       await sendOtpEmail(trimmedEmail, otp);
     } catch (mailErr) {
