@@ -6,7 +6,7 @@ import streamifier from 'streamifier';
 import bcrypt      from 'bcrypt';
 import crypto      from 'crypto';
 import multer      from 'multer';
-import nodemailer  from 'nodemailer';
+import { sendOTP as sendOtpEmail } from '../../services/authService.js'; // confirm this matches the file actually used by your working signup/login OTP flow
 
 export const upload = multer({
   storage: multer.memoryStorage(),
@@ -16,19 +16,6 @@ export const upload = multer({
     else cb(new Error('Only image files are allowed.'), false);
   },
 });
-
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
-});
-async function sendOtpEmail(to, otp) {
-  await transporter.sendMail({
-    from:    `"Velmora Chroné" <${process.env.EMAIL_USER}>`,
-    to,
-    subject: 'Your email-change verification code',
-    html:    `<p>Your 6-digit code is <strong>${otp}</strong>. It expires in 10 minutes.</p>`,
-  });
-}
 
 const getProfile = async (req, res) => {
   try {
@@ -127,8 +114,19 @@ const requestEmailChange = async (req, res) => {
 
     console.log(`[OTP] Email change code for ${trimmedEmail} → ${otp}`);
 
-    if (process.env.NODE_ENV === 'production') {
+    // FIX: previously this was gated behind `if (process.env.NODE_ENV === 'production')`,
+    // which meant the email was silently never sent in dev/staging (or whenever
+    // NODE_ENV wasn't exactly 'production'), while the response still said success: true.
+    // Now we always attempt to send, and if it fails we tell the client honestly
+    // instead of returning a false "success".
+    try {
       await sendOtpEmail(trimmedEmail, otp);
+    } catch (mailErr) {
+      console.error('requestEmailChange: failed to send OTP email:', mailErr);
+      return res.json({
+        success: false,
+        message: 'Could not send verification email. Please check the address and try again.',
+      });
     }
 
     res.json({ success: true });

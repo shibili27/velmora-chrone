@@ -1284,11 +1284,13 @@
       cells[Math.min(pasted.length-1,5)].focus(); if (pasted.length===6) verifyEmailOTP();
     });
   });
-  function startResendTimer() {
-    const btn = document.getElementById('resendOtpBtn'), timerEl = document.getElementById('resendTimer');
-    btn.disabled = true; let secs = 30; timerEl.textContent = '('+secs+'s)'; clearInterval(resendInterval);
-    resendInterval = setInterval(() => { secs--; timerEl.textContent = '('+secs+'s)'; if (secs<=0) { clearInterval(resendInterval); btn.disabled = false; timerEl.textContent = ''; } }, 1000);
-  }
+function startResendTimer() {
+  const btn = document.getElementById('resendOtpBtn'), timerEl = document.getElementById('resendTimer');
+  btn.disabled = true; let secs = 300; 
+  function formatTime(s) { const m = Math.floor(s/60); const r = s%60; return '('+m+':'+String(r).padStart(2,'0')+')'; }
+  timerEl.textContent = formatTime(secs); clearInterval(resendInterval);
+  resendInterval = setInterval(() => { secs--; timerEl.textContent = formatTime(secs); if (secs<=0) { clearInterval(resendInterval); btn.disabled = false; timerEl.textContent = ''; } }, 1000);
+}
   function resetEmailForm() {
     document.getElementById('email-step1').style.display = 'block'; document.getElementById('email-step2').style.display = 'none';
     document.getElementById('new-email').value = ''; document.getElementById('err-new-email').classList.add('hidden');
