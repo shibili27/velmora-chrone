@@ -60,6 +60,7 @@ export const cancelOrder = async (req, res) => {
       reason,
     });
 
+
     return res.json({ success: true, message: 'Order cancelled successfully.' });
   } catch (err) {
     console.error('[cancelOrder]', err);

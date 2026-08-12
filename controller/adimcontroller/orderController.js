@@ -133,6 +133,10 @@ export const listOrders = async (req, res) => {
       currentTo          : to   || '',
       currentReturnFilter: returnFilter,
     });
+
+    res.render('admin/customers',{
+      currentStatus      : status,
+    });
   } catch (err) {
     console.error('listOrders error:', err);
     req.flash('error', 'Failed to load orders.');
@@ -175,6 +179,7 @@ export const updateOrderStatus = async (req, res) => {
     if (!validStatuses.includes(status)) {
       return res.status(400).json({ success: false, message: 'Invalid status value.' });
     }
+
 
     const updateFields = { orderStatus: status };
 
@@ -477,3 +482,4 @@ export const getRecentOrders = async (req, res) => {
     res.json({ success: false, orders: [] });
   }
 };
+

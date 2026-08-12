@@ -449,6 +449,14 @@
                       <div class="customer-avatar"><%= c.name.charAt(0).toUpperCase() %></div>
                       <div class="customer-name"><%= c.name %></div>
                     </div>
+
+
+                    <div>  <% if (currentStatus == "cancelled") { %>
+                      <span class="customer-avata">'cancelled'</span>
+                    <% } else { %></div> 
+
+
+
                   </td>
                   <td><%= c.email %></td>
                   <td><%= new Date(c.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) %></td>
