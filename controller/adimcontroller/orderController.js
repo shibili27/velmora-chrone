@@ -133,10 +133,6 @@ export const listOrders = async (req, res) => {
       currentTo          : to   || '',
       currentReturnFilter: returnFilter,
     });
-
-    res.render('admin/customers',{
-      currentStatus      : status,
-    });
   } catch (err) {
     console.error('listOrders error:', err);
     req.flash('error', 'Failed to load orders.');
@@ -482,4 +478,3 @@ export const getRecentOrders = async (req, res) => {
     res.json({ success: false, orders: [] });
   }
 };
-

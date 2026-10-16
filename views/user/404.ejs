@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="robots" content="noindex"/>
+  <title>Page Not Found — Velmora Chroné</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" type="image/png" href="https://res.cloudinary.com/dwb0hd0m6/image/upload/v1784952357/Gemini_Generated_Image_do2fqpdo2fqpdo2f-removebg-preview_xw0yiv.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Jost', sans-serif; background: #111110; color: #f5f2eb; overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column; }
+    ::-webkit-scrollbar { width: 2px; }
+    ::-webkit-scrollbar-track { background: #111110; }
+    ::-webkit-scrollbar-thumb { background: #c9a96e; }
+
+    body::before {
+      content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity: .016;
+    }
+
+    .nav-root { position: fixed; top: 0; left: 0; right: 0; z-index: 200; background: rgba(17,17,16,0.92); backdrop-filter: blur(18px) saturate(1.4); -webkit-backdrop-filter: blur(18px) saturate(1.4); border-bottom: 1px solid rgba(245,242,235,0.06); transition: box-shadow 0.3s; }
+    .nav-root.scrolled { box-shadow: 0 2px 24px rgba(0,0,0,0.5); }
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 1rem 2rem; }
+    @media(min-width:768px) { .nav-inner { padding: 1rem 3rem; } }
+    .nav-logo { font-family: 'Cormorant Garamond', serif; font-size: 0.85rem; font-weight: 300; letter-spacing: 0.25em; text-transform: uppercase; color: #f5f2eb; text-decoration: none; }
+    .nav-link { font-family: 'Jost', sans-serif; font-size: 0.53rem; font-weight: 400; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(245,242,235,0.45); text-decoration: none; transition: color 0.2s; position: relative; padding-bottom: 2px; }
+    .nav-link::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 0; height: 1px; background: #c9a96e; transition: width 0.3s; }
+    .nav-link:hover { color: rgba(245,242,235,0.9); }
+    .nav-link:hover::after { width: 100%; }
+
+    .nav-icon-btn { position: relative; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; color: rgba(245,242,235,0.5); background: rgba(255,255,255,0.03); border: 1px solid rgba(201,169,110,0.12); border-radius: 10px; cursor: pointer; text-decoration: none; transition: color 0.22s, background 0.22s, border-color 0.22s, transform 0.18s cubic-bezier(.34,1.56,.64,1), box-shadow 0.22s; box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 2px 6px rgba(0,0,0,0.35); }
+    .nav-icon-btn::before { content: ''; position: absolute; inset: 0; border-radius: 10px; background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 55%); pointer-events: none; }
+    .nav-icon-btn:hover { color: #c9a96e; background: rgba(201,169,110,0.08); border-color: rgba(201,169,110,0.35); transform: translateY(-2px) scale(1.06); box-shadow: 0 1px 0 rgba(255,255,255,0.06) inset, 0 6px 20px rgba(0,0,0,0.5), 0 0 14px rgba(201,169,110,0.15); }
+    .nav-icon-btn:active { transform: translateY(0) scale(0.97); }
+    .cart-badge { position: absolute; top: -5px; right: -5px; width: 14px; height: 14px; border-radius: 50%; background: linear-gradient(135deg, #d4b97e, #c9a96e); font-size: 0.38rem; font-weight: 600; color: #111110; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(201,169,110,0.4); }
+
+    .hamburger { display: flex; flex-direction: column; gap: 5px; background: none; border: none; cursor: pointer; padding: 3px; }
+    .hamburger span { display: block; width: 20px; height: 1px; background: rgba(245,242,235,0.6); transition: transform 0.3s, opacity 0.3s; }
+    .hamburger.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+    .mobile-menu { display: none; flex-direction: column; background: #0d0d0c; padding: 1.5rem 2rem; gap: 1rem; border-top: 1px solid rgba(245,242,235,0.05); }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu .nav-link { font-size: 0.68rem; padding: 0.45rem 0; border-bottom: 1px solid rgba(245,242,235,0.04); color: rgba(245,242,235,0.5); }
+
+    .nf-main { flex: 1; position: relative; display: flex; align-items: center; justify-content: center; padding: 6.5rem 1.5rem 4rem; overflow: hidden; background: radial-gradient(ellipse at 50% 35%, rgba(201,169,110,0.08), transparent 60%), #111110; }
+    .nf-wrap { position: relative; z-index: 1; text-align: center; max-width: 560px; width: 100%; }
+    .nf-eyebrow { display: inline-flex; align-items: center; gap: 0.6rem; font-size: 0.46rem; letter-spacing: 0.38em; text-transform: uppercase; color: #c9a96e; margin-bottom: 0.5rem; }
+    .nf-eyebrow::before, .nf-eyebrow::after { content: ''; width: 28px; height: 1px; background: #c9a96e; opacity: 0.55; }
+
+    .nf-scene { display: block; width: clamp(14rem, 62vw, 19rem); height: auto; margin: 0 auto; overflow: visible; }
+    .nf-num { display: block; font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(4.2rem, 16vw, 7.5rem); line-height: 0.9; letter-spacing: 0.04em; margin-top: -0.4rem; background: linear-gradient(125deg, #e8d49a 0%, #c9a96e 45%, #a8873d 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+    /* ---------- Cat scene animation ---------- */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes catBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
+    @keyframes swing { from { transform: rotate(-8deg); } to { transform: rotate(8deg); } }
+    @keyframes follow { from { transform: rotate(-3deg); } to { transform: rotate(5deg); } }
+    @keyframes look { from { transform: translateX(-1.6px); } to { transform: translateX(2.4px); } }
+    @keyframes tail { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(7deg); } }
+    @keyframes swat { 0%, 70%, 100% { transform: rotate(0deg); } 82% { transform: rotate(-9deg); } 92% { transform: rotate(2deg); } }
+    @keyframes earTwitch { 0%, 86%, 100% { transform: rotate(0deg); } 90% { transform: rotate(-9deg); } 94% { transform: rotate(3deg); } }
+    @keyframes blink { 0%, 92%, 100% { transform: scaleY(1); } 96% { transform: scaleY(0.08); } }
+    @keyframes glint { 0%, 78%, 100% { opacity: 0; transform: scale(.4); } 88% { opacity: 1; transform: scale(1); } }
+    @keyframes floatQ { 0% { transform: translateY(0); opacity: 0; } 20% { opacity: .85; } 100% { transform: translateY(-34px); opacity: 0; } }
+    @keyframes pulse { 0%, 100% { transform: scale(1); opacity: .45; } 50% { transform: scale(1.12); opacity: 1; } }
+    @keyframes shadowPulse { 0%, 100% { transform: scaleX(1); } 50% { transform: scaleX(.95); } }
+
+    .cat      { animation: catBob 3.6s ease-in-out infinite; }
+    .tail     { transform-origin: 90px 282px; animation: tail 2.8s ease-in-out infinite; }
+    .head     { transform-origin: 130px 190px; animation: follow 3.2s ease-in-out infinite alternate; }
+    .ear-r    { transform-origin: 156px 134px; animation: earTwitch 6s ease-in-out infinite; }
+    .eye      { transform-box: fill-box; transform-origin: center; animation: blink 4.5s infinite; }
+    .pupils   { animation: look 3.2s ease-in-out infinite alternate; }
+    .paw-arm  { transform-origin: 152px 214px; animation: swat 3.2s ease-in-out infinite; }
+    .glint    { transform-box: fill-box; transform-origin: center; animation: glint 5s ease-in-out infinite; }
+    .pendulum { transform-origin: 215px 16px; animation: swing 3.2s ease-in-out infinite alternate; }
+    .hand-hr  { transform-origin: 215px 130px; animation: spin 24s linear infinite; }
+    .hand-min { transform-origin: 215px 130px; animation: spin 4s linear infinite; }
+    .hand-sec { transform-origin: 215px 130px; animation: spin 1.4s linear infinite; }
+    .glow     { transform-origin: 215px 130px; animation: pulse 2.4s ease-in-out infinite; }
+    .shadow   { transform-origin: 120px 298px; animation: shadowPulse 3.6s ease-in-out infinite; }
+    .q { font-family: 'Cormorant Garamond', serif; font-style: italic; fill: #c9a96e; animation: floatQ 3.6s ease-in infinite; opacity: 0; }
+
+    .nf-title { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(1.7rem, 4vw, 2.5rem); color: #f5f2eb; margin-top: 1.5rem; letter-spacing: 0.02em; }
+    .nf-title em { font-style: italic; color: #c9a96e; }
+    .nf-rule { width: 60px; height: 1px; margin: 1.4rem auto; background: linear-gradient(90deg, transparent, rgba(201,169,110,0.7), transparent); }
+    .nf-sub { font-size: 0.68rem; font-weight: 300; letter-spacing: 0.06em; color: rgba(245,242,235,0.4); line-height: 1.95; max-width: 380px; margin: 0 auto 2.25rem; }
+    .nf-btns { display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; justify-content: center; }
+    .nf-path { margin-top: 2.25rem; font-size: 0.5rem; letter-spacing: 0.14em; color: rgba(245,242,235,0.18); word-break: break-all; }
+    .nf-path span { color: rgba(201,169,110,0.4); }
+
+    .btn-gold { font-family: 'Jost', sans-serif; font-size: 0.5rem; letter-spacing: 0.24em; text-transform: uppercase; color: #0d0b08; display: inline-flex; align-items: center; gap: 0.6rem; padding: 0.85rem 2.1rem; border-radius: 100px; text-decoration: none; position: relative; overflow: hidden; background: linear-gradient(135deg, #e0c47e 0%, #c9a96e 50%, #b8913d 100%); border: none; transition: transform 0.2s cubic-bezier(.34,1.56,.64,1), box-shadow 0.22s; box-shadow: 0 1px 0 rgba(255,255,255,0.35) inset, 0 4px 18px rgba(185,140,55,0.35), 0 1px 4px rgba(0,0,0,0.4); }
+    .btn-gold::after { content: ''; position: absolute; top: 0; left: -75%; width: 50%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent); transform: skewX(-18deg); transition: left 0.55s ease; }
+    .btn-gold:hover::after { left: 130%; }
+    .btn-gold:hover { transform: translateY(-2px) scale(1.04); box-shadow: 0 1px 0 rgba(255,255,255,0.4) inset, 0 8px 28px rgba(185,140,55,0.45), 0 2px 8px rgba(0,0,0,0.45); }
+    .btn-gold:active { transform: translateY(1px) scale(0.98); }
+    .btn-gold .btn-arrow { width: 16px; height: 16px; border-radius: 50%; background: rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: transform 0.2s; }
+    .btn-gold:hover .btn-arrow { transform: translateX(3px); }
+    .btn-outline { font-family: 'Jost', sans-serif; font-size: 0.5rem; letter-spacing: 0.24em; text-transform: uppercase; color: rgba(245,242,235,0.7); display: inline-flex; align-items: center; gap: 0.55rem; padding: 0.83rem 2rem; border-radius: 100px; text-decoration: none; background: rgba(255,255,255,0.04); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(201,169,110,0.35); cursor: pointer; transition: transform 0.2s cubic-bezier(.34,1.56,.64,1), box-shadow 0.22s, background 0.22s, color 0.22s, border-color 0.22s; box-shadow: 0 2px 12px rgba(0,0,0,0.25); }
+    .btn-outline:hover { color: #f5f2eb; background: rgba(201,169,110,0.1); border-color: rgba(201,169,110,0.65); transform: translateY(-2px) scale(1.03); box-shadow: 0 6px 22px rgba(0,0,0,0.35), 0 0 18px rgba(201,169,110,0.12); }
+    .btn-outline:active { transform: translateY(1px) scale(0.98); }
+
+    .footer { background: #0a0a09; padding: 2rem; border-top: 1px solid rgba(245,242,235,0.05); position: relative; z-index: 1; }
+    .footer-bottom { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 0.75rem; align-items: center; text-align: center; }
+    @media(min-width:768px) { .footer { padding: 2rem 3rem; } .footer-bottom { flex-direction: row; justify-content: space-between; } }
+    .footer-copy { font-size: 0.46rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(245,242,235,0.12); }
+    .footer-legal { display: flex; gap: 1.25rem; }
+    .footer-legal a { font-size: 0.46rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(245,242,235,0.18); text-decoration: none; transition: color 0.2s; }
+    .footer-legal a:hover { color: rgba(245,242,235,0.5); }
+
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(26px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-up { animation: fadeUp .95s ease both; }
+    .d1 { animation-delay: .1s; } .d2 { animation-delay: .25s; } .d3 { animation-delay: .42s; } .d4 { animation-delay: .58s; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .cat, .tail, .head, .ear-r, .eye, .pupils, .paw-arm, .glint, .pendulum,
+      .hand-hr, .hand-min, .hand-sec, .glow, .shadow, .q { animation: none; }
+      .q { opacity: .6; }
+      .glint { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="nav-root" id="navbar">
+  <div class="nav-inner">
+    <div class="hidden md:flex items-center gap-8">
+      <a href="/products" class="nav-link">Collection</a>
+      <a href="/orders" class="nav-link">Orders</a>
+      <a href="/about" class="nav-link">About</a>
+      <a href="/contact" class="nav-link">Contact</a>
+    </div>
+
+    <a href="/home" class="nav-logo md:absolute md:left-1/2 md:-translate-x-1/2">Velmora Chroné</a>
+
+    <div class="flex items-center gap-2 md:gap-3 ml-auto md:ml-0">
+      <a href="/profile" class="nav-icon-btn" aria-label="Profile">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </a>
+      <a href="/wallet" class="nav-icon-btn" aria-label="Wallet">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12V8H6a2 2 0 0 1 0-4h14v4"/><path d="M4 6v12a2 2 0 0 0 2 2h14v-4"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg>
+      </a>
+      <a href="/wishlist" class="nav-icon-btn" aria-label="Wishlist">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      </a>
+      <a href="/cart" class="nav-icon-btn" aria-label="Cart">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <span class="cart-badge" id="cartBadge">0</span>
+      </a>
+      <button class="hamburger md:hidden" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="/products" class="nav-link">Collection</a>
+    <a href="/orders" class="nav-link">Orders</a>
+    <a href="/about" class="nav-link">About</a>
+    <a href="/contact" class="nav-link">Contact</a>
+    <a href="/profile" class="nav-link">My Profile</a>
+    <a href="/cart" class="nav-link">Cart</a>
+  </div>
+</nav>
+
+<main class="nf-main">
+  <div class="nf-wrap">
+    <p class="nf-eyebrow fade-up d1">Error 404</p>
+
+    <svg class="nf-scene fade-up d2" viewBox="0 0 300 310" fill="none" role="img" aria-label="A monocled black cat whose tail curls into a question mark, watching a swinging pocket watch">
+      <defs>
+        <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#e8d49a"/>
+          <stop offset="50%" stop-color="#c9a96e"/>
+          <stop offset="100%" stop-color="#a8873d"/>
+        </linearGradient>
+        <linearGradient id="ground" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="rgba(201,169,110,0)"/>
+          <stop offset="50%" stop-color="rgba(201,169,110,0.45)"/>
+          <stop offset="100%" stop-color="rgba(201,169,110,0)"/>
+        </linearGradient>
+      </defs>
+
+      <text class="q" x="92" y="76" font-size="28" style="animation-delay:0s">?</text>
+      <text class="q" x="266" y="70" font-size="24" style="animation-delay:2.2s">?</text>
+      <text class="q" x="270" y="210" font-size="20" style="animation-delay:1.2s">?</text>
+
+      <line x1="30" y1="300" x2="270" y2="300" stroke="url(#ground)" stroke-width="1"/>
+      <ellipse class="shadow" cx="120" cy="298" rx="70" ry="7" fill="rgba(0,0,0,0.45)"/>
+
+      <!-- swinging pocket watch -->
+      <g class="pendulum">
+        <circle cx="215" cy="16" r="2.5" fill="url(#gold)"/>
+        <line x1="215" y1="16" x2="215" y2="94" stroke="url(#gold)" stroke-width="1.4" stroke-dasharray="2 3"/>
+        <circle class="glow" cx="215" cy="130" r="42" fill="rgba(201,169,110,0.12)"/>
+        <circle cx="215" cy="98" r="4.5" stroke="url(#gold)" stroke-width="1.6" fill="none"/>
+        <rect x="212" y="101" width="6" height="6" rx="1.5" fill="url(#gold)"/>
+        <circle cx="215" cy="130" r="28" fill="#1a1a18" stroke="url(#gold)" stroke-width="3"/>
+        <circle cx="215" cy="130" r="23" fill="#0d0d0c" stroke="rgba(201,169,110,0.3)" stroke-width="0.8"/>
+        <g stroke="url(#gold)" stroke-width="1.5" stroke-linecap="round">
+          <line x1="215" y1="109" x2="215" y2="113"/>
+          <line x1="236" y1="130" x2="232" y2="130"/>
+          <line x1="215" y1="151" x2="215" y2="147"/>
+          <line x1="194" y1="130" x2="198" y2="130"/>
+        </g>
+        <g class="hand-hr"><line x1="215" y1="130" x2="215" y2="118" stroke="#f5f2eb" stroke-width="2.4" stroke-linecap="round"/></g>
+        <g class="hand-min"><line x1="215" y1="130" x2="215" y2="112" stroke="#f5f2eb" stroke-width="1.6" stroke-linecap="round"/></g>
+        <g class="hand-sec"><line x1="215" y1="136" x2="215" y2="110" stroke="#c9a96e" stroke-width="0.9" stroke-linecap="round"/></g>
+        <circle cx="215" cy="130" r="3" fill="url(#gold)"/>
+        <circle cx="215" cy="130" r="1.1" fill="#111110"/>
+      </g>
+
+      <g class="cat">
+        <!-- tail: curls into a question-mark hook, gold-tipped -->
+        <g class="tail">
+          <path d="M90 282 C44 290 28 244 44 220 C58 200 84 204 78 182" stroke="#34342f" stroke-width="13" stroke-linecap="round"/>
+          <circle cx="78" cy="181" r="6.5" fill="url(#gold)"/>
+        </g>
+
+        <!-- body -->
+        <ellipse cx="130" cy="244" rx="44" ry="50" fill="#34342f"/>
+        <ellipse cx="98" cy="264" rx="26" ry="28" fill="#2c2c27"/>
+        <rect x="118" y="262" width="16" height="30" rx="8" fill="#3d3d37"/>
+        <ellipse cx="127" cy="292" rx="15" ry="7" fill="#1a1a18" stroke="#c9a96e" stroke-width="1.2"/>
+        <ellipse cx="98" cy="292" rx="16" ry="7" fill="#1a1a18" stroke="#c9a96e" stroke-width="1.2"/>
+
+        <!-- raised paw batting at the watch -->
+        <g class="paw-arm">
+          <line x1="152" y1="214" x2="184" y2="166" stroke="#3d3d37" stroke-width="15" stroke-linecap="round"/>
+          <circle cx="187" cy="162" r="9" fill="#46463f"/>
+          <circle cx="183" cy="156" r="2" fill="#c9a96e" opacity=".7"/>
+          <circle cx="189" cy="155" r="2" fill="#c9a96e" opacity=".7"/>
+        </g>
+
+        <!-- gold bow tie -->
+        <g>
+          <path d="M130 204 L112 194 L112 214 Z" fill="url(#gold)"/>
+          <path d="M130 204 L148 194 L148 214 Z" fill="url(#gold)"/>
+          <circle cx="130" cy="204" r="4" fill="#a8873d"/>
+        </g>
+
+        <g class="head">
+          <!-- ears -->
+          <polygon points="98,142 100,104 126,128" fill="#34342f"/>
+          <polygon points="104,134 105,114 119,128" fill="rgba(201,169,110,0.35)"/>
+          <g class="ear-r">
+            <polygon points="162,142 160,104 134,128" fill="#34342f"/>
+            <polygon points="156,134 155,114 141,128" fill="rgba(201,169,110,0.35)"/>
+          </g>
+
+          <ellipse cx="130" cy="158" rx="38" ry="32" fill="#34342f"/>
+
+          <!-- eyes -->
+          <g class="eye">
+            <ellipse cx="117" cy="156" rx="8" ry="9" fill="#e0c47e"/>
+            <g class="pupils"><ellipse cx="118" cy="156" rx="2.4" ry="7" fill="#111110"/></g>
+          </g>
+          <g class="eye">
+            <ellipse cx="143" cy="156" rx="8" ry="9" fill="#e0c47e"/>
+            <g class="pupils"><ellipse cx="144" cy="156" rx="2.4" ry="7" fill="#111110"/></g>
+          </g>
+
+          <!-- monocle on the right eye, chained to the bow tie -->
+          <circle cx="143" cy="156" r="13" stroke="url(#gold)" stroke-width="2" fill="rgba(201,169,110,0.08)"/>
+          <path d="M153 166 C168 186 160 202 148 206" stroke="url(#gold)" stroke-width="1.1" stroke-dasharray="2 2.5" fill="none"/>
+          <path class="glint" d="M149 148 l1.6 3.4 3.4 1.6 -3.4 1.6 -1.6 3.4 -1.6 -3.4 -3.4 -1.6 3.4 -1.6 z" fill="#fff6d6"/>
+
+          <!-- nose, mouth, whiskers -->
+          <path d="M126 168 L134 168 L130 173 Z" fill="#d39c8a"/>
+          <path d="M130 173 Q130 178 124 179 M130 173 Q130 178 136 179" stroke="#c9a96e" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+          <g stroke="rgba(245,242,235,0.45)" stroke-width="0.9" stroke-linecap="round">
+            <line x1="108" y1="170" x2="86" y2="166"/>
+            <line x1="108" y1="175" x2="86" y2="177"/>
+            <line x1="152" y1="170" x2="174" y2="166"/>
+            <line x1="152" y1="175" x2="174" y2="177"/>
+          </g>
+        </g>
+      </g>
+    </svg>
+
+    <span class="nf-num fade-up d2">404</span>
+
+    <h1 class="nf-title fade-up d3">This moment is <em>lost in time</em></h1>
+    <div class="nf-rule fade-up d3"></div>
+    <p class="nf-sub fade-up d3">The page you're looking for has moved, been retired, or never existed. Let us guide you back to the collection.</p>
+
+    <div class="nf-btns fade-up d4">
+      <a href="/home" class="btn-gold">
+        Back to Home
+        <span class="btn-arrow">
+          <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </span>
+      </a>
+      <a href="/products" class="btn-outline">Explore the Collection</a>
+    </div>
+
+    <p class="nf-path fade-up d4"><span>Requested:</span> <%= typeof requestedUrl !== 'undefined' ? requestedUrl : '' %></p>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="footer-bottom">
+    <span class="footer-copy">&copy; <%= new Date().getFullYear() %> Velmora Chroné. All rights reserved.</span>
+    <div class="footer-legal">
+      <a href="#">Privacy Policy</a><a href="#">Terms of Service</a><a href="#">Accessibility</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+const navbar = document.getElementById('navbar');
+window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', scrollY > 30), { passive: true });
+
+const hamburger = document.getElementById('hamburger');
+const mobileMenu = document.getElementById('mobileMenu');
+hamburger.addEventListener('click', () => {
+  hamburger.classList.toggle('open');
+  mobileMenu.classList.toggle('open');
+});
+
+fetch('/api/cart/count', { headers: { 'Accept': 'application/json' } })
+  .then(r => r.json())
+  .then(d => { if (d.count !== undefined) document.getElementById('cartBadge').textContent = d.count; })
+  .catch(() => {});
+</script>
+</body>
+</html>

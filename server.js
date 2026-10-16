@@ -89,7 +89,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// SSE
 app.get('/sse/products', (req, res) => addClient(res));
 
 app.set('view engine', 'ejs');
@@ -98,6 +97,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/',       userRoutes);
 app.use('/admin',  adminRoutes);
+
+app.use((req, res) => {
+  res.status(404).render('user/404', { requestedUrl: req.originalUrl });
+});
 
 const PORT = process.env.PORT || 3000;
 httpServer.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));

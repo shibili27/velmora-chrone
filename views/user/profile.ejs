@@ -76,6 +76,35 @@
     @keyframes orbFloat { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-20px) scale(1.05); } }
     .page-hero-scan { position: absolute; top: 0; left: -100%; width: 60%; height: 100%; background: linear-gradient(90deg, transparent, rgba(201,169,110,0.025), transparent); animation: heroScan 6s ease-in-out infinite; pointer-events: none; z-index: 0; }
     @keyframes heroScan { 0% { left: -60%; } 100% { left: 140%; } }
+
+    /* ── CAT HERO ANIMATION ── */
+    .cat-stage { width: 200px; height: 140px; margin: 0 auto; position: relative; }
+    .cat-stage svg { width: 100%; height: 100%; overflow: visible; }
+    .cat-tail { transform-origin: 138px 112px; animation: tailSway 2.6s ease-in-out infinite; }
+    @keyframes tailSway { 0%,100% { transform: rotate(-12deg); } 50% { transform: rotate(18deg); } }
+    .cat-head { transform-origin: 100px 78px; animation: headTilt 5s ease-in-out infinite; }
+    @keyframes headTilt { 0%,40%,100% { transform: rotate(0deg); } 50%,60% { transform: rotate(-5deg); } 70% { transform: rotate(3deg); } }
+    .cat-ear-l { transform-origin: 78px 50px; animation: earTwitch 4.5s ease-in-out infinite; }
+    @keyframes earTwitch { 0%,88%,100% { transform: rotate(0); } 92% { transform: rotate(-10deg); } 96% { transform: rotate(4deg); } }
+    .cat-eye { transform-box: fill-box; transform-origin: center; animation: catBlink 4s infinite; }
+    @keyframes catBlink { 0%,92%,100% { transform: scaleY(1); } 95% { transform: scaleY(0.08); } }
+    .cat-pupil { animation: lookAround 6s ease-in-out infinite; }
+    @keyframes lookAround { 0%,30%,100% { transform: translateX(0); } 40%,55% { transform: translateX(2.5px); } 65%,80% { transform: translateX(-2.5px); } }
+    .cat-whisker { transform-box: fill-box; animation: whiskerWiggle 3s ease-in-out infinite; }
+    .cat-whisker.l { transform-origin: right center; }
+    .cat-whisker.r { transform-origin: left center; animation-delay: .2s; }
+    @keyframes whiskerWiggle { 0%,100% { transform: rotate(0); } 50% { transform: rotate(3deg); } }
+    .cat-body { transform-origin: 100px 130px; animation: breathe 3s ease-in-out infinite; }
+    @keyframes breathe { 0%,100% { transform: scaleY(1); } 50% { transform: scaleY(1.03); } }
+    .cat-yarn { transform-origin: 40px 118px; animation: yarnRoll 5s ease-in-out infinite; }
+    @keyframes yarnRoll { 0%,100% { transform: translateX(0) rotate(0); } 50% { transform: translateX(-10px) rotate(-120deg); } }
+    .cat-zzz { font-family: 'Cormorant Garamond', serif; font-style: italic; fill: rgba(201,169,110,0.5); opacity: 0; animation: floatZ 4s ease-in infinite; }
+    .cat-zzz.z2 { animation-delay: 1.3s; }
+    .cat-zzz.z3 { animation-delay: 2.6s; }
+    @keyframes floatZ { 0% { opacity: 0; transform: translate(0,0); } 20% { opacity: .9; } 100% { opacity: 0; transform: translate(14px,-26px); } }
+    .cat-caption { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.15rem; color: #edd99e; margin-top: .6rem; letter-spacing: .02em; }
+    @media (prefers-reduced-motion: reduce) { .cat-stage * { animation: none !important; } }
+
     .rule { height: 1px; background: linear-gradient(90deg, transparent, rgba(201,169,110,0.2), transparent); }
     .watch-divider { background: #0a0a09; border-top: 1px solid rgba(201,169,110,0.07); border-bottom: 1px solid rgba(201,169,110,0.07); padding: 1.1rem 2rem; display: flex; align-items: center; justify-content: center; gap: 2.5rem; position: relative; overflow: hidden; }
     .watch-divider::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(201,169,110,0.04) 0%, transparent 65%); pointer-events: none; }
@@ -391,7 +420,7 @@
   </div>
 </nav>
 
-<!-- ══ PAGE HERO ══ -->
+<!-- ══ PAGE HERO (CAT ANIMATION) ══ -->
 <div class="page-hero">
   <div class="hero-particles" id="heroParticles"></div>
   <div class="hero-orb orb1"></div>
@@ -399,7 +428,60 @@
   <div class="page-hero-scan"></div>
   <div class="page-hero-inner">
     <p class="page-hero-tag fade-up d1">My Account</p>
-    <h1 class="page-hero-title fade-up d2">My<em>Profile</em></h1>
+
+    <div class="cat-stage fade-up d2" role="img" aria-label="Animated cat">
+      <svg viewBox="0 0 200 140" fill="none" stroke="#c9a96e" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+
+        <!-- floor line -->
+        <line x1="20" y1="132" x2="180" y2="132" stroke="rgba(201,169,110,0.25)" stroke-width="1"/>
+
+        <!-- yarn ball -->
+        <g class="cat-yarn">
+          <circle cx="40" cy="120" r="12" fill="rgba(201,169,110,0.08)"/>
+          <path d="M30 116 Q40 108 50 118 M29 122 Q41 112 51 123 M33 129 Q42 120 49 128" stroke-width="1"/>
+        </g>
+
+        <!-- tail -->
+        <g class="cat-tail">
+          <path d="M138 112 C165 112 172 90 160 72 C155 65 162 58 168 64" stroke-width="3.2"/>
+        </g>
+
+        <!-- body -->
+        <g class="cat-body">
+          <path d="M72 128 C62 100 78 84 100 84 C122 84 138 100 128 128 Z" fill="#161614"/>
+          <path d="M88 128 C88 116 92 108 100 108 C108 108 112 116 112 128" stroke-width="1" opacity=".5"/>
+        </g>
+
+        <!-- head -->
+        <g class="cat-head">
+          <g class="cat-ear-l"><path d="M76 62 L74 40 L92 54 Z" fill="#161614"/><path d="M79 56 L78 47 L86 53" stroke-width="1" opacity=".6"/></g>
+          <path d="M124 62 L126 40 L108 54 Z" fill="#161614"/>
+          <path d="M121 56 L122 47 L114 53" stroke-width="1" opacity=".6"/>
+          <ellipse cx="100" cy="68" rx="26" ry="22" fill="#161614"/>
+
+          <!-- eyes -->
+          <g class="cat-eye"><ellipse cx="90" cy="66" rx="5" ry="6" fill="#0d0d0c"/><ellipse class="cat-pupil" cx="90" cy="66" rx="1.8" ry="4.5" fill="#c9a96e" stroke="none"/></g>
+          <g class="cat-eye"><ellipse cx="110" cy="66" rx="5" ry="6" fill="#0d0d0c"/><ellipse class="cat-pupil" cx="110" cy="66" rx="1.8" ry="4.5" fill="#c9a96e" stroke="none"/></g>
+
+          <!-- nose & mouth -->
+          <path d="M97.5 74 L102.5 74 L100 77 Z" fill="#c9a96e" stroke="none"/>
+          <path d="M100 77 L100 80 M100 80 Q96 83 93 80 M100 80 Q104 83 107 80" stroke-width="1.1"/>
+
+          <!-- whiskers -->
+          <g class="cat-whisker l"><path d="M82 77 L62 72 M82 80 L62 82" stroke-width="1" opacity=".7"/></g>
+          <g class="cat-whisker r"><path d="M118 77 L138 72 M118 80 L138 82" stroke-width="1" opacity=".7"/></g>
+        </g>
+
+        <!-- zzz -->
+        <text class="cat-zzz"    x="122" y="40" font-size="10">z</text>
+        <text class="cat-zzz z2" x="128" y="34" font-size="13">z</text>
+        <text class="cat-zzz z3" x="134" y="28" font-size="16">Z</text>
+      </svg>
+    </div>
+
+    <!-- ▼ CHANGED: shows the user's name under the cat -->
+    <p class="cat-caption fade-up d2">Hi, <%= user.name %></p>
+
     <div class="hero-clock-row fade-up d3">
       <div class="clock-line"></div>
       <span id="liveTime" style="font-family:'Jost',sans-serif;font-size:0.42rem;letter-spacing:0.32em;text-transform:uppercase;color:rgba(201,169,110,0.45);font-variant-numeric:tabular-nums;min-width:92px;display:inline-block;text-align:center;"></span>
